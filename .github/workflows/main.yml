@@ -1,0 +1,22 @@
+name: 🚀 Deploy website Server
+
+on:
+    workflow_dispatch: # Manual trigger event
+
+jobs:
+    web-deploy:
+        name: 🎉 Deploy
+        runs-on: ubuntu-latest
+        steps:
+            - name: 🚚 Get latest code
+              uses: actions/checkout@v3
+
+            - name: 📂 Sync files
+              uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+              with:
+                  server: 88.198.34.212
+                  username: ${{ secrets.ftp_username }}
+                  password: ${{ secrets.ftp_password }}
+                  server-dir: /
+              env:
+                  DEBUG: 1
