@@ -15,8 +15,8 @@ jobs:
               uses: SamKirkland/FTP-Deploy-Action@v4.3.4
               with:
                   server: 88.198.34.212
-                  username: ${{ secrets.ftp_username }}
-                  password: ${{ secrets.ftp_password }}
+                  username: "gi-mis@gi-mis.ekopiidev.com"
+                  password: "!szQCu1aZP8B"
                   server-dir: /
               env:
                   DEBUG: 1
