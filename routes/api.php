@@ -3,15 +3,20 @@
 use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\Auth\UserAuthController;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductModelController;
 use App\Http\Controllers\User\UserController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
 use App\Http\Controllers\Admin\SupplierController;
+use App\Http\Controllers\Admin\UnitController;
+use App\Models\Unit;
 
 Route::resource('suppliers', SupplierController::class);
 Route::resource('models', ProductModelController::class);
+Route::resource('category', CategoryController::class);
+Route::resource('units', UnitController::class);
 
 // Admin Auth Routes
 Route::prefix('admin')->group(function () {

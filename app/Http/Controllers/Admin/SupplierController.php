@@ -14,13 +14,46 @@ class SupplierController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    // public function index()
+    // {
+    //     $suppliers = Supplier::all()->map(function ($supplier) {
+    //         $supplier->photo = $supplier->photo ? asset('storage/' . $supplier->photo) : null;
+    //         return $supplier;
+    //     });
+    //     return response()->json(['suppliers' => $suppliers, 'total' => $suppliers->count()]);
+    // }
+
+
+    public function index(Request $request)
     {
-        $suppliers = Supplier::all()->map(function ($supplier) {
-            $supplier->photo = $supplier->photo ? asset('storage/' . $supplier->photo) : null;
-            return $supplier;
-        });
-        return response()->json(['suppliers' => $suppliers, 'total' => $suppliers->count()]);
+        // Validate incoming request parameters
+
+        $request->validate([
+            'search'       => 'nullable|string|max:255',
+            'itemsPerPage' => 'nullable|integer|min:1|max:100',
+        ]);
+
+        $query = Supplier::query();
+
+        // Search functionality
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%')
+                ->orWhere('description', 'like', '%' . $request->search . '%');
+        }
+
+        // Sorting
+        if ($request->filled('sortBy')) {
+            $query->orderBy($request->sortBy, $request->sortDesc ? 'desc' : 'asc');
+        }
+
+        // Pagination
+        $itemsPerPage = $request->input('itemsPerPage', 15); // Default items per page
+        $suppliers    = $query->paginate($itemsPerPage);
+
+        return response()->json([
+            'suppliers' => $suppliers->items(),
+            'total'     => $suppliers->total(), // Total count for pagination
+        ]);
     }
 
 

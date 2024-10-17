@@ -13,35 +13,39 @@
             <li class="nav-item">
                 <a
                     class="nav-link collapsed"
-                    :class="{ show: isProductRoute }"
+                    :class="{ show: isMechineRoute }"
                     data-bs-target="#components-nav"
                     data-bs-toggle="collapse"
                     href="#"
                 >
-                    <i class="bi bi-menu-button-wide"></i><span>Products</span
+                    <i class="bi bi-menu-button-wide"></i><span>Mechines</span
                     ><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
                 <ul
                     id="components-nav"
                     class="nav-content collapse"
-                    :class="{ show: isProductRoute }"
+                    :class="{ show: isMechineRoute }"
                     data-bs-parent="#sidebar-nav"
                 >
                     <li>
-                        <router-link to="/admin/contact">
-                            <i class="bi bi-circle"></i><span>Add Product</span>
+                        <router-link to="#">
+                            <i class="bi bi-circle"></i><span>Add Mechine</span>
                         </router-link>
                     </li>
                     <li>
                         <a href="#">
                             <i class="bi bi-circle"></i
-                            ><span>All Products </span>
+                            ><span>All Mechines </span>
                         </a>
                     </li>
                     <li>
-                        <a href="#">
+                        <router-link
+                            :to="{ name: 'CategoryIndex' }"
+                            active-class="active"
+                            :class="{ active: isCategoryRoute }"
+                        >
                             <i class="bi bi-circle"></i><span>Category</span>
-                        </a>
+                        </router-link>
                     </li>
                     <li>
                         <router-link
@@ -53,9 +57,13 @@
                         </router-link>
                     </li>
                     <li>
-                        <a href="components-buttons.html">
+                        <router-link
+                            :to="{ name: 'UnitIndex' }"
+                            active-class="active"
+                            :class="{ active: isUnitRoute }"
+                        >
                             <i class="bi bi-circle"></i><span>Unit</span>
-                        </a>
+                        </router-link>
                     </li>
                     <li>
                         <router-link
@@ -293,8 +301,8 @@ import { useRoute } from "vue-router";
 // Access the current route
 const route = useRoute();
 
-// Check if the current route is part of the product-related routes
-const isProductRoute = computed(() => {
+// Check if the current route is part of the Mechine-related routes
+const isMechineRoute = computed(() => {
     return [
         "ModelIndex",
         "ModelCreate",
@@ -302,6 +310,12 @@ const isProductRoute = computed(() => {
         "SupplierIndex",
         "SupplierCreate",
         "SupplierEdit",
+        "CategoryIndex",
+        "CategoryCreate",
+        "CategoryEdit",
+        "UnitIndex",
+        "UnitCreate",
+        "UnitEdit",
     ].includes(route.name);
 });
 
@@ -313,6 +327,12 @@ const isModelRoute = computed(() =>
 // Check if the current route is for a specific supplier-related route
 const isSupplierRoute = computed(() =>
     ["SupplierIndex", "SupplierCreate", "SupplierEdit"].includes(route.name)
+);
+const isCategoryRoute = computed(() =>
+    ["CategoryIndex", "CategoryCreate", "CategoryEdit"].includes(route.name)
+);
+const isUnitRoute = computed(() =>
+    ["UnitIndex", "UnitCreate", "UnitEdit"].includes(route.name)
 );
 </script>
 

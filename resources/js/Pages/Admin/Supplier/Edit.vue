@@ -51,10 +51,30 @@
                     <v-alert v-if="serverError" type="error" class="mt-4">
                         {{ serverError }}
                     </v-alert>
+                    <v-row class="mt-4">
+                        <v-col cols="12" class="text-right">
+                            <v-btn
+                                type="button"
+                                color="secondary"
+                                class="mr-3"
+                                @click="resetForm"
+                            >
+                                Reset Form
+                            </v-btn>
+                            <v-btn
+                                type="submit"
+                                color="primary"
+                                :disabled="!valid || loading"
+                                :loading="loading"
+                            >
+                                Update Supplier
+                            </v-btn>
+                        </v-col>
+                    </v-row>
                 </v-form>
             </v-card-text>
 
-            <v-card-actions>
+            <!-- <v-card-actions>
                 <v-btn
                     color="primary"
                     @click="updateSupplier"
@@ -64,7 +84,7 @@
                 <v-btn text @click="$router.push({ name: 'SupplierIndex' })"
                     >Cancel</v-btn
                 >
-            </v-card-actions>
+            </v-card-actions> -->
         </v-card>
     </v-container>
 </template>
@@ -83,6 +103,7 @@ export default {
                 description: "",
             },
             valid: false,
+            loading: false,
             errors: {}, // Initialize errors as an empty object
             serverError: null,
             rules: {
@@ -107,25 +128,31 @@ export default {
         async updateSupplier() {
             this.errors = {}; // Reset errors before submission
             this.serverError = null; // Reset server error
+            this.loading = true;
 
             // Perform client-side validation
             if (this.$refs.form.validate()) {
-                try {
-                    await this.$axios.put(
-                        `/suppliers/${this.id}`,
-                        this.supplier
-                    );
-                    this.$router.push({ name: "SupplierIndex" }); // Redirect after update
-                } catch (error) {
-                    if (error.response && error.response.status === 422) {
-                        // Handle validation errors from the backend
-                        this.errors = error.response.data.errors || {};
-                    } else {
-                        // Handle other types of errors
-                        this.serverError =
-                            "An error occurred. Please try again.";
+                setTimeout(async () => {
+                    try {
+                        await this.$axios.put(
+                            `/suppliers/${this.id}`,
+                            this.supplier
+                        );
+                        this.$router.push({ name: "SupplierIndex" }); // Redirect after update
+                    } catch (error) {
+                        if (error.response && error.response.status === 422) {
+                            // Handle validation errors from the backend
+                            this.errors = error.response.data.errors || {};
+                        } else {
+                            // Handle other types of errors
+                            this.serverError =
+                                "An error occurred. Please try again.";
+                        }
+                    } finally {
+                        // Stop loading after the request (or simulated time) is done
+                        this.loading = false;
                     }
-                }
+                }, 1000);
             }
         },
     },

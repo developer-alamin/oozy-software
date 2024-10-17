@@ -3,30 +3,29 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\ProductModel;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
-class ProductModelController extends Controller
+class CategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-    // Validate incoming request parameters
+        // Validate incoming request parameters
 
         $request->validate([
             'search'       => 'nullable|string|max:255',
             'itemsPerPage' => 'nullable|integer|min:1|max:100',
         ]);
 
-        $query = ProductModel::query();
+        $query = Category::query();
 
         // Search functionality
         if ($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->search . '%')
-                ->orWhere('model_number', 'like', '%' . $request->search . '%')
                 ->orWhere('description', 'like', '%' . $request->search . '%');
         }
 
@@ -37,13 +36,14 @@ class ProductModelController extends Controller
 
         // Pagination
         $itemsPerPage = $request->input('itemsPerPage', 15); // Default items per page
-        $models        = $query->paginate($itemsPerPage);
+        $categories   = $query->paginate($itemsPerPage);
 
         return response()->json([
-            'models' => $models->items(),
-            'total'  => $models->total(), // Total count for pagination
+            'categories' => $categories->items(),
+            'total'      => $categories->total(), // Total count for pagination
         ]);
     }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -57,16 +57,17 @@ class ProductModelController extends Controller
      */
     public function store(Request $request)
     {
-        $validatedData = $request->validate(ProductModel::validationRules());
+        $validatedData = $request->validate(Category::validationRules());
         
-        ProductModel::create($validatedData);
-        return response()->json(['success' => true], 201);
+        Category::create($validatedData);
+        return response()->json(['success' => true,'message' => 'Category created successfully.'], 201);
     }
+
 
     /**
      * Display the specified resource.
      */
-    public function show(ProductModel $productModel)
+    public function show(Category $category)
     {
         //
     }
@@ -74,57 +75,48 @@ class ProductModelController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(ProductModel $model)
+    public function edit(Category $category)
     {
-        // Returning the product model for editing (e.g., in a JSON response for a frontend app)
         return response()->json([
             'success' => true,
-            'model' => $model
+            'category' => $category
         ], Response::HTTP_OK);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    
-
-    public function update(Request $request, ProductModel $model)
+    public function update(Request $request, Category $category)
     {
-    // Validate the request data
-        $validatedData = $request->validate([
-            'name'         => 'required|string|max:255',
-            'model_number' => 'required|string|max:255|unique:product_models,model_number,' . $model->id, // Ignore current model's ID for uniqueness check
-            'description'  => 'nullable|string',
-            'status'       => 'nullable',
-        ]);
+        $validatedData = $request->validate(Category::validationRules());
 
         // Update the product model with the validated data
-        $model->update($validatedData);
+        $category->update($validatedData);
 
         // Return a success response
         return response()->json([
             'success' => true,
-            'message' => 'Product model updated successfully.',
-            'model' => $model
+            'message' => 'Category updated successfully.',
+            // 'category' => $category
         ]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ProductModel $model)
+    public function destroy(Category $category)
     {
         try {
             // Delete the supplier
-            $model->delete();
+            $category->delete();
             return response()->json([
                 'success' => true,
-                'message' => 'Model deleted successfully.'
+                'message' => 'Category deleted successfully.'
             ], Response::HTTP_OK);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error deleting model: ' . $e->getMessage()
+                'message' => 'Error deleting Category: ' . $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
