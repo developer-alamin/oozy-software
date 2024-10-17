@@ -1,0 +1,16 @@
+                Sider Menu 
+============================================
+
+1.Dashboard
+2.Supplier
+3.Machines
+4.Parts
+5.Category
+6.Model
+7.Stock
+8.Reports
+9.Users Role & Permission
+11.Technician Tier 
+12.Factory
+13.Production
+14.Settings
