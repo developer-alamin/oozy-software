@@ -1,24 +1,8 @@
-<!-- <template>
-    <v-container>
-        <supplier-index ref="SupplierIndex" />
-    </v-container>
-</template>
-
-<script>
-import SupplierIndex from "../../Components/Admin/Supplier/SupplierIndex.vue";
-
-export default {
-    components: {
-        SupplierIndex,
-    },
-};
-</script> -->
-
 <template>
-    <v-card outlined class="mx-auto my-5" max-width="900">
+    <v-card outlined class="mx-auto my-5">
         <v-card-title class="pt-5">
             <v-row>
-                <v-col cols="6"><span>Supplier List</span></v-col>
+                <v-col cols="6"><span>Categories List</span></v-col>
 
                 <v-col cols="6" class="d-flex">
                     <v-text-field
@@ -34,8 +18,8 @@ export default {
                         single-line
                         clearable
                     ></v-text-field>
-                    <v-btn @click="createSupplier" color="primary"
-                        >Add Supplier</v-btn
+                    <v-btn @click="createCategory" color="primary"
+                        >Add Category</v-btn
                     >
                 </v-col>
             </v-row>
@@ -43,13 +27,45 @@ export default {
 
         <v-data-table
             :headers="headers"
-            :items="suppliers"
+            :items="categories"
             :items-per-page="itemsPerPage"
             :search="search"
             :loading="loading"
+            loading-text="Loading... Please wait"
             class="elevation-1"
             @update:options="updateOptions"
         >
+            <template v-slot:item.status="{ item }">
+                <v-chip
+                    :color="
+                        item.status == 'true' || item.status == true
+                            ? 'green'
+                            : 'red'
+                    "
+                    :text="
+                        item.status == 'true' || item.status == true
+                            ? 'Active'
+                            : 'In-active'
+                    "
+                    class="text-uppercase"
+                    size="small"
+                    label
+                ></v-chip>
+                <!-- <span
+                    :class="{
+                        'text-green':
+                            item.status == 'true' || item.status == true,
+                        'text-red':
+                            item.status == 'false' || item.status == false,
+                    }"
+                >
+                    {{
+                        item.status == "true" || item.status == true
+                            ? "Active"
+                            : "In-Active"
+                    }}
+                </span> -->
+            </template>
             <template v-slot:item.actions="{ item }">
                 <v-icon @click="editSupplier(item.id)" class="mr-2"
                     >mdi-pencil</v-icon
@@ -57,6 +73,14 @@ export default {
                 <v-icon @click="deleteSupplier(item.id)" color="red"
                     >mdi-delete</v-icon
                 >
+            </template>
+            <!-- Add pagination controls -->
+            <template v-slot:footer>
+                <v-pagination
+                    v-model="pagination.page"
+                    :length="totalPages"
+                    @input="fetchCategories"
+                ></v-pagination>
             </template>
         </v-data-table>
     </v-card>
@@ -66,7 +90,7 @@ export default {
 export default {
     data() {
         return {
-            suppliers: [],
+            categories: [],
             search: "",
             itemsPerPage: 15,
             pagination: {
@@ -78,41 +102,38 @@ export default {
             sortDesc: false, // Default sort direction
             headers: [
                 {
-                    title: "Name",
+                    title: "Category Name",
                     value: "name",
                     sortable: true, // Enable sorting
                     align: "start",
                 },
+
                 {
-                    title: "Email",
-                    value: "email",
-                    sortable: true, // Enable sorting
-                    align: "start",
+                    title: "Description",
+                    value: "description",
+                    sortable: false,
                 },
                 {
-                    title: "Phone",
-                    value: "phone",
+                    title: "Status",
+                    value: "status",
                     sortable: true, // Enable sorting
-                    align: "start",
                 },
                 {
-                    title: "Contact Person",
-                    value: "contact_person",
-                    sortable: true, // Enable sorting
-                    align: "start",
+                    title: "Actions",
+                    value: "actions",
+                    sortable: false,
                 },
-                { title: "Actions", value: "actions", sortable: false },
             ],
         };
     },
     created() {
-        this.fetchSuppliers();
+        this.fetchCategories();
     },
     methods: {
-        async fetchSuppliers() {
+        async fetchCategories() {
             this.loading = true; // Start loading
             try {
-                const response = await this.$axios.get("/suppliers", {
+                const response = await this.$axios.get("/category", {
                     params: {
                         search: this.search,
                         itemsPerPage: this.itemsPerPage,
@@ -121,47 +142,51 @@ export default {
                         sortDesc: this.sortDesc, // Include sort direction
                     },
                 });
-                this.suppliers = response.data.suppliers;
+                console.log(response.data);
+
+                this.categories = response.data.categories;
+                this.totalPages = Math.ceil(
+                    response.data.total / this.itemsPerPage
+                ); // Calculate total pages
                 this.loading = false; // Stop loading
             } catch (error) {
-                console.error("Error fetching suppliers:", error);
+                console.error("Error fetching categories:", error);
                 this.loading = false; // Stop loading even on error
             }
         },
         updateOptions(options) {
-            // Ensure sortBy is a string and sortDesc is a boolean
             this.itemsPerPage = options.itemsPerPage;
-            this.pagination.page = 1;
-            this.fetchSuppliers(); // Refetch suppliers with updated options
+            this.pagination.page = 1; // Reset to the first page on items per page change
+            this.fetchCategories(); // Refetch categories with updated options
         },
-        createSupplier() {
-            this.$router.push({ name: "SupplierCreate" });
+        createCategory() {
+            this.$router.push({ name: "CategoryCreate" });
         },
         editSupplier(id) {
-            this.$router.push({ name: "SupplierEdit", params: { id } });
+            this.$router.push({ name: "CategoryEdit", params: { id } });
         },
         async deleteSupplier(id) {
             const confirmDelete = confirm(
-                "Are you sure you want to delete this supplier?"
+                "Are you sure you want to delete this category?"
             );
             if (confirmDelete) {
                 try {
-                    await this.$axios.delete(`/suppliers/${id}`);
-                    this.fetchSuppliers(); // Refresh the supplier list
+                    await this.$axios.delete(`/category/${id}`);
+                    this.fetchCategories(); // Refresh the categories list
                 } catch (error) {
-                    console.error("Error deleting supplier:", error);
+                    console.error("Error deleting categories:", error);
                 }
             }
         },
         // Method to handle sorting
-        sortSuppliers(column) {
+        sortCategories(column) {
             if (this.sortBy === column) {
                 this.sortDesc = !this.sortDesc; // Toggle sort direction
             } else {
                 this.sortBy = column; // Set new sort column
                 this.sortDesc = false; // Reset to ascending
             }
-            this.fetchSuppliers(); // Refetch units with the updated sort options
+            this.fetchCategories(); // Refetch categories with the updated sort options
         },
     },
 };

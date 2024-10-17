@@ -1,11 +1,11 @@
 <template>
-    <v-card outlined class="mx-auto my-5" max-width="900">
-        <v-card-title>Create Supplier</v-card-title>
+    <v-card outlined class="mx-auto my-5" max-width="">
+        <v-card-title>Create category</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="submit">
                 <!-- Name Field -->
                 <v-text-field
-                    v-model="supplier.name"
+                    v-model="category.name"
                     :rules="[rules.required]"
                     label="Name"
                     outlined
@@ -16,61 +16,28 @@
                     </template>
                 </v-text-field>
 
-                <!-- Email Field -->
-                <v-text-field
-                    v-model="supplier.email"
-                    label="Email"
-                    :rules="[rules.required, rules.email]"
-                    :error-messages="errors.email ? errors.email : ''"
-                    required
-                />
-
-                <!-- Phone Field -->
-                <v-text-field
-                    v-model="supplier.phone"
-                    label="Phone"
-                    :rules="[rules.required]"
-                    :error-messages="errors.phone ? errors.phone : ''"
-                    required
-                />
-
-                <!-- Contact Person Field -->
-                <v-text-field
-                    v-model="supplier.contact_person"
-                    label="Contact Person"
-                    :error-messages="
-                        errors.contact_person ? errors.contact_person : ''
-                    "
-                />
-
-                <!-- Address Field -->
-                <v-textarea
-                    v-model="supplier.address"
-                    label="Address"
-                    :error-messages="errors.address ? errors.address : ''"
-                />
-
                 <!-- Description Field -->
                 <v-textarea
-                    v-model="supplier.description"
+                    v-model="category.description"
                     label="Description"
                     :error-messages="
                         errors.description ? errors.description : ''
                     "
                 />
 
-                <!-- Photo Upload Field -->
-                <!-- <v-file-input
-                    v-model="photo"
-                    label="Upload Photo"
-                    accept="image/*"
-                    :error-messages="errors.photo ? errors.photo : ''"
-                    @change="onFileChange"
-                /> -->
+                <!-- Featured Checkbox -->
+                <v-checkbox
+                    v-model="category.status"
+                    label="Status"
+                    :error-messages="errors.status ? errors.status : ''"
+                >
+                </v-checkbox>
 
                 <!-- Action Buttons -->
                 <v-row class="mt-4">
                     <!-- Submit Button -->
+
+                    <!-- Reset Button -->
                     <v-col cols="12" class="text-right">
                         <v-btn
                             type="button"
@@ -87,7 +54,7 @@
                             :disabled="!valid || loading"
                             :loading="loading"
                         >
-                            Create Supplier
+                            Create category
                         </v-btn>
                     </v-col>
                 </v-row>
@@ -100,61 +67,54 @@
         {{ serverError }}
     </v-alert>
 </template>
-
 <script>
 export default {
     data() {
         return {
             valid: false,
-            loading: false,
-            supplier: {
+            loading: false, // Controls loading state of the button
+            category: {
                 name: "",
-                email: "",
-                phone: "",
-                contact_person: "",
-                address: "",
                 description: "",
+                status: false, // New property for checkbox
             },
-            photo: null,
-            errors: {}, // Initialize errors as an empty object
-            serverError: null,
+            errors: {}, // Stores validation errors
+            serverError: null, // Stores server-side error messages
             rules: {
                 required: (value) => !!value || "Required.",
-                email: (value) =>
-                    /.+@.+\..+/.test(value) || "E-mail must be valid.",
             },
         };
     },
     methods: {
         async submit() {
-            this.errors = {}; // Reset errors before submission
-            this.serverError = null; // Reset server error
-            this.loading = true;
+            // Reset errors and loading state before submission
+            this.errors = {};
+            this.serverError = null;
+            this.loading = true; // Start loading when submit is clicked
 
             const formData = new FormData();
-            Object.entries(this.supplier).forEach(([key, value]) => {
+            Object.entries(this.category).forEach(([key, value]) => {
                 formData.append(key, value);
             });
-            if (this.photo) {
-                formData.append("photo", this.photo);
-            }
+
+            // Simulate a 3-second loading time (e.g., for an API call)
             setTimeout(async () => {
                 try {
+                    // Assuming the actual API call here
                     const response = await this.$axios.post(
-                        "/suppliers",
+                        "/category",
                         formData
                     );
 
                     if (response.data.success) {
                         this.resetForm();
-                        // Notify the user on success (e.g., with a toast)
                     }
                 } catch (error) {
                     if (error.response && error.response.status === 422) {
-                        // Handle validation errors
+                        // Handle validation errors from the server
                         this.errors = error.response.data.errors || {};
                     } else {
-                        // Handle other types of errors
+                        // Handle other server errors
                         this.serverError =
                             "An error occurred. Please try again.";
                     }
@@ -162,23 +122,18 @@ export default {
                     // Stop loading after the request (or simulated time) is done
                     this.loading = false;
                 }
-            }, 1000);
+            }, 1000); // Simulates a 3-second loading duration
         },
         resetForm() {
-            this.supplier = {
+            this.category = {
                 name: "",
-                email: "",
-                phone: "",
-                contact_person: "",
-                address: "",
                 description: "",
+                status: false, // Reset checkbox on form reset
             };
-            this.photo = null;
             this.errors = {}; // Reset errors on form reset
-            this.$refs.form.reset();
-        },
-        onFileChange(event) {
-            this.photo = event.target.files[0];
+            if (this.$refs.form) {
+                this.$refs.form.reset(); // Reset the form via its ref if necessary
+            }
         },
     },
 };

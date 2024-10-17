@@ -12,6 +12,12 @@ import SupplierCreate from "./Pages/Components/Admin/Supplier/SupplierCreateFrom
 import ModelIndex from "./Pages/Admin/Model/Index.vue";
 import ModelCreate from "./Pages/Admin/Model/Create.vue";
 import ModelEdit from "./Pages/Admin/Model/Edit.vue";
+import CategoryIndex from "./Pages/Admin/Category/Index.vue";
+import CategoryCreate from "./Pages/Admin/Category/Create.vue";
+import CategoryEdit from "./Pages/Admin/Category/Edit.vue";
+import UnitIndex from "./Pages/Admin/Unit/Index.vue";
+import UnitCreate from "./Pages/Admin/Unit/Create.vue";
+import UnitEdit from "./Pages/Admin/Unit/Edit.vue";
 import Contact from "./Pages/Contact.vue";
 
 const routes = [
@@ -75,6 +81,47 @@ const routes = [
                 name: "ModelEdit",
                 component: ModelEdit,
                 meta: { title: "Edit Model" },
+                props: true, // Enables passing route params as props
+            },
+
+            {
+                path: "category/index", // New route for Contact
+                name: "CategoryIndex",
+                component: CategoryIndex,
+                meta: { title: "Category Index" },
+            },
+            {
+                path: "category/create", // New route for Contact
+                name: "CategoryCreate",
+                component: CategoryCreate,
+                meta: { title: "Category Create" },
+            },
+
+            {
+                path: "category/edit/:id", // Dynamic route for Category Edit
+                name: "CategoryEdit",
+                component: CategoryEdit,
+                meta: { title: "Edit Category" },
+                props: true, // Enables passing route params as props
+            },
+
+            {
+                path: "unit/index", // New route for Contact
+                name: "UnitIndex",
+                component: UnitIndex,
+                meta: { title: "Unit Index" },
+            },
+            {
+                path: "unit/create", // New route for Contact
+                name: "UnitCreate",
+                component: UnitCreate,
+                meta: { title: "Unit Create" },
+            },
+            {
+                path: "unit/edit/:id", // Dynamic route for Unit Edit
+                name: "UnitEdit",
+                component: UnitEdit,
+                meta: { title: "Edit Unit" },
                 props: true, // Enables passing route params as props
             },
 
