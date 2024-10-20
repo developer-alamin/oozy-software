@@ -122,7 +122,7 @@ const routes = [
             },
 
             {
-                path: "Brand/edit/:id", // Dynamic route for Brand Edit
+                path: "brand/edit/:id", // Dynamic route for Brand Edit
                 name: "BrandEdit",
                 component: BrandEdit,
                 meta: { title: "Edit Brand" },

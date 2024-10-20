@@ -1,10 +1,10 @@
 <template>
-    <v-card outlined class="mx-auto my-5">
+    <v-card>
         <v-card-title class="pt-5">
             <v-row>
                 <v-col cols="6"><span>Brand List</span></v-col>
 
-                <v-col cols="6" class="d-flex">
+                <v-col cols="6" class="d-flex justify-end">
                     <v-text-field
                         v-model="search"
                         density="compact"
@@ -25,52 +25,45 @@
             </v-row>
         </v-card-title>
 
-        <v-data-table
+        <v-data-table-server
+            v-model:items-per-page="itemsPerPage"
             :headers="headers"
-            :items="brands"
-            :items-per-page="itemsPerPage"
-            :items-length="totalItems"
             :search="search"
+            :items="serverItems"
+            :items-length="totalItems"
             :loading="loading"
+            item-value="created_at"
             loading-text="Loading... Please wait"
-            class="elevation-1"
-            @update:options="updateOptions"
+            @update:options="loadItems"
         >
             <template v-slot:item.status="{ item }">
                 <v-chip
                     :color="
-                        item.status == 'Active' || item.status == true
+                        item.status == 'Active' || item.status === true
                             ? 'green'
                             : 'red'
-                    "
-                    :text="
-                        item.status == 'In-active' || item.status == true
-                            ? 'Active'
-                            : 'In-active'
                     "
                     class="text-uppercase"
                     size="small"
                     label
-                ></v-chip>
+                >
+                    {{
+                        item.status == "Active" || item.status === true
+                            ? "Active"
+                            : "In-active"
+                    }}
+                </v-chip>
             </template>
+
             <template v-slot:item.actions="{ item }">
-                <v-icon @click="editSupplier(item.id)" class="mr-2"
+                <v-icon @click="editBrand(item.id)" class="mr-2"
                     >mdi-pencil</v-icon
                 >
-                <v-icon @click="deleteSupplier(item.id)" color="red"
+                <v-icon @click="deleteBrand(item.id)" color="red"
                     >mdi-delete</v-icon
                 >
             </template>
-
-            <!-- Add pagination controls -->
-            <template v-slot:footer>
-                <v-pagination
-                    v-model="pagination.page"
-                    :length="totalPages"
-                    @input="fetchBrands"
-                ></v-pagination>
-            </template>
-        </v-data-table>
+        </v-data-table-server>
     </v-card>
 </template>
 
@@ -78,107 +71,68 @@
 export default {
     data() {
         return {
-            brands: [],
             search: "",
             itemsPerPage: 15,
-            pagination: {
-                page: 1, // Current page
-            },
-            totalPages: 0, // Total number of pages
-            loading: false,
-            sortBy: "name", // Default sorting column
-            sortDesc: false, // Default sort direction
             headers: [
-                {
-                    title: "Brand Name",
-                    value: "name",
-                    sortable: true, // Enable sorting
-                    align: "start",
-                },
-                {
-                    title: "Description",
-                    value: "description",
-                    sortable: false,
-                },
+                { title: "Brand Name", key: "name", sortable: true },
+                { title: "Description", key: "description", sortable: false },
                 {
                     title: "Status",
+                    key: "status",
                     value: "status",
-                    sortable: true, // Enable sorting
+                    sortable: true,
                 },
-                {
-                    title: "Actions",
-                    value: "actions",
-                    sortable: false,
-                },
+                { title: "Actions", key: "actions", sortable: false },
             ],
+            serverItems: [],
+            loading: true,
+            totalItems: 0,
         };
     },
-    created() {
-        this.fetchBrands();
-    },
     methods: {
-        async fetchBrands() {
-            this.loading = true; // Start loading
+        async loadItems({ page, itemsPerPage, sortBy }) {
+            this.loading = true;
+            const sortOrder = sortBy.length ? sortBy[0].order : "desc";
+            const sortKey = sortBy.length ? sortBy[0].key : "created_at";
             try {
                 const response = await this.$axios.get("/brand", {
                     params: {
+                        page,
+                        itemsPerPage,
+                        sortBy: sortKey,
+                        sortOrder,
                         search: this.search,
-                        itemsPerPage: this.itemsPerPage,
-                        page: this.pagination.page, // Include current page
-                        sortBy: this.sortBy, // Include sortBy
-                        sortDesc: this.sortDesc, // Include sort direction
                     },
                 });
-                console.log(response.data);
-
-                this.brands = response.data.brands;
-                this.totalPages = Math.ceil(
-                    response.data.total / this.itemsPerPage
-                ); // Calculate total pages
-                this.loading = false; // Stop loading
+                // console.log(response.data.items);
+                this.serverItems = response.data.items || [];
+                this.totalItems = response.data.total || 0;
             } catch (error) {
-                console.error("Error fetching brands:", error);
-                this.loading = false; // Stop loading even on error
+                console.error("Error loading items:", error);
+            } finally {
+                this.loading = false;
             }
-        },
-        updateOptions(options) {
-            this.itemsPerPage = options.itemsPerPage;
-            this.pagination.page = 1;
-            this.fetchBrands(); // Refetch brands with updated options
         },
         createBrand() {
             this.$router.push({ name: "BrandCreate" });
         },
-        editSupplier(id) {
+        editBrand(id) {
             this.$router.push({ name: "BrandEdit", params: { id } });
         },
-        async deleteSupplier(id) {
-            const confirmDelete = confirm(
-                "Are you sure you want to delete this Brand?"
-            );
-            if (confirmDelete) {
-                try {
-                    await this.$axios.delete(`/brand/${id}`);
-                    this.fetchBrands(); // Refresh the brands list
-                } catch (error) {
-                    console.error("Error deleting brands:", error);
-                }
-            }
+        deleteBrand(id) {
+            // Logic for deleting a brand
         },
-        // Method to handle sorting
-        sortBrands(column) {
-            if (this.sortBy === column) {
-                this.sortDesc = !this.sortDesc; // Toggle sort direction
-            } else {
-                this.sortBy = column; // Set new sort column
-                this.sortDesc = false; // Reset to ascending
-            }
-            this.fetchBrands(); // Refetch brands with the updated sort options
-        },
+    },
+    created() {
+        this.loadItems({
+            page: 1,
+            itemsPerPage: this.itemsPerPage,
+            sortBy: [],
+        });
     },
 };
 </script>
 
 <style scoped>
-/* Add custom styles here */
+/* Optional: Add any styles here */
 </style>

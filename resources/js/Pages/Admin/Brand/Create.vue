@@ -35,7 +35,7 @@
                 <v-select
                     v-model="brand.status"
                     :items="statusItems"
-                    label="Select Status"
+                    label="Brand Status"
                     @change="updateStatus"
                     clearable
                 ></v-select>

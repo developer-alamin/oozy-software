@@ -1,11 +1,11 @@
 <template>
     <v-card outlined class="mx-auto my-5" max-width="900">
-        <v-card-title>Edit Category</v-card-title>
+        <v-card-title>Edit Brand</v-card-title>
         <v-card-text>
-            <v-form ref="form" v-model="valid" @submit.prevent="submit">
+            <v-form ref="form" v-model="valid" @submit.prevent="update">
                 <!-- Name Field -->
                 <v-text-field
-                    v-model="category.name"
+                    v-model="brand.name"
                     :rules="[rules.required]"
                     label="Name"
                     outlined
@@ -18,7 +18,7 @@
 
                 <!-- Description Field -->
                 <v-textarea
-                    v-model="category.description"
+                    v-model="brand.description"
                     label="Description"
                     outlined
                     :error-messages="
@@ -27,11 +27,17 @@
                 />
 
                 <!-- Status Field (Checkbox) -->
-                <v-checkbox
-                    v-model="category.status"
+                <!-- <v-checkbox
+                    v-model="brand.status"
                     label="Status"
                     :error-messages="errors.status ? errors.status : ''"
-                />
+                /> -->
+                <v-select
+                    v-model="brand.status"
+                    :items="statusItems"
+                    label="Brand Status"
+                    clearable
+                ></v-select>
 
                 <!-- Action Buttons -->
 
@@ -51,7 +57,7 @@
                             :disabled="!valid || loading"
                             :loading="loading"
                         >
-                            Update Category
+                            Update Brand
                         </v-btn>
                     </v-col>
                 </v-row>
@@ -71,7 +77,8 @@ export default {
         return {
             valid: false,
             loading: false,
-            category: {
+            statusItems: ["Active", "In-Active"],
+            brand: {
                 name: "",
                 description: "",
                 status: false, // Default to false (inactive)
@@ -84,46 +91,45 @@ export default {
         };
     },
     created() {
-        this.fetchCategory();
+        this.fetchBrand();
     },
     methods: {
-        async fetchCategory() {
-            // Fetch the category data to populate the form
-            const categoryId = this.$route.params.id; // Assuming the category ID is passed in the route params
+        async fetchBrand() {
+            // Fetch the brand data to populate the form
+            const brandId = this.$route.params.id; // Assuming the brand ID is passed in the route params
             try {
                 const response = await this.$axios.get(
-                    `/category/${categoryId}/edit`
+                    `/brand/${brandId}/edit`
                 );
                 console.log(response.data);
 
-                this.category = response.data.category; // Populate form with the existing category data
-                this.category.status =
-                    this.category.status == "true" ||
-                    this.category.status == true;
+                this.brand = response.data.brand; // Populate form with the existing brand data
+                this.brand.status =
+                    this.brand.status === "Active" ? "Active" : "In-Active";
             } catch (error) {
-                this.serverError = "Error fetching category data.";
+                this.serverError = "Error fetching brand data.";
             }
         },
-        async submit() {
+        async update() {
             this.errors = {}; // Reset errors before submission
             this.serverError = null;
             this.loading = true;
-            const categoryId = this.$route.params.id; // Assuming category ID is in route params
+            const brandId = this.$route.params.id; // Assuming brand ID is in route params
             setTimeout(async () => {
                 try {
                     const response = await this.$axios.put(
-                        `/category/${categoryId}`,
-                        this.category
+                        `/brand/${brandId}`,
+                        this.brand
                     );
 
                     if (response.data.success) {
-                        this.$router.push({ name: "CategoryIndex" }); // Redirect to category list page
+                        this.$router.push({ name: "BrandIndex" }); // Redirect to brand list page
                     }
                 } catch (error) {
                     if (error.response && error.response.status === 422) {
                         this.errors = error.response.data.errors || {};
                     } else {
-                        this.serverError = "Error updating category.";
+                        this.serverError = "Error updating brand.";
                     }
                 } finally {
                     // Stop loading after the request (or simulated time) is done
@@ -132,7 +138,7 @@ export default {
             }, 1000);
         },
         resetForm() {
-            this.fetchCategory(); // Reset the form with existing category data
+            this.fetchBrand(); // Reset the form with existing brand data
             this.errors = {};
             this.$refs.form.resetValidation();
         },

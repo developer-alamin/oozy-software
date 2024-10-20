@@ -19,6 +19,7 @@ class CategoryController extends Controller
         $request->validate([
             'search'       => 'nullable|string|max:255',
             'itemsPerPage' => 'nullable|integer|min:1|max:100',
+            'page'         => 'nullable|integer|min:1',
         ]);
 
         $query = Category::query();
@@ -35,7 +36,7 @@ class CategoryController extends Controller
         }
 
         // Pagination
-        $itemsPerPage = $request->input('itemsPerPage', 15); // Default items per page
+        $itemsPerPage = $request->input('itemsPerPage', 5); // Default items per page
         $categories   = $query->paginate($itemsPerPage);
 
         return response()->json([
