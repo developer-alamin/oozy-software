@@ -12,6 +12,8 @@ import "vuetify/styles"; // Ensure Vuetify styles are imported
 import { createVuetify } from "vuetify";
 import { aliases, mdi } from "vuetify/iconsets/mdi";
 import "@mdi/font/css/materialdesignicons.css";
+import "vue3-toastify/dist/index.css";
+import { toast } from "vue3-toastify";
 
 // Import fonts and any global custom styles
 // import "@/assets/styles/global.css"; // (If you have any custom global styles)
@@ -43,6 +45,7 @@ app.use(createPinia());
 app.use(router);
 // Use Vuetify
 app.use(vuetify);
+app.config.globalProperties.$toast = toast;
 
 app.config.globalProperties.$axios = axios; // Make Axios instance globally accessible
 
