@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\Auth\UserAuthController;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductModelController;
 use App\Http\Controllers\User\UserController;
@@ -16,6 +17,7 @@ use App\Models\Unit;
 Route::resource('suppliers', SupplierController::class);
 Route::resource('models', ProductModelController::class);
 Route::resource('category', CategoryController::class);
+Route::resource('brand', BrandController::class);
 Route::resource('units', UnitController::class);
 
 // Admin Auth Routes

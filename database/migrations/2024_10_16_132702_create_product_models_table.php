@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('model_number')->unique();
             $table->text('description')->nullable();
-            $table->boolean('status')->default(false);
+            $table->string('status')->default(false);
             $table->text('meta_data')->nullable();
             $table->timestamps();
         });

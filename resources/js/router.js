@@ -15,6 +15,9 @@ import ModelEdit from "./Pages/Admin/Model/Edit.vue";
 import CategoryIndex from "./Pages/Admin/Category/Index.vue";
 import CategoryCreate from "./Pages/Admin/Category/Create.vue";
 import CategoryEdit from "./Pages/Admin/Category/Edit.vue";
+import BrandIndex from "./Pages/Admin/Brand/Index.vue";
+import BrandCreate from "./Pages/Admin/Brand/Create.vue";
+import BrandEdit from "./Pages/Admin/Brand/Edit.vue";
 import UnitIndex from "./Pages/Admin/Unit/Index.vue";
 import UnitCreate from "./Pages/Admin/Unit/Create.vue";
 import UnitEdit from "./Pages/Admin/Unit/Edit.vue";
@@ -102,6 +105,27 @@ const routes = [
                 name: "CategoryEdit",
                 component: CategoryEdit,
                 meta: { title: "Edit Category" },
+                props: true, // Enables passing route params as props
+            },
+            // brand
+            {
+                path: "brand/index", // New route for Contact
+                name: "BrandIndex",
+                component: BrandIndex,
+                meta: { title: "Brand Index" },
+            },
+            {
+                path: "brand/create", // New route for Contact
+                name: "BrandCreate",
+                component: BrandCreate,
+                meta: { title: "Brand Create" },
+            },
+
+            {
+                path: "Brand/edit/:id", // Dynamic route for Brand Edit
+                name: "BrandEdit",
+                component: BrandEdit,
+                meta: { title: "Edit Brand" },
                 props: true, // Enables passing route params as props
             },
 

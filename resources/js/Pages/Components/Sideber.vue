@@ -40,6 +40,15 @@
                     </li>
                     <li>
                         <router-link
+                            :to="{ name: 'BrandIndex' }"
+                            active-class="active"
+                            :class="{ active: isBrandRoute }"
+                        >
+                            <i class="bi bi-circle"></i><span>Brand</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link
                             :to="{ name: 'CategoryIndex' }"
                             active-class="active"
                             :class="{ active: isCategoryRoute }"
@@ -316,6 +325,9 @@ const isMechineRoute = computed(() => {
         "UnitIndex",
         "UnitCreate",
         "UnitEdit",
+        "BrandIndex",
+        "BrandCreate",
+        "BrandEdit",
     ].includes(route.name);
 });
 
@@ -330,6 +342,9 @@ const isSupplierRoute = computed(() =>
 );
 const isCategoryRoute = computed(() =>
     ["CategoryIndex", "CategoryCreate", "CategoryEdit"].includes(route.name)
+);
+const isBrandRoute = computed(() =>
+    ["BrandIndex", "BrandCreate", "BrandEdit"].includes(route.name)
 );
 const isUnitRoute = computed(() =>
     ["UnitIndex", "UnitCreate", "UnitEdit"].includes(route.name)
