@@ -105,6 +105,7 @@
 <script>
 import { toast } from "vue3-toastify";
 import ConfirmDialog from "../../Components/ConfirmDialog.vue";
+import bus from "./eventBus";
 
 export default {
     components: {
@@ -150,6 +151,7 @@ export default {
                 });
                 this.serverItems = response.data.items || [];
                 this.totalItems = response.data.total || 0;
+                this.fetchTrashedBrandsCount();
             } catch (error) {
                 console.error("Error loading items:", error);
             } finally {

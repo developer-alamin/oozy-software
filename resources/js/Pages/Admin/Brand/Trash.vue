@@ -53,20 +53,17 @@
             </template>
         </v-data-table-server>
 
-        <!-- Confirmation Dialog -->
+        <!-- Restore Confirmation Dialog -->
         <RestoreConfirmDialog
-            v-model:modelValue="dialog"
+            v-model:modelValue="restoreDialog"
             :onConfirm="confirmRestore"
-            :onCancel="() => (dialog = false)"
+            :onCancel="() => (restoreDialog = false)"
         />
+        <!-- Delete Confirmation Dialog -->
         <ConfirmDialog
-            v-model:modelValue="dialog"
+            v-model:modelValue="deleteDialog"
             :onConfirm="confirmDelete"
-            :onCancel="
-                () => {
-                    dialog = false;
-                }
-            "
+            :onCancel="() => (deleteDialog = false)"
         />
     </v-card>
 </template>
@@ -75,6 +72,7 @@
 import { toast } from "vue3-toastify";
 import RestoreConfirmDialog from "../../Components/RestoreConfirmDialog.vue";
 import ConfirmDialog from "../../Components/ConfirmDialog.vue";
+import bus from "./eventBus";
 
 export default {
     components: {
@@ -99,7 +97,8 @@ export default {
             serverItems: [],
             loading: true,
             totalItems: 0,
-            dialog: false,
+            restoreDialog: false, // Separate state for restore dialog
+            deleteDialog: false, // Separate state for delete dialog
             selectedBrandId: null,
         };
     },
@@ -128,14 +127,14 @@ export default {
         },
         showRestoreDialog(id) {
             this.selectedBrandId = id;
-            this.dialog = true;
+            this.restoreDialog = true; // Open restore dialog
         },
         showConfirmDialog(id) {
             this.selectedBrandId = id;
-            this.dialog = true;
+            this.deleteDialog = true; // Open delete dialog
         },
         async confirmRestore() {
-            this.dialog = false; // Close the dialog
+            this.restoreDialog = false; // Close the restore dialog
             try {
                 await this.$axios.post(
                     `/brand/${this.selectedBrandId}/restore`
@@ -146,13 +145,14 @@ export default {
                     sortBy: [],
                 });
                 toast.success("Brand restored successfully!");
+                bus.updateCount(bus.trashedBrandsCount.value - 1);
             } catch (error) {
                 console.error("Error restoring brand:", error);
                 toast.error("Failed to restore brand.");
             }
         },
         async confirmDelete() {
-            this.dialog = false; // Close the dialog
+            this.deleteDialog = false; // Close the delete dialog
             try {
                 await this.$axios.delete(
                     `/brand/${this.selectedBrandId}/force-delete`
