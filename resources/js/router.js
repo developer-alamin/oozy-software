@@ -16,6 +16,7 @@ import CategoryIndex from "./Pages/Admin/Category/Index.vue";
 import CategoryCreate from "./Pages/Admin/Category/Create.vue";
 import CategoryEdit from "./Pages/Admin/Category/Edit.vue";
 import BrandIndex from "./Pages/Admin/Brand/Index.vue";
+import BrandTrash from "./Pages/Admin/Brand/Trash.vue";
 import BrandCreate from "./Pages/Admin/Brand/Create.vue";
 import BrandEdit from "./Pages/Admin/Brand/Edit.vue";
 import UnitIndex from "./Pages/Admin/Unit/Index.vue";
@@ -127,6 +128,12 @@ const routes = [
                 component: BrandEdit,
                 meta: { title: "Edit Brand" },
                 props: true, // Enables passing route params as props
+            },
+            {
+                path: "brand/trash", // New route for Contact
+                name: "BrandTrash",
+                component: BrandTrash,
+                meta: { title: "Brand Trash" },
             },
 
             {

@@ -17,8 +17,15 @@ use App\Models\Unit;
 Route::resource('suppliers', SupplierController::class);
 Route::resource('models', ProductModelController::class);
 Route::resource('category', CategoryController::class);
+
+Route::get('/brand/trashed', [BrandController::class, 'trashed']);
+Route::post('/brand/{id}/restore', [BrandController::class, 'restore']);
+Route::delete('/brand/{id}/force-delete', [BrandController::class, 'forceDelete']);
+Route::get('/brand/trashed-count', [BrandController::class, 'trashedBrandsCount']);
 Route::resource('brand', BrandController::class);
+
 Route::resource('units', UnitController::class);
+
 
 // Admin Auth Routes
 Route::prefix('admin')->group(function () {

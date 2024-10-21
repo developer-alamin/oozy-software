@@ -2,8 +2,8 @@
     <v-card>
         <v-card-title class="pt-5">
             <v-row>
-                <v-col cols="4"><span>Brand List</span></v-col>
-                <v-col cols="8" class="d-flex justify-end">
+                <v-col cols="6"><span>Brand Trash List</span></v-col>
+                <v-col cols="6" class="d-flex justify-end">
                     <v-text-field
                         v-model="search"
                         density="compact"
@@ -17,43 +17,6 @@
                         single-line
                         clearable
                     ></v-text-field>
-                    <v-btn
-                        @click="createBrand"
-                        color="primary"
-                        icon
-                        style="width: 40px; height: 40px"
-                    >
-                        <v-tooltip location="top" activator="parent">
-                            <template v-slot:activator="{ props }">
-                                <v-icon v-bind="props" style="font-size: 20px"
-                                    >mdi-plus</v-icon
-                                >
-                            </template>
-                            <span>Add a new brand</span>
-                        </v-tooltip>
-                    </v-btn>
-
-                    <v-badge :content="trashedCount" color="red" overlap>
-                        <v-btn
-                            @click="viewTrash"
-                            color="red"
-                            icon
-                            class="ml-2"
-                            style="width: 40px; height: 40px"
-                        >
-                            <v-tooltip location="top" activator="parent">
-                                <template v-slot:activator="{ props }">
-                                    <v-icon
-                                        v-bind="props"
-                                        style="font-size: 20px"
-                                    >
-                                        mdi-trash-can-outline
-                                    </v-icon>
-                                </template>
-                                <span>View trashed brands</span>
-                            </v-tooltip>
-                        </v-btn>
-                    </v-badge>
                 </v-col>
             </v-row>
         </v-card-title>
@@ -81,8 +44,8 @@
             </template>
 
             <template v-slot:item.actions="{ item }">
-                <v-icon @click="editBrand(item.id)" class="mr-2"
-                    >mdi-pencil</v-icon
+                <v-icon @click="showRestoreDialog(item.id)" color="green"
+                    >mdi-restore</v-icon
                 >
                 <v-icon @click="showConfirmDialog(item.id)" color="red"
                     >mdi-delete</v-icon
@@ -90,6 +53,12 @@
             </template>
         </v-data-table-server>
 
+        <!-- Confirmation Dialog -->
+        <RestoreConfirmDialog
+            v-model:modelValue="dialog"
+            :onConfirm="confirmRestore"
+            :onCancel="() => (dialog = false)"
+        />
         <ConfirmDialog
             v-model:modelValue="dialog"
             :onConfirm="confirmDelete"
@@ -104,10 +73,12 @@
 
 <script>
 import { toast } from "vue3-toastify";
+import RestoreConfirmDialog from "../../Components/RestoreConfirmDialog.vue";
 import ConfirmDialog from "../../Components/ConfirmDialog.vue";
 
 export default {
     components: {
+        RestoreConfirmDialog,
         ConfirmDialog,
     },
     data() {
@@ -130,7 +101,6 @@ export default {
             totalItems: 0,
             dialog: false,
             selectedBrandId: null,
-            trashedCount: 0,
         };
     },
     methods: {
@@ -139,7 +109,7 @@ export default {
             const sortOrder = sortBy.length ? sortBy[0].order : "desc";
             const sortKey = sortBy.length ? sortBy[0].key : "created_at";
             try {
-                const response = await this.$axios.get("/brand", {
+                const response = await this.$axios.get("/brand/trashed", {
                     params: {
                         page,
                         itemsPerPage,
@@ -156,23 +126,37 @@ export default {
                 this.loading = false;
             }
         },
-        createBrand() {
-            this.$router.push({ name: "BrandCreate" });
-        },
-        viewTrash() {
-            this.$router.push({ name: "BrandTrash" });
-        },
-        editBrand(id) {
-            this.$router.push({ name: "BrandEdit", params: { id } });
+        showRestoreDialog(id) {
+            this.selectedBrandId = id;
+            this.dialog = true;
         },
         showConfirmDialog(id) {
             this.selectedBrandId = id;
             this.dialog = true;
         },
+        async confirmRestore() {
+            this.dialog = false; // Close the dialog
+            try {
+                await this.$axios.post(
+                    `/brand/${this.selectedBrandId}/restore`
+                );
+                this.loadItems({
+                    page: 1,
+                    itemsPerPage: this.itemsPerPage,
+                    sortBy: [],
+                });
+                toast.success("Brand restored successfully!");
+            } catch (error) {
+                console.error("Error restoring brand:", error);
+                toast.error("Failed to restore brand.");
+            }
+        },
         async confirmDelete() {
             this.dialog = false; // Close the dialog
             try {
-                await this.$axios.delete(`/brand/${this.selectedBrandId}`);
+                await this.$axios.delete(
+                    `/brand/${this.selectedBrandId}/force-delete`
+                );
                 this.loadItems({
                     page: 1,
                     itemsPerPage: this.itemsPerPage,
@@ -184,27 +168,16 @@ export default {
                 toast.error("Failed to delete brand.");
             }
         },
-        async fetchTrashedBrandsCount() {
-            try {
-                const response = await this.$axios.get("/brand/trashed-count");
-                this.trashedCount = response.data.trashedCount;
-            } catch (error) {
-                console.error("Error fetching trashed brands count:", error);
-            }
+        editBrand(id) {
+            this.$router.push({ name: "BrandEdit", params: { id } });
         },
     },
-
     created() {
         this.loadItems({
             page: 1,
             itemsPerPage: this.itemsPerPage,
             sortBy: [],
         });
-        this.fetchTrashedBrandsCount();
     },
 };
 </script>
-
-<style scoped>
-/* Optional: Add styles for the main component */
-</style>
