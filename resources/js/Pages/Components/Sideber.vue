@@ -328,6 +328,7 @@ const isMechineRoute = computed(() => {
         "BrandIndex",
         "BrandCreate",
         "BrandEdit",
+        "BrandTrash",
     ].includes(route.name);
 });
 
@@ -344,7 +345,9 @@ const isCategoryRoute = computed(() =>
     ["CategoryIndex", "CategoryCreate", "CategoryEdit"].includes(route.name)
 );
 const isBrandRoute = computed(() =>
-    ["BrandIndex", "BrandCreate", "BrandEdit"].includes(route.name)
+    ["BrandIndex", "BrandCreate", "BrandEdit", "BrandTrash"].includes(
+        route.name
+    )
 );
 const isUnitRoute = computed(() =>
     ["UnitIndex", "UnitCreate", "UnitEdit"].includes(route.name)

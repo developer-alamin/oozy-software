@@ -7,7 +7,7 @@
                 <img :src="loginImage" class="mx-auto" width="100px" alt="" />
                 <!-- <span class="d-none d-lg-block">NiceAdmin</span> -->
             </a>
-            <i class="bi bi-list toggle-sidebar-btn"></i>
+            <i class="bi bi-list toggle-sidebar-btn" @click="toggleSidebar"></i>
         </div>
         <!-- End Logo -->
         <!-- 
@@ -214,7 +214,14 @@
 </template>
 
 <script setup>
+import { ref } from "vue";
 import loginImage from "../../../img/login_page.png";
+const sidebarVisible = ref(false);
+
+const toggleSidebar = () => {
+    sidebarVisible.value = !sidebarVisible.value;
+    document.body.classList.toggle("toggle-sidebar", sidebarVisible.value);
+};
 </script>
 
 <style scoped>
