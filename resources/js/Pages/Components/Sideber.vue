@@ -3,10 +3,10 @@
     <aside id="sidebar" class="sidebar">
         <ul class="sidebar-nav" id="sidebar-nav">
             <li class="nav-item">
-                <a class="nav-link" href="#">
+                <router-link class="nav-link" :to="{ name: 'AdminDashboard' }">
                     <i class="bi bi-grid"></i>
                     <span>Dashboard</span>
-                </a>
+                </router-link>
             </li>
             <!-- End Dashboard Nav -->
 

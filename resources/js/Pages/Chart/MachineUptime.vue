@@ -1,14 +1,33 @@
 <template>
     <v-container class="mt-5">
-        <v-row justify="center">
+        <!-- <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="text-center">
+                        <apexchart
+                            type="radialBar"
+                            :options="gaugeOptions"
+                            :series="gaugeSeries"
+                        />
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="text-center">
+                        <apexchart
+                            type="donut"
+                            :options="donutOptions"
+                            :series="donutSeries"
+                        />
+                    </div>
+                </div>
+            </div>
+        </div> -->
+        <v-row>
             <v-col cols="12" md="6">
-                <v-card elevation="2">
-                    <v-card-title> Machine Uptime (Last 10 Days) </v-card-title>
-                    <v-card-subtitle>
-                        Percentage of time machines are operational and
-                        available.
-                    </v-card-subtitle>
-
+                <v-card>
+                    <v-card-title>Machine Uptime (Last 10 Days)</v-card-title>
                     <v-card-text>
                         <div class="text-center">
                             <!-- ApexCharts Gauge Chart for Machine Uptime -->
@@ -16,34 +35,38 @@
                                 type="radialBar"
                                 :options="gaugeOptions"
                                 :series="gaugeSeries"
-                            ></apexchart>
+                            />
                         </div>
                     </v-card-text>
+                </v-card>
+            </v-col>
 
-                    <v-divider></v-divider>
-
+            <v-col cols="12" md="6">
+                <v-card>
+                    <v-card-title
+                        >Machine Uptime Breakdown (Last 10 Days)</v-card-title
+                    >
                     <v-card-text>
                         <div class="text-center">
-                            <!-- Donut Chart for the last 10 days -->
                             <apexchart
                                 type="donut"
                                 :options="donutOptions"
                                 :series="donutSeries"
-                            ></apexchart>
+                            />
                         </div>
                     </v-card-text>
-
-                    <v-card-actions>
-                        <v-btn color="primary" @click="refreshData"
-                            >Refresh Data</v-btn
-                        >
-                    </v-card-actions>
                 </v-card>
+            </v-col>
+        </v-row>
+
+        <!-- Refresh Button -->
+        <v-row justify="center">
+            <v-col cols="12" class="text-center">
+                <v-btn color="primary" @click="refreshData">Refresh Data</v-btn>
             </v-col>
         </v-row>
     </v-container>
 </template>
-
 <script setup>
 import VueApexCharts from "vue3-apexcharts";
 import { ref } from "vue";
@@ -125,7 +148,8 @@ const refreshData = () => {
 
 <style scoped>
 .v-card {
-    max-width: 500px;
+    max-width: 480px;
+    max-height: 380px;
     margin: auto;
 }
 </style>

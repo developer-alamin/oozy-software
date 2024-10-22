@@ -1,7 +1,7 @@
 <template>
     <div>
-        <h2>Admin Dashboard</h2>
-        <p>Welcome to the admin dashboard!</p>
+        <!-- <h2>Admin Dashboard</h2> -->
+        <h5 class="text-center">Welcome to the admin dashboard!</h5>
         <PieChart />
         <!-- <BarChart /> -->
         <!-- <MonochromePieChart /> -->

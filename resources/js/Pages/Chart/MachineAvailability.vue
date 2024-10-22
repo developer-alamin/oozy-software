@@ -2,9 +2,9 @@
     <v-container>
         <v-row>
             <!-- Gauge Chart for Machine Availability -->
-            <v-col cols="12" md="12">
+            <v-col cols="12" md="6">
                 <v-card>
-                    <v-card-title
+                    <v-card-title class="text-center"
                         >Machine Availability - Gauge Chart</v-card-title
                     >
                     <v-card-text>
@@ -19,9 +19,9 @@
             </v-col>
 
             <!-- Donut Chart for Machine Availability vs Unavailability -->
-            <v-col cols="12" md="12">
+            <v-col cols="12" md="6">
                 <v-card>
-                    <v-card-title
+                    <v-card-title class="text-center"
                         >Machine Availability - Donut Chart</v-card-title
                     >
                     <v-card-text>
@@ -111,7 +111,9 @@ export default {
 </script>
 
 <style scoped>
-.chart {
-    margin-bottom: 30px;
+.v-card {
+    max-height: 380px;
+    max-width: 480px;
+    margin: auto;
 }
 </style>
