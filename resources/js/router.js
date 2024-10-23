@@ -25,6 +25,9 @@ import UnitEdit from "./Pages/Admin/Unit/Edit.vue";
 import TechnicianIndex from "./Pages/Technician/Index.vue";
 import TechnicianCreate from "./Pages/Technician/Create.vue";
 import TechnicianEdit from "./Pages/Technician/Edit.vue";
+import TechnicianTrash from "./Pages/Technician/Trash.vue";
+
+import UserTechnicianIndex from "./Pages/Technician/Index.vue";
 import Contact from "./Pages/Contact.vue";
 
 const routes = [
@@ -41,6 +44,7 @@ const routes = [
         component: Register,
         meta: { title: "Register" },
     },
+
     {
         path: "/admin",
         component: AdminLayout, // Use the AdminLayout here
@@ -179,6 +183,12 @@ const routes = [
                 props: true, // Enables passing route params as props
             },
             {
+                path: "technician/trash", // New route for Contact
+                name: "TechnicianTrash",
+                component: TechnicianTrash,
+                meta: { title: "Technician Trash" },
+            },
+            {
                 path: "contact", // New route for Contact
                 name: "Contact",
                 component: Contact,
@@ -209,26 +219,13 @@ const routes = [
                 component: Contact,
                 meta: { title: "Contact" },
             },
-            // technician
             {
                 path: "technician/index", // New route for Contact
-                name: "TechnicianIndex",
+                name: "UserTechnicianIndex",
                 component: TechnicianIndex,
                 meta: { title: "Technician Index" },
             },
-            {
-                path: "technician/create", // New route for Contact
-                name: "TechnicianCreate",
-                component: TechnicianCreate,
-                meta: { title: "Technician Create" },
-            },
-            {
-                path: "technician/edit/:id", // Dynamic route for Technician Edit
-                name: "TechnicianEdit",
-                component: TechnicianEdit,
-                meta: { title: "Edit Technician" },
-                props: true, // Enables passing route params as props
-            },
+
             {
                 path: "contact", // New route for Contact
                 name: "Contact",

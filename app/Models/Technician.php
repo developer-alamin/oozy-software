@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
 class Technician extends Model
 {
-    use HasFactory;
+    use HasFactory,SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -16,11 +17,14 @@ class Technician extends Model
         'photo',
         'address',
         'description',
+        'status',
         'creator_id',
         'creator_type',
         'updater_id',
         'updater_type',
     ];
+
+
 
     // Polymorphic relationships
     public function creator()

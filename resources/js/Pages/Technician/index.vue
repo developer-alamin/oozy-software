@@ -2,7 +2,7 @@
     <v-card>
         <v-card-title class="pt-5">
             <v-row>
-                <v-col cols="4"><span>Brand List</span></v-col>
+                <v-col cols="4"><span>Technician List</span></v-col>
                 <v-col cols="8" class="d-flex justify-end">
                     <v-text-field
                         v-model="search"
@@ -18,7 +18,7 @@
                         clearable
                     ></v-text-field>
                     <v-btn
-                        @click="createBrand"
+                        @click="createTechnician"
                         color="primary"
                         icon
                         style="width: 40px; height: 40px"
@@ -29,7 +29,7 @@
                                     >mdi-plus</v-icon
                                 >
                             </template>
-                            <span>Add a new brand</span>
+                            <span>Add a new technician</span>
                         </v-tooltip>
                     </v-btn>
 
@@ -50,7 +50,7 @@
                                         mdi-trash-can-outline
                                     </v-icon>
                                 </template>
-                                <span>View trashed brands</span>
+                                <span>View trashed technicians</span>
                             </v-tooltip>
                         </v-btn>
                     </v-badge>
@@ -81,7 +81,7 @@
             </template>
 
             <template v-slot:item.actions="{ item }">
-                <v-icon @click="editBrand(item.id)" class="mr-2"
+                <v-icon @click="editTechnician(item.id)" class="mr-2"
                     >mdi-pencil</v-icon
                 >
                 <v-icon @click="showConfirmDialog(item.id)" color="red"
@@ -115,8 +115,9 @@ export default {
             search: "",
             itemsPerPage: 15,
             headers: [
-                { title: "Brand Name", key: "name", sortable: true },
-                { title: "Description", key: "description", sortable: false },
+                { title: "Name", key: "name", sortable: true },
+                { title: "Email", key: "email", sortable: true },
+                { title: "Phone", key: "phone", sortable: true },
                 {
                     title: "Status",
                     key: "status",
@@ -129,9 +130,19 @@ export default {
             loading: true,
             totalItems: 0,
             dialog: false,
-            selectedBrandId: null,
+            selectedTechnicianId: null,
             trashedCount: 0,
         };
+    },
+    computed: {
+        // Check if the user is authorized to create technicians
+        isAuthorized() {
+            // You can customize the logic based on your needs
+            return (
+                this.user &&
+                (this.user.role === "admin" || this.user.role === "user")
+            );
+        },
     },
     methods: {
         async loadItems({ page, itemsPerPage, sortBy }) {
@@ -139,7 +150,7 @@ export default {
             const sortOrder = sortBy.length ? sortBy[0].order : "desc";
             const sortKey = sortBy.length ? sortBy[0].key : "created_at";
             try {
-                const response = await this.$axios.get("/brand", {
+                const response = await this.$axios.get("/technician", {
                     params: {
                         page,
                         itemsPerPage,
@@ -150,47 +161,56 @@ export default {
                 });
                 this.serverItems = response.data.items || [];
                 this.totalItems = response.data.total || 0;
-                this.fetchTrashedBrandsCount();
+                this.fetchTrashedTechniciansCount();
             } catch (error) {
                 console.error("Error loading items:", error);
             } finally {
                 this.loading = false;
             }
         },
-        createBrand() {
-            this.$router.push({ name: "BrandCreate" });
+        createTechnician() {
+            this.$router.push({ name: "TechnicianCreate" });
         },
         viewTrash() {
-            this.$router.push({ name: "BrandTrash" });
+            this.$router.push({ name: "TechnicianTrash" });
         },
-        editBrand(id) {
-            this.$router.push({ name: "BrandEdit", params: { id } });
+        editTechnician(id) {
+            this.$router.push({ name: "TechnicianEdit", params: { id } });
         },
         showConfirmDialog(id) {
-            this.selectedBrandId = id;
+            this.selectedTechnicianId = id;
             this.dialog = true;
         },
         async confirmDelete() {
             this.dialog = false; // Close the dialog
             try {
-                await this.$axios.delete(`/brand/${this.selectedBrandId}`);
+                await this.$axios.delete(
+                    `/technician/${this.selectedTechnicianId}`
+                );
                 this.loadItems({
                     page: 1,
                     itemsPerPage: this.itemsPerPage,
                     sortBy: [],
                 });
-                toast.success("Brand deleted successfully!");
+                toast.success("Technician deleted successfully!");
             } catch (error) {
-                console.error("Error deleting brand:", error);
-                toast.error("Failed to delete brand.");
+                console.error("Error deleting Technician:", error);
+                toast.error("Failed to delete Technician.");
             }
         },
-        async fetchTrashedBrandsCount() {
+        async fetchTrashedTechniciansCount() {
             try {
-                const response = await this.$axios.get("/brand/trashed-count");
-                this.trashedCount = response.data.trashedCount;
+                const response = await this.$axios.get(
+                    "/technician/trashed-count"
+                );
+                this.trashedCount = response.data.trashedCount
+                    ? response.data.trashedCount
+                    : 0;
             } catch (error) {
-                console.error("Error fetching trashed brands count:", error);
+                console.error(
+                    "Error fetching trashed technicians count:",
+                    error
+                );
             }
         },
     },
@@ -201,7 +221,7 @@ export default {
             itemsPerPage: this.itemsPerPage,
             sortBy: [],
         });
-        this.fetchTrashedBrandsCount();
+        this.fetchTrashedTechniciansCount();
     },
 };
 </script>

@@ -20,7 +20,7 @@ Route::resource('suppliers', SupplierController::class);
 Route::resource('models', ProductModelController::class);
 Route::resource('category', CategoryController::class);
 
-// brand  
+// brand
 Route::get('/brand/trashed', [BrandController::class, 'trashed']);
 Route::post('/brand/{id}/restore', [BrandController::class, 'restore']);
 Route::delete('/brand/{id}/force-delete', [BrandController::class, 'forceDelete']);
@@ -29,8 +29,12 @@ Route::resource('brand', BrandController::class);
 // units
 Route::resource('units', UnitController::class);
 // Technician
+Route::get('/technician/trashed', [TechnicianController::class, 'trashed']);
+Route::post('/technician/{id}/restore', [TechnicianController::class, 'restore']);
+Route::delete('/technician/{id}/force-delete', [TechnicianController::class, 'forceDelete']);
+Route::get('/technician/trashed-count', [TechnicianController::class, 'trashedTechniciansCount']);
 Route::resource('technician', TechnicianController::class);
-// Rent 
+// Rent
 Route::resource('rent', RentController::class);
 // Company
 Route::resource('company', CompanyController::class);

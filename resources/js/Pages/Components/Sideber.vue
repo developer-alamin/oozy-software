@@ -199,55 +199,64 @@
                 >
                     <li>
                         <a href="icons-bootstrap.html">
-                            <i class="bi bi-circle"></i
-                            ><span>Bootstrap Icons</span>
+                            <i class="bi bi-circle"></i><span>User List</span>
                         </a>
                     </li>
                     <li>
                         <a href="icons-remix.html">
-                            <i class="bi bi-circle"></i><span>Remix Icons</span>
+                            <i class="bi bi-circle"></i><span>Add User</span>
                         </a>
                     </li>
                     <li>
                         <a href="icons-boxicons.html">
-                            <i class="bi bi-circle"></i><span>Boxicons</span>
+                            <i class="bi bi-circle"></i><span>Role</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="icons-boxicons.html">
+                            <i class="bi bi-circle"></i><span>Permission </span>
                         </a>
                     </li>
                 </ul>
             </li>
+
             <li class="nav-item">
                 <a
                     class="nav-link collapsed"
-                    data-bs-target="#tables-nav"
+                    data-bs-target="#tables-nav-tt"
                     data-bs-toggle="collapse"
                     href="#"
+                    :class="{ show: isTechnicianRouteShow }"
                 >
                     <i class="bi bi-layout-text-window-reverse"></i
                     ><span>Technician</span
                     ><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
                 <ul
-                    id="tables-nav"
+                    id="tables-nav-tt"
                     class="nav-content collapse"
                     data-bs-parent="#sidebar-nav"
+                    :class="{ show: isTechnicianRouteShow }"
                 >
                     <li>
-                        <a href="tables-general.html">
+                        <router-link
+                            :to="{ name: 'TechnicianCreate' }"
+                            active-class="active"
+                            :class="{ active: isTechnicianCreateActive }"
+                        >
                             <i class="bi bi-circle"></i
                             ><span>Add Technician </span>
-                        </a>
+                        </router-link>
                     </li>
                     <li>
-                        <a href="tables-data.html">
+                        <router-link
+                            :to="{ name: 'TechnicianIndex' }"
+                            active-class="active"
+                            :class="{ active: isTechnicianIndexActive }"
+                        >
                             <i class="bi bi-circle"></i
-                            ><span>All Technicians </span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="tables-data.html">
-                            <i class="bi bi-circle"></i
-                            ><span>Tiers/Groups </span>
-                        </a>
+                            ><span>All Technicians</span>
+                        </router-link>
                     </li>
                 </ul>
             </li>
@@ -284,7 +293,7 @@
             <!-- End F.A.Q Page Nav -->
 
             <!-- End Contact Page Nav -->
-            <!-- 
+            <!--
             <li class="nav-item">
                 <a class="nav-link collapsed" href="pages-register.html">
                     <i class="bi bi-card-list"></i>
@@ -351,6 +360,21 @@ const isBrandRoute = computed(() =>
 );
 const isUnitRoute = computed(() =>
     ["UnitIndex", "UnitCreate", "UnitEdit"].includes(route.name)
+);
+//
+const isTechnicianRouteShow = computed(() => {
+    return [
+        "TechnicianIndex",
+        "TechnicianCreate",
+        "TechnicianEdit",
+        "TechnicianTrash",
+    ].includes(route.name);
+});
+const isTechnicianCreateActive = computed(
+    () => route.name === "TechnicianCreate"
+);
+const isTechnicianIndexActive = computed(
+    () => route.name === "TechnicianIndex"
 );
 </script>
 

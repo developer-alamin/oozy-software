@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 class Admin extends Authenticatable
 {
     use HasFactory,HasApiTokens;
-    
+
     /**
      * The attributes that are mass assignable.
      *
@@ -21,8 +21,9 @@ class Admin extends Authenticatable
         'name',
         'email',
         'password',
+        'role'
     ];
-    
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -32,6 +33,11 @@ class Admin extends Authenticatable
         'password',
         'remember_token',
     ];
+    public function isSuperAdmin()
+    {
+        // Adjust this condition according to how you define superadmin in your database
+        return $this->role === 'superadmin'; // Assuming you have a 'role' column
+    }
     // Technicians created by this user
     public function createdTechnicians(): MorphMany
     {

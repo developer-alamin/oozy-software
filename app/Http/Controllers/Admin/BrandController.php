@@ -10,79 +10,8 @@ use Illuminate\Http\Response;
 
 class BrandController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    // public function index(Request $request)
-    // {
-    //     // Validate incoming request parameters
 
-    //     $request->validate([
-    //         'search'       => 'nullable|string|max:255',
-    //         'itemsPerPage' => 'nullable|integer|min:1|max:100',
-    //     ]);
 
-    //     $query = Brand::query();
-
-    //     // Search functionality
-    //     if ($request->filled('search')) {
-    //         $query->where('name', 'like', '%' . $request->search . '%')
-    //             ->orWhere('description', 'like', '%' . $request->search . '%');
-    //     }
-
-    //     // Sorting
-    //     if ($request->filled('sortBy')) {
-    //         $query->orderBy($request->sortBy, $request->sortDesc ? 'desc' : 'asc');
-    //     }
-
-    //     // Pagination
-    //     $itemsPerPage = $request->input('itemsPerPage', 15); // Default items per page
-    //     $brands   = $query->paginate($itemsPerPage);
-
-    //     return response()->json([
-    //         'brands'     => $brands->items(),
-    //         'total'      => $brands->total(), // Total count for pagination
-    //     ]);
-    // }
-
-    // public function index(Request $request)
-    // {
-    //     // Validate incoming request parameters
-    //     $request->validate([
-    //         'search'       => 'nullable|string|max:255',
-    //         'itemsPerPage' => 'nullable|integer|min:1|max:100',
-           
-    //     ]);
-        
-    //     // Create a base query for the Brand model
-    //     $query = Brand::query();
-
-    //     // Search functionality
-    //     if ($request->filled('search')) {
-    //         $query->where('name', 'like', '%' . $request->search . '%')
-    //               ->orWhere('description', 'like', '%' . $request->search . '%');
-    //     }
-
-    //     // Sorting
-    //     if ($request->filled('sortBy')) {
-    //         $query->orderBy($request->sortBy, $request->sortDesc ? 'desc' : 'asc');
-    //     }
-
-    //     // Pagination
-    //     $itemsPerPage = $request->input('itemsPerPage', 15); // Default items per page
-    //     $brands = $query->paginate($itemsPerPage);
-
-    //     // Return the paginated results as a JSON response
-    //     return response()->json([
-    //         'brands'     => $brands->items(), // Array of brand items
-    //         'total'      => $brands->total(), // Total count for pagination
-    //         'currentPage' => $brands->currentPage(),
-    //         'lastPage'   => $brands->lastPage(),
-    //         'perPage'    => $brands->perPage(),
-    //     ]);
-    // }
-
-    
     public function index(Request $request)
     {
         // Get parameters from the request
@@ -91,20 +20,20 @@ class BrandController extends Controller
         $sortBy       = $request->input('sortBy', 'created_at'); // Default sort by name
         $sortOrder    = $request->input('sortOrder', 'desc'); // Default order is ascending
         $search       = $request->input('search', ''); // Search term, default is empty
-    
+
         // Query brands with pagination, sorting, and search
         $brandsQuery = Brand::query();
         // Apply search if the search term is not empty
         if (!empty($search)) {
             $brandsQuery->where('name', 'LIKE', '%' . $search . '%');
         }
-    
+
         // Apply sorting
         $brandsQuery->orderBy($sortBy, $sortOrder);
-    
+
         // Paginate results
         $brands = $brandsQuery->paginate($itemsPerPage);
-    
+
         // Return the response as JSON
         return response()->json([
             'items' => $brands->items(), // Current page items
@@ -141,7 +70,7 @@ class BrandController extends Controller
             'total' => $brands->total(), // Total number of trashed records
         ]);
     }
-    
+
     /**
      * Show the form for creating a new resource.
      */
@@ -156,7 +85,7 @@ class BrandController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate(Brand::validationRules());
-        
+
         Brand::create($validatedData);
         return response()->json(['success' => true,'message' => 'Brand created successfully.'], 201);
     }
@@ -231,10 +160,10 @@ class BrandController extends Controller
      {
          $brand = Brand::onlyTrashed()->findOrFail($id);
          $brand->forceDelete(); // Permanent delete
- 
+
          return response()->json(['message' => 'Brand permanently deleted']);
      }
- 
+
      // Restore a soft-deleted brand
      public function restore($id)
     {
@@ -247,5 +176,5 @@ class BrandController extends Controller
 
         return response()->json(['message' => 'Brand not found or is not trashed'], 404);
     }
-     
+
 }

@@ -110,7 +110,7 @@ const handleLogin = async () => {
         await authStore.login(email.value, password.value, rememberMe.value); // Pass the remember me option
 
         // Redirect based on role
-        if (authStore.role === "admin") {
+        if (authStore.role === "admin" || authStore.role === "superadmin") {
             router.push({ name: "AdminDashboard" });
         } else {
             router.push({ name: "UserDashboard" });
