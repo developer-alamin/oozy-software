@@ -18,6 +18,14 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('role')->default('user');
+            $table->string('phone')->nullable();
+            $table->string('code')->nullable();
+            $table->text('photo')->nullable();
+            $table->text('address')->nullable();
+            $table->text('description')->nullable();
+            $table->enum('status', ['pending', 'approved', 'cancel'])->default('pending');
+            $table->bigInteger('created_by');
+            $table->bigInteger('updated_by');
             $table->rememberToken();
             $table->timestamps();
         });

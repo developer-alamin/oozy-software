@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class User extends Authenticatable
 {
@@ -44,5 +45,17 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    
+    public function createdTechnicians(): MorphMany
+    {
+        return $this->morphMany(Technician::class, 'creator');
+    }
+
+    // Technicians updated by this user
+    public function updatedTechnicians(): MorphMany
+    {
+        return $this->morphMany(Technician::class, 'updater');
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Technician;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TechnicianController extends Controller
 {
@@ -28,7 +29,22 @@ class TechnicianController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validatedData = $request->validate(Technician::validationRules());
+        if (Auth::guard('admin')->check()) {
+            $creator = Auth::guard('admin')->user();
+        } elseif (Auth::guard('user')->check()) {
+            $creator = Auth::guard('user')->user();
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        // Create the technician and associate it with the creator
+        $technician = new Technician($validatedData);
+        $technician->creator()->associate($creator);  // Assign creator polymorphically
+        $technician->updater()->associate($creator);
+        $technician->save();
+
+        return response()->json(['success' => true, 'message' => 'Technician created successfully.'], 201);
     }
 
     /**

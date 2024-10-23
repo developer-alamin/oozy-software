@@ -22,6 +22,9 @@ import BrandEdit from "./Pages/Admin/Brand/Edit.vue";
 import UnitIndex from "./Pages/Admin/Unit/Index.vue";
 import UnitCreate from "./Pages/Admin/Unit/Create.vue";
 import UnitEdit from "./Pages/Admin/Unit/Edit.vue";
+import TechnicianIndex from "./Pages/Technician/Index.vue";
+import TechnicianCreate from "./Pages/Technician/Create.vue";
+import TechnicianEdit from "./Pages/Technician/Edit.vue";
 import Contact from "./Pages/Contact.vue";
 
 const routes = [
@@ -155,7 +158,26 @@ const routes = [
                 meta: { title: "Edit Unit" },
                 props: true, // Enables passing route params as props
             },
-
+            // technician
+            {
+                path: "technician/index", // New route for Contact
+                name: "TechnicianIndex",
+                component: TechnicianIndex,
+                meta: { title: "Technician Index" },
+            },
+            {
+                path: "technician/create", // New route for Contact
+                name: "TechnicianCreate",
+                component: TechnicianCreate,
+                meta: { title: "Technician Create" },
+            },
+            {
+                path: "technician/edit/:id", // Dynamic route for Technician Edit
+                name: "TechnicianEdit",
+                component: TechnicianEdit,
+                meta: { title: "Edit Technician" },
+                props: true, // Enables passing route params as props
+            },
             {
                 path: "contact", // New route for Contact
                 name: "Contact",
@@ -180,6 +202,32 @@ const routes = [
                 name: "UserDashboard",
                 component: UserDashboard,
                 meta: { title: "User Dashboard" },
+            },
+            {
+                path: "contact", // New route for Contact
+                name: "Contact",
+                component: Contact,
+                meta: { title: "Contact" },
+            },
+            // technician
+            {
+                path: "technician/index", // New route for Contact
+                name: "TechnicianIndex",
+                component: TechnicianIndex,
+                meta: { title: "Technician Index" },
+            },
+            {
+                path: "technician/create", // New route for Contact
+                name: "TechnicianCreate",
+                component: TechnicianCreate,
+                meta: { title: "Technician Create" },
+            },
+            {
+                path: "technician/edit/:id", // Dynamic route for Technician Edit
+                name: "TechnicianEdit",
+                component: TechnicianEdit,
+                meta: { title: "Edit Technician" },
+                props: true, // Enables passing route params as props
             },
             {
                 path: "contact", // New route for Contact

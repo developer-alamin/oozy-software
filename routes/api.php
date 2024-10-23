@@ -37,6 +37,8 @@ Route::resource('company', CompanyController::class);
 // Factory
 Route::resource('factory', FactoryController::class);
 
+
+
 // Admin Auth Routes
 Route::prefix('admin')->group(function () {
     Route::post('/login', [AdminAuthController::class, 'login']);

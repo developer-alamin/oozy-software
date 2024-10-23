@@ -13,6 +13,14 @@ return new class extends Migration
     {
         Schema::create('rents', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->string('email')->nullable();
+            $table->string('phone')->nullable();
+            $table->text('photo')->nullable();
+            $table->text('address')->nullable();
+            $table->text('description')->nullable();
+            $table->morphs('creator'); // Polymorphic relationship for creator
+            $table->morphs('updater'); // Polymorphic relationship for updater
             $table->timestamps();
         });
     }

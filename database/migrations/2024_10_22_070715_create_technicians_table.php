@@ -13,6 +13,15 @@ return new class extends Migration
     {
         Schema::create('technicians', function (Blueprint $table) {
             $table->id();
+            $table->morphs('creator');
+            $table->morphs('updater'); 
+            $table->bigInteger('group_id');
+            $table->string('name');
+            $table->string('email')->nullable();
+            $table->string('phone')->nullable();
+            $table->text('photo')->nullable();
+            $table->text('address')->nullable();
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }
