@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\Admin\ProductModelController;
+use App\Http\Controllers\Auth\AuthController;
 
 Route::resource('suppliers', SupplierController::class);
 Route::resource('models', ProductModelController::class);
@@ -50,8 +51,10 @@ Route::prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->middleware('auth:admin');
 });
 
+Route::get('/user/role/auth', [AuthController::class, 'fetchUserAuthRoleInfo']);
 // User Auth Routes
 Route::prefix('user')->group(function () {
+
     Route::post('/register', [UserAuthController::class, 'register']);
     Route::post('/login', [UserAuthController::class, 'login']);
     Route::post('/logout', [UserAuthController::class, 'logout'])->middleware('auth:user');

@@ -199,12 +199,19 @@
                 >
                     <li>
                         <a href="icons-bootstrap.html">
-                            <i class="bi bi-circle"></i><span>User List</span>
+                            <i class="bi bi-circle"></i
+                            ><span>Admin User List</span>
                         </a>
                     </li>
                     <li>
                         <a href="icons-remix.html">
-                            <i class="bi bi-circle"></i><span>Add User</span>
+                            <i class="bi bi-circle"></i
+                            ><span>Add Admin User</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="icons-bootstrap.html">
+                            <i class="bi bi-circle"></i><span>User List</span>
                         </a>
                     </li>
                     <li>

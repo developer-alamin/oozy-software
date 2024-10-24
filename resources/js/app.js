@@ -2,7 +2,8 @@ import "./bootstrap";
 import { createApp } from "vue";
 import App from "./App.vue";
 import { createPinia } from "pinia";
-import router from "./router";
+import router from "./router/router.js";
+// import router from "./router";
 import axios from "./axiosInstance"; // Import your Axios instance
 // import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap CSS
 // import "bootstrap"; // Import Bootstrap JS

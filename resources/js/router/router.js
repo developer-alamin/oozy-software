@@ -1,34 +1,18 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { useAuthStore } from "./stores/authStore"; // Import the Pinia store
-import Login from "./Pages/Auth/Login.vue";
-import Register from "./Pages/Auth/Register.vue"; // Import Register component
-import UserDashboard from "./Pages/User/Dashboard.vue";
-import AdminDashboard from "./Pages/Admin/Dashboard.vue";
-import UserLayout from "./Pages/Layouts/UserLayout.vue";
-import AdminLayout from "./Pages/Layouts/AdminLayout.vue";
-import SupplierIndex from "./Pages/Admin/Supplier/Index.vue";
-import SupplierEdit from "./Pages/Admin/Supplier/Edit.vue";
-import SupplierCreate from "./Pages/Components/Admin/Supplier/SupplierCreateFrom.vue";
-import ModelIndex from "./Pages/Admin/Model/Index.vue";
-import ModelCreate from "./Pages/Admin/Model/Create.vue";
-import ModelEdit from "./Pages/Admin/Model/Edit.vue";
-import CategoryIndex from "./Pages/Admin/Category/Index.vue";
-import CategoryCreate from "./Pages/Admin/Category/Create.vue";
-import CategoryEdit from "./Pages/Admin/Category/Edit.vue";
-import BrandIndex from "./Pages/Admin/Brand/Index.vue";
-import BrandTrash from "./Pages/Admin/Brand/Trash.vue";
-import BrandCreate from "./Pages/Admin/Brand/Create.vue";
-import BrandEdit from "./Pages/Admin/Brand/Edit.vue";
-import UnitIndex from "./Pages/Admin/Unit/Index.vue";
-import UnitCreate from "./Pages/Admin/Unit/Create.vue";
-import UnitEdit from "./Pages/Admin/Unit/Edit.vue";
-import TechnicianIndex from "./Pages/Technician/Index.vue";
-import TechnicianCreate from "./Pages/Technician/Create.vue";
-import TechnicianEdit from "./Pages/Technician/Edit.vue";
-import TechnicianTrash from "./Pages/Technician/Trash.vue";
+import { useAuthStore } from "../stores/authStore"; // Import the Pinia store
+import Login from "../Pages/Auth/Login.vue";
+import Register from "../Pages/Auth/Register.vue"; // Import Register component
+import UserDashboard from "../Pages/User/Dashboard.vue";
+import AdminDashboard from "../Pages/Admin/Dashboard.vue";
+import UserLayout from "../Pages/Layouts/UserLayout.vue";
+import AdminLayout from "../Pages/Layouts/AdminLayout.vue";
+import * as adminComponents from "./adminComponents.js";
+// console.log(adminComponents);
 
-import UserTechnicianIndex from "./Pages/Technician/Index.vue";
-import Contact from "./Pages/Contact.vue";
+// Your route definitions can follow
+
+import UserTechnicianIndex from "../Pages/Technician/Index.vue";
+import Contact from "../Pages/Contact.vue";
 
 const routes = [
     {
@@ -59,38 +43,38 @@ const routes = [
             {
                 path: "supplier/index", // New route for Contact
                 name: "SupplierIndex",
-                component: SupplierIndex,
+                component: adminComponents.SupplierIndex,
                 meta: { title: "Supplier Index" },
             },
             {
                 path: "supplier/create", // New route for Contact
                 name: "SupplierCreate",
-                component: SupplierCreate,
+                component: adminComponents.SupplierCreate,
                 meta: { title: "Supplier Create" },
             },
             {
                 path: "supplier/edit/:id", // Dynamic route for Supplier Edit
                 name: "SupplierEdit",
-                component: SupplierEdit,
+                component: adminComponents.SupplierEdit,
                 meta: { title: "Edit Supplier" },
                 props: true, // Enables passing route params as props
             },
             {
                 path: "model/index", // New route for Contact
                 name: "ModelIndex",
-                component: ModelIndex,
+                component: adminComponents.ModelIndex,
                 meta: { title: "Model Index" },
             },
             {
                 path: "model/create", // New route for Contact
                 name: "ModelCreate",
-                component: ModelCreate,
+                component: adminComponents.ModelCreate,
                 meta: { title: "Model Create" },
             },
             {
                 path: "model/edit/:id", // Dynamic route for Model Edit
                 name: "ModelEdit",
-                component: ModelEdit,
+                component: adminComponents.ModelEdit,
                 meta: { title: "Edit Model" },
                 props: true, // Enables passing route params as props
             },
@@ -98,20 +82,20 @@ const routes = [
             {
                 path: "category/index", // New route for Contact
                 name: "CategoryIndex",
-                component: CategoryIndex,
+                component: adminComponents.CategoryIndex,
                 meta: { title: "Category Index" },
             },
             {
                 path: "category/create", // New route for Contact
                 name: "CategoryCreate",
-                component: CategoryCreate,
+                component: adminComponents.CategoryCreate,
                 meta: { title: "Category Create" },
             },
 
             {
                 path: "category/edit/:id", // Dynamic route for Category Edit
                 name: "CategoryEdit",
-                component: CategoryEdit,
+                component: adminComponents.CategoryEdit,
                 meta: { title: "Edit Category" },
                 props: true, // Enables passing route params as props
             },
@@ -119,46 +103,46 @@ const routes = [
             {
                 path: "brand/index", // New route for Contact
                 name: "BrandIndex",
-                component: BrandIndex,
+                component: adminComponents.BrandIndex,
                 meta: { title: "Brand Index" },
             },
             {
                 path: "brand/create", // New route for Contact
                 name: "BrandCreate",
-                component: BrandCreate,
+                component: adminComponents.BrandCreate,
                 meta: { title: "Brand Create" },
             },
 
             {
                 path: "brand/edit/:id", // Dynamic route for Brand Edit
                 name: "BrandEdit",
-                component: BrandEdit,
+                component: adminComponents.BrandEdit,
                 meta: { title: "Edit Brand" },
                 props: true, // Enables passing route params as props
             },
             {
                 path: "brand/trash", // New route for Contact
                 name: "BrandTrash",
-                component: BrandTrash,
+                component: adminComponents.BrandTrash,
                 meta: { title: "Brand Trash" },
             },
 
             {
                 path: "unit/index", // New route for Contact
                 name: "UnitIndex",
-                component: UnitIndex,
+                component: adminComponents.UnitIndex,
                 meta: { title: "Unit Index" },
             },
             {
                 path: "unit/create", // New route for Contact
                 name: "UnitCreate",
-                component: UnitCreate,
+                component: adminComponents.UnitCreate,
                 meta: { title: "Unit Create" },
             },
             {
                 path: "unit/edit/:id", // Dynamic route for Unit Edit
                 name: "UnitEdit",
-                component: UnitEdit,
+                component: adminComponents.UnitEdit,
                 meta: { title: "Edit Unit" },
                 props: true, // Enables passing route params as props
             },
@@ -166,26 +150,26 @@ const routes = [
             {
                 path: "technician/index", // New route for Contact
                 name: "TechnicianIndex",
-                component: TechnicianIndex,
+                component: adminComponents.TechnicianIndex,
                 meta: { title: "Technician Index" },
             },
             {
                 path: "technician/create", // New route for Contact
                 name: "TechnicianCreate",
-                component: TechnicianCreate,
+                component: adminComponents.TechnicianCreate,
                 meta: { title: "Technician Create" },
             },
             {
                 path: "technician/edit/:id", // Dynamic route for Technician Edit
                 name: "TechnicianEdit",
-                component: TechnicianEdit,
+                component: adminComponents.TechnicianEdit,
                 meta: { title: "Edit Technician" },
                 props: true, // Enables passing route params as props
             },
             {
                 path: "technician/trash", // New route for Contact
                 name: "TechnicianTrash",
-                component: TechnicianTrash,
+                component: adminComponents.TechnicianTrash,
                 meta: { title: "Technician Trash" },
             },
             {
@@ -204,7 +188,7 @@ const routes = [
     // },
     {
         path: "/user",
-        component: UserLayout, // Use the AdminLayout here
+        component: UserLayout, // Use the UserLayout here
         meta: { requiresAuth: true },
         children: [
             {
@@ -222,7 +206,7 @@ const routes = [
             {
                 path: "technician/index", // New route for Contact
                 name: "UserTechnicianIndex",
-                component: TechnicianIndex,
+                component: UserTechnicianIndex,
                 meta: { title: "Technician Index" },
             },
 
@@ -278,4 +262,14 @@ router.afterEach((to) => {
     document.title = to.meta.title || "My Application"; // Set document title
 });
 
+// router.beforeEach((to, from, next) => {
+//     const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+//     const isAuthenticated = checkAuthentication(); // Your logic for checking authentication
+
+//     if (requiresAuth && !isAuthenticated) {
+//         next({ name: "Login" }); // Redirect to login if not authenticated
+//     } else {
+//         next(); // Proceed to the route
+//     }
+// });
 export default router;

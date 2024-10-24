@@ -18,6 +18,7 @@
                         clearable
                     ></v-text-field>
                     <v-btn
+                        v-if="isAuthorized"
                         @click="createTechnician"
                         color="primary"
                         icon
@@ -132,6 +133,7 @@ export default {
             dialog: false,
             selectedTechnicianId: null,
             trashedCount: 0,
+            user: {},
         };
     },
     computed: {
@@ -139,11 +141,13 @@ export default {
         isAuthorized() {
             // You can customize the logic based on your needs
             return (
-                this.user &&
-                (this.user.role === "admin" || this.user.role === "user")
+                this.user.superadmin === true ||
+                this.user.admin === true ||
+                this.user.user_role === true
             );
         },
     },
+
     methods: {
         async loadItems({ page, itemsPerPage, sortBy }) {
             this.loading = true;
@@ -213,6 +217,14 @@ export default {
                 );
             }
         },
+        async fetchUserInfo() {
+            try {
+                const response = await this.$axios.get("/user/role/auth"); // Adjust to your API
+                this.user = response.data; // Ensure you set user role data here
+            } catch (error) {
+                console.error("Error fetching user info:", error);
+            }
+        },
     },
 
     created() {
@@ -221,6 +233,7 @@ export default {
             itemsPerPage: this.itemsPerPage,
             sortBy: [],
         });
+        this.fetchUserInfo();
         this.fetchTrashedTechniciansCount();
     },
 };
