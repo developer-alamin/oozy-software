@@ -96,12 +96,13 @@
 </template>
 
 <script>
+import { toast } from "vue3-toastify";
 export default {
     data() {
         return {
             valid: false,
             loading: false,
-            statusItems: ["Active", "In-Active"],
+            statusItems: ["Active", "Inactive"],
             technician: {
                 group_id: "",
                 name: "",
@@ -130,7 +131,7 @@ export default {
                 const response = await this.$axios.get(
                     `/technician/${technicianId}/edit`
                 );
-                console.log(response.data);
+                // console.log(response.data);
 
                 this.technician = response.data.technician; // Populate form with the existing technician data
                 this.technician.status =
@@ -155,11 +156,14 @@ export default {
 
                     if (response.data.success) {
                         this.$router.push({ name: "TechnicianIndex" }); // Redirect to technician list page
+                        toast.success("Technician Update successfully!");
                     }
                 } catch (error) {
                     if (error.response && error.response.status === 422) {
                         this.errors = error.response.data.errors || {};
+                        toast.error("Failed to Update technician.");
                     } else {
+                        toast.error("Failed to Update technician.");
                         this.serverError = "Error updating technician.";
                     }
                 } finally {

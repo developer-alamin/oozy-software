@@ -22,6 +22,7 @@ return new class extends Migration
             $table->text('photo')->nullable();
             $table->text('address')->nullable();
             $table->text('description')->nullable();
+            $table->enum('status', ['Active', 'Inactive'])->default('Inactive');
             $table->timestamps();
         });
     }

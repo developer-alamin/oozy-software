@@ -92,12 +92,13 @@
 </template>
 <script>
 import { ref } from "vue";
+import { toast } from "vue3-toastify";
 export default {
     data() {
         return {
             valid: false,
             loading: false, // Controls loading state of the button
-            statusItems: ["Active", "In-Active"],
+            statusItems: ["Active", "Inactive"],
             technician: {
                 group_id: "",
                 name: "",
@@ -106,7 +107,7 @@ export default {
                 photo: "",
                 address: "",
                 description: "",
-                status: "", // New property for checkbox
+                status: "Active", // New property for checkbox
             },
             errors: {}, // Stores validation errors
             serverError: null, // Stores server-side error messages
@@ -137,13 +138,16 @@ export default {
                     );
 
                     if (response.data.success) {
+                        toast.success("Technician create successfully!");
                         this.resetForm();
                     }
                 } catch (error) {
                     if (error.response && error.response.status === 422) {
+                        toast.error("Failed to create technician.");
                         // Handle validation errors from the server
                         this.errors = error.response.data.errors || {};
                     } else {
+                        toast.error("Failed to create technician.");
                         // Handle other server errors
                         this.serverError =
                             "An error occurred. Please try again.";
@@ -162,7 +166,7 @@ export default {
                 photo: "",
                 address: "",
                 description: "",
-                status: "", // New property for checkbox
+                status: "Active", // New property for checkbox
             };
             this.errors = {}; // Reset errors on form reset
             if (this.$refs.form) {
