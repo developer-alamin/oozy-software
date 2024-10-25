@@ -198,20 +198,21 @@
                     data-bs-parent="#sidebar-nav"
                 >
                     <li>
-                        <a href="icons-bootstrap.html">
+                        <router-link :to="{ name: 'AdminUserIndex' }">
                             <i class="bi bi-circle"></i
                             ><span>Admin User List</span>
-                        </a>
+                        </router-link>
                     </li>
                     <li>
-                        <a href="icons-remix.html">
+                        <router-link :to="{ name: 'AdminUserCreate' }">
                             <i class="bi bi-circle"></i
                             ><span>Add Admin User</span>
-                        </a>
+                        </router-link>
                     </li>
                     <li>
                         <a href="icons-bootstrap.html">
-                            <i class="bi bi-circle"></i><span>User List</span>
+                            <i class="bi bi-circle"></i
+                            ><span>All User List</span>
                         </a>
                     </li>
                     <li>

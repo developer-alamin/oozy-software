@@ -41,6 +41,31 @@ const routes = [
                 meta: { title: "Admin Dashboard" },
             },
             {
+                path: "user/index", // New route for Contact
+                name: "AdminUserIndex",
+                component: adminComponents.AdminUserIndex,
+                meta: { title: "Admin All User Index" },
+            },
+            {
+                path: "user/create", // New route for Contact
+                name: "AdminUserCreate",
+                component: adminComponents.AdminUserCreate,
+                meta: { title: "Admin User Create" },
+            },
+            {
+                path: "user/edit/:id", // Dynamic route for User Edit
+                name: "AdminUserEdit",
+                component: adminComponents.AdminUserEdit,
+                meta: { title: "Edit Admin User" },
+                props: true, // Enables passing route params as props
+            },
+            {
+                path: "user/trash", // New route for Contact
+                name: "AdminUserTrash",
+                component: adminComponents.AdminUserTrash,
+                meta: { title: "Admin User Trash" },
+            },
+            {
                 path: "supplier/index", // New route for Contact
                 name: "SupplierIndex",
                 component: adminComponents.SupplierIndex,

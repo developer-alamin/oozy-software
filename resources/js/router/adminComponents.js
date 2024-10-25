@@ -1,3 +1,9 @@
+// Admin user components
+export { default as AdminUserIndex } from "../Pages/Admin/User/AdminAllUserIndex.vue";
+export { default as AdminUserCreate } from "../Pages/Admin/User/AdminAllUserCreate.vue";
+export { default as AdminUserEdit } from "../Pages/Admin/User/AdminAllUserEdit.vue";
+export { default as AdminUserTrash } from "../Pages/Admin/User/AdminAllUserTrash.vue";
+
 // Supplier components
 export { default as SupplierIndex } from "../Pages/Admin/Supplier/Index.vue";
 export { default as SupplierEdit } from "../Pages/Admin/Supplier/Edit.vue";

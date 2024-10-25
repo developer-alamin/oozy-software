@@ -46,6 +46,12 @@ Route::resource('factory', FactoryController::class);
 
 // Admin Auth Routes
 Route::prefix('admin')->group(function () {
+    // admin user 
+    Route::get('/user/all', [AuthController::class, 'fetchAdminAllUserInfo']);
+    Route::post('/user/store', [AuthController::class, 'adminUserCreate']);
+    Route::get('/user/edit/{id}', [AuthController::class, 'adminUserEdit']);
+    Route::get('/user/trash', [AuthController::class, 'fetchAdminAllUserTrashInfo']);
+
     Route::post('/login', [AdminAuthController::class, 'login']);
     Route::post('/logout', [AdminAuthController::class, 'logout'])->middleware('auth:admin');
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->middleware('auth:admin');
