@@ -9,6 +9,12 @@ import AdminLayout from "../Pages/Layouts/AdminLayout.vue";
 import * as adminComponents from "./adminComponents.js";
 // console.log(adminComponents);
 
+
+
+
+
+
+
 // Your route definitions can follow
 
 import UserTechnicianIndex from "../Pages/Technician/Index.vue";
@@ -202,6 +208,75 @@ const routes = [
                 name: "Contact",
                 component: Contact,
                 meta: { title: "Contact" },
+            },
+
+            {
+                path: "line/index", // New route for line index
+                name: "LineIndex",
+                component: adminComponents.LineIndex,
+                meta: { title: "line Index" },
+            },
+            {
+                path: "line/create", // New route for line create
+                name: "LineCreate",
+                component: adminComponents.LineCreate,
+                meta: { title: "line Create" },
+            },
+            {
+                path: "line/edit/:id", // New route for line edit
+                name: "LineEdit",
+                component: adminComponents.LineEdit,
+                meta: { title: "line Edit" },
+                props:true
+            },
+            {
+                path: "line/trash", // New route for line trash
+                name: "LineTrash",
+                component: adminComponents.LineTrash,
+                meta: { title: "line Trash" },
+                props:true
+            },
+            {
+                path: "group/create", // New route for Group Create
+                name: "GroupCreate",
+                component: adminComponents.GroupCreate,
+                meta: { title: "Group Create" },
+                props:true
+            },
+            {
+                path: "group/index", // New route for Group Index
+                name: "GroupIndex",
+                component: adminComponents.GroupIndex,
+                meta: { title: "Group Index" },
+                props:true
+            },
+            {
+                path: "group/edit/:id", // New route for Group edit
+                name: "GroupEdit",
+                component: adminComponents.GroupEdit,
+                meta: { title: "group Edit" },
+                props:true
+            },
+            {
+                path: "group/trash", // New route for line trash
+                name: "GroupTrash",
+                component: adminComponents.GroupTrash,
+                meta: { title: "group Trash" },
+                props:true
+            },
+            {
+                path: "rent/index", // New route for rent index
+                name: "RentIndex",
+                component: adminComponents.RentIndex,
+                meta: { title: "rent index" },
+                props:true
+            },
+            {
+                path: "rent/create", // New route for rent Create
+                name: "RentCreate",
+                component: adminComponents.RentCreate,
+                meta: { title: "Rent Create" },
+                props:true
             },
         ],
     },

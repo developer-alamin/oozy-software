@@ -2,7 +2,7 @@
     <v-card>
         <v-card-title class="pt-5">
             <v-row>
-                <v-col cols="4"><span>Admin User List</span></v-col>
+                <v-col cols="4"><span>Line List</span></v-col>
                 <v-col cols="8" class="d-flex justify-end">
                     <v-text-field
                         v-model="search"
@@ -18,8 +18,7 @@
                         clearable
                     ></v-text-field>
                     <v-btn
-                        v-if="isAuthorized"
-                        @click="createUser"
+                        @click="createLine"
                         color="primary"
                         icon
                         style="width: 40px; height: 40px"
@@ -30,11 +29,11 @@
                                     >mdi-plus</v-icon
                                 >
                             </template>
-                            <span>Add a new user</span>
+                            <span>Add New a Line</span>
                         </v-tooltip>
                     </v-btn>
 
-                    <v-badge :content="trashedCount" color="red" overlap>
+                     <v-badge :content="trashedCount" color="red" overlap>
                         <v-btn
                             @click="viewTrash"
                             color="red"
@@ -51,7 +50,7 @@
                                         mdi-trash-can-outline
                                     </v-icon>
                                 </template>
-                                <span>View trashed Users</span>
+                                <span>View trashed Lines</span>
                             </v-tooltip>
                         </v-btn>
                     </v-badge>
@@ -70,19 +69,8 @@
             loading-text="Loading... Please wait"
             @update:options="loadItems"
         >
-            <template v-slot:item.status="{ item }">
-                <v-chip
-                    :color="item.status === 'Active' ? 'green' : 'red'"
-                    class="text-uppercase"
-                    size="small"
-                    label
-                >
-                    {{ item.status === "Active" ? "Active" : "Inactive" }}
-                </v-chip>
-            </template>
-
             <template v-slot:item.actions="{ item }">
-                <v-icon @click="editUser(item.id)" class="mr-2"
+                <v-icon @click="editLine(item.id)" class="mr-2"
                     >mdi-pencil</v-icon
                 >
                 <v-icon @click="showConfirmDialog(item.id)" color="red"
@@ -114,47 +102,30 @@ export default {
     data() {
         return {
             search: "",
-            itemsPerPage: 15,
+            itemsPerPage: 10,
             headers: [
                 { title: "Name", key: "name", sortable: true },
-                { title: "Email", key: "email", sortable: true },
-                { title: "Phone", key: "phone", sortable: true },
-                {
-                    title: "Status",
-                    key: "status",
-                    value: "status",
-                    sortable: true,
-                },
+                { title: "Number ",key: "number",value: "number",sortable: false,},
+                { title: "Description", key: "description", sortable: false },
+                
+                { title: "Craeate ",key: "created_at",value: "created_at",sortable: true,},
                 { title: "Actions", key: "actions", sortable: false },
             ],
             serverItems: [],
             loading: true,
             totalItems: 0,
             dialog: false,
-            selectedUserId: null,
+            selectedlineId: null,
             trashedCount: 0,
-            user: {},
         };
     },
-    computed: {
-        // Check if the user is authorized to create Users
-        isAuthorized() {
-            // You can customize the logic based on your needs
-            return (
-                this.user.superadmin === true ||
-                this.user.admin === true ||
-                this.user.user_role === true
-            );
-        },
-    },
-
     methods: {
         async loadItems({ page, itemsPerPage, sortBy }) {
             this.loading = true;
             const sortOrder = sortBy.length ? sortBy[0].order : "desc";
             const sortKey = sortBy.length ? sortBy[0].key : "created_at";
             try {
-                const response = await this.$axios.get("/admin/user/all", {
+                const response = await this.$axios.get("/line", {
                     params: {
                         page,
                         itemsPerPage,
@@ -163,62 +134,49 @@ export default {
                         search: this.search,
                     },
                 });
-                console.log(response.data.items)
                 this.serverItems = response.data.items || [];
-                // console.log(this.serverItems);
-
                 this.totalItems = response.data.total || 0;
-                this.fetchTrashedUsersCount();
+                this.fetchTrashedLinesCount();
             } catch (error) {
                 console.error("Error loading items:", error);
             } finally {
                 this.loading = false;
             }
         },
-        createUser() {
-            this.$router.push({ name: "AdminUserCreate" });
+        createLine() {
+            this.$router.push({ name: "LineCreate" });
         },
         viewTrash() {
-            this.$router.push({ name: "AdminUserTrash" });
+            this.$router.push({ name: "LineTrash" });
         },
-        editUser(id) {
-            this.$router.push({ name: "AdminUserEdit", params: { id } });
+        editLine(id) {
+            this.$router.push({ name: "LineEdit", params: { id } });
         },
         showConfirmDialog(id) {
-            this.selectedUserId = id;
+            this.selectedlineId = id;
             this.dialog = true;
         },
         async confirmDelete() {
             this.dialog = false; // Close the dialog
             try {
-                await this.$axios.delete(`/user/${this.selectedUserId}`);
+                await this.$axios.delete(`/line/${this.selectedlineId}`);
                 this.loadItems({
                     page: 1,
                     itemsPerPage: this.itemsPerPage,
                     sortBy: [],
                 });
-                toast.success("User deleted successfully!");
+                toast.success("Line deleted successfully!");
             } catch (error) {
-                console.error("Error deleting user:", error);
-                toast.error("Failed to delete user.");
+                console.error("Error deleting brand:", error);
+                toast.error("Failed to delete brand.");
             }
         },
-        async fetchTrashedUsersCount() {
+         async fetchTrashedLinesCount() {
             try {
-                const response = await this.$axios.get("/user/trashed-count");
-                this.trashedCount = response.data.trashedCount
-                    ? response.data.trashedCount
-                    : 0;
+                const response = await this.$axios.get("lines/trashed-count");
+                this.trashedCount = response.data.trashedCount;
             } catch (error) {
-                console.error("Error fetching trashed Users count:", error);
-            }
-        },
-        async fetchUserInfo() {
-            try {
-                const response = await this.$axios.get("/user/role/auth"); // Adjust to your API
-                this.user = response.data; // Ensure you set user role data here
-            } catch (error) {
-                console.error("Error fetching user info:", error);
+                console.error("Error fetching trashed Line count:", error);
             }
         },
     },
@@ -229,8 +187,7 @@ export default {
             itemsPerPage: this.itemsPerPage,
             sortBy: [],
         });
-        this.fetchUserInfo();
-        this.fetchTrashedUsersCount();
+        this.fetchTrashedLinesCount();
     },
 };
 </script>

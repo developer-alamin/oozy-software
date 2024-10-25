@@ -8,6 +8,11 @@ use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\Admin\UnitController;
 use App\Http\Controllers\TechnicianController;
 
+
+use App\Http\Controllers\Admin\LineController;
+use App\Http\Controllers\Admin\GroupController;
+
+
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Auth\UserAuthController;
@@ -20,6 +25,11 @@ use App\Http\Controllers\Auth\AuthController;
 Route::resource('suppliers', SupplierController::class);
 Route::resource('models', ProductModelController::class);
 Route::resource('category', CategoryController::class);
+
+
+
+Route::resource('line', LineController::class);
+Route::resource('group', GroupController::class);
 
 // brand
 Route::get('/brand/trashed', [BrandController::class, 'trashed']);
@@ -41,6 +51,44 @@ Route::resource('rent', RentController::class);
 Route::resource('company', CompanyController::class);
 // Factory
 Route::resource('factory', FactoryController::class);
+
+
+
+
+// Line Group Controllers start form here
+Route::controller(LineController::class)
+->prefix('lines')
+->as("lines")
+->group(function () {
+    Route::get('/trashed-count', 'lineTrashedCount')->name('line.Trashed.Count');
+    Route::get('/trashed', 'lineTrashed')->name('line.Trashed');
+    Route::post('{id}/restore', 'lineRestore')->name('line.Restore');
+    Route::delete('{id}/forceDelete', 'lineforceDelete')->name('line.lineforce.Delete');
+});
+// Line Group Controllers end form here
+
+
+// Groups Gorup Controller start form here
+Route::controller(GroupController::class)
+->prefix("groups")
+->as("groups")
+->group(function () {
+    Route::get('/trashed-count', 'groupsTrashedCount')->name('groups.Trashed.Count');
+    Route::get('/trashed', 'groupsTrashed')->name('groups.Trashed');
+    Route::post('{id}/restore', 'groupsRestore')->name('groups.Restore');
+    Route::delete('{id}/forceDelete', 'groupsforceDelete')->name('groups.groupsforce.Delete');
+});
+// Groups Gorup Controller end form here
+
+
+
+
+
+
+
+
+
+
 
 
 

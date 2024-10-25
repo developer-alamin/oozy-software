@@ -35,3 +35,24 @@ export { default as TechnicianIndex } from "../Pages/Technician/Index.vue";
 export { default as TechnicianCreate } from "../Pages/Technician/Create.vue";
 export { default as TechnicianEdit } from "../Pages/Technician/Edit.vue";
 export { default as TechnicianTrash } from "../Pages/Technician/Trash.vue";
+
+
+
+// Line components
+export { default as LineIndex } from "../Pages/Admin/Line/Index.vue";
+export { default as LineCreate } from "../Pages/Admin/Line/Create.vue";
+export { default as LineEdit } from "../Pages/Admin/Line/Edit.vue";
+export { default as LineTrash } from "../Pages/Admin/Line/Trash.vue";
+
+// Group components
+export { default as GroupIndex } from "../Pages/Admin/Line/Index.vue";
+export { default as GroupCreate } from "../Pages/Admin/Group/Create.vue";
+export { default as GroupEdit } from "../Pages/Admin/Group/Edit.vue";
+export { default as GroupTrash } from "../Pages/Admin/Group/Trash.vue";
+
+
+// Rent components
+export { default as RentIndex } from "../Pages/Admin/Rent/Index.vue";
+export { default as RentCreate } from "../Pages/Admin/Rent/Create.vue";
+
+
