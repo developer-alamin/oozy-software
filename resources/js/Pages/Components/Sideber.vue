@@ -268,10 +268,11 @@
                     </li>
                 </ul>
             </li>
+             <!-- Start Settings Nav -->
             <li class="nav-item">
                 <a
                     class="nav-link collapsed"
-                    data-bs-target="#tables-nav"
+                    data-bs-target="#settings-nav"
                     data-bs-toggle="collapse"
                     href="#"
                 >
@@ -280,19 +281,40 @@
                     ><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
                 <ul
-                    id="tables-nav"
+                    id="settings-nav"
                     class="nav-content collapse"
                     data-bs-parent="#sidebar-nav"
                 >
                     <li>
-                        <a href="tables-general.html">
-                            <i class="bi bi-circle"></i
-                            ><span>General Settings </span>
-                        </a>
+                        <router-link
+                            :to="{ name: 'LineIndex' }"
+                            active-class="active"
+                            :class="{ active: isLineIndex }"
+                        >
+                            <i class="bi bi-circle"></i><span>Line</span>
+                        </router-link>
+                    </li>
+                     <li>
+                        <router-link
+                            :to="{ name: 'GroupIndex' }"
+                            active-class="active"
+                            :class="{ active: isGroupIndex }"
+                        >
+                            <i class="bi bi-circle"></i><span>Group</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'RentIndex' }"
+                            active-class="active"
+                            :class="{ active: isRentIndex }"
+                        >
+                            <i class="bi bi-circle"></i><span>Rent</span>
+                        </router-link>
                     </li>
                 </ul>
             </li>
-            <!-- End Icons Nav -->
+            <!-- End Settings Nav -->
 
             <li class="nav-heading"></li>
 

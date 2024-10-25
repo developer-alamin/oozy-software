@@ -2,7 +2,7 @@
     <v-card>
         <v-card-title class="pt-5">
             <v-row>
-                <v-col cols="4"><span>Admin User List</span></v-col>
+                <v-col cols="4"><span>Group List</span></v-col>
                 <v-col cols="8" class="d-flex justify-end">
                     <v-text-field
                         v-model="search"
@@ -18,8 +18,7 @@
                         clearable
                     ></v-text-field>
                     <v-btn
-                        v-if="isAuthorized"
-                        @click="createUser"
+                        @click="GroupCreate"
                         color="primary"
                         icon
                         style="width: 40px; height: 40px"
@@ -30,7 +29,7 @@
                                     >mdi-plus</v-icon
                                 >
                             </template>
-                            <span>Add a new user</span>
+                            <span>Add a new Group</span>
                         </v-tooltip>
                     </v-btn>
 
@@ -51,7 +50,7 @@
                                         mdi-trash-can-outline
                                     </v-icon>
                                 </template>
-                                <span>View trashed Users</span>
+                                <span>View Trashed Groups</span>
                             </v-tooltip>
                         </v-btn>
                     </v-badge>
@@ -82,7 +81,7 @@
             </template>
 
             <template v-slot:item.actions="{ item }">
-                <v-icon @click="editUser(item.id)" class="mr-2"
+                <v-icon @click="editGroup(item.id)" class="mr-2"
                     >mdi-pencil</v-icon
                 >
                 <v-icon @click="showConfirmDialog(item.id)" color="red"
@@ -106,6 +105,7 @@
 <script>
 import { toast } from "vue3-toastify";
 import ConfirmDialog from "../../Components/ConfirmDialog.vue";
+import bus from "./eventBus";
 
 export default {
     components: {
@@ -116,13 +116,12 @@ export default {
             search: "",
             itemsPerPage: 15,
             headers: [
-                { title: "Name", key: "name", sortable: true },
-                { title: "Email", key: "email", sortable: true },
-                { title: "Phone", key: "phone", sortable: true },
+                { title: "Group Name", key: "name", sortable: true },
+                { title: "Description", key: "description", sortable: false },
                 {
-                    title: "Status",
-                    key: "status",
-                    value: "status",
+                    title: "Create",
+                    key: "create",
+                    value:"created_at",
                     sortable: true,
                 },
                 { title: "Actions", key: "actions", sortable: false },
@@ -131,30 +130,17 @@ export default {
             loading: true,
             totalItems: 0,
             dialog: false,
-            selectedUserId: null,
+            selectedGroupId: null,
             trashedCount: 0,
-            user: {},
         };
     },
-    computed: {
-        // Check if the user is authorized to create Users
-        isAuthorized() {
-            // You can customize the logic based on your needs
-            return (
-                this.user.superadmin === true ||
-                this.user.admin === true ||
-                this.user.user_role === true
-            );
-        },
-    },
-
     methods: {
         async loadItems({ page, itemsPerPage, sortBy }) {
             this.loading = true;
             const sortOrder = sortBy.length ? sortBy[0].order : "desc";
             const sortKey = sortBy.length ? sortBy[0].key : "created_at";
             try {
-                const response = await this.$axios.get("/admin/user/all", {
+                const response = await this.$axios.get("/group", {
                     params: {
                         page,
                         itemsPerPage,
@@ -163,62 +149,48 @@ export default {
                         search: this.search,
                     },
                 });
-                console.log(response.data.items)
                 this.serverItems = response.data.items || [];
-                // console.log(this.serverItems);
-
                 this.totalItems = response.data.total || 0;
-                this.fetchTrashedUsersCount();
+                this.fetchTrashedGroupsCount();
             } catch (error) {
                 console.error("Error loading items:", error);
             } finally {
                 this.loading = false;
             }
         },
-        createUser() {
-            this.$router.push({ name: "AdminUserCreate" });
+        GroupCreate() {
+            this.$router.push({ name: "GroupCreate" });
         },
         viewTrash() {
-            this.$router.push({ name: "AdminUserTrash" });
+            this.$router.push({ name: "GroupTrash" });
         },
-        editUser(id) {
-            this.$router.push({ name: "AdminUserEdit", params: { id } });
+        editGroup(id) {
+            this.$router.push({ name: "GroupEdit", params: { id } });
         },
         showConfirmDialog(id) {
-            this.selectedUserId = id;
+            this.selectedGroupId = id;
             this.dialog = true;
         },
         async confirmDelete() {
             this.dialog = false; // Close the dialog
             try {
-                await this.$axios.delete(`/user/${this.selectedUserId}`);
+                await this.$axios.delete(`/group/${this.selectedGroupId}`);
                 this.loadItems({
                     page: 1,
                     itemsPerPage: this.itemsPerPage,
                     sortBy: [],
                 });
-                toast.success("User deleted successfully!");
+                toast.success("Group deleted successfully!");
             } catch (error) {
-                console.error("Error deleting user:", error);
-                toast.error("Failed to delete user.");
+                toast.error("Failed to delete group.");
             }
         },
-        async fetchTrashedUsersCount() {
+        async fetchTrashedGroupsCount() {
             try {
-                const response = await this.$axios.get("/user/trashed-count");
-                this.trashedCount = response.data.trashedCount
-                    ? response.data.trashedCount
-                    : 0;
+                const response = await this.$axios.get("/groups/trashed-count");
+                this.trashedCount = response.data.trashedCount;
             } catch (error) {
-                console.error("Error fetching trashed Users count:", error);
-            }
-        },
-        async fetchUserInfo() {
-            try {
-                const response = await this.$axios.get("/user/role/auth"); // Adjust to your API
-                this.user = response.data; // Ensure you set user role data here
-            } catch (error) {
-                console.error("Error fetching user info:", error);
+                console.error("Error fetching trashed groups count:", error);
             }
         },
     },
@@ -229,8 +201,7 @@ export default {
             itemsPerPage: this.itemsPerPage,
             sortBy: [],
         });
-        this.fetchUserInfo();
-        this.fetchTrashedUsersCount();
+        this.fetchTrashedGroupsCount();
     },
 };
 </script>
