@@ -127,7 +127,7 @@ class AuthController extends Controller
         
     }
 
-    public function fetchAllUserInfo(Request $request)
+    public function allUserInfo(Request $request)
     {
         // $currentUser = Auth::guard('admin')->user();
         // return response()->json([
@@ -142,25 +142,25 @@ class AuthController extends Controller
         $search       = $request->input('search', '');           // Search term, default is empty
 
         // Determine the authenticated user (either from 'admin' guard)
-        if (Auth::guard('user')->check()) {
+        if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('user')->user();
             // retrieve all admin all users
-            $adminAllUsersQuery = User::query(); // No filters applied
+            $allUsersQuery = User::query(); // No filters applied
         } else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
         // Apply search if the search term is not empty
         if (!empty($search)) {
-            $adminAllUsersQuery->where('name', 'LIKE', '%' . $search . '%');
+            $allUsersQuery->where('name', 'LIKE', '%' . $search . '%');
         }
         // Apply sorting
-        $adminAllUsersQuery->orderBy($sortBy, $sortOrder);
+        $allUsersQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $adminAllUsers = $adminAllUsersQuery->paginate($itemsPerPage);
+        $allUsers = $allUsersQuery->paginate($itemsPerPage);
         // Return the response as JSON
         return response()->json([
-            'items' => $adminAllUsers->items(), // Current page items
-            'total' => $adminAllUsers->total(), // Total number of records
+            'items' => $allUsers->items(), // Current page items
+            'total' => $allUsers->total(), // Total number of records
         ]);
     }
 

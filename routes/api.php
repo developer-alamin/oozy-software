@@ -51,10 +51,6 @@ Route::resource('rent', RentController::class);
 Route::resource('company', CompanyController::class);
 // Factory
 Route::resource('factory', FactoryController::class);
-
-
-
-
 // Line Group Controllers start form here
 Route::controller(LineController::class)
 ->prefix('lines')
@@ -66,8 +62,6 @@ Route::controller(LineController::class)
     Route::delete('{id}/forceDelete', 'lineforceDelete')->name('line.lineforce.Delete');
 });
 // Line Group Controllers end form here
-
-
 // Groups Gorup Controller start form here
 Route::controller(GroupController::class)
 ->prefix("groups")
@@ -79,19 +73,6 @@ Route::controller(GroupController::class)
     Route::delete('{id}/forceDelete', 'groupsforceDelete')->name('groups.groupsforce.Delete');
 });
 // Groups Gorup Controller end form here
-
-
-
-
-
-
-
-
-
-
-
-
-
 // Admin Auth Routes
 Route::prefix('admin')->group(function () {
     // admin user 
@@ -99,6 +80,9 @@ Route::prefix('admin')->group(function () {
     Route::post('/user/store', [AuthController::class, 'adminUserCreate']);
     Route::get('/user/edit/{id}', [AuthController::class, 'adminUserEdit']);
     Route::get('/user/trash', [AuthController::class, 'fetchAdminAllUserTrashInfo']);
+
+    Route::get('/company/user/all', [AuthController::class, 'allUserInfo']);
+    Route::post('/company/user/store', [AuthController::class, 'userCreate']);
 
     Route::post('/login', [AdminAuthController::class, 'login']);
     Route::post('/logout', [AdminAuthController::class, 'logout'])->middleware('auth:admin');

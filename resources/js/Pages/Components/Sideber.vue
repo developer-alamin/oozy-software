@@ -86,6 +86,43 @@
                 </ul>
             </li>
             <!-- End Components Nav -->
+            <li class="nav-item">
+                <a
+                    class="nav-link collapsed"
+                    data-bs-target="#forms-nav-company"
+                    data-bs-toggle="collapse"
+                    href="#"
+                    :class="{ show: isCompanyRouteShow }"
+                >
+                    <i class="bi bi-journal-text"></i><span>Company</span
+                    ><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul
+                    id="forms-nav-company"
+                    class="nav-content collapse"
+                    data-bs-parent="#sidebar-nav"
+                    :class="{ show: isCompanyRouteShow }"
+                >
+                    <li>
+                        <router-link
+                            :to="{ name: 'CompanyCreate' }"
+                            active-class="active"
+                            :class="{ active: isCompanyCreateActive }"
+                        >
+                            <i class="bi bi-circle"></i><span>Add Company</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'AllCompanyIndex' }"
+                            active-class="active"
+                            :class="{ active: isCompanyIndexActive }"
+                        >
+                            <i class="bi bi-circle"></i><span>All Company</span>
+                        </router-link>
+                    </li>
+                </ul>
+            </li>
 
             <li class="nav-item">
                 <a
@@ -188,6 +225,7 @@
                     data-bs-target="#icons-nav"
                     data-bs-toggle="collapse"
                     href="#"
+                    :class="{ show: isAdminUserRouteShow }"
                 >
                     <i class="bi bi-gem"></i><span>User & Permissions</span
                     ><i class="bi bi-chevron-down ms-auto"></i>
@@ -196,24 +234,46 @@
                     id="icons-nav"
                     class="nav-content collapse"
                     data-bs-parent="#sidebar-nav"
+                    :class="{ show: isAdminUserRouteShow }"
                 >
                     <li>
-                        <router-link :to="{ name: 'AdminUserIndex' }">
+                        <router-link
+                            :to="{ name: 'AdminUserIndex' }"
+                            active-class="active"
+                            :class="{ active: isAdminUserIndexActive }"
+                        >
                             <i class="bi bi-circle"></i
                             ><span>Admin User List</span>
                         </router-link>
                     </li>
                     <li>
-                        <router-link :to="{ name: 'AdminUserCreate' }">
+                        <router-link
+                            :to="{ name: 'AdminUserCreate' }"
+                            active-class="active"
+                            :class="{ active: isAdminUserCreateActive }"
+                        >
                             <i class="bi bi-circle"></i
                             ><span>Add Admin User</span>
                         </router-link>
                     </li>
                     <li>
-                        <a href="icons-bootstrap.html">
+                        <router-link
+                            :to="{ name: 'AllUserIndex' }"
+                            active-class="active"
+                            :class="{ active: isUserIndexActive }"
+                        >
                             <i class="bi bi-circle"></i
                             ><span>All User List</span>
-                        </a>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link
+                            active-class="active"
+                            :class="{ active: isUserCreateActive }"
+                            :to="{ name: 'UserCreate' }"
+                        >
+                            <i class="bi bi-circle"></i><span>User Create</span>
+                        </router-link>
                     </li>
                     <li>
                         <a href="icons-boxicons.html">
@@ -268,7 +328,7 @@
                     </li>
                 </ul>
             </li>
-             <!-- Start Settings Nav -->
+            <!-- Start Settings Nav -->
             <li class="nav-item">
                 <a
                     class="nav-link collapsed"
@@ -294,7 +354,7 @@
                             <i class="bi bi-circle"></i><span>Line</span>
                         </router-link>
                     </li>
-                     <li>
+                    <li>
                         <router-link
                             :to="{ name: 'GroupIndex' }"
                             active-class="active"
@@ -391,6 +451,17 @@ const isBrandRoute = computed(() =>
 const isUnitRoute = computed(() =>
     ["UnitIndex", "UnitCreate", "UnitEdit"].includes(route.name)
 );
+// Company
+const isCompanyRouteShow = computed(() => {
+    return [
+        "AllCompanyIndex",
+        "CompanyCreate",
+        "CompanyEdit",
+        "CompanyTrash",
+    ].includes(route.name);
+});
+const isCompanyCreateActive = computed(() => route.name === "CompanyCreate");
+const isCompanyIndexActive = computed(() => route.name === "AllCompanyIndex");
 //
 const isTechnicianRouteShow = computed(() => {
     return [
@@ -406,6 +477,26 @@ const isTechnicianCreateActive = computed(
 const isTechnicianIndexActive = computed(
     () => route.name === "TechnicianIndex"
 );
+
+// Company
+const isAdminUserRouteShow = computed(() => {
+    return [
+        "AdminUserIndex",
+        "AdminUserCreate",
+        "AdminUserEdit",
+        "AdminUserTrash",
+        "AllUserIndex",
+        "UserCreate",
+    ].includes(route.name);
+});
+const isAdminUserIndexActive = computed(() => route.name === "AdminUserIndex");
+const isAdminUserCreateActive = computed(
+    () => route.name === "AdminUserCreate"
+);
+const isAdminUserEditActive = computed(() => route.name === "AdminUserEdit");
+const isAdminUserTrashActive = computed(() => route.name === "AdminUserTrash");
+const isUserCreateActive = computed(() => route.name === "UserCreate");
+const isUserIndexActive = computed(() => route.name === "AllUserIndex");
 </script>
 
 <style scoped>
