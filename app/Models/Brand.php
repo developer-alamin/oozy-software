@@ -17,38 +17,38 @@ class Brand extends Model
     protected $keyType = 'string'; // Set key type to string for UUIDs
     // Define the primary key for this model
     protected $primaryKey = 'uuid'; // Assuming you want the uuid as the primary key
-    
+
     protected $fillable = [
-        'uuid', 
+        'uuid',
         'name',
-        'description', 
+        'description',
         'status',
-        'meta_data', 
+        'meta_data',
         'creator_id',
         'creator_type',
         'updater_id',
         'updater_type',
     ];
-    
+
     // protected static function boot()
     // {
     //     parent::boot();
-        
+
     //     static::creating(function ($model) {
     //         if (empty($model->uuid)) {
     //             $model->uuid = (string) Str::uuid();
     //         }
     //     });
     // }
-    
+
     public static function validationRules()
     {
         return [
             'name'         => 'required|string|max:255',
             'description'  => 'nullable|string',
-            'status'       => 'nullable',
+            'status'       => 'nullable|in:Active,Inactive',
             'meta_data'    => 'nullable',
-            
+
         ];
     }
 

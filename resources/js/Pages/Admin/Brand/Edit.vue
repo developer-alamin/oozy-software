@@ -37,6 +37,7 @@
                     :items="statusItems"
                     label="Brand Status"
                     clearable
+                    :error-messages="errors.status ? errors.status : ''"
                 ></v-select>
 
                 <!-- Action Buttons -->
@@ -72,12 +73,13 @@
 </template>
 
 <script>
+import { toast } from "vue3-toastify";
 export default {
     data() {
         return {
             valid: false,
             loading: false,
-            statusItems: ["Active", "In-Active"],
+            statusItems: ["Active", "Inactive"],
             brand: {
                 name: "",
                 description: "",
@@ -105,7 +107,7 @@ export default {
 
                 this.brand = response.data.brand; // Populate form with the existing brand data
                 this.brand.status =
-                    this.brand.status === "Active" ? "Active" : "In-Active";
+                    this.brand.status === "Active" ? "Active" : "Inactive";
             } catch (error) {
                 this.serverError = "Error fetching brand data.";
             }
@@ -114,7 +116,7 @@ export default {
             this.errors = {}; // Reset errors before submission
             this.serverError = null;
             this.loading = true;
-            const brandId = this.$route.params.id; // Assuming brand ID is in route params
+            const brandId = this.$route.params.uuid; // Assuming brand ID is in route params
             setTimeout(async () => {
                 try {
                     const response = await this.$axios.put(
@@ -123,12 +125,15 @@ export default {
                     );
 
                     if (response.data.success) {
+                        toast.success("Brand update successfully!");
                         this.$router.push({ name: "BrandIndex" }); // Redirect to brand list page
                     }
                 } catch (error) {
                     if (error.response && error.response.status === 422) {
+                        toast.error("Failed to update brand.");
                         this.errors = error.response.data.errors || {};
                     } else {
+                        toast.error("Error updating brand. Please try again.");
                         this.serverError = "Error updating brand.";
                     }
                 } finally {

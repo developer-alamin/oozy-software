@@ -76,16 +76,17 @@
 </template>
 <script>
 import { ref } from "vue";
+import { toast } from "vue3-toastify";
 export default {
     data() {
         return {
             valid: false,
             loading: false, // Controls loading state of the button
-            statusItems: ["Active", "In-Active"],
+            statusItems: ["Active", "Inactive"],
             brand: {
                 name: "",
                 description: "",
-                status: "", // New property for checkbox
+                status: "Active", // New property for checkbox
             },
             errors: {}, // Stores validation errors
             serverError: null, // Stores server-side error messages
@@ -113,13 +114,17 @@ export default {
                     const response = await this.$axios.post("/brand", formData);
 
                     if (response.data.success) {
+                        toast.success("Brand create successfully!");
                         this.resetForm();
                     }
                 } catch (error) {
                     if (error.response && error.response.status === 422) {
+                        toast.error("Failed to create brand.");
                         // Handle validation errors from the server
                         this.errors = error.response.data.errors || {};
                     } else {
+                        toast.error("An error occurred. Please try again.");
+
                         // Handle other server errors
                         this.serverError =
                             "An error occurred. Please try again.";

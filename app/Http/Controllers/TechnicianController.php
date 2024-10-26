@@ -146,12 +146,10 @@ class TechnicianController extends Controller
         } else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
-
         // Check if the technician belongs to the current user or admin
         if ($technician->creator_type !== $creatorType || $technician->creator_id !== $currentUser->id) {
             return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to edit this technician.'], 403);
         }
-
         // Return the technician data if authorized
         return response()->json([
             'success' => true,

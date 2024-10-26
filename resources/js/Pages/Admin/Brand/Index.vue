@@ -80,6 +80,10 @@
                 </v-chip>
             </template>
 
+            <template v-slot:item.creator_name="{ item }">
+                <span>{{ item.creator ? item.creator.name : "Unknown" }}</span>
+            </template>
+
             <template v-slot:item.actions="{ item }">
                 <v-icon @click="editBrand(item.uuid)" class="mr-2"
                     >mdi-pencil</v-icon
@@ -124,6 +128,7 @@ export default {
                     value: "status",
                     sortable: true,
                 },
+                { title: "Creator", key: "creator.name", sortable: false },
                 { title: "Actions", key: "actions", sortable: false },
             ],
             serverItems: [],
