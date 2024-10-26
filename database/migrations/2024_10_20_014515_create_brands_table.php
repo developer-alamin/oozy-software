@@ -13,9 +13,13 @@ return new class extends Migration
     {
         Schema::create('brands', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid')->unique();
+            // $table->bigInteger('brand_id');
+            $table->morphs('creator');
+            $table->morphs('updater'); 
             $table->string('name');
             $table->text('description')->nullable();
-            $table->string('status')->default(false);
+            $table->enum('status', ['Active', 'Inactive', 'Pending'])->default('Inactive');
             $table->text('meta_data')->nullable();
             $table->timestamps();
         });

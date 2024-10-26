@@ -81,10 +81,10 @@
             </template>
 
             <template v-slot:item.actions="{ item }">
-                <v-icon @click="editBrand(item.id)" class="mr-2"
+                <v-icon @click="editBrand(item.uuid)" class="mr-2"
                     >mdi-pencil</v-icon
                 >
-                <v-icon @click="showConfirmDialog(item.id)" color="red"
+                <v-icon @click="showConfirmDialog(item.uuid)" color="red"
                     >mdi-delete</v-icon
                 >
             </template>
@@ -164,11 +164,11 @@ export default {
         viewTrash() {
             this.$router.push({ name: "BrandTrash" });
         },
-        editBrand(id) {
-            this.$router.push({ name: "BrandEdit", params: { id } });
+        editBrand(uuid) {
+            this.$router.push({ name: "BrandEdit", params: { uuid } });
         },
-        showConfirmDialog(id) {
-            this.selectedBrandId = id;
+        showConfirmDialog(uuid) {
+            this.selectedBrandId = uuid;
             this.dialog = true;
         },
         async confirmDelete() {

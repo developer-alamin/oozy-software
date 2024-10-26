@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
-class Line extends Model
+class line extends Model
 {
-    use HasFactory,SoftDeletes,HasUuids;
+    use HasFactory,SoftDeletes;
 
     protected $table = 'lines';
 
@@ -31,16 +30,15 @@ class Line extends Model
             'description'  => 'nullable|string',
         ];
     }
-    // Polymorphic relationships
-    public function creator()
-    {
-        return $this->morphTo();
-    }
 
-    public function updater()
-    {
-        return $this->morphTo();
-    }
-
-
+     // Polymorphic relationships
+     public function creator()
+     {
+         return $this->morphTo();
+     }
+ 
+     public function updater()
+     {
+         return $this->morphTo();
+     }
 }

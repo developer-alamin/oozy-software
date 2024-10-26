@@ -190,7 +190,7 @@ const routes = [
             },
 
             {
-                path: "brand/edit/:id", // Dynamic route for Brand Edit
+                path: "brand/edit/:uuid", // Dynamic route for Brand Edit
                 name: "BrandEdit",
                 component: adminComponents.BrandEdit,
                 meta: { title: "Edit Brand" },

@@ -12,7 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('lines', function (Blueprint $table) {
-            $table->id();
+            // No auto-increment here
+            $table->uuid()->primary(); 
+            $table->bigInteger('line_id')->default(0)->unique();
+            $table->morphs('creator');
+            $table->morphs('updater');
             $table->string('name')->nullable();
             $table->string('number')->nullable();
             $table->string('description')->nullable();

@@ -60,4 +60,28 @@ class User extends Authenticatable
     {
         return $this->morphMany(Technician::class, 'updater');
     }
+    
+    // Technicians created by this user
+    public function createdBrands(): MorphMany
+    {
+        return $this->morphMany(Brand::class, 'creator');
+    }
+
+    // Brands updated by this user
+    public function updatedBrands(): MorphMany
+    {
+        return $this->morphMany(Brand::class, 'updater');
+    }
+
+     // Lines created by this user
+     public function createdLines(): MorphMany
+     {
+         return $this->morphMany(Line::class, 'creator');
+     }
+ 
+     // Lines updated by this user
+     public function updatedLines(): MorphMany
+     {
+         return $this->morphMany(Line::class, 'updater');
+     }
 }

@@ -96,7 +96,7 @@ export default {
     methods: {
         async fetchBrand() {
             // Fetch the brand data to populate the form
-            const brandId = this.$route.params.id; // Assuming the brand ID is passed in the route params
+            const brandId = this.$route.params.uuid; // Assuming the brand ID is passed in the route params
             try {
                 const response = await this.$axios.get(
                     `/brand/${brandId}/edit`

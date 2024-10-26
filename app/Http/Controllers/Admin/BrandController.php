@@ -7,6 +7,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 
 class BrandController extends Controller
 {
@@ -84,10 +85,36 @@ class BrandController extends Controller
      */
     public function store(Request $request)
     {
+        // $lastBrandId = Brand::orderBy('brand_id', 'desc')->first();
+        // $newBrandId = $lastBrandId ? $lastBrandId->brand_id + 1 : 1;
+         // Validate the incoming request data
         $validatedData = $request->validate(Brand::validationRules());
-
-        Brand::create($validatedData);
-        return response()->json(['success' => true,'message' => 'Brand created successfully.'], 201);
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+             $creator = Auth::guard('admin')->user();
+             // Check if the admin is a superadmin
+             if ($creator->role === 'superadmin') {
+                 // Superadmin can create technician without additional checks
+             } else {
+                 // Regular admin authorization check can be implemented here if needed
+             }
+ 
+         } elseif (Auth::guard('user')->check()) {
+             $creator = Auth::guard('user')->user();
+             // If you want users to have specific restrictions, implement checks here
+         } else {
+             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+         }
+ 
+         // Create the technician and associate it with the creator
+         $brand = new Brand($validatedData);
+        //  $brand->brand_id = $newBrandId;
+         $brand->creator()->associate($creator);  // Assign creator polymorphically
+         $brand->updater()->associate($creator);  // Associate the updater
+         $brand->save(); // Save the technician to the database
+         // Return a success response
+         return response()->json(['success' => true, 'message' => 'Brand created successfully.'], 201);
+    
     }
 
     /**
@@ -103,6 +130,7 @@ class BrandController extends Controller
      */
     public function edit(Brand $brand)
     {
+        
         return response()->json([
             'success' => true,
             'brand' => $brand
