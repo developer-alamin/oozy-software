@@ -24,6 +24,11 @@ use App\Http\Controllers\Auth\AuthController;
 
 Route::resource('suppliers', SupplierController::class);
 Route::resource('models', ProductModelController::class);
+// category
+Route::get('/category/trashed', [CategoryController::class, 'trashed']);
+Route::post('/category/{id}/restore', [CategoryController::class, 'restore']);
+Route::delete('/category/{id}/force-delete', [CategoryController::class, 'forceDelete']);
+Route::get('/category/trashed-count', [CategoryController::class, 'trashedcategorysCount']);
 Route::resource('category', CategoryController::class);
 
 
@@ -75,7 +80,7 @@ Route::controller(GroupController::class)
 // Groups Gorup Controller end form here
 // Admin Auth Routes
 Route::prefix('admin')->group(function () {
-    // admin user 
+    // admin user
     Route::get('/user/all', [AuthController::class, 'fetchAdminAllUserInfo']);
     Route::post('/user/store', [AuthController::class, 'adminUserCreate']);
     Route::get('/user/edit/{id}', [AuthController::class, 'adminUserEdit']);

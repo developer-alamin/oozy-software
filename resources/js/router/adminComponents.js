@@ -30,6 +30,7 @@ export { default as ModelEdit } from "../Pages/Admin/Model/Edit.vue";
 export { default as CategoryIndex } from "../Pages/Admin/Category/Index.vue";
 export { default as CategoryCreate } from "../Pages/Admin/Category/Create.vue";
 export { default as CategoryEdit } from "../Pages/Admin/Category/Edit.vue";
+export { default as CategoryTrash } from "../Pages/Admin/Category/Trash.vue";
 
 // Brand components
 export { default as BrandIndex } from "../Pages/Admin/Brand/Index.vue";

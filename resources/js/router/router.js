@@ -169,11 +169,17 @@ const routes = [
             },
 
             {
-                path: "category/edit/:id", // Dynamic route for Category Edit
+                path: "category/edit/:uuid", // Dynamic route for Category Edit
                 name: "CategoryEdit",
                 component: adminComponents.CategoryEdit,
                 meta: { title: "Edit Category" },
                 props: true, // Enables passing route params as props
+            },
+            {
+                path: "category/trash", // New route for Contact
+                name: "CategoryTrash",
+                component: adminComponents.CategoryTrash,
+                meta: { title: "Category Trash" },
             },
             // brand
             {

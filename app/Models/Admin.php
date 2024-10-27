@@ -63,6 +63,18 @@ class Admin extends Authenticatable
         return $this->morphMany(Brand::class, 'updater');
     }
 
+    // Category created by this user
+    public function createdCategorys(): MorphMany
+    {
+        return $this->morphMany(Category::class, 'creator');
+    }
+
+    // Categorys updated by this user
+    public function updatedCategorys(): MorphMany
+    {
+        return $this->morphMany(Category::class, 'updater');
+    }
+
     // Lines created by this user
     public function createdLines(): MorphMany
     {
@@ -80,7 +92,7 @@ class Admin extends Authenticatable
      {
          return $this->morphMany(Line::class, 'creator');
      }
- 
+
      // Lines updated by this user
      public function updatedGroups(): MorphMany
      {

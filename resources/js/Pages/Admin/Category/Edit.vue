@@ -27,12 +27,19 @@
                 />
 
                 <!-- Status Field (Checkbox) -->
-                <v-checkbox
+                <!-- <v-checkbox
                     v-model="category.status"
                     label="Status"
                     :error-messages="errors.status ? errors.status : ''"
-                />
+                /> -->
 
+                <v-select
+                    v-model="category.status"
+                    :items="statusItems"
+                    label="Category Status"
+                    @change="updateStatus"
+                    clearable
+                ></v-select>
                 <!-- Action Buttons -->
 
                 <v-row class="mt-4">
@@ -66,11 +73,13 @@
 </template>
 
 <script>
+import { toast } from "vue3-toastify";
 export default {
     data() {
         return {
             valid: false,
             loading: false,
+            statusItems: ["Active", "Inactive"],
             category: {
                 name: "",
                 description: "",
@@ -89,7 +98,7 @@ export default {
     methods: {
         async fetchCategory() {
             // Fetch the category data to populate the form
-            const categoryId = this.$route.params.id; // Assuming the category ID is passed in the route params
+            const categoryId = this.$route.params.uuid; // Assuming the category ID is passed in the route params
             try {
                 const response = await this.$axios.get(
                     `/category/${categoryId}/edit`
@@ -97,9 +106,11 @@ export default {
                 console.log(response.data);
 
                 this.category = response.data.category; // Populate form with the existing category data
+                // this.category.status =
+                //     this.category.status == "true" ||
+                //     this.category.status == true;
                 this.category.status =
-                    this.category.status == "true" ||
-                    this.category.status == true;
+                    this.category.status === "Active" ? "Active" : "Inactive";
             } catch (error) {
                 this.serverError = "Error fetching category data.";
             }
@@ -108,7 +119,7 @@ export default {
             this.errors = {}; // Reset errors before submission
             this.serverError = null;
             this.loading = true;
-            const categoryId = this.$route.params.id; // Assuming category ID is in route params
+            const categoryId = this.$route.params.uuid; // Assuming category ID is in route params
             setTimeout(async () => {
                 try {
                     const response = await this.$axios.put(
@@ -117,12 +128,15 @@ export default {
                     );
 
                     if (response.data.success) {
+                        toast.success("Category updated successfully!");
                         this.$router.push({ name: "CategoryIndex" }); // Redirect to category list page
                     }
                 } catch (error) {
                     if (error.response && error.response.status === 422) {
+                        toast.error("Failed to update category.");
                         this.errors = error.response.data.errors || {};
                     } else {
+                        toast.error("Error updating category.");
                         this.serverError = "Error updating category.";
                     }
                 } finally {
