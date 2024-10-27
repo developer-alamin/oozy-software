@@ -1,11 +1,11 @@
 <template>
     <v-card outlined class="mx-auto my-5" max-width="900">
-        <v-card-title>Edit Brand</v-card-title>
+        <v-card-title>Edit Technician</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="update">
                 <!-- Name Field -->
                 <v-text-field
-                    v-model="brand.name"
+                    v-model="technician.name"
                     :rules="[rules.required]"
                     label="Name"
                     outlined
@@ -15,10 +15,34 @@
                         Name <span style="color: red">*</span>
                     </template>
                 </v-text-field>
+                <v-text-field
+                    v-model="technician.email"
+                    label="Email"
+                    outlined
+                    :error-messages="errors.email ? errors.email : ''"
+                >
+                    <template v-slot:label> Email </template>
+                </v-text-field>
+
+                <v-text-field
+                    v-model="technician.phone"
+                    label="Phone"
+                    outlined
+                    :error-messages="errors.phone ? errors.phone : ''"
+                >
+                    <template v-slot:label> Phone </template>
+                </v-text-field>
 
                 <!-- Description Field -->
                 <v-textarea
-                    v-model="brand.description"
+                    v-model="technician.address"
+                    label="Address"
+                    :error-messages="errors.description ? errors.address : ''"
+                />
+
+                <!-- Description Field -->
+                <v-textarea
+                    v-model="technician.description"
                     label="Description"
                     outlined
                     :error-messages="
@@ -28,16 +52,15 @@
 
                 <!-- Status Field (Checkbox) -->
                 <!-- <v-checkbox
-                    v-model="brand.status"
+                    v-model="technician.status"
                     label="Status"
                     :error-messages="errors.status ? errors.status : ''"
                 /> -->
                 <v-select
-                    v-model="brand.status"
+                    v-model="technician.status"
                     :items="statusItems"
-                    label="Brand Status"
+                    label="Technician Status"
                     clearable
-                    :error-messages="errors.status ? errors.status : ''"
                 ></v-select>
 
                 <!-- Action Buttons -->
@@ -58,7 +81,7 @@
                             :disabled="!valid || loading"
                             :loading="loading"
                         >
-                            Update Brand
+                            Update Technician
                         </v-btn>
                     </v-col>
                 </v-row>
@@ -80,8 +103,13 @@ export default {
             valid: false,
             loading: false,
             statusItems: ["Active", "Inactive"],
-            brand: {
+            technician: {
+                group_id: "",
                 name: "",
+                email: "",
+                phone: "",
+                photo: "",
+                address: "",
                 description: "",
                 status: false, // Default to false (inactive)
             },
@@ -93,48 +121,50 @@ export default {
         };
     },
     created() {
-        this.fetchBrand();
+        this.fetchTechnician();
     },
     methods: {
-        async fetchBrand() {
-            // Fetch the brand data to populate the form
-            const brandId = this.$route.params.uuid; // Assuming the brand ID is passed in the route params
+        async fetchTechnician() {
+            // Fetch the technician data to populate the form
+            const technicianId = this.$route.params.id; // Assuming the technician ID is passed in the route params
             try {
                 const response = await this.$axios.get(
-                    `/brand/${brandId}/edit`
+                    `/technician/${technicianId}/edit`
                 );
-                console.log(response.data);
+                // console.log(response.data);
 
-                this.brand = response.data.brand; // Populate form with the existing brand data
-                this.brand.status =
-                    this.brand.status === "Active" ? "Active" : "Inactive";
+                this.technician = response.data.technician; // Populate form with the existing technician data
+                this.technician.status =
+                    this.technician.status === "Active"
+                        ? "Active"
+                        : "In-Active";
             } catch (error) {
-                this.serverError = "Error fetching brand data.";
+                this.serverError = "Error fetching technician data.";
             }
         },
         async update() {
             this.errors = {}; // Reset errors before submission
             this.serverError = null;
             this.loading = true;
-            const brandId = this.$route.params.uuid; // Assuming brand ID is in route params
+            const technicianId = this.$route.params.id; // Assuming technician ID is in route params
             setTimeout(async () => {
                 try {
                     const response = await this.$axios.put(
-                        `/brand/${brandId}`,
-                        this.brand
+                        `/technician/${technicianId}`,
+                        this.technician
                     );
 
                     if (response.data.success) {
-                        toast.success("Brand update successfully!");
-                        this.$router.push({ name: "BrandIndex" }); // Redirect to brand list page
+                        this.$router.push({ name: "TechnicianIndex" }); // Redirect to technician list page
+                        toast.success("Technician Update successfully!");
                     }
                 } catch (error) {
                     if (error.response && error.response.status === 422) {
-                        toast.error("Failed to update brand.");
                         this.errors = error.response.data.errors || {};
+                        toast.error("Failed to Update technician.");
                     } else {
-                        toast.error("Error updating brand. Please try again.");
-                        this.serverError = "Error updating brand.";
+                        toast.error("Failed to Update technician.");
+                        this.serverError = "Error updating technician.";
                     }
                 } finally {
                     // Stop loading after the request (or simulated time) is done
@@ -143,7 +173,7 @@ export default {
             }, 1000);
         },
         resetForm() {
-            this.fetchBrand(); // Reset the form with existing brand data
+            this.fetchTechnician(); // Reset the form with existing technician data
             this.errors = {};
             this.$refs.form.resetValidation();
         },

@@ -3,6 +3,18 @@ export { default as AdminUserIndex } from "../Pages/Admin/User/AdminAllUserIndex
 export { default as AdminUserCreate } from "../Pages/Admin/User/AdminAllUserCreate.vue";
 export { default as AdminUserEdit } from "../Pages/Admin/User/AdminAllUserEdit.vue";
 export { default as AdminUserTrash } from "../Pages/Admin/User/AdminAllUserTrash.vue";
+export { default as AllUserIndex } from "../Pages/Admin/User/AllUserIndex.vue";
+export { default as UserCreate } from "../Pages/Admin/User/UserCreate.vue";
+
+// Company components
+export { default as AllCompanyIndex } from "../Pages/Admin/Company/Index.vue";
+export { default as CompanyCreate } from "../Pages/Admin/Company/Create.vue";
+
+// Factory components
+export { default as FactoryIndex } from "../Pages/Admin/Factory/Index.vue";
+export { default as FactoryCreate } from "../Pages/Admin/Factory/Create.vue";
+export { default as FactoryEdit } from "../Pages/Admin/Factory/Edit.vue";
+export { default as FactoryTrash } from "../Pages/Admin/Factory/Trash.vue";
 
 // Supplier components
 export { default as SupplierIndex } from "../Pages/Admin/Supplier/Index.vue";
@@ -36,8 +48,6 @@ export { default as TechnicianCreate } from "../Pages/Technician/Create.vue";
 export { default as TechnicianEdit } from "../Pages/Technician/Edit.vue";
 export { default as TechnicianTrash } from "../Pages/Technician/Trash.vue";
 
-
-
 // Line components
 export { default as LineIndex } from "../Pages/Admin/Line/Index.vue";
 export { default as LineCreate } from "../Pages/Admin/Line/Create.vue";
@@ -50,8 +60,8 @@ export { default as GroupCreate } from "../Pages/Admin/Group/Create.vue";
 export { default as GroupEdit } from "../Pages/Admin/Group/Edit.vue";
 export { default as GroupTrash } from "../Pages/Admin/Group/Trash.vue";
 
-
 // Rent components
+
 export { default as RentIndex } from "../Pages/Admin/Rents/Index.vue";
 export { default as RentCreate } from "../Pages/Admin/Rents/Create.vue";
 export { default as RentEdit } from "../Pages/Admin/Rents/Edit.vue";

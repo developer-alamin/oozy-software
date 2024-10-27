@@ -2,7 +2,7 @@
     <v-card>
         <v-card-title class="pt-5">
             <v-row>
-                <v-col cols="4"><span>Brand List</span></v-col>
+                <v-col cols="4"><span>Company List</span></v-col>
                 <v-col cols="8" class="d-flex justify-end">
                     <v-text-field
                         v-model="search"
@@ -18,7 +18,8 @@
                         clearable
                     ></v-text-field>
                     <v-btn
-                        @click="createBrand"
+                        v-if="isAuthorized"
+                        @click="createUser"
                         color="primary"
                         icon
                         style="width: 40px; height: 40px"
@@ -29,7 +30,7 @@
                                     >mdi-plus</v-icon
                                 >
                             </template>
-                            <span>Add a new brand</span>
+                            <span>Add a new user</span>
                         </v-tooltip>
                     </v-btn>
 
@@ -50,7 +51,7 @@
                                         mdi-trash-can-outline
                                     </v-icon>
                                 </template>
-                                <span>View trashed brands</span>
+                                <span>View trashed Users</span>
                             </v-tooltip>
                         </v-btn>
                     </v-badge>
@@ -80,22 +81,17 @@
                 </v-chip>
             </template>
 
-            <template v-slot:item.creator_name="{ item }">
-                <span>{{ item.creator ? item.creator.name : "Unknown" }}</span>
-            </template>
-
             <template v-slot:item.actions="{ item }">
-                <v-icon @click="editBrand(item.uuid)" class="mr-2"
+                <v-icon @click="editUser(item.id)" class="mr-2"
                     >mdi-pencil</v-icon
                 >
-                <v-icon @click="showConfirmDialog(item.uuid)" color="red"
+                <v-icon @click="showConfirmDialog(item.id)" color="red"
                     >mdi-delete</v-icon
                 >
             </template>
         </v-data-table-server>
 
-         <ConfirmDialog
-            :dialogName="dialogName"
+        <ConfirmDialog
             v-model:modelValue="dialog"
             :onConfirm="confirmDelete"
             :onCancel="
@@ -110,7 +106,6 @@
 <script>
 import { toast } from "vue3-toastify";
 import ConfirmDialog from "../../Components/ConfirmDialog.vue";
-import bus from "./eventBus";
 
 export default {
     components: {
@@ -118,87 +113,115 @@ export default {
     },
     data() {
         return {
-            dialogName:"Are you sure you want to delete this Brand ?",
             search: "",
             itemsPerPage: 15,
             headers: [
-                { title: "Brand Name", key: "name", sortable: true },
-                { title: "Description", key: "description", sortable: false },
+                { title: "Name", key: "name", sortable: true },
+                { title: "Email", key: "email", sortable: true },
+                { title: "Phone", key: "phone", sortable: true },
                 {
                     title: "Status",
                     key: "status",
                     value: "status",
                     sortable: true,
                 },
-                { title: "Creator", key: "creator.name", sortable: false },
                 { title: "Actions", key: "actions", sortable: false },
             ],
             serverItems: [],
             loading: true,
             totalItems: 0,
             dialog: false,
-            selectedBrandId: null,
+            selectedUserId: null,
             trashedCount: 0,
+            user: {},
         };
     },
+    computed: {
+        // Check if the user is authorized to create Users
+        isAuthorized() {
+            // You can customize the logic based on your needs
+            return (
+                this.user.superadmin === true ||
+                this.user.admin === true ||
+                this.user.user_role === true
+            );
+        },
+    },
+
     methods: {
         async loadItems({ page, itemsPerPage, sortBy }) {
             this.loading = true;
             const sortOrder = sortBy.length ? sortBy[0].order : "desc";
             const sortKey = sortBy.length ? sortBy[0].key : "created_at";
             try {
-                const response = await this.$axios.get("/brand", {
-                    params: {
-                        page,
-                        itemsPerPage,
-                        sortBy: sortKey,
-                        sortOrder,
-                        search: this.search,
-                    },
-                });
+                const response = await this.$axios.get(
+                    "/admin/company/user/all",
+                    {
+                        params: {
+                            page,
+                            itemsPerPage,
+                            sortBy: sortKey,
+                            sortOrder,
+                            search: this.search,
+                        },
+                    }
+                );
+                console.log(response.data.items);
                 this.serverItems = response.data.items || [];
+                // console.log(this.serverItems);
+
                 this.totalItems = response.data.total || 0;
-                this.fetchTrashedBrandsCount();
+                this.fetchTrashedUsersCount();
             } catch (error) {
                 console.error("Error loading items:", error);
             } finally {
                 this.loading = false;
             }
         },
-        createBrand() {
-            this.$router.push({ name: "BrandCreate" });
+        createUser() {
+            this.$router.push({ name: "UserCreate" });
         },
         viewTrash() {
-            this.$router.push({ name: "BrandTrash" });
+            this.$router.push({ name: "AdminUserTrash" });
         },
-        editBrand(uuid) {
-            this.$router.push({ name: "BrandEdit", params: { uuid } });
+        editUser(id) {
+            this.$router.push({ name: "AdminUserEdit", params: { id } });
         },
-        showConfirmDialog(uuid) {
-            this.selectedBrandId = uuid;
+        showConfirmDialog(id) {
+            this.selectedUserId = id;
             this.dialog = true;
         },
         async confirmDelete() {
             this.dialog = false; // Close the dialog
             try {
-                await this.$axios.delete(`/brand/${this.selectedBrandId}`);
+                await this.$axios.delete(`/user/${this.selectedUserId}`);
                 this.loadItems({
                     page: 1,
                     itemsPerPage: this.itemsPerPage,
                     sortBy: [],
                 });
-                toast.success("Brand deleted successfully!");
+                toast.success("User deleted successfully!");
             } catch (error) {
-                console.error("Error deleting brand:", error);
-                toast.error("Failed to delete brand.");
+                console.error("Error deleting user:", error);
+                toast.error("Failed to delete user.");
             }
         },
-        async fetchTrashedBrandsCount() {
+        async fetchTrashedUsersCount() {
             try {
-                const response = await this.$axios.get("/brand/trashed-count");
-                this.trashedCount = response.data.trashedCount;
+                const response = await this.$axios.get("/user/trashed-count");
+                this.trashedCount = response.data.trashedCount
+                    ? response.data.trashedCount
+                    : 0;
             } catch (error) {
-                console.error("Error fetching trashed brands count:", error);
+                console.error("Error fetching trashed Users count:", error);
+            }
+        },
+        async fetchUserInfo() {
+            try {
+                const response = await this.$axios.get("/user/role/auth"); // Adjust to your API
+                this.user = response.data; // Ensure you set user role data here
+            } catch (error) {
+                console.error("Error fetching user info:", error);
             }
         },
     },
@@ -209,7 +232,8 @@ export default {
             itemsPerPage: this.itemsPerPage,
             sortBy: [],
         });
-        this.fetchTrashedBrandsCount();
+        this.fetchUserInfo();
+        this.fetchTrashedUsersCount();
     },
 };
 </script>

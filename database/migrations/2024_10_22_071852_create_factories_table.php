@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('factories', function (Blueprint $table) {
             $table->id();
-    $table->string('name'); // Name of the factory
+            $table->string('name'); // Name of the factory
             $table->string('location')->nullable(); // Physical location of the factory
             $table->string('manager_name'); // Name of the factory manager
             $table->string('contact_number')->nullable(); // Contact number for the factory

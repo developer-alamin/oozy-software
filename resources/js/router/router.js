@@ -9,12 +9,6 @@ import AdminLayout from "../Pages/Layouts/AdminLayout.vue";
 import * as adminComponents from "./adminComponents.js";
 // console.log(adminComponents);
 
-
-
-
-
-
-
 // Your route definitions can follow
 
 import UserTechnicianIndex from "../Pages/Technician/Index.vue";
@@ -71,6 +65,57 @@ const routes = [
                 component: adminComponents.AdminUserTrash,
                 meta: { title: "Admin User Trash" },
             },
+            {
+                path: "company/user/index", // New route for Contact
+                name: "AllUserIndex",
+                component: adminComponents.AllUserIndex,
+                meta: { title: "All User Index" },
+            },
+            {
+                path: "company/user/create", // New route for Contact
+                name: "UserCreate",
+                component: adminComponents.UserCreate,
+                meta: { title: "User Create" },
+            },
+            {
+                path: "company/create", // New route for Contact
+                name: "CompanyCreate",
+                component: adminComponents.CompanyCreate,
+                meta: { title: "Company Create" },
+            },
+            {
+                path: "company/index", // New route for Contact
+                name: "AllCompanyIndex",
+                component: adminComponents.AllCompanyIndex,
+                meta: { title: "All Company Index" },
+            },
+            {
+                path: "factory/index", // New route for Contact
+                name: "FactoryIndex",
+                component: adminComponents.FactoryIndex,
+                meta: { title: "Factory Index" },
+            },
+            // factory
+            {
+                path: "factory/create", // New route for Factory
+                name: "FactoryCreate",
+                component: adminComponents.FactoryCreate,
+                meta: { title: "Factory Create" },
+            },
+            {
+                path: "factory/edit/:id", // Dynamic route for Factory Edit
+                name: "FactoryEdit",
+                component: adminComponents.FactoryEdit,
+                meta: { title: "Edit Factory" },
+                props: true, // Enables passing route params as props
+            },
+            {
+                path: "factory/trash", // New route for Contact
+                name: "FactoryTrash",
+                component: adminComponents.FactoryTrash,
+                meta: { title: "Factory Trash" },
+            },
+
             {
                 path: "supplier/index", // New route for Contact
                 name: "SupplierIndex",
@@ -145,7 +190,7 @@ const routes = [
             },
 
             {
-                path: "brand/edit/:id", // Dynamic route for Brand Edit
+                path: "brand/edit/:uuid", // Dynamic route for Brand Edit
                 name: "BrandEdit",
                 component: adminComponents.BrandEdit,
                 meta: { title: "Edit Brand" },
@@ -227,56 +272,60 @@ const routes = [
                 name: "LineEdit",
                 component: adminComponents.LineEdit,
                 meta: { title: "line Edit" },
-                props:true
+                props: true,
             },
             {
                 path: "line/trash", // New route for line trash
                 name: "LineTrash",
                 component: adminComponents.LineTrash,
                 meta: { title: "line Trash" },
-                props:true
+                props: true,
             },
             {
                 path: "group/create", // New route for Group Create
                 name: "GroupCreate",
                 component: adminComponents.GroupCreate,
                 meta: { title: "Group Create" },
-                props:true
+                props: true,
             },
             {
                 path: "group/index", // New route for Group Index
                 name: "GroupIndex",
                 component: adminComponents.GroupIndex,
                 meta: { title: "Group Index" },
-                props:true
+                props: true,
             },
             {
                 path: "group/edit/:id", // New route for Group edit
                 name: "GroupEdit",
                 component: adminComponents.GroupEdit,
                 meta: { title: "group Edit" },
-                props:true
+                props: true,
             },
             {
                 path: "group/trash", // New route for line trash
                 name: "GroupTrash",
                 component: adminComponents.GroupTrash,
                 meta: { title: "group Trash" },
-                props:true
+                props: true,
             },
             {
                 path: "rent/index", // New route for rent index
                 name: "RentIndex",
                 component: adminComponents.RentIndex,
+
                 meta: { title: "Rent index" },
                 props:true
+
+                meta: { title: "rent index" },
+                props: true,
             },
             {
                 path: "rent/create", // New route for rent Create
                 name: "RentCreate",
                 component: adminComponents.RentCreate,
                 meta: { title: "Rent Create" },
-                props:true
+                props: true,
             },
             {
                 path: "rent/edit/:id", // New route for rent Edit

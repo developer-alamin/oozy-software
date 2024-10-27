@@ -2,7 +2,7 @@
     <v-card>
         <v-card-title class="pt-5">
             <v-row>
-                <v-col cols="6"><span>Brand Trash List</span></v-col>
+                <v-col cols="6"><span>Technician Trash List</span></v-col>
                 <v-col cols="6" class="d-flex justify-end">
                     <v-text-field
                         v-model="search"
@@ -44,10 +44,10 @@
             </template>
 
             <template v-slot:item.actions="{ item }">
-                <v-icon @click="showRestoreDialog(item.uuid)" color="green"
+                <v-icon @click="showRestoreDialog(item.id)" color="green"
                     >mdi-restore</v-icon
                 >
-                <v-icon @click="showConfirmDialog(item.uuid)" color="red"
+                <v-icon @click="showConfirmDialog(item.id)" color="red"
                     >mdi-delete</v-icon
                 >
             </template>
@@ -55,14 +55,12 @@
 
         <!-- Restore Confirmation Dialog -->
         <RestoreConfirmDialog
-            :restroreDialogName="restroreDialogName"
             v-model:modelValue="restoreDialog"
             :onConfirm="confirmRestore"
             :onCancel="() => (restoreDialog = false)"
         />
         <!-- Delete Confirmation Dialog -->
         <ConfirmDialog
-            :dialogName="dialogName"
             v-model:modelValue="deleteDialog"
             :onConfirm="confirmDelete"
             :onCancel="() => (deleteDialog = false)"
@@ -82,13 +80,10 @@ export default {
     },
     data() {
         return {
-            restroreDialogName:"Are you sure you want to restore this brand?",
-            dialogName:"Are you sure you want to delete this Brand ?",
-
             search: "",
             itemsPerPage: 15,
             headers: [
-                { title: "Brand Name", key: "name", sortable: true },
+                { title: "Technician Name", key: "name", sortable: true },
                 { title: "Description", key: "description", sortable: false },
                 {
                     title: "Status",
@@ -103,7 +98,7 @@ export default {
             totalItems: 0,
             restoreDialog: false, // Separate state for restore dialog
             deleteDialog: false, // Separate state for delete dialog
-            selectedBrandId: null,
+            selectedTechnicianId: null,
         };
     },
     methods: {
@@ -112,7 +107,7 @@ export default {
             const sortOrder = sortBy.length ? sortBy[0].order : "desc";
             const sortKey = sortBy.length ? sortBy[0].key : "created_at";
             try {
-                const response = await this.$axios.get("/brand/trashed", {
+                const response = await this.$axios.get("/technician/trashed", {
                     params: {
                         page,
                         itemsPerPage,
@@ -129,50 +124,50 @@ export default {
                 this.loading = false;
             }
         },
-        showRestoreDialog(uuid) {
-            this.selectedBrandId = uuid;
+        showRestoreDialog(id) {
+            this.selectedTechnicianId = id;
             this.restoreDialog = true; // Open restore dialog
         },
-        showConfirmDialog(uuid) {
-            this.selectedBrandId = uuid;
+        showConfirmDialog(id) {
+            this.selectedTechnicianId = id;
             this.deleteDialog = true; // Open delete dialog
         },
         async confirmRestore() {
             this.restoreDialog = false; // Close the restore dialog
             try {
                 await this.$axios.post(
-                    `/brand/${this.selectedBrandId}/restore`
+                    `/technician/${this.selectedTechnicianId}/restore`
                 );
                 this.loadItems({
                     page: 1,
                     itemsPerPage: this.itemsPerPage,
                     sortBy: [],
                 });
-                toast.success("Brand restored successfully!");
+                toast.success("Technician restored successfully!");
             } catch (error) {
-                console.error("Error restoring brand:", error);
-                toast.error("Failed to restore brand.");
+                console.error("Error restoring technician:", error);
+                toast.error("Failed to restore technician.");
             }
         },
         async confirmDelete() {
             this.deleteDialog = false; // Close the delete dialog
             try {
                 await this.$axios.delete(
-                    `/brand/${this.selectedBrandId}/force-delete`
+                    `/technician/${this.selectedTechnicianId}/force-delete`
                 );
                 this.loadItems({
                     page: 1,
                     itemsPerPage: this.itemsPerPage,
                     sortBy: [],
                 });
-                toast.success("Brand deleted successfully!");
+                toast.success("technician deleted successfully!");
             } catch (error) {
-                console.error("Error deleting brand:", error);
-                toast.error("Failed to delete brand.");
+                console.error("Error deleting technician:", error);
+                toast.error("Failed to delete technician.");
             }
         },
-        editBrand(uuid) {
-            this.$router.push({ name: "BrandEdit", params: { uuid } });
+        editTechnician(id) {
+            this.$router.push({ name: "TechnicianEdit", params: { id } });
         },
     },
     created() {
