@@ -69,17 +69,6 @@
             loading-text="Loading... Please wait"
             @update:options="loadItems"
         >
-            <template v-slot:item.status="{ item }">
-                <v-chip
-                    :color="item.status === 'Active' ? 'green' : 'red'"
-                    class="text-uppercase"
-                    size="small"
-                    label
-                >
-                    {{ item.status === "Active" ? "Active" : "Inactive" }}
-                </v-chip>
-            </template>
-
             <template v-slot:item.actions="{ item }">
                 <v-icon @click="editGroup(item.id)" class="mr-2"
                     >mdi-pencil</v-icon
@@ -90,7 +79,8 @@
             </template>
         </v-data-table-server>
 
-        <ConfirmDialog
+         <ConfirmDialog
+            :dialogName="dialogName"
             v-model:modelValue="dialog"
             :onConfirm="confirmDelete"
             :onCancel="
@@ -113,6 +103,7 @@ export default {
     },
     data() {
         return {
+            dialogName:"Are you sure you want to delete this Group ?",
             search: "",
             itemsPerPage: 15,
             headers: [
@@ -149,6 +140,7 @@ export default {
                         search: this.search,
                     },
                 });
+                console.log(response.data.items)
                 this.serverItems = response.data.items || [];
                 this.totalItems = response.data.total || 0;
                 this.fetchTrashedGroupsCount();

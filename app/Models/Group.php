@@ -19,7 +19,7 @@ class Group extends Model
             'description'  => 'nullable|string',
         ];
     }
-     public static function restoreGroup($id)
+    public static function restoreGroup($id)
     {
         // Find the group by id in the trashed records
         $group = self::onlyTrashed()->find($id);

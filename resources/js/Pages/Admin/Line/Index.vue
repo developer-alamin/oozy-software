@@ -80,6 +80,7 @@
         </v-data-table-server>
 
         <ConfirmDialog
+            :dialogName="dialogName"
             v-model:modelValue="dialog"
             :onConfirm="confirmDelete"
             :onCancel="
@@ -101,6 +102,8 @@ export default {
     },
     data() {
         return {
+            dialogName:"Are you sure you want to delete this Line ?",
+
             search: "",
             itemsPerPage: 10,
             headers: [

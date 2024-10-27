@@ -6,7 +6,7 @@
                 <span class="headline">Restore Confirmation</span>
             </v-card-title>
             <v-card-text>
-                <p>Are you sure you want to restore this brand?</p>
+                <p>{{ restroreDialogName }}</p>
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
@@ -20,6 +20,9 @@
 <script>
 export default {
     props: {
+        restroreDialogName:{
+            type:String
+        },
         modelValue: {
             type: Boolean,
             required: true,
@@ -32,6 +35,9 @@ export default {
             type: Function,
             required: true,
         },
+    },
+    setup(props){
+
     },
     computed: {
         localVisible: {

@@ -16,12 +16,13 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
-            $table->text('photo')->nullable();
+            $table->blob('photo')->nullable();
             $table->text('address')->nullable();
             $table->text('description')->nullable();
-            $table->morphs('creator'); // Polymorphic relationship for creator
-            $table->morphs('updater'); // Polymorphic relationship for updater
+            //$table->morphs('creator')->default(null); // Polymorphic relationship for creator
+           // $table->morphs('updater')->nullable(); // Polymorphic relationship for updater
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -268,7 +268,7 @@ const routes = [
                 path: "rent/index", // New route for rent index
                 name: "RentIndex",
                 component: adminComponents.RentIndex,
-                meta: { title: "rent index" },
+                meta: { title: "Rent index" },
                 props:true
             },
             {
@@ -278,6 +278,21 @@ const routes = [
                 meta: { title: "Rent Create" },
                 props:true
             },
+            {
+                path: "rent/edit/:id", // New route for rent Edit
+                name: "RentEdit",
+                component: adminComponents.RentEdit,
+                meta: { title: "Rent Edit" },
+                props:true
+            },
+            {
+                path: "rent/trash", // New route for rent trash
+                name: "RentsTrash",
+                component: adminComponents.RentsTrash,
+                meta: { title: "Rent Trash" },
+                props:true
+            },
+
         ],
     },
     // {

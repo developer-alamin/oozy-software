@@ -6,7 +6,7 @@
                 <span class="headline">Delete Confirmation</span>
             </v-card-title>
             <v-card-text>
-                <p>Are you sure you want to delete this brand?</p>
+                <p>{{ dialogName }}</p>
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
@@ -20,6 +20,10 @@
 <script>
 export default {
     props: {
+        dialogName:{
+            type:String
+        },
+
         modelValue: {
             type: Boolean,
             required: true,
@@ -32,6 +36,8 @@ export default {
             type: Function,
             required: true,
         },
+    },
+    setup(props){
     },
     computed: {
         localVisible: {
@@ -51,7 +57,7 @@ export default {
         cancel() {
             this.onCancel();
             this.localVisible = false; // Close the dialog
-        },
+        }
     },
 };
 </script>
