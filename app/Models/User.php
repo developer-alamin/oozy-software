@@ -73,6 +73,18 @@ class User extends Authenticatable
         return $this->morphMany(Brand::class, 'updater');
     }
 
+    // Models created by this user
+    public function createdModels(): MorphMany
+    {
+        return $this->morphMany(ProductModel::class, 'creator');
+    }
+
+    // Models updated by this user
+    public function updatedModels(): MorphMany
+    {
+        return $this->morphMany(ProductModel::class, 'updater');
+    }
+
     // Category created by this user
     public function createdCategorys(): MorphMany
     {

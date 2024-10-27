@@ -25,6 +25,7 @@ export { default as SupplierCreate } from "../Pages/Components/Admin/Supplier/Su
 export { default as ModelIndex } from "../Pages/Admin/Model/Index.vue";
 export { default as ModelCreate } from "../Pages/Admin/Model/Create.vue";
 export { default as ModelEdit } from "../Pages/Admin/Model/Edit.vue";
+export { default as ModelTrash } from "../Pages/Admin/Model/Trash.vue";
 
 // Category components
 export { default as CategoryIndex } from "../Pages/Admin/Category/Index.vue";

@@ -23,6 +23,11 @@ use App\Http\Controllers\Admin\ProductModelController;
 use App\Http\Controllers\Auth\AuthController;
 
 Route::resource('suppliers', SupplierController::class);
+// models
+Route::get('/models/trashed', [ProductModelController::class, 'trashed']);
+Route::post('/models/{id}/restore', [ProductModelController::class, 'restore']);
+Route::delete('/models/{id}/force-delete', [ProductModelController::class, 'forceDelete']);
+Route::get('/models/trashed-count', [ProductModelController::class, 'trashedModelsCount']);
 Route::resource('models', ProductModelController::class);
 // category
 Route::get('/category/trashed', [CategoryController::class, 'trashed']);

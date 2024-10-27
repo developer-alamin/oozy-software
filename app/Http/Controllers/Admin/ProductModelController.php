@@ -14,6 +14,7 @@ class ProductModelController extends Controller
 {
     public function index(Request $request)
     {
+
         $page         = $request->input('page', 1);
         $itemsPerPage = $request->input('itemsPerPage', 5);
         $sortBy       = $request->input('sortBy', 'created_at'); // Default sort by created_at
@@ -109,10 +110,6 @@ class ProductModelController extends Controller
      */
     public function edit(ProductModel $model)
     {
-        // return response()->json([
-        //     'success' => true,
-        //     'model' => $model
-        // ], Response::HTTP_OK);
 
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
