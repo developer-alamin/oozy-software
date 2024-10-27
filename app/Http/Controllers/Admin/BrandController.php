@@ -59,32 +59,6 @@ class BrandController extends Controller
         ]);
     }
 
-    public function trashed(Request $request)
-    {
-        // Get parameters from the request
-        $page         = $request->input('page', 1);
-        $itemsPerPage = $request->input('itemsPerPage', 5);
-        $sortBy       = $request->input('sortBy', 'created_at'); // Default sort by name
-        $sortOrder    = $request->input('sortOrder', 'desc'); // Default order is descending
-        $search       = $request->input('search', ''); // Search term, default is empty
-
-        // Query only soft deleted brands with pagination, sorting, and search
-        $brandsQuery = Brand::onlyTrashed(); // Fetch only soft-deleted records
-        // Apply search if the search term is not empty
-        if (!empty($search)) {
-            $brandsQuery->where('name', 'LIKE', '%' . $search . '%');
-        }
-        // Apply sorting
-        $brandsQuery->orderBy($sortBy, $sortOrder);
-        // Paginate results
-        $brands = $brandsQuery->paginate($itemsPerPage);
-        // Return the response as JSON
-        return response()->json([
-            'items' => $brands->items(), // Current page items
-            'total' => $brands->total(), // Total number of trashed records
-        ]);
-    }
-
     /**
      * Show the form for creating a new resource.
      */
@@ -260,6 +234,63 @@ class BrandController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+    public function trashed(Request $request)
+    {
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
+
+            // Superadmin check: Allow access to all soft-deleted technicians
+            if ($currentUser->role === 'superadmin') {
+                // Fetch all trashed technicians without additional checks
+                $brandsQuery = Brand::onlyTrashed();
+            } else {
+                // Regular admin authorization check
+                $brandsQuery = Brand::onlyTrashed()
+                    ->where('creator_id', $currentUser->id)
+                    ->where('creator_type', $creatorType); // Only fetch soft-deleted records created by this admin
+            }
+
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+
+            // Regular user authorization check
+            $brandsQuery = Brand::onlyTrashed()
+                ->where('creator_id', $currentUser->id)
+                ->where('creator_type', $creatorType); // Only fetch soft-deleted records created by this user
+
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        // Get parameters from the request
+        $page         = $request->input('page', 1);
+        $itemsPerPage = $request->input('itemsPerPage', 5);
+        $sortBy       = $request->input('sortBy', 'created_at'); // Default sort by created_at
+        $sortOrder    = $request->input('sortOrder', 'desc'); // Default order is descending
+        $search       = $request->input('search', ''); // Search term, default is empty
+
+        // Apply search if the search term is not empty
+        if (!empty($search)) {
+            $brandsQuery->where('name', 'LIKE', '%' . $search . '%'); // Adjust as per your brand fields
+        }
+
+        // Apply sorting
+        $brandsQuery->orderBy($sortBy, $sortOrder);
+
+        // Paginate results
+        $brands = $brandsQuery->paginate($itemsPerPage);
+
+        // Return the response as JSON
+        return response()->json([
+            'items' => $brands->items(), // Current page items
+            'total' => $brands->total(), // Total number of trashed records
+        ]);
+
+
+    }
     public function trashedBrandsCount()
     {
         // Get the count of soft-deleted brands
@@ -270,25 +301,92 @@ class BrandController extends Controller
         ], Response::HTTP_OK);
     }
      // Permanently delete a brand from trash
-     public function forceDelete($id)
-     {
-         $brand = Brand::onlyTrashed()->findOrFail($id);
-         $brand->forceDelete(); // Permanent delete
+    public function forceDelete($id)
+    {
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+                
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
 
-         return response()->json(['message' => 'Brand permanently deleted']);
-     }
+            // Superadmin check: Allow access to all trashed technicians
+            if ($currentUser->role === 'superadmin') {
+                $brand = Brand::onlyTrashed()->findOrFail($id);
+            } else {
+                // Regular admin authorization check
+                $brand = Brand::onlyTrashed()
+                    ->where('creator_id', $currentUser->id)
+                    ->where('creator_type', $creatorType)
+                    ->findOrFail($id);
+            }
+
+            } elseif (Auth::guard('user')->check()) {
+                $currentUser = Auth::guard('user')->user();
+                $creatorType = User::class;
+
+                // Regular user authorization check
+                $brand = Brand::onlyTrashed()
+                    ->where('creator_id', $currentUser->id)
+                    ->where('creator_type', $creatorType)
+                    ->findOrFail($id);
+            } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+        
+        try {
+            // Delete the supplier
+            $brand->forceDelete();
+            return response()->json([
+                'success' => true,
+                'message' => 'Brand permanently deleted successfully.'
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting Brand: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+       
+    }
 
      // Restore a soft-deleted brand
-     public function restore($id)
+    public function restore($id)
     {
-        // Attempt to restore the brand using the static method on the model
-        $restored = Brand::restoreBrand($id);
+        
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
 
-        if ($restored) {
-            return response()->json(['message' => 'Brand restored successfully'], 200);
+            // Superadmin check: Allow access to all trashed technicians
+            if ($currentUser->role === 'superadmin') {
+                $restored = Brand::onlyTrashed()->findOrFail($id)->restore();
+            } else {
+                // Regular admin authorization check
+                $restored = Brand::onlyTrashed()
+                    ->where('creator_id', $currentUser->id)
+                    ->where('creator_type', $creatorType)
+                    ->findOrFail($id)
+                    ->restore();
+            }
+
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+
+            // Regular user authorization check
+            $restored = Brand::onlyTrashed()
+                ->where('creator_id', $currentUser->id)
+                ->where('creator_type', $creatorType)
+                ->findOrFail($id)
+                ->restore();
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
-
-        return response()->json(['message' => 'Brand not found or is not trashed'], 404);
+        if ($restored) {
+            return response()->json(['message' => 'Brand restored successfully'], Response::HTTP_OK);
+        }
+        return response()->json(['message' => 'Brand not found or is not trashed'], Response::HTTP_NOT_FOUND);
     }
 
 }
