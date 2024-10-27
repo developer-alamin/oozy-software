@@ -13,11 +13,15 @@ return new class extends Migration
     {
         Schema::create('product_models', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid')->unique();
+            $table->morphs('creator');
+            $table->morphs('updater');
             $table->string('name');
             $table->string('model_number')->unique();
             $table->text('description')->nullable();
-            $table->string('status')->default(false);
+            $table->enum('status', ['Active', 'Inactive', 'Pending'])->default('Inactive');
             $table->text('meta_data')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

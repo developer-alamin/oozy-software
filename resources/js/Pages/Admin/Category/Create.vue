@@ -26,12 +26,20 @@
                 />
 
                 <!-- Featured Checkbox -->
-                <v-checkbox
+                <!-- <v-checkbox
                     v-model="category.status"
                     label="Status"
                     :error-messages="errors.status ? errors.status : ''"
                 >
-                </v-checkbox>
+                </v-checkbox> -->
+
+                <v-select
+                    v-model="category.status"
+                    :items="statusItems"
+                    label="Category Status"
+                    @change="updateStatus"
+                    clearable
+                ></v-select>
 
                 <!-- Action Buttons -->
                 <v-row class="mt-4">
@@ -68,15 +76,17 @@
     </v-alert>
 </template>
 <script>
+import { toast } from "vue3-toastify";
 export default {
     data() {
         return {
             valid: false,
             loading: false, // Controls loading state of the button
+            statusItems: ["Active", "Inactive"],
             category: {
                 name: "",
                 description: "",
-                status: false, // New property for checkbox
+                status: "Active", // New property for checkbox
             },
             errors: {}, // Stores validation errors
             serverError: null, // Stores server-side error messages
@@ -107,13 +117,16 @@ export default {
                     );
 
                     if (response.data.success) {
+                        toast.success("Category created successfully!");
                         this.resetForm();
                     }
                 } catch (error) {
                     if (error.response && error.response.status === 422) {
                         // Handle validation errors from the server
                         this.errors = error.response.data.errors || {};
+                        toast.error("Failed to create category.");
                     } else {
+                        toast.error("An error occurred. Please try again.");
                         // Handle other server errors
                         this.serverError =
                             "An error occurred. Please try again.";
@@ -128,7 +141,7 @@ export default {
             this.category = {
                 name: "",
                 description: "",
-                status: false, // Reset checkbox on form reset
+                status: "", // Reset checkbox on form reset
             };
             this.errors = {}; // Reset errors on form reset
             if (this.$refs.form) {
