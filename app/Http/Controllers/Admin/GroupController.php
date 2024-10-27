@@ -55,6 +55,7 @@ class GroupController extends Controller
      */
     public function store(Request $request)
     {
+
         $validatedData = $request->validate(Group::validationRules());
         
         Group::create($validatedData);

@@ -61,5 +61,10 @@ export { default as GroupEdit } from "../Pages/Admin/Group/Edit.vue";
 export { default as GroupTrash } from "../Pages/Admin/Group/Trash.vue";
 
 // Rent components
-export { default as RentIndex } from "../Pages/Admin/Rent/Index.vue";
-export { default as RentCreate } from "../Pages/Admin/Rent/Create.vue";
+
+export { default as RentIndex } from "../Pages/Admin/Rents/Index.vue";
+export { default as RentCreate } from "../Pages/Admin/Rents/Create.vue";
+export { default as RentEdit } from "../Pages/Admin/Rents/Edit.vue";
+export { default as RentsTrash } from "../Pages/Admin/Rents/Trash.vue";
+
+

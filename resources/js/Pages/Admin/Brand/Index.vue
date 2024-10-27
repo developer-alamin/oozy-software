@@ -94,7 +94,8 @@
             </template>
         </v-data-table-server>
 
-        <ConfirmDialog
+         <ConfirmDialog
+            :dialogName="dialogName"
             v-model:modelValue="dialog"
             :onConfirm="confirmDelete"
             :onCancel="
@@ -117,6 +118,7 @@ export default {
     },
     data() {
         return {
+            dialogName:"Are you sure you want to delete this Brand ?",
             search: "",
             itemsPerPage: 15,
             headers: [
