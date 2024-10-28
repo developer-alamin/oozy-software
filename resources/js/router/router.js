@@ -148,11 +148,17 @@ const routes = [
                 meta: { title: "Model Create" },
             },
             {
-                path: "model/edit/:id", // Dynamic route for Model Edit
+                path: "model/edit/:uuid", // Dynamic route for Model Edit
                 name: "ModelEdit",
                 component: adminComponents.ModelEdit,
                 meta: { title: "Edit Model" },
                 props: true, // Enables passing route params as props
+            },
+            {
+                path: "model/trash", // New route for Contact
+                name: "ModelTrash",
+                component: adminComponents.ModelTrash,
+                meta: { title: "Model Trash" },
             },
 
             {
@@ -169,11 +175,17 @@ const routes = [
             },
 
             {
-                path: "category/edit/:id", // Dynamic route for Category Edit
+                path: "category/edit/:uuid", // Dynamic route for Category Edit
                 name: "CategoryEdit",
                 component: adminComponents.CategoryEdit,
                 meta: { title: "Edit Category" },
                 props: true, // Enables passing route params as props
+            },
+            {
+                path: "category/trash", // New route for Contact
+                name: "CategoryTrash",
+                component: adminComponents.CategoryTrash,
+                meta: { title: "Category Trash" },
             },
             // brand
             {

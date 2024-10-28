@@ -49,7 +49,7 @@ class User extends Authenticatable
         ];
     }
 
-    
+
     public function createdTechnicians(): MorphMany
     {
         return $this->morphMany(Technician::class, 'creator');
@@ -60,8 +60,8 @@ class User extends Authenticatable
     {
         return $this->morphMany(Technician::class, 'updater');
     }
-    
-    // Technicians created by this user
+
+    // Brands created by this user
     public function createdBrands(): MorphMany
     {
         return $this->morphMany(Brand::class, 'creator');
@@ -73,12 +73,46 @@ class User extends Authenticatable
         return $this->morphMany(Brand::class, 'updater');
     }
 
+    // Models created by this user
+    public function createdModels(): MorphMany
+    {
+        return $this->morphMany(ProductModel::class, 'creator');
+    }
+
+    // Models updated by this user
+    public function updatedModels(): MorphMany
+    {
+        return $this->morphMany(ProductModel::class, 'updater');
+    }
+
+    // Category created by this user
+    public function createdCategorys(): MorphMany
+    {
+        return $this->morphMany(Category::class, 'creator');
+    }
+
+    // Categorys updated by this user
+    public function updatedCategorys(): MorphMany
+    {
+        return $this->morphMany(Category::class, 'updater');
+    }
+     // Units created by this user
+     public function createdUnits(): MorphMany
+     {
+         return $this->morphMany(Unit::class, 'creator');
+     }
+ 
+     // Units updated by this user
+     public function updatedUnits(): MorphMany
+     {
+         return $this->morphMany(Unit::class, 'updater');
+     }
      // Lines created by this user
      public function createdLines(): MorphMany
      {
          return $this->morphMany(Line::class, 'creator');
      }
- 
+
      // Lines updated by this user
      public function updatedLines(): MorphMany
      {

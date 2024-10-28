@@ -2,8 +2,8 @@
     <v-card>
         <v-card-title class="pt-5">
             <v-row>
-                <v-col cols="4"><span>Categories List</span></v-col>
-                <v-col cols="8" class="d-flex justify-end">
+                <v-col cols="6"><span>Category Trash List</span></v-col>
+                <v-col cols="6" class="d-flex justify-end">
                     <v-text-field
                         v-model="search"
                         density="compact"
@@ -17,43 +17,6 @@
                         single-line
                         clearable
                     ></v-text-field>
-                    <v-btn
-                        @click="createCategory"
-                        color="primary"
-                        icon
-                        style="width: 40px; height: 40px"
-                    >
-                        <v-tooltip location="top" activator="parent">
-                            <template v-slot:activator="{ props }">
-                                <v-icon v-bind="props" style="font-size: 20px"
-                                    >mdi-plus</v-icon
-                                >
-                            </template>
-                            <span>Add a new Category</span>
-                        </v-tooltip>
-                    </v-btn>
-
-                    <v-badge :content="trashedCount" color="red" overlap>
-                        <v-btn
-                            @click="viewTrash"
-                            color="red"
-                            icon
-                            class="ml-2"
-                            style="width: 40px; height: 40px"
-                        >
-                            <v-tooltip location="top" activator="parent">
-                                <template v-slot:activator="{ props }">
-                                    <v-icon
-                                        v-bind="props"
-                                        style="font-size: 20px"
-                                    >
-                                        mdi-trash-can-outline
-                                    </v-icon>
-                                </template>
-                                <span>View trashed categories </span>
-                            </v-tooltip>
-                        </v-btn>
-                    </v-badge>
                 </v-col>
             </v-row>
         </v-card-title>
@@ -80,13 +43,9 @@
                 </v-chip>
             </template>
 
-            <template v-slot:item.creator_name="{ item }">
-                <span>{{ item.creator ? item.creator.name : "Unknown" }}</span>
-            </template>
-
             <template v-slot:item.actions="{ item }">
-                <v-icon @click="editCategory(item.uuid)" class="mr-2"
-                    >mdi-pencil</v-icon
+                <v-icon @click="showRestoreDialog(item.uuid)" color="green"
+                    >mdi-restore</v-icon
                 >
                 <v-icon @click="showConfirmDialog(item.uuid)" color="red"
                     >mdi-delete</v-icon
@@ -94,24 +53,29 @@
             </template>
         </v-data-table-server>
 
+        <!-- Restore Confirmation Dialog -->
+        <RestoreConfirmDialog
+            v-model:modelValue="restoreDialog"
+            :onConfirm="confirmRestore"
+            :onCancel="() => (restoreDialog = false)"
+        />
+        <!-- Delete Confirmation Dialog -->
         <ConfirmDialog
-            v-model:modelValue="dialog"
+            v-model:modelValue="deleteDialog"
             :onConfirm="confirmDelete"
-            :onCancel="
-                () => {
-                    dialog = false;
-                }
-            "
+            :onCancel="() => (deleteDialog = false)"
         />
     </v-card>
 </template>
 
 <script>
 import { toast } from "vue3-toastify";
+import RestoreConfirmDialog from "../../Components/RestoreConfirmDialog.vue";
 import ConfirmDialog from "../../Components/ConfirmDialog.vue";
 
 export default {
     components: {
+        RestoreConfirmDialog,
         ConfirmDialog,
     },
     data() {
@@ -127,15 +91,14 @@ export default {
                     value: "status",
                     sortable: true,
                 },
-                { title: "Creator", key: "creator.name", sortable: false },
                 { title: "Actions", key: "actions", sortable: false },
             ],
             serverItems: [],
             loading: true,
             totalItems: 0,
-            dialog: false,
+            restoreDialog: false, // Separate state for restore dialog
+            deleteDialog: false, // Separate state for delete dialog
             selectedCategoryId: null,
-            trashedCount: 0,
         };
     },
     methods: {
@@ -144,7 +107,7 @@ export default {
             const sortOrder = sortBy.length ? sortBy[0].order : "desc";
             const sortKey = sortBy.length ? sortBy[0].key : "created_at";
             try {
-                const response = await this.$axios.get("/category", {
+                const response = await this.$axios.get("/category/trashed", {
                     params: {
                         page,
                         itemsPerPage,
@@ -155,31 +118,42 @@ export default {
                 });
                 this.serverItems = response.data.items || [];
                 this.totalItems = response.data.total || 0;
-                this.fetchTrashedCategorysCount();
             } catch (error) {
                 console.error("Error loading items:", error);
             } finally {
                 this.loading = false;
             }
         },
-        createCategory() {
-            this.$router.push({ name: "CategoryCreate" });
-        },
-        viewTrash() {
-            this.$router.push({ name: "CategoryTrash" });
-        },
-        editCategory(uuid) {
-            this.$router.push({ name: "CategoryEdit", params: { uuid } });
+        showRestoreDialog(uuid) {
+            this.selectedCategoryId = uuid;
+            this.restoreDialog = true; // Open restore dialog
         },
         showConfirmDialog(uuid) {
             this.selectedCategoryId = uuid;
-            this.dialog = true;
+            this.deleteDialog = true; // Open delete dialog
+        },
+        async confirmRestore() {
+            this.restoreDialog = false; // Close the restore dialog
+            try {
+                await this.$axios.post(
+                    `/category/${this.selectedCategoryId}/restore`
+                );
+                this.loadItems({
+                    page: 1,
+                    itemsPerPage: this.itemsPerPage,
+                    sortBy: [],
+                });
+                toast.success("Category restored successfully!");
+            } catch (error) {
+                console.error("Error restoring category:", error);
+                toast.error("Failed to restore category.");
+            }
         },
         async confirmDelete() {
-            this.dialog = false; // Close the dialog
+            this.deleteDialog = false; // Close the delete dialog
             try {
                 await this.$axios.delete(
-                    `/category/${this.selectedCategoryId}`
+                    `/category/${this.selectedCategoryId}/force-delete`
                 );
                 this.loadItems({
                     page: 1,
@@ -192,29 +166,16 @@ export default {
                 toast.error("Failed to delete category.");
             }
         },
-        async fetchTrashedCategorysCount() {
-            try {
-                const response = await this.$axios.get(
-                    "/category/trashed-count"
-                );
-                this.trashedCount = response.data.trashedCount;
-            } catch (error) {
-                console.error("Error fetching trashed categorys count:", error);
-            }
+        editCategory(uuid) {
+            this.$router.push({ name: "CategoryEdit", params: { uuid } });
         },
     },
-
     created() {
         this.loadItems({
             page: 1,
             itemsPerPage: this.itemsPerPage,
             sortBy: [],
         });
-        this.fetchTrashedCategorysCount();
     },
 };
 </script>
-
-<style scoped>
-/* Optional: Add styles for the main component */
-</style>
