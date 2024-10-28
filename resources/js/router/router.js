@@ -316,9 +316,6 @@ const routes = [
 
                 meta: { title: "Rent index" },
                 props:true
-
-                meta: { title: "rent index" },
-                props: true,
             },
             {
                 path: "rent/create", // New route for rent Create
