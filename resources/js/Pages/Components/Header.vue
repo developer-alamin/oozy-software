@@ -138,16 +138,16 @@
                             alt="Profile"
                             class="rounded-circle"
                         /> -->
-                        <span class="d-none d-md-block dropdown-toggle ps-2"
-                            >K. Anderson</span
-                        > </a
+                        <span class="d-none d-md-block dropdown-toggle ps-2">{{
+                            userName
+                        }}</span> </a
                     ><!-- End Profile Iamge Icon -->
 
                     <ul
                         class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile"
                     >
                         <li class="dropdown-header">
-                            <h6 v-if="user">{{ user.name }}</h6>
+                            <h6 v-if="userName">{{ userName }}</h6>
                             <span>Web Designer</span>
                         </li>
                         <li>
@@ -216,7 +216,10 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import axios from "axios";
-
+// import { useAuthStore } from "../../stores/authStore";
+// const authStore = useAuthStore();
+const userName = localStorage.getItem("user");
+console.log(userName);
 const sidebarVisible = ref(false);
 
 const toggleSidebar = () => {
@@ -226,20 +229,10 @@ const toggleSidebar = () => {
 
 const user = ref(null);
 
-async function fetchUserInfo() {
-    try {
-        const response = await axios.get("/api/auth/user"); // Use your API endpoint here
-        user.value = response.data; // Assuming `name` is a property in the response
-        console.log(response.data);
-    } catch (error) {
-        console.error("Error fetching user info:", error);
-    }
-}
-
 // Fetch user info when component mounts
-onMounted(() => {
-    fetchUserInfo();
-});
+// onMounted(() => {
+//     fetchUserInfo();
+// });
 </script>
 
 <style scoped>
