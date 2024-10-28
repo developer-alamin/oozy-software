@@ -48,6 +48,10 @@ Route::delete('/brand/{id}/force-delete', [BrandController::class, 'forceDelete'
 Route::get('/brand/trashed-count', [BrandController::class, 'trashedBrandsCount']);
 Route::resource('brand', BrandController::class);
 // units
+Route::get('/units/trashed', [UnitController::class, 'trashed']);
+Route::post('/units/{id}/restore', [UnitController::class, 'restore']);
+Route::delete('/units/{id}/force-delete', [UnitController::class, 'forceDelete']);
+Route::get('/units/trashed-count', [UnitController::class, 'trashedUnitsCount']);
 Route::resource('units', UnitController::class);
 // Technician
 Route::get('/technician/trashed', [TechnicianController::class, 'trashed']);
@@ -98,7 +102,7 @@ Route::prefix('admin')->group(function () {
     Route::post('/logout', [AdminAuthController::class, 'logout'])->middleware('auth:admin');
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->middleware('auth:admin');
 });
-
+Route::get('/auth/user', [AuthController::class, 'fetchGobalUserAuthInfo']);
 Route::get('/user/role/auth', [AuthController::class, 'fetchUserAuthRoleInfo']);
 // User Auth Routes
 Route::prefix('user')->group(function () {

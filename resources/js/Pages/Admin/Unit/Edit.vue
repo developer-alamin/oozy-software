@@ -25,13 +25,11 @@
                         errors.description ? errors.description : ''
                     "
                 />
-
                 <!-- Status Field (Checkbox) -->
                 <v-select
                     v-model="unit.status"
                     :items="statusItems"
                     label="Unit Status"
-                    @change="updateStatus"
                     clearable
                 ></v-select>
 
@@ -93,21 +91,24 @@ export default {
     methods: {
         async fetchUnit() {
             // Fetch the unit data to populate the form
-            const unitId = this.$route.params.id; // Assuming the unit ID is passed in the route params
+            const unitId = this.$route.params.uuid; // Assuming the unit ID is passed in the route params
             try {
                 const response = await this.$axios.get(`/units/${unitId}/edit`);
                 this.unit = response.data.unit; // Populate form with the existing unit data
-                his.unit.status =
+                // console.log(this.unit);
+
+                this.unit.status =
                     this.unit.status === "Active" ? "Active" : "Inactive";
             } catch (error) {
-                this.serverError = "Error fetching unit data.";
+                console.log(error);
+                this.serverError = "Error fetching unit data." + error;
             }
         },
         async submit() {
             this.errors = {}; // Reset errors before submission
             this.serverError = null;
             this.loading = true;
-            const unitId = this.$route.params.id; // Assuming unit ID is in route params
+            const unitId = this.$route.params.uuid; // Assuming unit ID is in route params
             setTimeout(async () => {
                 try {
                     const response = await this.$axios.put(

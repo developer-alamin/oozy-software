@@ -28,9 +28,13 @@ export const useAuthStore = defineStore("auth", {
                 password,
             });
             this.user = response.data.user;
-            this.role = response.data.role; // Store the role from response
+            this.role = response.data.user.role; // Store the role from response
+            console.log(this.role, this.user);
+
             localStorage.setItem("token", response.data.token); // Save token for future requests
-            localStorage.setItem("role", response.data.role);
+            localStorage.setItem("role", response.data.user.role);
+            localStorage.setItem("user", response.data.user.name);
+            localStorage.setItem("auth_gurd", true);
         },
         async logout() {
             await axios.post("/user/logout");

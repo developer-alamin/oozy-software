@@ -11,6 +11,14 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+
+    public function fetchGobalUserAuthInfo(){
+        $currentUser = Auth::guard('admin')->user();
+        return response()->json([
+            'user'   => $currentUser,
+             // Return the entire user object
+        ]);
+    }
     public function fetchUserAuthRoleInfo()
     {
 
@@ -43,6 +51,10 @@ class AuthController extends Controller
         } else {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
+        return response()->json([
+            'user_role' => true,
+            'user' => $currentUser, // Return the entire user object
+        ]);
     }
 
     public function fetchAdminAllUserInfo(Request $request)
@@ -50,7 +62,7 @@ class AuthController extends Controller
         // $currentUser = Auth::guard('admin')->user();
         // return response()->json([
         //     'items'   => $currentUser,
-            
+
         // ]);
         // Get parameters from the request
         $page         = $request->input('page', 1);
@@ -99,9 +111,9 @@ class AuthController extends Controller
                 // Superadmin can create user without additional checks
             } else {
                 // Regular admin authorization check can be implemented here if needed
-               
+
             }
-    
+
         }else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
@@ -121,10 +133,10 @@ class AuthController extends Controller
             'token'   => $token,
             'user'    => $admin,
             'role'    => 'admin',
-            'success' => true, 
+            'success' => true,
             'message' => 'Admin created successfully.'
         ]);
-        
+
     }
 
     public function allUserInfo(Request $request)
@@ -132,7 +144,7 @@ class AuthController extends Controller
         // $currentUser = Auth::guard('admin')->user();
         // return response()->json([
         //     'items'   => $currentUser,
-            
+
         // ]);
         // Get parameters from the request
         $page         = $request->input('page', 1);
@@ -181,9 +193,9 @@ class AuthController extends Controller
         //         // Superadmin can create user without additional checks
         //     } else {
         //         // Regular admin authorization check can be implemented here if needed
-               
+
         //     }
-    
+
         // }else {
         //     return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         // }
@@ -203,9 +215,9 @@ class AuthController extends Controller
             'token'   => $token,
             'user'    => $user,
             'role'    => 'user',
-            'success' => true, 
+            'success' => true,
             'message' => 'Users created successfully.'
         ]);
-        
+
     }
 }

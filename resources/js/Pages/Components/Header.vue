@@ -10,7 +10,7 @@
             <i class="bi bi-list toggle-sidebar-btn" @click="toggleSidebar"></i>
         </div>
         <!-- End Logo -->
-        <!-- 
+        <!--
         <div class="search-bar">
             <form
                 class="search-form d-flex align-items-center"
@@ -147,7 +147,7 @@
                         class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile"
                     >
                         <li class="dropdown-header">
-                            <h6>Kevin Anderson</h6>
+                            <h6 v-if="user">{{ user.name }}</h6>
                             <span>Web Designer</span>
                         </li>
                         <li>
@@ -214,14 +214,32 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import loginImage from "../../../img/login_page.png";
+import { ref, onMounted } from "vue";
+import axios from "axios";
+
 const sidebarVisible = ref(false);
 
 const toggleSidebar = () => {
     sidebarVisible.value = !sidebarVisible.value;
     document.body.classList.toggle("toggle-sidebar", sidebarVisible.value);
 };
+
+const user = ref(null);
+
+async function fetchUserInfo() {
+    try {
+        const response = await axios.get("/api/auth/user"); // Use your API endpoint here
+        user.value = response.data; // Assuming `name` is a property in the response
+        console.log(response.data);
+    } catch (error) {
+        console.error("Error fetching user info:", error);
+    }
+}
+
+// Fetch user info when component mounts
+onMounted(() => {
+    fetchUserInfo();
+});
 </script>
 
 <style scoped>

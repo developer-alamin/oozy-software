@@ -111,11 +111,6 @@ class UnitController extends Controller
      */
     public function edit(Unit $unit)
     {
-        // return response()->json([
-        //     'success' => true,
-        //     'unit' => $unit
-        // ], Response::HTTP_OK);
-
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('admin')->user();
@@ -290,7 +285,7 @@ class UnitController extends Controller
 
 
     }
-    public function trashedunitsCount()
+    public function trashedUnitsCount()
     {
         // Get the count of soft-deleted units
         $trashedCount = Unit::onlyTrashed()->count();
@@ -304,7 +299,7 @@ class UnitController extends Controller
     {
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
-                
+
             $currentUser = Auth::guard('admin')->user();
             $creatorType = Admin::class;
 
@@ -331,7 +326,7 @@ class UnitController extends Controller
             } else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
-        
+
         try {
             // Delete the supplier
             $unit->forceDelete();
@@ -345,13 +340,13 @@ class UnitController extends Controller
                 'message' => 'Error deleting unit: ' . $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-       
+
     }
 
      // Restore a soft-deleted unit
     public function restore($id)
     {
-        
+
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('admin')->user();

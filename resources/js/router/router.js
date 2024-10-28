@@ -19,14 +19,14 @@ const routes = [
         path: "/",
         name: "Login",
         component: Login,
-        meta: { title: "Login" },
+        meta: { title: "Login", requiresAuth: true },
     },
 
     {
         path: "/register",
         name: "Register",
         component: Register,
-        meta: { title: "Register" },
+        meta: { title: "Register", requiresAuth: true },
     },
 
     {
@@ -228,11 +228,17 @@ const routes = [
                 meta: { title: "Unit Create" },
             },
             {
-                path: "unit/edit/:id", // Dynamic route for Unit Edit
+                path: "unit/edit/:uuid", // Dynamic route for Unit Edit
                 name: "UnitEdit",
                 component: adminComponents.UnitEdit,
                 meta: { title: "Edit Unit" },
                 props: true, // Enables passing route params as props
+            },
+            {
+                path: "unit/trash", // New route for Contact
+                name: "UnitTrash",
+                component: adminComponents.UnitTrash,
+                meta: { title: "Unit Trash" },
             },
             // technician
             {
@@ -401,11 +407,12 @@ const router = createRouter({
 //     }
 // });
 // router.beforeEach((to, from, next) => {
-//     const token = localStorage.getItem("token");
+//     const role = localStorage.getItem("role");
 //     const authStore = useAuthStore();
-//     console.log(to.name, authStore.role);
+//     const isAuthenticated = to.meta.requiresAuth;
+//     console.log(to.meta.requiresAuth, to.name, authStore.user);
 
-//     if (to.name === "AdminDashboard" && authStore.role !== "admin") {
+//     if (to.name === "AdminDashboard" && !role) {
 //         next({ name: "Login" }); // Redirect to login if not admin
 //     } else if (to.name === "UserDashboard" && authStore.role !== "user") {
 //         next({ name: "Login" }); // Redirect to login if not user

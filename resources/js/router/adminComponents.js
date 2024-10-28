@@ -43,6 +43,7 @@ export { default as BrandEdit } from "../Pages/Admin/Brand/Edit.vue";
 export { default as UnitIndex } from "../Pages/Admin/Unit/Index.vue";
 export { default as UnitCreate } from "../Pages/Admin/Unit/Create.vue";
 export { default as UnitEdit } from "../Pages/Admin/Unit/Edit.vue";
+export { default as UnitTrash } from "../Pages/Admin/Unit/Trash.vue";
 
 // Technician components
 export { default as TechnicianIndex } from "../Pages/Technician/Index.vue";
