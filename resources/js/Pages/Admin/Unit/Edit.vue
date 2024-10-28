@@ -27,11 +27,13 @@
                 />
 
                 <!-- Status Field (Checkbox) -->
-                <v-checkbox
+                <v-select
                     v-model="unit.status"
-                    label="Status"
-                    :error-messages="errors.status ? errors.status : ''"
-                />
+                    :items="statusItems"
+                    label="Unit Status"
+                    @change="updateStatus"
+                    clearable
+                ></v-select>
 
                 <!-- Action Buttons -->
 
@@ -66,15 +68,17 @@
 </template>
 
 <script>
+import { toast } from "vue3-toastify";
 export default {
     data() {
         return {
             valid: false,
             loading: false,
+            statusItems: ["Active", "Inactive"],
             unit: {
                 name: "",
                 description: "",
-                status: false, // Default to false (inactive)
+                status: "", // Default to false (inactive)
             },
             errors: {},
             serverError: null,
@@ -92,11 +96,9 @@ export default {
             const unitId = this.$route.params.id; // Assuming the unit ID is passed in the route params
             try {
                 const response = await this.$axios.get(`/units/${unitId}/edit`);
-                console.log(response.data);
-
                 this.unit = response.data.unit; // Populate form with the existing unit data
-                this.unit.status =
-                    this.unit.status == "true" || this.unit.status == true;
+                his.unit.status =
+                    this.unit.status === "Active" ? "Active" : "Inactive";
             } catch (error) {
                 this.serverError = "Error fetching unit data.";
             }
@@ -114,12 +116,15 @@ export default {
                     );
 
                     if (response.data.success) {
+                        toast.success("Unit updated successfully!");
                         this.$router.push({ name: "UnitIndex" }); // Redirect to unit list page
                     }
                 } catch (error) {
                     if (error.response && error.response.status === 422) {
+                        toast.error("Failed to update unit.");
                         this.errors = error.response.data.errors || {};
                     } else {
+                        toast.error("Error updating unit.");
                         this.serverError = "Error updating unit.";
                     }
                 } finally {
