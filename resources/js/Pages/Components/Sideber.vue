@@ -62,7 +62,8 @@
                             active-class="active"
                             :class="{ active: isModelRoute }"
                         >
-                            <i class="bi bi-circle"></i><span>Model</span>
+                            <i class="bi bi-circle"></i
+                            ><span>Mechine Model</span>
                         </router-link>
                     </li>
                     <li>
@@ -71,7 +72,8 @@
                             active-class="active"
                             :class="{ active: isUnitRoute }"
                         >
-                            <i class="bi bi-circle"></i><span>Unit</span>
+                            <i class="bi bi-circle"></i
+                            ><span>Mechine Unit</span>
                         </router-link>
                     </li>
                     <li>
