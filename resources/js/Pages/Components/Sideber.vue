@@ -417,15 +417,18 @@ const isMechineRoute = computed(() => {
         "ModelIndex",
         "ModelCreate",
         "ModelEdit",
+        "ModelTrash",
         "SupplierIndex",
         "SupplierCreate",
         "SupplierEdit",
         "CategoryIndex",
         "CategoryCreate",
         "CategoryEdit",
+        "CategoryTrash",
         "UnitIndex",
         "UnitCreate",
         "UnitEdit",
+        "UnitTrash",
         "BrandIndex",
         "BrandCreate",
         "BrandEdit",
@@ -435,7 +438,9 @@ const isMechineRoute = computed(() => {
 
 // Check if the current route is for a specific model-related route
 const isModelRoute = computed(() =>
-    ["ModelIndex", "ModelCreate", "ModelEdit"].includes(route.name)
+    ["ModelIndex", "ModelCreate", "ModelEdit", "ModelTrash"].includes(
+        route.name
+    )
 );
 
 // Check if the current route is for a specific supplier-related route
@@ -443,7 +448,12 @@ const isSupplierRoute = computed(() =>
     ["SupplierIndex", "SupplierCreate", "SupplierEdit"].includes(route.name)
 );
 const isCategoryRoute = computed(() =>
-    ["CategoryIndex", "CategoryCreate", "CategoryEdit"].includes(route.name)
+    [
+        "CategoryIndex",
+        "CategoryCreate",
+        "CategoryEdit",
+        "CategoryTrash",
+    ].includes(route.name)
 );
 const isBrandRoute = computed(() =>
     ["BrandIndex", "BrandCreate", "BrandEdit", "BrandTrash"].includes(
@@ -451,7 +461,7 @@ const isBrandRoute = computed(() =>
     )
 );
 const isUnitRoute = computed(() =>
-    ["UnitIndex", "UnitCreate", "UnitEdit"].includes(route.name)
+    ["UnitIndex", "UnitCreate", "UnitEdit", "UnitTrash"].includes(route.name)
 );
 // Company
 const isCompanyRouteShow = computed(() => {
