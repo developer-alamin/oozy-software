@@ -6,12 +6,29 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Support\Str;
+
 class Rent extends Model
 {
-    use HasFactory,SoftDeletes;
+    use HasFactory,SoftDeletes,HasUuids;
     protected $table = 'rents';
-
-    protected $fillable = ['name','email','phone','photo','address','description'];
+   
+    // Assuming you want the uuid as the primary key
+    protected $primaryKey = 'uuid'; 
+    protected $fillable = [
+        'uuid',
+        'name',
+        'email',
+        'phone',
+        'photo',
+        'address',
+        'description',
+        'creator_type',
+        'creator_id',
+        'updater_type',
+        'updater_id',
+    ];
 
     public static function validationRules()
     {
@@ -34,5 +51,16 @@ class Rent extends Model
         $rent->restore();
 
         return true;
+    }
+
+    // Polymorphic relationships
+    public function creator()
+    {
+        return $this->morphTo();
+    }
+
+    public function updater()
+    {
+        return $this->morphTo();
     }
 }

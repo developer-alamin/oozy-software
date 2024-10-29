@@ -356,6 +356,15 @@
                             <i class="bi bi-circle"></i><span>Line</span>
                         </router-link>
                     </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'GroupIndex' }"
+                            active-class="active"
+                            :class="{ active: isGroupIndex }"
+                        >
+                            <i class="bi bi-circle"></i><span>Group</span>
+                        </router-link>
+                    </li>
 
                 </ul>
             </li>

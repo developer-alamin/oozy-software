@@ -148,7 +148,7 @@ export default {
         },
         async fetchBrand() {
             // Fetch the rent data to populate the form
-            const rentId = this.$route.params.id; // Assuming the brand ID is passed in the route params
+            const rentId = this.$route.params.uuid; // Assuming the brand ID is passed in the route params
             try {
                 const response = await this.$axios.get(
                     `/rent/${rentId}/edit`
@@ -173,7 +173,7 @@ export default {
                 formData.append("_method","PUT");
             });
 
-            const rentId = this.$route.params.id; // Assuming brand ID is in route params
+            const rentId = this.$route.params.uuid; // Assuming brand ID is in route params
             setTimeout(async () => {
                 try {
                 const response = await this.$axios.post("/rent/"+rentId,formData);

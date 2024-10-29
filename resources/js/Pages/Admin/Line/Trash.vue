@@ -50,10 +50,10 @@
         >
 
             <template v-slot:item.actions="{ item }">
-                <v-icon @click="showRestoreDialog(item.id)" color="green"
+                <v-icon @click="showRestoreDialog(item.uuid)" color="green"
                     >mdi-restore</v-icon
                 >
-                <v-icon @click="showConfirmDialog(item.id)" color="red"
+                <v-icon @click="showConfirmDialog(item.uuid)" color="red"
                     >mdi-delete</v-icon
                 >
             </template>
@@ -131,12 +131,12 @@ export default {
                 this.loading = false;
             }
         },
-        showRestoreDialog(id) {
-            this.selectedLineId = id;
+        showRestoreDialog(uuid) {
+            this.selectedLineId = uuid;
             this.restoreDialog = true; // Open restore dialog
         },
-        showConfirmDialog(id) {
-            this.selectedLineId = id;
+        showConfirmDialog(uuid) {
+            this.selectedLineId = uuid;
             this.deleteDialog = true; // Open delete dialog
         },
         async confirmRestore() {

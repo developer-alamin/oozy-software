@@ -13,14 +13,15 @@ return new class extends Migration
     {
         Schema::create('rents', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid')->unique();
             $table->string('name');
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
-            $table->blob('photo')->nullable();
+            $table->binary('photo')->nullable();
             $table->text('address')->nullable();
             $table->text('description')->nullable();
-            //$table->morphs('creator')->default(null); // Polymorphic relationship for creator
-           // $table->morphs('updater')->nullable(); // Polymorphic relationship for updater
+            $table->morphs('creator');
+            $table->morphs('updater'); 
             $table->timestamps();
             $table->softDeletes();
         });

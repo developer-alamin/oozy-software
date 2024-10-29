@@ -12,12 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('groups', function (Blueprint $table) {
-            $table->uuid()->primary(); 
-            $table->bigInteger('group_id')->default(0)->unique();
-            $table->morphs('creator');
-            $table->morphs('updater');
+            $table->id();
+            $table->uuid('uuid')->unique();
+            $table->bigInteger('group_id')->default(0);
             $table->string('name')->nullable();
             $table->string('description')->nullable();
+            $table->morphs('creator');
+            $table->morphs('updater');
             $table->timestamp("created_at")->useCurrent();
             $table->timestamp("updated_at")->useCurrent()->useCurrentOnUpdate();
             $table->softDeletes();

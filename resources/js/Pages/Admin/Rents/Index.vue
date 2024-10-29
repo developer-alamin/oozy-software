@@ -69,15 +69,18 @@
             loading-text="Loading... Please wait"
             @update:options="loadItems"
         >
+            <template v-slot:item.creator_name="{ item }">
+                <span>{{ item.creator ? item.creator.name : "Unknown" }}</span>
+            </template>
             <template v-slot:item.photo="{ item }">
                 <img class="rentsImg" :src="item.photo" alt="">
             </template>
 
             <template v-slot:item.actions="{ item }">
-                <v-icon @click="editRent(item.id)" class="mr-2"
+                <v-icon @click="editRent(item.uuid)" class="mr-2"
                     >mdi-pencil</v-icon
                 >
-                <v-icon @click="showConfirmDialog(item.id)" color="red"
+                <v-icon @click="showConfirmDialog(item.uuid)" color="red"
                     >mdi-delete</v-icon
                 >
             </template>
@@ -116,6 +119,7 @@ export default {
                 { title: "Phone", key: "phone", sortable: true },
                 { title: "Address", key: "address", sortable: true },
                 { title: "Description", key: "description", sortable: false },
+                { title: "Creator", key: "creator.name", sortable: false },
                 { title: "Photo", key: "photo", sortable: false },
                 
                 { title: "Actions", key: "actions", sortable: false },
@@ -158,11 +162,11 @@ export default {
         viewTrash() {
             this.$router.push({ name: "RentsTrash" });
         },
-        editRent(id) {
-            this.$router.push({ name: "RentEdit", params: { id } });
+        editRent(uuid) {
+            this.$router.push({ name: "RentEdit", params: { uuid } });
         },
-        showConfirmDialog(id) {
-            this.selectedBrandId = id;
+        showConfirmDialog(uuid) {
+            this.selectedBrandId = uuid;
             this.dialog = true;
         },
         async confirmDelete() {
@@ -176,8 +180,8 @@ export default {
                 });
                 toast.success("Rent deleted successfully!");
             } catch (error) {
-                console.error("Error deleting brand:", error);
-                toast.error("Failed to delete brand.");
+                console.error("Error deleting Rent:", error);
+                toast.error("Failed to delete Rent.");
             }
         },
         async fetchTrashedRentsCount() {

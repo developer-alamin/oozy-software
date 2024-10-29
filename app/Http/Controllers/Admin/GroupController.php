@@ -4,8 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Admin;
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\User;
 use App\Models\Group;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
+
 
 class GroupController extends Controller
 {
@@ -14,27 +20,43 @@ class GroupController extends Controller
      */
     public function index(Request $request)
     {
-        
-        // Get parameters from the request
+
+
         $page         = $request->input('page', 1);
         $itemsPerPage = $request->input('itemsPerPage', 5);
-        $sortBy       = $request->input('sortBy', 'created_at'); // Default sort by name
-        $sortOrder    = $request->input('sortOrder', 'desc'); // Default order is ascending
-        $search       = $request->input('search', ''); // Search term, default is empty
-    
-        // Query brands with pagination, sorting, and search
-        $groupsQuery = Group::query();
+        $sortBy       = $request->input('sortBy', 'created_at'); // Default sort by created_at
+        $sortOrder    = $request->input('sortOrder', 'desc');    // Default sort order is descending
+        $search       = $request->input('search', '');           // Search term, default is empty
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
+            // Check if the admin is a super admin
+            if ($currentUser->role === 'superadmin') {
+                // If superadmin, retrieve all technicians
+                $groupsQuery = Group::query(); // No filters applied
+            } else {
+                // If not superadmin, filter by creator type and id
+                $groupsQuery = Group::where('creator_type', $creatorType)
+                    ->where('creator_id', $currentUser->id);
+            }
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+            // For regular users, filter by creator type and id
+            $groupsQuery = Group::where('creator_type', $creatorType)
+                ->where('creator_id', $currentUser->id);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
         // Apply search if the search term is not empty
         if (!empty($search)) {
             $groupsQuery->where('name', 'LIKE', '%' . $search . '%');
         }
-    
         // Apply sorting
         $groupsQuery->orderBy($sortBy, $sortOrder);
-    
         // Paginate results
-        $groups = $groupsQuery->paginate($itemsPerPage);
-    
+        $groups = $groupsQuery->with('creator:id,name')->paginate($itemsPerPage);
         // Return the response as JSON
         return response()->json([
             'items' => $groups->items(), // Current page items
@@ -56,10 +78,32 @@ class GroupController extends Controller
     public function store(Request $request)
     {
 
+
         $validatedData = $request->validate(Group::validationRules());
-        
-        Group::create($validatedData);
-        return response()->json(['success' => true,'message' => 'Group created successfully.'], 200);
+
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+             $creator = Auth::guard('admin')->user();
+             // Check if the admin is a superadmin
+             if ($creator->role === 'superadmin') {
+                 // Superadmin can create technician without additional checks
+             } else {
+                 // Regular admin authorization check can be implemented here if needed
+             }
+
+         } elseif (Auth::guard('user')->check()) {
+             $creator = Auth::guard('user')->user();
+             // If you want users to have specific restrictions, implement checks here
+         } else {
+             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+         }
+         // Create the technician and associate it with the creator
+         $group = new Group($validatedData);
+         $group->creator()->associate($creator);  // Assign creator polymorphically
+         $group->updater()->associate($creator);  // Associate the updater
+         $group->save(); // Save the technician to the database
+         // Return a success response
+         return response()->json(['success' => true, 'message' => 'Group created successfully.'], 201);
     }
 
     /**
@@ -75,9 +119,31 @@ class GroupController extends Controller
      */
     public function edit(Group $group)
     {
-         return response()->json([
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
+            // Check if the admin is a super admin
+            if ($currentUser->role === 'superadmin') {
+                // Super admins can edit any group
+                return response()->json([
+                    'success' => true,
+                    'group' => $group
+                ], Response::HTTP_OK);
+            }
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+        // Check if the group belongs to the current user or admin
+        if ($group->creator_type !== $creatorType || $group->creator_id !== $currentUser->id) {
+            return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to edit this group.'], 403);
+        }
+        // Return the brand data if authorized
+        return response()->json([
             'success' => true,
-            'group' => $group
+            'group'   => $group
         ], Response::HTTP_OK);
     }
 
@@ -86,17 +152,44 @@ class GroupController extends Controller
      */
     public function update(Request $request, Group $group)
     {
-         $validatedData = $request->validate(Group::validationRules());
 
-        // Update the product model with the validated data
-        $group->update($validatedData);
 
-        // Return a success response
-        return response()->json([
-            'success' => true,
-            'message' => 'Group updated successfully.',
-            // 'category' => $category
-        ]);
+        // Validate the incoming request data
+          $validatedData = $request->validate(Group::validationRules());
+
+         // Determine the authenticated user (either from 'admin' or 'user' guard)
+         if (Auth::guard('admin')->check()) {
+             $currentUser = Auth::guard('admin')->user();
+             $creatorType = Admin::class;
+
+             // Check if the admin is a superadmin
+             if ($currentUser->role === 'superadmin') {
+                 // Superadmin can update without additional checks
+             } else {
+                 // Regular admin authorization check
+                 if ($group->creator_type !== $creatorType || $group->creator_id !== $currentUser->id) {
+                     return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to update this group.'], 403);
+                 }
+             }
+
+         } elseif (Auth::guard('user')->check()) {
+             $currentUser = Auth::guard('user')->user();
+             $creatorType = User::class;
+
+             // Regular user authorization check
+             if ($group->creator_type !== $creatorType || $group->creator_id !== $currentUser->id) {
+                 return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to update this group.'], 403);
+             }
+         } else {
+             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+         }
+         // Update the brand's details
+         $group->fill($validatedData);
+         $group->updater()->associate($currentUser); // Associate the updater
+         $group->save();
+
+         // Return a success response
+         return response()->json(['success' => true, 'message' => 'Group updated successfully.', 'group' => $group], 200);
     }
 
     /**
@@ -104,7 +197,30 @@ class GroupController extends Controller
      */
     public function destroy(Group $group)
     {
-         
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            // Check if the admin is a superadmin
+            if ($currentUser->role === 'superadmin') {
+                // Superadmin can delete any brand without additional checks
+            } else {
+                $creatorType = Admin::class;
+                // Regular admin authorization check
+                if ($group->creator_type !== $creatorType || $group->creator_id !== $currentUser->id) {
+                    return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to delete this group.'], 403);
+                }
+            }
+
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+            // Regular user authorization check
+            if ($group->creator_type !== $creatorType || $group->creator_id !== $currentUser->id) {
+                return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to delete this group.'], 403);
+            }
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
         try {
             // Delete the supplier
             $group->delete();
@@ -115,9 +231,10 @@ class GroupController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error deleting gropu: ' . $e->getMessage()
+                'message' => 'Error deleting Group: ' . $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        }  
+        
     }
     public function groupsTrashedCount()
     {
@@ -130,19 +247,45 @@ class GroupController extends Controller
     }
     public function groupsTrashed(Request $request)
     {
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
+
+            // Superadmin check: Allow access to all soft-deleted technicians
+            if ($currentUser->role === 'superadmin') {
+                // Fetch all trashed technicians without additional checks
+                $groupsQuery = Group::onlyTrashed();
+            } else {
+                // Regular admin authorization check
+                $groupsQuery = Group::onlyTrashed()
+                    ->where('creator_id', $currentUser->id)
+                    ->where('creator_type', $creatorType); // Only fetch soft-deleted records created by this admin
+            }
+
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+
+            // Regular user authorization check
+            $groupsQuery = Group::onlyTrashed()
+                ->where('creator_id', $currentUser->id)
+                ->where('creator_type', $creatorType); // Only fetch soft-deleted records created by this user
+
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
         // Get parameters from the request
         $page         = $request->input('page', 1);
         $itemsPerPage = $request->input('itemsPerPage', 5);
-        $sortBy       = $request->input('sortBy', 'created_at'); // Default sort by name
+        $sortBy       = $request->input('sortBy', 'created_at'); // Default sort by created_at
         $sortOrder    = $request->input('sortOrder', 'desc'); // Default order is descending
         $search       = $request->input('search', ''); // Search term, default is empty
 
-        // Query only soft deleted brands with pagination, sorting, and search
-        $groupsQuery = Group::onlyTrashed(); // Fetch only soft-deleted records
-
         // Apply search if the search term is not empty
         if (!empty($search)) {
-            $groupsQuery->where('name', 'LIKE', '%' . $search . '%');
+            $groupsQuery->where('name', 'LIKE', '%' . $search . '%'); // Adjust as per your brand fields
         }
 
         // Apply sorting
@@ -160,22 +303,87 @@ class GroupController extends Controller
     // Restore a soft-deleted brand
      public function groupsRestore($id)
     {
-        // Attempt to restore the brand using the static method on the model
-        $restored = Group::restoreGroup($id);
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
 
-        if ($restored) {
-            return response()->json(['message' => 'Group restored successfully'], 200);
+            // Superadmin check: Allow access to all trashed technicians
+            if ($currentUser->role === 'superadmin') {
+                $restored = Group::onlyTrashed()->findOrFail($id)->restore();
+            } else {
+                // Regular admin authorization check
+                $restored = Group::onlyTrashed()
+                    ->where('creator_id', $currentUser->id)
+                    ->where('creator_type', $creatorType)
+                    ->findOrFail($id)
+                    ->restore();
+            }
+
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+
+            // Regular user authorization check
+            $restored = Group::onlyTrashed()
+                ->where('creator_id', $currentUser->id)
+                ->where('creator_type', $creatorType)
+                ->findOrFail($id)
+                ->restore();
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
-
-        return response()->json(['message' => 'Group not found or is not trashed'], 404);
+        if ($restored) {
+            return response()->json(['message' => 'Group restored successfully'], Response::HTTP_OK);
+        }
+        return response()->json(['message' => 'Group not found or is not trashed'], Response::HTTP_NOT_FOUND);
     }
 
     // Permanently delete a group from trash
      public function groupsforceDelete($id)
      {
-         $group = Group::onlyTrashed()->findOrFail($id);
-         $group->forceDelete(); // Permanent delete
- 
-         return response()->json(['message' => 'Group permanently deleted']);
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+                
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
+
+            // Superadmin check: Allow access to all trashed technicians
+            if ($currentUser->role === 'superadmin') {
+                $group = Group::onlyTrashed()->findOrFail($id);
+            } else {
+                // Regular admin authorization check
+                $group = Group::onlyTrashed()
+                    ->where('creator_id', $currentUser->id)
+                    ->where('creator_type', $creatorType)
+                    ->findOrFail($id);
+            }
+
+            } elseif (Auth::guard('user')->check()) {
+                $currentUser = Auth::guard('user')->user();
+                $creatorType = User::class;
+
+                // Regular user authorization check
+                $group = Group::onlyTrashed()
+                    ->where('creator_id', $currentUser->id)
+                    ->where('creator_type', $creatorType)
+                    ->findOrFail($id);
+            } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+        
+        try {
+            // Delete the supplier
+            $group->forceDelete();
+            return response()->json([
+                'success' => true,
+                'message' => 'Group permanently deleted successfully.'
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting Group: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
      }
 }

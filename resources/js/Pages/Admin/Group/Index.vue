@@ -69,11 +69,14 @@
             loading-text="Loading... Please wait"
             @update:options="loadItems"
         >
+            <template v-slot:item.creator_name="{ item }">
+                <span>{{ item.creator ? item.creator : "Unknown" }}</span>
+            </template>
             <template v-slot:item.actions="{ item }">
-                <v-icon @click="editGroup(item.id)" class="mr-2"
+                <v-icon @click="editGroup(item.uuid)" class="mr-2"
                     >mdi-pencil</v-icon
                 >
-                <v-icon @click="showConfirmDialog(item.id)" color="red"
+                <v-icon @click="showConfirmDialog(item.uuid)" color="red"
                     >mdi-delete</v-icon
                 >
             </template>
@@ -109,12 +112,7 @@ export default {
             headers: [
                 { title: "Group Name", key: "name", sortable: true },
                 { title: "Description", key: "description", sortable: false },
-                {
-                    title: "Create",
-                    key: "create",
-                    value:"created_at",
-                    sortable: true,
-                },
+                { title: "Creator", key: "creator.name", sortable: false },
                 { title: "Actions", key: "actions", sortable: false },
             ],
             serverItems: [],
@@ -156,11 +154,11 @@ export default {
         viewTrash() {
             this.$router.push({ name: "GroupTrash" });
         },
-        editGroup(id) {
-            this.$router.push({ name: "GroupEdit", params: { id } });
+        editGroup(uuid) {
+            this.$router.push({ name: "GroupEdit", params: { uuid } });
         },
-        showConfirmDialog(id) {
-            this.selectedGroupId = id;
+        showConfirmDialog(uuid) {
+            this.selectedGroupId = uuid;
             this.dialog = true;
         },
         async confirmDelete() {

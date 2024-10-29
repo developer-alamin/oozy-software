@@ -48,10 +48,10 @@
             @update:options="loadItems"
         >
             <template v-slot:item.actions="{ item }">
-                <v-icon @click="showRestoreDialog(item.id)" color="green"
+                <v-icon @click="showRestoreDialog(item.uuid)" color="green"
                     >mdi-restore</v-icon
                 >
-                <v-icon @click="showConfirmDialog(item.id)" color="red"
+                <v-icon @click="showConfirmDialog(item.uuid)" color="red"
                     >mdi-delete</v-icon
                 >
             </template>
@@ -94,12 +94,6 @@ export default {
             headers: [
                 { title: "Group Name", key: "name", sortable: true },
                 { title: "Description", key: "description", sortable: false },
-                {
-                    title: "Create",
-                    key: "create",
-                    value: "created_at",
-                    sortable: true,
-                },
                 { title: "Actions", key: "actions", sortable: false },
             ],
             serverItems: [],
@@ -133,12 +127,12 @@ export default {
                 this.loading = false;
             }
         },
-        showRestoreDialog(id) {
-            this.selectedGroupId = id;
+        showRestoreDialog(uuid) {
+            this.selectedGroupId = uuid;
             this.restoreDialog = true; // Open restore dialog
         },
-        showConfirmDialog(id) {
-            this.selectedGroupId = id;
+        showConfirmDialog(uuid) {
+            this.selectedGroupId = uuid;
             this.deleteDialog = true; // Open delete dialog
         },
         async confirmRestore() {

@@ -74,7 +74,7 @@ export default {
     methods: {
         async fetchLine() {
             // Fetch the brand data to populate the form
-            const lineId = this.$route.params.id; // Assuming the brand ID is passed in the route params
+            const lineId = this.$route.params.uuid; // Assuming the brand ID is passed in the route params
             try {
                 const response = await this.$axios.get(
                     `/line/${lineId}/edit`
@@ -89,7 +89,7 @@ export default {
             this.errors = {}; // Reset errors before submission
             this.serverError = null;
             this.loading = true;
-            const lineId = this.$route.params.id; // Assuming brand ID is in route params
+            const lineId = this.$route.params.uuid; // Assuming brand ID is in route params
             setTimeout(async () => {
                 try {
                     const response = await this.$axios.put(
