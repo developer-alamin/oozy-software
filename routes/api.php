@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\RentController;
+use App\Http\Controllers\Admin\RentController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\FactoryController;
 use App\Http\Controllers\User\UserController;
@@ -41,6 +41,9 @@ Route::resource('category', CategoryController::class);
 Route::resource('line', LineController::class);
 Route::resource('group', GroupController::class);
 
+// Rent
+Route::resource('rent', RentController::class);
+
 // brand
 Route::get('/brand/trashed', [BrandController::class, 'trashed']);
 Route::post('/brand/{id}/restore', [BrandController::class, 'restore']);
@@ -59,8 +62,7 @@ Route::post('/technician/{id}/restore', [TechnicianController::class, 'restore']
 Route::delete('/technician/{id}/force-delete', [TechnicianController::class, 'forceDelete']);
 Route::get('/technician/trashed-count', [TechnicianController::class, 'trashedTechniciansCount']);
 Route::resource('technician', TechnicianController::class);
-// Rent
-Route::resource('rent', RentController::class);
+
 // Company
 Route::resource('company', CompanyController::class);
 // Factory
@@ -87,6 +89,20 @@ Route::controller(GroupController::class)
     Route::delete('{id}/forceDelete', 'groupsforceDelete')->name('groups.groupsforce.Delete');
 });
 // Groups Gorup Controller end form here
+
+
+// Group Rents Controller start form here
+Route::controller(RentController::class)
+->prefix('rents')
+->as("rents")
+->group(function () {
+     Route::get('/trashed-count', 'rentstrashedcount')->name('rents.trashed.count');
+     Route::get('/trashed', 'rentstrashed')->name('rents.trashed');
+     Route::post('{id}/restore', 'rentsrestore')->name('line.restore');
+     Route::delete('{id}/force-delete', 'rentsforcedelete')->name('rents.force.delete');
+});
+// Group Rents Controller End form here
+
 // Admin Auth Routes
 Route::prefix('admin')->group(function () {
     // admin user

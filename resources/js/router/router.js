@@ -286,7 +286,7 @@ const routes = [
                 meta: { title: "line Create" },
             },
             {
-                path: "line/edit/:id", // New route for line edit
+                path: "line/edit/:uuid", // New route for line edit
                 name: "LineEdit",
                 component: adminComponents.LineEdit,
                 meta: { title: "line Edit" },
@@ -314,7 +314,7 @@ const routes = [
                 props: true,
             },
             {
-                path: "group/edit/:id", // New route for Group edit
+                path: "group/edit/:uuid", // New route for Group edit
                 name: "GroupEdit",
                 component: adminComponents.GroupEdit,
                 meta: { title: "group Edit" },
@@ -331,8 +331,9 @@ const routes = [
                 path: "rent/index", // New route for rent index
                 name: "RentIndex",
                 component: adminComponents.RentIndex,
-                meta: { title: "rent index" },
-                props: true,
+
+                meta: { title: "Rent index" },
+                props:true
             },
             {
                 path: "rent/create", // New route for rent Create
@@ -341,6 +342,21 @@ const routes = [
                 meta: { title: "Rent Create" },
                 props: true,
             },
+            {
+                path: "rent/edit/:uuid", // New route for rent Edit
+                name: "RentEdit",
+                component: adminComponents.RentEdit,
+                meta: { title: "Rent Edit" },
+                props:true
+            },
+            {
+                path: "rent/trash", // New route for rent trash
+                name: "RentsTrash",
+                component: adminComponents.RentsTrash,
+                meta: { title: "Rent Trash" },
+                props:true
+            },
+
         ],
     },
     // {

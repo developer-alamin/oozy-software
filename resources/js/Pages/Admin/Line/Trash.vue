@@ -50,10 +50,10 @@
         >
 
             <template v-slot:item.actions="{ item }">
-                <v-icon @click="showRestoreDialog(item.id)" color="green"
+                <v-icon @click="showRestoreDialog(item.uuid)" color="green"
                     >mdi-restore</v-icon
                 >
-                <v-icon @click="showConfirmDialog(item.id)" color="red"
+                <v-icon @click="showConfirmDialog(item.uuid)" color="red"
                     >mdi-delete</v-icon
                 >
             </template>
@@ -61,12 +61,14 @@
 
         <!-- Restore Confirmation Dialog -->
         <RestoreConfirmDialog
+            :restroreDialogName="restroreDialogName"
             v-model:modelValue="restoreDialog"
             :onConfirm="confirmRestore"
             :onCancel="() => (restoreDialog = false)"
         />
         <!-- Delete Confirmation Dialog -->
         <ConfirmDialog
+            :dialogName="dialogName"
             v-model:modelValue="deleteDialog"
             :onConfirm="confirmDelete"
             :onCancel="() => (deleteDialog = false)"
@@ -87,6 +89,8 @@ export default {
     },
     data() {
         return {
+            restroreDialogName:"Are you sure you want to restore this Line?",
+            dialogName:"Are you sure you want to delete this Line ?",
             search: "",
             itemsPerPage: 15,
             headers: [
@@ -127,12 +131,12 @@ export default {
                 this.loading = false;
             }
         },
-        showRestoreDialog(id) {
-            this.selectedLineId = id;
+        showRestoreDialog(uuid) {
+            this.selectedLineId = uuid;
             this.restoreDialog = true; // Open restore dialog
         },
-        showConfirmDialog(id) {
-            this.selectedLineId = id;
+        showConfirmDialog(uuid) {
+            this.selectedLineId = uuid;
             this.deleteDialog = true; // Open delete dialog
         },
         async confirmRestore() {

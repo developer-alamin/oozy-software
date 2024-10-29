@@ -11,14 +11,17 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 class Group extends Model
 {
    use HasFactory,SoftDeletes,HasUuids;
+    protected $table = 'groups';
+    protected $primaryKey = 'uuid'; // Assuming you want the uuid as the primary key
+
     protected $fillable = [
-        'name',
-        'description',
-        'deleted_at',
-        'creator_id',
+        'uuid',
         'creator_type',
-        'updater_id',
+        'creator_id',
         'updater_type',
+        'updater_id',
+        'name',
+        'description'
     ];
     
     public static function validationRules()

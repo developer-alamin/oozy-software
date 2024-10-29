@@ -80,7 +80,7 @@ export default {
     methods: {
         async fetchGroup() {
             // Fetch the group data to populate the form
-            const brandId = this.$route.params.id; // Assuming the group ID is passed in the route params
+            const brandId = this.$route.params.uuid; // Assuming the group ID is passed in the route params
             try {
                 const response = await this.$axios.get(
                     `/group/${brandId}/edit`
@@ -96,7 +96,7 @@ export default {
             this.errors = {}; // Reset errors before submission
             this.serverError = null;
             this.loading = true;
-            const groupId = this.$route.params.id; // Assuming group ID is in route params
+            const groupId = this.$route.params.uuid; // Assuming group ID is in route params
             setTimeout(async () => {
                 try {
                     const response = await this.$axios.put(

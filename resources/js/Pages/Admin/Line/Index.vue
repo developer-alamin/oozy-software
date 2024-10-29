@@ -69,17 +69,21 @@
             loading-text="Loading... Please wait"
             @update:options="loadItems"
         >
+            <template v-slot:item.creator_name="{ item }">
+                <span>{{ item.creator ? item.creator.name : "Unknown" }}</span>
+            </template>
             <template v-slot:item.actions="{ item }">
-                <v-icon @click="editLine(item.id)" class="mr-2"
+                <v-icon @click="editLine(item.uuid)" class="mr-2"
                     >mdi-pencil</v-icon
                 >
-                <v-icon @click="showConfirmDialog(item.id)" color="red"
+                <v-icon @click="showConfirmDialog(item.uuid)" color="red"
                     >mdi-delete</v-icon
                 >
             </template>
         </v-data-table-server>
 
         <ConfirmDialog
+            :dialogName="dialogName"
             v-model:modelValue="dialog"
             :onConfirm="confirmDelete"
             :onCancel="
@@ -101,6 +105,8 @@ export default {
     },
     data() {
         return {
+            dialogName:"Are you sure you want to delete this Line ?",
+
             search: "",
             itemsPerPage: 10,
             headers: [
@@ -108,7 +114,7 @@ export default {
                 { title: "Number ",key: "number",value: "number",sortable: false,},
                 { title: "Description", key: "description", sortable: false },
                 
-                { title: "Craeate ",key: "created_at",value: "created_at",sortable: true,},
+                { title: "Creator", key: "creator.name", sortable: false },
                 { title: "Actions", key: "actions", sortable: false },
             ],
             serverItems: [],
@@ -149,26 +155,27 @@ export default {
         viewTrash() {
             this.$router.push({ name: "LineTrash" });
         },
-        editLine(id) {
-            this.$router.push({ name: "LineEdit", params: { id } });
+        editLine(uuid) {
+            this.$router.push({ name: "LineEdit", params: { uuid } });
         },
-        showConfirmDialog(id) {
-            this.selectedlineId = id;
+        showConfirmDialog(uuid) {
+            this.selectedlineId = uuid;
             this.dialog = true;
         },
         async confirmDelete() {
             this.dialog = false; // Close the dialog
             try {
-                await this.$axios.delete(`/line/${this.selectedlineId}`);
+               const response = await this.$axios.delete(`/line/${this.selectedlineId}`);
                 this.loadItems({
                     page: 1,
                     itemsPerPage: this.itemsPerPage,
                     sortBy: [],
                 });
+                console.log(response.data)
                 toast.success("Line deleted successfully!");
             } catch (error) {
-                console.error("Error deleting brand:", error);
-                toast.error("Failed to delete brand.");
+                console.error("Error deleting Line:", error);
+                toast.error("Failed to delete Line.");
             }
         },
          async fetchTrashedLinesCount() {

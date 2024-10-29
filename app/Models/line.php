@@ -12,15 +12,17 @@ class Line extends Model
     use HasFactory,SoftDeletes,HasUuids;
 
     protected $table = 'lines';
+    protected $primaryKey = 'uuid'; // Assuming you want the uuid as the primary key
 
     protected $fillable = [
+        'uuid',
+        'creator_type',
+        'creator_id',
+        'updater_type',
+        'updater_id',
         'name',
         'number',
         'description', 
-        'creator_id',
-        'creator_type',
-        'updater_id',
-        'updater_type',
     ];
 
     public static function validationRules()

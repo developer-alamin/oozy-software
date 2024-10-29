@@ -78,6 +78,7 @@
 import { ref } from "vue";
 import { useAuthStore } from "../../stores/authStore";
 import loginImage from "../../../img/login_page.png";
+
 import { useRouter } from "vue-router";
 
 // Frontend form state

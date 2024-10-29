@@ -94,6 +94,7 @@ export default {
                 try {
                     // Assuming the actual API call here
                     const response = await this.$axios.post("/group", formData);
+                    console.log(response.data)
                     if (response.data.success) {
                         this.resetForm();
                         toast.success("Group Created successfully!");
@@ -114,7 +115,7 @@ export default {
             }, 1000); // Simulates a 3-second loading duration
         },
         resetForm() {
-            this.brand = {
+            this.group = {
                 name: "",
                 description: "",
                 status: "", // Reset checkbox on form reset
