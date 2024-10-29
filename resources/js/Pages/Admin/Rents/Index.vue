@@ -73,7 +73,7 @@
                 <span>{{ item.creator ? item.creator.name : "Unknown" }}</span>
             </template>
             <template v-slot:item.photo="{ item }">
-                <img class="rentsImg" :src="item.photo" alt="">
+                <img class="rentsImg" :src="item.photo" alt="" />
             </template>
 
             <template v-slot:item.actions="{ item }">
@@ -110,7 +110,7 @@ export default {
     },
     data() {
         return {
-            dialogName:"Are you sure you want to delete this Resnt ?",
+            dialogName: "Are you sure you want to delete this Rent ?",
             search: "",
             itemsPerPage: 15,
             headers: [
@@ -118,10 +118,10 @@ export default {
                 { title: "Email", key: "email", sortable: true },
                 { title: "Phone", key: "phone", sortable: true },
                 { title: "Address", key: "address", sortable: true },
-                { title: "Description", key: "description", sortable: false },
+                // { title: "Description", key: "description", sortable: false },
                 { title: "Creator", key: "creator.name", sortable: false },
                 { title: "Photo", key: "photo", sortable: false },
-                
+
                 { title: "Actions", key: "actions", sortable: false },
             ],
             serverItems: [],
@@ -172,7 +172,9 @@ export default {
         async confirmDelete() {
             this.dialog = false; // Close the dialog
             try {
-                const response = await this.$axios.delete(`/rent/${this.selectedBrandId}`);
+                const response = await this.$axios.delete(
+                    `/rent/${this.selectedBrandId}`
+                );
                 this.loadItems({
                     page: 1,
                     itemsPerPage: this.itemsPerPage,

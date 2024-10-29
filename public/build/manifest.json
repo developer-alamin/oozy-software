@@ -68,24 +68,24 @@
     "src": "resources/assets/vendor/remixicon/remixicon.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-DerC_oAE.css",
+    "file": "assets/app-Cdbl-y8U.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
-  "resources/img/login_page.png": {
-    "file": "assets/login_page-DJfEer1f.png",
-    "src": "resources/img/login_page.png"
+  "resources/img/login_page_img.png": {
+    "file": "assets/login_page_img-CfsmQqeV.png",
+    "src": "resources/img/login_page_img.png"
   },
   "resources/js/app.js": {
-    "file": "assets/app-1KJLCzJq.js",
+    "file": "assets/app-BPaSeY6c.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "css": [
-      "assets/app-CzStdtqg.css"
+      "assets/app-DyNT_aX2.css"
     ],
     "assets": [
-      "assets/login_page-DJfEer1f.png",
+      "assets/login_page_img-CfsmQqeV.png",
       "assets/logo-vvC7y5Z-.svg",
       "assets/materialdesignicons-webfont-CSr8KVlo.eot",
       "assets/materialdesignicons-webfont-Dp5v-WZN.woff2",

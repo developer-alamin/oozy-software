@@ -330,6 +330,41 @@
                     </li>
                 </ul>
             </li>
+            <li class="nav-item">
+                <a
+                    class="nav-link collapsed"
+                    data-bs-target="#rant-nav"
+                    data-bs-toggle="collapse"
+                    href="#"
+                >
+                    <i class="bi bi-layout-text-window-reverse"></i
+                    ><span>Rant</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul
+                    id="rant-nav"
+                    class="nav-content collapse"
+                    data-bs-parent="#sidebar-nav"
+                >
+                    <li>
+                        <router-link
+                            :to="{ name: 'RentIndex' }"
+                            active-class="active"
+                            :class="{ active: isRentIndex }"
+                        >
+                            <i class="bi bi-circle"></i><span>All Rent </span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'RentCreate' }"
+                            active-class="active"
+                            :class="{ active: isRentCreate }"
+                        >
+                            <i class="bi bi-circle"></i><span>Create Rent</span>
+                        </router-link>
+                    </li>
+                </ul>
+            </li>
             <!-- Start Settings Nav -->
             <li class="nav-item">
                 <a
@@ -365,48 +400,11 @@
                             <i class="bi bi-circle"></i><span>Group</span>
                         </router-link>
                     </li>
-
                 </ul>
             </li>
             <!-- End Settings Nav -->
-             <!-- Start Rant Nav -->
-            <li class="nav-item">
-                <a
-                    class="nav-link collapsed"
-                    data-bs-target="#rant-nav"
-                    data-bs-toggle="collapse"
-                    href="#"
-                >
-                    <i class="bi bi-layout-text-window-reverse"></i
-                    ><span>Rant</span
-                    ><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul
-                    id="rant-nav"
-                    class="nav-content collapse"
-                    data-bs-parent="#sidebar-nav"
-                >
+            <!-- Start Rant Nav -->
 
-                    <li>
-                        <router-link
-                            :to="{ name: 'RentIndex' }"
-                            active-class="active"
-                            :class="{ active: isRentIndex }"
-                        >
-                            <i class="bi bi-circle"></i><span>All Rent </span>
-                        </router-link>
-                    </li>
-                     <li>
-                        <router-link
-                            :to="{ name: 'RentCreate' }"
-                            active-class="active"
-                            :class="{ active: isRentCreate }"
-                        >
-                            <i class="bi bi-circle"></i><span>Create Rent</span>
-                        </router-link>
-                    </li>
-                </ul>
-            </li>
             <!-- End Settings Nav -->
 
             <li class="nav-heading"></li>

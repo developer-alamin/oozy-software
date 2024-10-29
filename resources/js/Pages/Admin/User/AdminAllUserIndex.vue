@@ -81,14 +81,14 @@
                 </v-chip>
             </template>
 
-            <template v-slot:item.actions="{ item }">
+            <!-- <template v-slot:item.actions="{ item }">
                 <v-icon @click="editUser(item.id)" class="mr-2"
                     >mdi-pencil</v-icon
                 >
                 <v-icon @click="showConfirmDialog(item.id)" color="red"
                     >mdi-delete</v-icon
                 >
-            </template>
+            </template> -->
         </v-data-table-server>
 
         <ConfirmDialog
@@ -125,7 +125,7 @@ export default {
                     value: "status",
                     sortable: true,
                 },
-                { title: "Actions", key: "actions", sortable: false },
+                // { title: "Actions", key: "actions", sortable: false },
             ],
             serverItems: [],
             loading: true,
@@ -163,7 +163,7 @@ export default {
                         search: this.search,
                     },
                 });
-                console.log(response.data.items)
+                console.log(response.data.items);
                 this.serverItems = response.data.items || [];
                 // console.log(this.serverItems);
 

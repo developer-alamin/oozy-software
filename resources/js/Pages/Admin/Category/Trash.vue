@@ -55,12 +55,14 @@
 
         <!-- Restore Confirmation Dialog -->
         <RestoreConfirmDialog
+            :restroreDialogName="restroreDialogName"
             v-model:modelValue="restoreDialog"
             :onConfirm="confirmRestore"
             :onCancel="() => (restoreDialog = false)"
         />
         <!-- Delete Confirmation Dialog -->
         <ConfirmDialog
+            :dialogName="dialogName"
             v-model:modelValue="deleteDialog"
             :onConfirm="confirmDelete"
             :onCancel="() => (deleteDialog = false)"
@@ -80,6 +82,9 @@ export default {
     },
     data() {
         return {
+            dialogName:
+                "Are you sure you want to permanently delete this Category ?",
+            restroreDialogName: "Are you sure you want to restore this Rent?",
             search: "",
             itemsPerPage: 15,
             headers: [

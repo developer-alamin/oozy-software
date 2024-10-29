@@ -2,7 +2,7 @@
     <v-card>
         <v-card-title class="pt-5">
             <v-row>
-                <v-col cols="4"><span>Product models List</span></v-col>
+                <v-col cols="4"><span>Machine model lists</span></v-col>
                 <v-col cols="8" class="d-flex justify-end">
                     <v-text-field
                         v-model="search"
@@ -96,6 +96,7 @@
 
         <ConfirmDialog
             v-model:modelValue="dialog"
+            :dialogName="dialogName"
             :onConfirm="confirmDelete"
             :onCancel="
                 () => {
@@ -116,6 +117,7 @@ export default {
     },
     data() {
         return {
+            dialogName: "Are you sure you want to delete this Machine Model ?",
             search: "",
             itemsPerPage: 15,
             headers: [

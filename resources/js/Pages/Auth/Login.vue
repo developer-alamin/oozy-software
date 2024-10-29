@@ -1,6 +1,6 @@
 <template>
     <div class="login-bg">
-        <v-img class="mx-auto my-6" max-width="90" :src="loginImage"></v-img>
+        <v-img class="mx-auto my-6" max-width="100" :src="loginImage"></v-img>
 
         <v-card
             class="mx-auto pa-10 pb-3"
@@ -77,7 +77,7 @@
 <script setup>
 import { ref } from "vue";
 import { useAuthStore } from "../../stores/authStore";
-import loginImage from "../../../img/login_page.png";
+import loginImage from "../../../img/login_page_img.png";
 
 import { useRouter } from "vue-router";
 

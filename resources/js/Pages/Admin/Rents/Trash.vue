@@ -32,11 +32,9 @@
             loading-text="Loading... Please wait"
             @update:options="loadItems"
         >
-           
             <template v-slot:item.photo="{ item }">
-                <img class="rentsImg" :src="item.photo" alt="">
+                <img class="rentsImg" :src="item.photo" alt="" />
             </template>
-
 
             <template v-slot:item.actions="{ item }">
                 <v-icon @click="showRestoreDialog(item.uuid)" color="green"
@@ -77,8 +75,8 @@ export default {
     },
     data() {
         return {
-            restroreDialogName:"Are you sure you want to restore this Rents?",
-            dialogName:"Are you sure you want to delete this Rents ?",
+            restroreDialogName: "Are you sure you want to restore this Rent?",
+            dialogName: "Are you sure you want to delete this Rent ?",
             search: "",
             itemsPerPage: 15,
             headers: [
@@ -88,7 +86,7 @@ export default {
                 { title: "Address", key: "address", sortable: true },
                 { title: "Description", key: "description", sortable: false },
                 { title: "Photo", key: "photo", sortable: false },
-                
+
                 { title: "Actions", key: "actions", sortable: false },
             ],
             serverItems: [],
@@ -150,7 +148,7 @@ export default {
         async confirmDelete() {
             this.deleteDialog = false; // Close the delete dialog
             try {
-               const response = await this.$axios.delete(
+                const response = await this.$axios.delete(
                     `/rents/${this.selectedRentsId}/force-delete`
                 );
                 this.loadItems({
@@ -158,14 +156,13 @@ export default {
                     itemsPerPage: this.itemsPerPage,
                     sortBy: [],
                 });
-                
-                toast.success("Brand deleted successfully!");
 
+                toast.success("Brand deleted successfully!");
             } catch (error) {
                 console.error("Error deleting rent:", error);
                 toast.error("Failed to delete rent.");
             }
-        }
+        },
     },
     created() {
         this.loadItems({
