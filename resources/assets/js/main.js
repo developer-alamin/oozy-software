@@ -5,13 +5,13 @@
  * Author: BootstrapMade.com
  * License: https://bootstrapmade.com/license/
  */
-document.addEventListener("DOMContentLoaded", function () {
-    document
-        .querySelector(".toggle-sidebar-btn")
-        ?.addEventListener("click", function (e) {
-            document.querySelector("body").classList.toggle("toggle-sidebar");
-        });
-});
+// document.addEventListener("DOMContentLoaded", function () {
+//     document
+//         .querySelector(".toggle-sidebar-btn")
+//         ?.addEventListener("click", function (e) {
+//             document.querySelector("body").classList.toggle("toggle-sidebar");
+//         });
+// });
 // (function () {
 //     "use strict";
 

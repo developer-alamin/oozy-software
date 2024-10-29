@@ -6,6 +6,7 @@ use App\Models\Admin;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\JsonResponse;
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -74,7 +75,7 @@ class UserAuthController extends Controller
 
     //     if (Auth::guard('user')->attempt($request->only('email', 'password'))) {
     //         $user  = Auth::guard('user')->user();
-            
+
     //         $token = $user->createToken('UserToken')->plainTextToken;
 
     //         return response()->json(['token' => $token, 'user' => $user]);
@@ -162,6 +163,9 @@ class UserAuthController extends Controller
             ]);
         }
     }
+
+
+
 
 
 

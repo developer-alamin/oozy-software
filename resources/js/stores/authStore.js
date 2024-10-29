@@ -1,103 +1,10 @@
-// import { defineStore } from "pinia";
-// import axios from "../axiosInstance";
-
-// export const useAuthStore = defineStore("auth", {
-//     state: () => ({
-//         user: null,
-//     }),
-//     actions: {
-//         async login(email, password) {
-//             const response = await axios.post("/user/login", {
-//                 email,
-//                 password,
-//             });
-//             this.user = response.data.user;
-//             localStorage.setItem("token", response.data.token); // Save token for future requests
-//         },
-//         async register(data) {
-//             try {
-//                 const response = await axios.post("/user/register", data);
-//                 this.user = response.data.user;
-//                 this.token = response.data.token;
-//                 axios.defaults.headers.common[
-//                     "Authorization"
-//                 ] = `Bearer ${this.token}`;
-//             } catch (error) {
-//                 console.error("Registration error:", error);
-//                 throw error;
-//             }
-//         },
-//         async logout() {
-//             await axios.post("/user/logout");
-//             this.user = null;
-//             localStorage.removeItem("token");
-//         },
-//         async fetchUser() {
-//             const response = await axios.get("/user/dashboard"); // Adjust endpoint if necessary
-//             this.user = response.data;
-//         },
-//     },
-// });
-
 import { defineStore } from "pinia";
 import axios from "../axiosInstance";
-
-// export const useAuthStore = defineStore("auth", {
-//     state: () => ({
-//         user: null,
-//         role: null, // Store the role (admin or user)
-//         token: null, // Store the authentication token
-//     }),
-//     actions: {
-//         async login(email, password, userType = "user") {
-//             console.log(userType);
-
-//             const endpoint =
-//                 userType === "admin" ? "/admin/login" : "/user/login";
-//             const response = await axios.post(endpoint, { email, password });
-
-//             this.user = response.data.user || response.data.admin;
-//             this.role = response.data.role; // Role can be either 'user' or 'admin'
-//             this.token = response.data.token;
-
-//             // Save token in localStorage for further authenticated requests
-//             localStorage.setItem("token", this.token);
-//         },
-
-//         async logout() {
-//             const endpoint =
-//                 this.role === "admin" ? "/admin/logout" : "/user/logout";
-//             await axios.post(endpoint);
-
-//             this.user = null;
-//             this.role = null;
-//             localStorage.removeItem("token");
-//         },
-//         async register(data) {
-//             try {
-//                 const response = await axios.post("/user/register", data);
-//                 this.user = response.data.user;
-//                 this.token = response.data.token;
-//                 axios.defaults.headers.common[
-//                     "Authorization"
-//                 ] = `Bearer ${this.token}`;
-//             } catch (error) {
-//                 console.error("Registration error:", error);
-//                 throw error;
-//             }
-//         },
-
-//         async fetchUser() {
-//             const response = await axios.get("/user/dashboard"); // Adjust based on the role
-//             this.user = response.data;
-//         },
-//     },
-// });
 
 export const useAuthStore = defineStore("auth", {
     state: () => ({
         user: null,
-        role: null, // Store the role of the user/admin
+        role: null, // Store the role of the user/admin/superadmin
     }),
     actions: {
         initializeAuth() {
@@ -121,9 +28,13 @@ export const useAuthStore = defineStore("auth", {
                 password,
             });
             this.user = response.data.user;
-            this.role = response.data.role; // Store the role from response
+            this.role = response.data.user.role; // Store the role from response
+            console.log(this.role, this.user);
+
             localStorage.setItem("token", response.data.token); // Save token for future requests
-            localStorage.setItem("role", response.data.role);
+            localStorage.setItem("role", response.data.user.role);
+            localStorage.setItem("user", response.data.user.name);
+            localStorage.setItem("auth_gurd", true);
         },
         async logout() {
             await axios.post("/user/logout");

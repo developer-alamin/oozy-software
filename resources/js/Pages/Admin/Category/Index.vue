@@ -1,10 +1,9 @@
 <template>
-    <v-card outlined class="mx-auto my-5">
+    <v-card>
         <v-card-title class="pt-5">
             <v-row>
-                <v-col cols="6"><span>Categories List</span></v-col>
-
-                <v-col cols="6" class="d-flex">
+                <v-col cols="4"><span>Categories List</span></v-col>
+                <v-col cols="8" class="d-flex justify-end">
                     <v-text-field
                         v-model="search"
                         density="compact"
@@ -18,180 +17,206 @@
                         single-line
                         clearable
                     ></v-text-field>
-                    <v-btn @click="createCategory" color="primary"
-                        >Add Category</v-btn
+                    <v-btn
+                        @click="createCategory"
+                        color="primary"
+                        icon
+                        style="width: 40px; height: 40px"
                     >
+                        <v-tooltip location="top" activator="parent">
+                            <template v-slot:activator="{ props }">
+                                <v-icon v-bind="props" style="font-size: 20px"
+                                    >mdi-plus</v-icon
+                                >
+                            </template>
+                            <span>Add a new Category</span>
+                        </v-tooltip>
+                    </v-btn>
+
+                    <v-badge :content="trashedCount" color="red" overlap>
+                        <v-btn
+                            @click="viewTrash"
+                            color="red"
+                            icon
+                            class="ml-2"
+                            style="width: 40px; height: 40px"
+                        >
+                            <v-tooltip location="top" activator="parent">
+                                <template v-slot:activator="{ props }">
+                                    <v-icon
+                                        v-bind="props"
+                                        style="font-size: 20px"
+                                    >
+                                        mdi-trash-can-outline
+                                    </v-icon>
+                                </template>
+                                <span>View trashed categories </span>
+                            </v-tooltip>
+                        </v-btn>
+                    </v-badge>
                 </v-col>
             </v-row>
         </v-card-title>
 
-        <v-data-table
+        <v-data-table-server
+            v-model:items-per-page="itemsPerPage"
             :headers="headers"
-            :items="categories"
-            :items-per-page="itemsPerPage"
             :search="search"
+            :items="serverItems"
+            :items-length="totalItems"
             :loading="loading"
+            item-value="created_at"
             loading-text="Loading... Please wait"
-            class="elevation-1"
-            @update:options="updateOptions"
+            @update:options="loadItems"
         >
             <template v-slot:item.status="{ item }">
                 <v-chip
-                    :color="
-                        item.status == 'true' || item.status == true
-                            ? 'green'
-                            : 'red'
-                    "
-                    :text="
-                        item.status == 'true' || item.status == true
-                            ? 'Active'
-                            : 'In-active'
-                    "
+                    :color="item.status === 'Active' ? 'green' : 'red'"
                     class="text-uppercase"
                     size="small"
                     label
-                ></v-chip>
-                <!-- <span
-                    :class="{
-                        'text-green':
-                            item.status == 'true' || item.status == true,
-                        'text-red':
-                            item.status == 'false' || item.status == false,
-                    }"
                 >
-                    {{
-                        item.status == "true" || item.status == true
-                            ? "Active"
-                            : "In-Active"
-                    }}
-                </span> -->
+                    {{ item.status === "Active" ? "Active" : "Inactive" }}
+                </v-chip>
             </template>
+
+            <template v-slot:item.creator_name="{ item }">
+                <span>{{ item.creator ? item.creator.name : "Unknown" }}</span>
+            </template>
+
             <template v-slot:item.actions="{ item }">
-                <v-icon @click="editSupplier(item.id)" class="mr-2"
+                <v-icon @click="editCategory(item.uuid)" class="mr-2"
                     >mdi-pencil</v-icon
                 >
-                <v-icon @click="deleteSupplier(item.id)" color="red"
+                <v-icon @click="showConfirmDialog(item.uuid)" color="red"
                     >mdi-delete</v-icon
                 >
             </template>
-            <!-- Add pagination controls -->
-            <template v-slot:footer>
-                <v-pagination
-                    v-model="pagination.page"
-                    :length="totalPages"
-                    @input="fetchCategories"
-                ></v-pagination>
-            </template>
-        </v-data-table>
+        </v-data-table-server>
+
+        <ConfirmDialog
+            :dialogName="dialogName"
+            v-model:modelValue="dialog"
+            :onConfirm="confirmDelete"
+            :onCancel="
+                () => {
+                    dialog = false;
+                }
+            "
+        />
     </v-card>
 </template>
 
 <script>
+import { toast } from "vue3-toastify";
+import ConfirmDialog from "../../Components/ConfirmDialog.vue";
+
 export default {
+    components: {
+        ConfirmDialog,
+    },
     data() {
         return {
-            categories: [],
+            dialogName: "Are you sure you want to delete this Category ?",
             search: "",
             itemsPerPage: 15,
-            pagination: {
-                page: 1, // Current page
-            },
-            totalPages: 0, // Total number of pages
-            loading: false,
-            sortBy: "name", // Default sorting column
-            sortDesc: false, // Default sort direction
             headers: [
-                {
-                    title: "Category Name",
-                    value: "name",
-                    sortable: true, // Enable sorting
-                    align: "start",
-                },
-
-                {
-                    title: "Description",
-                    value: "description",
-                    sortable: false,
-                },
+                { title: "Category Name", key: "name", sortable: true },
+                { title: "Description", key: "description", sortable: false },
                 {
                     title: "Status",
+                    key: "status",
                     value: "status",
-                    sortable: true, // Enable sorting
+                    sortable: true,
                 },
-                {
-                    title: "Actions",
-                    value: "actions",
-                    sortable: false,
-                },
+                { title: "Creator", key: "creator.name", sortable: false },
+                { title: "Actions", key: "actions", sortable: false },
             ],
+            serverItems: [],
+            loading: true,
+            totalItems: 0,
+            dialog: false,
+            selectedCategoryId: null,
+            trashedCount: 0,
         };
     },
-    created() {
-        this.fetchCategories();
-    },
     methods: {
-        async fetchCategories() {
-            this.loading = true; // Start loading
+        async loadItems({ page, itemsPerPage, sortBy }) {
+            this.loading = true;
+            const sortOrder = sortBy.length ? sortBy[0].order : "desc";
+            const sortKey = sortBy.length ? sortBy[0].key : "created_at";
             try {
                 const response = await this.$axios.get("/category", {
                     params: {
+                        page,
+                        itemsPerPage,
+                        sortBy: sortKey,
+                        sortOrder,
                         search: this.search,
-                        itemsPerPage: this.itemsPerPage,
-                        page: this.pagination.page, // Include current page
-                        sortBy: this.sortBy, // Include sortBy
-                        sortDesc: this.sortDesc, // Include sort direction
                     },
                 });
-                console.log(response.data);
-
-                this.categories = response.data.categories;
-                this.totalPages = Math.ceil(
-                    response.data.total / this.itemsPerPage
-                ); // Calculate total pages
-                this.loading = false; // Stop loading
+                this.serverItems = response.data.items || [];
+                this.totalItems = response.data.total || 0;
+                this.fetchTrashedCategorysCount();
             } catch (error) {
-                console.error("Error fetching categories:", error);
-                this.loading = false; // Stop loading even on error
+                console.error("Error loading items:", error);
+            } finally {
+                this.loading = false;
             }
-        },
-        updateOptions(options) {
-            this.itemsPerPage = options.itemsPerPage;
-            this.pagination.page = 1; // Reset to the first page on items per page change
-            this.fetchCategories(); // Refetch categories with updated options
         },
         createCategory() {
             this.$router.push({ name: "CategoryCreate" });
         },
-        editSupplier(id) {
-            this.$router.push({ name: "CategoryEdit", params: { id } });
+        viewTrash() {
+            this.$router.push({ name: "CategoryTrash" });
         },
-        async deleteSupplier(id) {
-            const confirmDelete = confirm(
-                "Are you sure you want to delete this category?"
-            );
-            if (confirmDelete) {
-                try {
-                    await this.$axios.delete(`/category/${id}`);
-                    this.fetchCategories(); // Refresh the categories list
-                } catch (error) {
-                    console.error("Error deleting categories:", error);
-                }
+        editCategory(uuid) {
+            this.$router.push({ name: "CategoryEdit", params: { uuid } });
+        },
+        showConfirmDialog(uuid) {
+            this.selectedCategoryId = uuid;
+            this.dialog = true;
+        },
+        async confirmDelete() {
+            this.dialog = false; // Close the dialog
+            try {
+                await this.$axios.delete(
+                    `/category/${this.selectedCategoryId}`
+                );
+                this.loadItems({
+                    page: 1,
+                    itemsPerPage: this.itemsPerPage,
+                    sortBy: [],
+                });
+                toast.success("Category deleted successfully!");
+            } catch (error) {
+                console.error("Error deleting category:", error);
+                toast.error("Failed to delete category.");
             }
         },
-        // Method to handle sorting
-        sortCategories(column) {
-            if (this.sortBy === column) {
-                this.sortDesc = !this.sortDesc; // Toggle sort direction
-            } else {
-                this.sortBy = column; // Set new sort column
-                this.sortDesc = false; // Reset to ascending
+        async fetchTrashedCategorysCount() {
+            try {
+                const response = await this.$axios.get(
+                    "/category/trashed-count"
+                );
+                this.trashedCount = response.data.trashedCount;
+            } catch (error) {
+                console.error("Error fetching trashed categorys count:", error);
             }
-            this.fetchCategories(); // Refetch categories with the updated sort options
         },
+    },
+
+    created() {
+        this.loadItems({
+            page: 1,
+            itemsPerPage: this.itemsPerPage,
+            sortBy: [],
+        });
+        this.fetchTrashedCategorysCount();
     },
 };
 </script>
 
 <style scoped>
-/* Add custom styles here */
+/* Optional: Add styles for the main component */
 </style>

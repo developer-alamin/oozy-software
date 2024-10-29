@@ -42,11 +42,12 @@
                 />
 
                 <!-- Status Field (Checkbox) -->
-                <v-checkbox
+                <v-select
                     v-model="model.status"
-                    label="Status"
-                    :error-messages="errors.status ? errors.status : ''"
-                />
+                    :items="statusItems"
+                    label="Model Status"
+                    clearable
+                ></v-select>
 
                 <!-- Action Buttons -->
 
@@ -81,16 +82,18 @@
 </template>
 
 <script>
+import { toast } from "vue3-toastify";
 export default {
     data() {
         return {
             valid: false,
             loading: false,
+            statusItems: ["Active", "Inactive"],
             model: {
                 name: "",
                 model_number: "",
                 description: "",
-                status: false, // Default to false (inactive)
+                status: "", // Default to false (inactive)
             },
             errors: {},
             serverError: null,
@@ -105,16 +108,17 @@ export default {
     methods: {
         async fetchModel() {
             // Fetch the model data to populate the form
-            const modelId = this.$route.params.id; // Assuming the model ID is passed in the route params
+            const modelId = this.$route.params.uuid; // Assuming the model ID is passed in the route params
             try {
                 const response = await this.$axios.get(
                     `/models/${modelId}/edit`
                 );
-                console.log(response.data);
+                // console.log(response.data);
 
                 this.model = response.data.model; // Populate form with the existing model data
+
                 this.model.status =
-                    this.model.status == "true" || this.model.status == true;
+                    this.model.status === "Active" ? "Active" : "Inactive";
             } catch (error) {
                 this.serverError = "Error fetching model data.";
             }
@@ -123,7 +127,7 @@ export default {
             this.errors = {}; // Reset errors before submission
             this.serverError = null;
             this.loading = true;
-            const modelId = this.$route.params.id; // Assuming model ID is in route params
+            const modelId = this.$route.params.uuid; // Assuming model ID is in route params
             setTimeout(async () => {
                 try {
                     const response = await this.$axios.put(
@@ -132,12 +136,15 @@ export default {
                     );
 
                     if (response.data.success) {
+                        toast.success("Model update successfully!");
                         this.$router.push({ name: "ModelIndex" }); // Redirect to model list page
                     }
                 } catch (error) {
                     if (error.response && error.response.status === 422) {
+                        toast.error("Failed to update model.");
                         this.errors = error.response.data.errors || {};
                     } else {
+                        toast.error("Error updating model.");
                         this.serverError = "Error updating model.";
                     }
                 } finally {

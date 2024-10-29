@@ -1,12 +1,9 @@
 <template>
-    <v-card outlined class="mx-auto my-5">
+    <v-card>
         <v-card-title class="pt-5">
             <v-row>
-                <v-col cols="6"><span>Models List</span></v-col>
-
-                <!-- <v-toolbar-title>Models</v-toolbar-title> -->
-
-                <v-col cols="6" class="d-flex">
+                <v-col cols="4"><span>Machine model lists</span></v-col>
+                <v-col cols="8" class="d-flex justify-end">
                     <v-text-field
                         v-model="search"
                         density="compact"
@@ -20,184 +17,207 @@
                         single-line
                         clearable
                     ></v-text-field>
-                    <v-btn @click="createModels" color="primary"
-                        >Add Model</v-btn
+                    <v-btn
+                        @click="createModel"
+                        color="primary"
+                        icon
+                        style="width: 40px; height: 40px"
                     >
+                        <v-tooltip location="top" activator="parent">
+                            <template v-slot:activator="{ props }">
+                                <v-icon v-bind="props" style="font-size: 20px"
+                                    >mdi-plus</v-icon
+                                >
+                            </template>
+                            <span>Add a new model</span>
+                        </v-tooltip>
+                    </v-btn>
+
+                    <v-badge :content="trashedCount" color="red" overlap>
+                        <v-btn
+                            @click="viewTrash"
+                            color="red"
+                            icon
+                            class="ml-2"
+                            style="width: 40px; height: 40px"
+                        >
+                            <v-tooltip location="top" activator="parent">
+                                <template v-slot:activator="{ props }">
+                                    <v-icon
+                                        v-bind="props"
+                                        style="font-size: 20px"
+                                    >
+                                        mdi-trash-can-outline
+                                    </v-icon>
+                                </template>
+                                <span>View trashed product models </span>
+                            </v-tooltip>
+                        </v-btn>
+                    </v-badge>
                 </v-col>
             </v-row>
         </v-card-title>
 
-        <v-data-table
+        <v-data-table-server
+            v-model:items-per-page="itemsPerPage"
             :headers="headers"
-            :items="models"
-            :items-per-page="itemsPerPage"
             :search="search"
+            :items="serverItems"
+            :items-length="totalItems"
             :loading="loading"
+            item-value="created_at"
             loading-text="Loading... Please wait"
-            class="elevation-1"
-            @update:options="updateOptions"
+            @update:options="loadItems"
         >
             <template v-slot:item.status="{ item }">
                 <v-chip
-                    :color="
-                        item.status == 'true' || item.status == true
-                            ? 'green'
-                            : 'red'
-                    "
-                    :text="
-                        item.status == 'true' || item.status == true
-                            ? 'Active'
-                            : 'In-active'
-                    "
+                    :color="item.status === 'Active' ? 'green' : 'red'"
                     class="text-uppercase"
                     size="small"
                     label
-                ></v-chip>
-                <!-- <span
-                    :class="{
-                        'text-green':
-                            item.status == 'true' || item.status == true,
-                        'text-red':
-                            item.status == 'false' || item.status == false,
-                    }"
                 >
-                    {{
-                        item.status == "true" || item.status == true
-                            ? "Active"
-                            : "In-Active"
-                    }}
-                </span> -->
+                    {{ item.status === "Active" ? "Active" : "Inactive" }}
+                </v-chip>
             </template>
+
+            <template v-slot:item.creator_name="{ item }">
+                <span>{{ item.creator ? item.creator.name : "Unknown" }}</span>
+            </template>
+
             <template v-slot:item.actions="{ item }">
-                <v-icon @click="editSupplier(item.id)" class="mr-2"
+                <v-icon @click="editModel(item.uuid)" class="mr-2"
                     >mdi-pencil</v-icon
                 >
-                <v-icon @click="deleteSupplier(item.id)" color="red"
+                <v-icon @click="showConfirmDialog(item.uuid)" color="red"
                     >mdi-delete</v-icon
                 >
             </template>
-            <!-- Add pagination controls -->
-            <template v-slot:footer>
-                <v-pagination
-                    v-model="pagination.page"
-                    :length="totalPages"
-                    @input="fetchModels"
-                ></v-pagination>
-            </template>
-        </v-data-table>
+        </v-data-table-server>
+
+        <ConfirmDialog
+            v-model:modelValue="dialog"
+            :dialogName="dialogName"
+            :onConfirm="confirmDelete"
+            :onCancel="
+                () => {
+                    dialog = false;
+                }
+            "
+        />
     </v-card>
 </template>
 
 <script>
+import { toast } from "vue3-toastify";
+import ConfirmDialog from "../../Components/ConfirmDialog.vue";
+
 export default {
+    components: {
+        ConfirmDialog,
+    },
     data() {
         return {
-            models: [],
+            dialogName: "Are you sure you want to delete this Machine Model ?",
             search: "",
             itemsPerPage: 15,
-            pagination: {
-                page: 1, // Current page
-            },
-            totalPages: 0, // Total number of pages
-            loading: false,
-            sortBy: "name", // Default sorting column
-            sortDesc: false, // Default sort direction
             headers: [
-                {
-                    title: "Model Name",
-                    value: "name",
-                    sortable: true, // Enable sorting
-                    align: "start",
-                },
-                {
-                    title: "Model Number",
-                    value: "model_number",
-                    sortable: true, // Enable sorting
-                },
-                {
-                    title: "Description",
-                    value: "description",
-                    sortable: false,
-                },
+                { title: "Model Name", key: "name", sortable: true },
+                { title: "Model Number", key: "model_number", sortable: true },
+                { title: "Description", key: "description", sortable: false },
                 {
                     title: "Status",
+                    key: "status",
                     value: "status",
-                    sortable: true, // Enable sorting
+                    sortable: true,
                 },
-                {
-                    title: "Actions",
-                    value: "actions",
-                    sortable: false,
-                },
+                { title: "Creator", key: "creator.name", sortable: false },
+                { title: "Actions", key: "actions", sortable: false },
             ],
+            serverItems: [],
+            loading: true,
+            totalItems: 0,
+            dialog: false,
+            selectedModelId: null,
+            trashedCount: 0,
         };
     },
-    created() {
-        this.fetchModels();
-    },
     methods: {
-        async fetchModels() {
-            this.loading = true; // Start loading
+        async loadItems({ page, itemsPerPage, sortBy }) {
+            this.loading = true;
+            const sortOrder = sortBy.length ? sortBy[0].order : "desc";
+            const sortKey = sortBy.length ? sortBy[0].key : "created_at";
             try {
                 const response = await this.$axios.get("/models", {
                     params: {
+                        page,
+                        itemsPerPage,
+                        sortBy: sortKey,
+                        sortOrder,
                         search: this.search,
-                        itemsPerPage: this.itemsPerPage,
-                        page: this.pagination.page, // Include current page
-                        sortBy: this.sortBy, // Include sortBy
-                        sortDesc: this.sortDesc, // Include sort direction
                     },
                 });
+                this.serverItems = response.data.items || [];
                 console.log(response.data);
 
-                this.models = response.data.models;
-                this.totalPages = Math.ceil(
-                    response.data.total / this.itemsPerPage
-                ); // Calculate total pages
-                this.loading = false; // Stop loading
+                this.totalItems = response.data.total || 0;
+                this.fetchTrashedModelsCount();
             } catch (error) {
-                console.error("Error fetching models:", error);
-                this.loading = false; // Stop loading even on error
+                console.error("Error loading items:", error);
+            } finally {
+                this.loading = false;
             }
         },
-        updateOptions(options) {
-            this.itemsPerPage = options.itemsPerPage;
-            this.pagination.page = 1; // Reset to the first page on items per page change
-            this.fetchModels(); // Refetch models with updated options
-        },
-        createModels() {
+        createModel() {
             this.$router.push({ name: "ModelCreate" });
         },
-        editSupplier(id) {
-            this.$router.push({ name: "ModelEdit", params: { id } });
+        viewTrash() {
+            this.$router.push({ name: "ModelTrash" });
         },
-        async deleteSupplier(id) {
-            const confirmDelete = confirm(
-                "Are you sure you want to delete this model?"
-            );
-            if (confirmDelete) {
-                try {
-                    await this.$axios.delete(`/models/${id}`);
-                    this.fetchModels(); // Refresh the models list
-                } catch (error) {
-                    console.error("Error deleting models:", error);
-                }
+        editModel(uuid) {
+            this.$router.push({ name: "ModelEdit", params: { uuid } });
+        },
+        showConfirmDialog(uuid) {
+            this.selectedModelId = uuid;
+            this.dialog = true;
+        },
+        async confirmDelete() {
+            this.dialog = false; // Close the dialog
+            try {
+                await this.$axios.delete(`/models/${this.selectedModelId}`);
+                this.loadItems({
+                    page: 1,
+                    itemsPerPage: this.itemsPerPage,
+                    sortBy: [],
+                });
+                toast.success("Model deleted successfully!");
+            } catch (error) {
+                console.error("Error deleting model:", error);
+                toast.error("Failed to delete model.");
             }
         },
-        // Method to handle sorting
-        sortModels(column) {
-            if (this.sortBy === column) {
-                this.sortDesc = !this.sortDesc; // Toggle sort direction
-            } else {
-                this.sortBy = column; // Set new sort column
-                this.sortDesc = false; // Reset to ascending
+        async fetchTrashedModelsCount() {
+            try {
+                const response = await this.$axios.get("/models/trashed-count");
+                console.log(response.data);
+
+                this.trashedCount = response.data.trashedCount;
+            } catch (error) {
+                console.error("Error fetching trashed models count:", error);
             }
-            this.fetchModels(); // Refetch models with the updated sort options
         },
+    },
+
+    created() {
+        this.loadItems({
+            page: 1,
+            itemsPerPage: this.itemsPerPage,
+            sortBy: [],
+        });
+        this.fetchTrashedModelsCount();
     },
 };
 </script>
 
 <style scoped>
-/* Add custom styles here */
+/* Optional: Add styles for the main component */
 </style>

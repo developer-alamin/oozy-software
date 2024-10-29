@@ -2,15 +2,21 @@
     <!-- ======= Header ======= -->
     <header id="header" class="header fixed-top d-flex align-items-center">
         <div class="d-flex align-items-center justify-content-between">
-            <a href="index.html" class="logo d-flex align-items-center">
+            <router-link
+                :to="{ name: 'AdminDashboard' }"
+                class="logo d-flex align-items-center"
+            >
                 <!-- <img src="assets/img/logo.png" alt="" /> -->
-                <img :src="loginImage" class="mx-auto" width="100px" alt="" />
-                <!-- <span class="d-none d-lg-block">NiceAdmin</span> -->
-            </a>
-            <i class="bi bi-list toggle-sidebar-btn"></i>
+                <img :src="loginImage" class="mx-auto" width="50px" alt="" />
+                <span class="d-none d-lg-block">Oozy System</span>
+            </router-link>
+            <i
+                class="bi bi-list toggle-sidebar-btn ml-5"
+                @click="toggleSidebar"
+            ></i>
         </div>
         <!-- End Logo -->
-        <!-- 
+        <!--
         <div class="search-bar">
             <form
                 class="search-form d-flex align-items-center"
@@ -138,17 +144,17 @@
                             alt="Profile"
                             class="rounded-circle"
                         /> -->
-                        <span class="d-none d-md-block dropdown-toggle ps-2"
-                            >K. Anderson</span
-                        > </a
+                        <span class="d-none d-md-block dropdown-toggle ps-2">{{
+                            userName
+                        }}</span> </a
                     ><!-- End Profile Iamge Icon -->
 
                     <ul
                         class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile"
                     >
                         <li class="dropdown-header">
-                            <h6>Kevin Anderson</h6>
-                            <span>Web Designer</span>
+                            <h6 v-if="userName">{{ userName }}</h6>
+                            <span>{{ userRole }}</span>
                         </li>
                         <li>
                             <hr class="dropdown-divider" />
@@ -214,12 +220,44 @@
 </template>
 
 <script setup>
-import loginImage from "../../../img/login_page.png";
+import { ref, onMounted } from "vue";
+import loginImage from "../../../img/login_page_img.png";
+const userName = localStorage.getItem("user");
+const userRole = localStorage.getItem("role");
+// console.log(userName);
+const sidebarVisible = ref(false);
+
+const toggleSidebar = () => {
+    sidebarVisible.value = !sidebarVisible.value;
+    document.body.classList.toggle("toggle-sidebar", sidebarVisible.value);
+};
+
+const user = ref(null);
+
+// Fetch user info when component mounts
+// onMounted(() => {
+//     fetchUserInfo();
+// });
 </script>
 
 <style scoped>
 .logo img {
     max-height: 50px;
     /* margin-right: 6px; */
+}
+@media (min-width: 1200px) {
+    .logo {
+        width: 235px !important;
+    }
+}
+
+.header {
+    transition: all 0.5s;
+    z-index: 997;
+    height: 60px;
+    /* box-shadow: 0px 2px 20px rgba(1, 41, 112, 0.1); */
+    box-shadow: none !important;
+    background-color: #fff;
+    padding-left: 20px;
 }
 </style>
