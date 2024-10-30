@@ -100,7 +100,7 @@ class LineController extends Controller
          $line->creator()->associate($creator);  // Assign creator polymorphically
          $line->updater()->associate($creator);  // Associate the updater
          $line->save(); // Save the technician to the database
-        return response()->json(['success' => true,'message' => 'Line created successfully.'], 200);   
+        return response()->json(['success' => true,'message' => 'Line created successfully.'], 200);
     }
 
     /**
@@ -129,7 +129,7 @@ class LineController extends Controller
                 // Super admins can edit any line
                 return response()->json([
                     'success' => true,
-                    'brand' => $line
+                    'line'    => $line
                 ], Response::HTTP_OK);
             }
         } elseif (Auth::guard('user')->check()) {
@@ -193,7 +193,7 @@ class LineController extends Controller
 
 
 
-       
+
         //  $validatedData = $request->validate(Line::validationRules());
 
         //  // Update the product model with the validated data
@@ -253,7 +253,7 @@ class LineController extends Controller
     {
          // Get the count of soft-deleted brands
         $trashedCount = Line::onlyTrashed()->count();
-      
+
         return response()->json([
             'trashedCount' => $trashedCount
         ], Response::HTTP_OK);
@@ -374,7 +374,7 @@ class LineController extends Controller
 
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
-                
+
             $currentUser = Auth::guard('admin')->user();
             $creatorType = Admin::class;
 
@@ -401,7 +401,7 @@ class LineController extends Controller
             } else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
-        
+
         try {
             // Delete the supplier
             $line->forceDelete();
@@ -415,7 +415,7 @@ class LineController extends Controller
                 'message' => 'Error deleting Brand: ' . $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
- 
+
          return response()->json(['message' => 'Line permanently deleted']);
      }
 }

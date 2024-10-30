@@ -39,6 +39,7 @@ Route::resource('category', CategoryController::class);
 
 
 Route::resource('line', LineController::class);
+
 Route::resource('group', GroupController::class);
 
 // Rent
@@ -88,6 +89,7 @@ Route::controller(GroupController::class)
     Route::post('{id}/restore', 'groupsRestore')->name('groups.Restore');
     Route::delete('{id}/forceDelete', 'groupsforceDelete')->name('groups.groupsforce.Delete');
 });
+Route::get('get-technician', [GroupController::class, 'getTechnician']);
 // Groups Gorup Controller end form here
 
 

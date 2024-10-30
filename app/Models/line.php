@@ -7,8 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
+
 class Line extends Model
 {
+
     use HasFactory,SoftDeletes,HasUuids;
 
     protected $table = 'lines';
@@ -22,7 +24,7 @@ class Line extends Model
         'updater_id',
         'name',
         'number',
-        'description', 
+        'description',
     ];
 
     public static function validationRules()
@@ -43,6 +45,4 @@ class Line extends Model
     {
         return $this->morphTo();
     }
-
-
 }

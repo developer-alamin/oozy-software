@@ -4,21 +4,11 @@
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="update">
                 <!-- Name Field -->
-                <v-text-field
-                    v-model="line.name"
-                    label="Name"
-                >
-                </v-text-field>
-                <v-text-field
-                    v-model="line.number"
-                    label="Number"
-                >
+                <v-text-field v-model="line.name" label="Name"> </v-text-field>
+                <v-text-field v-model="line.number" label="Number">
                 </v-text-field>
                 <!-- Description Field -->
-                <v-textarea
-                    v-model="line.description"
-                    label="Description"
-                />
+                <v-textarea v-model="line.description" label="Description" />
                 <!-- Action Buttons -->
 
                 <v-row class="mt-4">
@@ -60,12 +50,11 @@ export default {
             loading: false,
             line: {
                 name: "",
-                number:"",
+                number: "",
                 description: "",
             },
             errors: {},
             serverError: null,
-            
         };
     },
     created() {
@@ -76,10 +65,9 @@ export default {
             // Fetch the brand data to populate the form
             const lineId = this.$route.params.uuid; // Assuming the brand ID is passed in the route params
             try {
-                const response = await this.$axios.get(
-                    `/line/${lineId}/edit`
-                );
+                const response = await this.$axios.get(`/line/${lineId}/edit`);
                 this.line = response.data.line;
+                console.log(response.data);
                 // Populate form with the existing brand data
             } catch (error) {
                 this.serverError = "Error fetching brand data.";

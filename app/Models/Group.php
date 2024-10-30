@@ -20,15 +20,17 @@ class Group extends Model
         'creator_id',
         'updater_type',
         'updater_id',
+        'technician_id',
         'name',
         'description'
     ];
-    
+
     public static function validationRules()
     {
         return [
-            'name'         => 'required|string|max:255',
-            'description'  => 'nullable|string',
+            'technician_id' => 'required',
+            'name'          => 'required|string|max:255',
+            'description'   => 'nullable|string',
         ];
     }
     // Polymorphic relationships

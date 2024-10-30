@@ -372,6 +372,7 @@
                     data-bs-target="#settings-nav"
                     data-bs-toggle="collapse"
                     href="#"
+                    :class="{ show: isSettingRouteShow }"
                 >
                     <i class="bi bi-layout-text-window-reverse"></i
                     ><span>Settings</span
@@ -381,6 +382,7 @@
                     id="settings-nav"
                     class="nav-content collapse"
                     data-bs-parent="#sidebar-nav"
+                    :class="{ show: isSettingRouteShow }"
                 >
                     <li>
                         <router-link
@@ -538,6 +540,18 @@ const isAdminUserEditActive = computed(() => route.name === "AdminUserEdit");
 const isAdminUserTrashActive = computed(() => route.name === "AdminUserTrash");
 const isUserCreateActive = computed(() => route.name === "UserCreate");
 const isUserIndexActive = computed(() => route.name === "AllUserIndex");
+
+const isSettingRouteShow = computed(() => {
+    return [
+        "LineIndex",
+        "LineCreate",
+        "LineEdit",
+        "LineTrash",
+        "GroupIndex",
+        "GroupEdit",
+        "GroupTrash",
+    ].includes(route.name);
+});
 </script>
 
 <style scoped>

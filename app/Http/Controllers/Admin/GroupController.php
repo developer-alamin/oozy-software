@@ -9,6 +9,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\User;
 use App\Models\Group;
+use App\Models\Technician;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
@@ -233,8 +234,8 @@ class GroupController extends Controller
                 'success' => false,
                 'message' => 'Error deleting Group: ' . $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }  
-        
+        }
+
     }
     public function groupsTrashedCount()
     {
@@ -344,7 +345,7 @@ class GroupController extends Controller
      {
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
-                
+
             $currentUser = Auth::guard('admin')->user();
             $creatorType = Admin::class;
 
@@ -371,7 +372,7 @@ class GroupController extends Controller
             } else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
-        
+
         try {
             // Delete the supplier
             $group->forceDelete();
@@ -385,5 +386,19 @@ class GroupController extends Controller
                 'message' => 'Error deleting Group: ' . $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-     }
+    }
+
+    public function getTechnician(Request $request)
+    {
+        $search      = $request->input('search', '');
+        $limit       = $request->input('limit', '');
+        $technicians = Technician::query()
+            ->when($search, function ($query, $search) {
+                return $query->where('name', 'like', "%$search%");
+            })
+            // ->take($limit)
+            ->get();
+        return response()->json($technicians);
+    }
+
 }

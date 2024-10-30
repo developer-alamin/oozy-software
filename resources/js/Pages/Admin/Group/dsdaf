@@ -91,7 +91,6 @@ export default {
                 required: (value) => !!value || "Required.",
             },
         };
-        console.log();
     },
     computed: {
         filteredTechnicians() {
@@ -130,7 +129,7 @@ export default {
             });
 
             try {
-                const response = await this.$axios.post("/group", formData);
+                const response = await axios.post("/group", formData);
                 if (response.data.success) {
                     this.resetForm();
                     toast.success("Group Created successfully!");
@@ -139,8 +138,6 @@ export default {
                 if (error.response && error.response.status === 422) {
                     this.errors = error.response.data.errors || {};
                 } else {
-                    console.log(error);
-
                     this.serverError = "An error occurred. Please try again.";
                 }
             } finally {
