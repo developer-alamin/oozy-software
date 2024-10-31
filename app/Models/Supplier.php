@@ -4,16 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Support\Str;
 
 class Supplier extends Model
 {
-    use HasFactory;
+    use HasFactory,SoftDeletes,HasUuids;
 
     // Define the table associated with the model (optional)
     protected $table = 'suppliers'; // Only necessary if the table name is not the plural form of the model
-
+     protected $primaryKey = 'uuid'; // Assuming you want the uuid as the primary key
     // Specify the fillable attributes
     protected $fillable = [
+        'uuid',
         'name',
         'email',
         'phone',
@@ -21,6 +25,10 @@ class Supplier extends Model
         'address',
         'description',
         'photo', // For the uploaded photo
+        'creator_type',
+        'creator_id',
+        'updater_type',
+        'updater_id'
     ];
 
     // Specify the hidden attributes (optional)
@@ -44,5 +52,16 @@ class Supplier extends Model
             'description' => 'nullable|string|max:500',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Example for image validation
         ];
+    }
+
+    // Polymorphic relationships
+    public function creator()
+    {
+        return $this->morphTo();
+    }
+
+    public function updater()
+    {
+        return $this->morphTo();
     }
 }

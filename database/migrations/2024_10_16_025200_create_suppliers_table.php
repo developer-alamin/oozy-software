@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('suppliers', function (Blueprint $table) {
-            $table->id();
+             $table->id();
+            $table->uuid('uuid')->unique();
             $table->string('name');
             $table->string('email')->unique();
             $table->string('phone');
@@ -20,7 +21,10 @@ return new class extends Migration
             $table->text('address')->nullable();
             $table->text('description')->nullable();
             $table->string('photo')->nullable();
+            $table->morphs('creator');
+            $table->morphs('updater'); 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

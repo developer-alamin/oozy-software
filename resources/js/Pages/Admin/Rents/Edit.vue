@@ -135,7 +135,7 @@ export default {
         this.fetchBrand();
     },
     methods: {
-         async onFilePicked(e){
+        async onFilePicked(e){
            const files = e.target.files;
            if(files[0] !== undefined){
               const fr = new FileReader();

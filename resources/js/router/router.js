@@ -129,12 +129,20 @@ const routes = [
                 meta: { title: "Supplier Create" },
             },
             {
-                path: "supplier/edit/:id", // Dynamic route for Supplier Edit
+                path: "supplier/edit/:uuid", // Dynamic route for Supplier Edit
                 name: "SupplierEdit",
                 component: adminComponents.SupplierEdit,
                 meta: { title: "Edit Supplier" },
                 props: true, // Enables passing route params as props
             },
+            {
+                path: "supplier/trash", // Dynamic route for Supplier Edit
+                name: "SupplierTrash",
+                component: adminComponents.SupplierTrash,
+                meta: { title: "Trash Supplier" },
+                props: true, // Enables passing route params as props
+            },
+
             {
                 path: "model/index", // New route for Contact
                 name: "ModelIndex",

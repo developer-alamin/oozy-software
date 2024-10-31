@@ -1,8 +1,33 @@
 <template>
     <v-card outlined class="mx-auto my-5" max-width="900">
-        <v-card-title>Create Supplier</v-card-title>
+        <v-card-title>
+            <v-row>
+                <v-col cols="12" md="6">
+                     Create Supplier
+                </v-col>
+                 <v-col cols="12" md="6">
+                    <v-img
+                      :width="50"
+                      aspect-ratio="16/9"
+                      cover
+                      :src="imageUrl" 
+                      style="margin-left:auto"
+                      v-if="imageUrl"
+                      ></v-img>
+                </v-col>
+            </v-row>
+        
+        </v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="submit">
+                 <v-file-input
+                        accept="image/png, image/jpeg, image/bmp"
+                        label="Photo"
+                        placeholder="Pick an avatar"
+                        prepend-icon="mdi-camera"
+                        @change="onFilePicked($event)"
+                    >    
+                </v-file-input>
                 <!-- Name Field -->
                 <v-text-field
                     v-model="supplier.name"
@@ -102,15 +127,18 @@
 </template>
 
 <script>
+import { toast } from "vue3-toastify";
 export default {
     data() {
         return {
+            imageUrl: '',
             valid: false,
             loading: false,
             supplier: {
                 name: "",
                 email: "",
                 phone: "",
+                imageFile:'',
                 contact_person: "",
                 address: "",
                 description: "",
@@ -126,6 +154,17 @@ export default {
         };
     },
     methods: {
+         async onFilePicked(e){
+           const files = e.target.files;
+           if(files[0] !== undefined){
+              const fr = new FileReader();
+              fr.readAsDataURL(files[0]);
+               fr.addEventListener('load', () => {
+                  this.imageUrl = fr.result;
+                  this.supplier.imageFile = files[0]
+                })
+           }
+        },
         async submit() {
             this.errors = {}; // Reset errors before submission
             this.serverError = null; // Reset server error
@@ -135,18 +174,20 @@ export default {
             Object.entries(this.supplier).forEach(([key, value]) => {
                 formData.append(key, value);
             });
-            if (this.photo) {
-                formData.append("photo", this.photo);
-            }
+            // if (this.photo) {
+            //     formData.append("photo", this.photo);
+            // }
             setTimeout(async () => {
                 try {
                     const response = await this.$axios.post(
                         "/suppliers",
                         formData
                     );
+                   // console.log(response.data)
 
                     if (response.data.success) {
                         this.resetForm();
+                        toast.success("Supplier Created successfully!");
                         // Notify the user on success (e.g., with a toast)
                     }
                 } catch (error) {
@@ -169,6 +210,7 @@ export default {
                 name: "",
                 email: "",
                 phone: "",
+                imageFile:'',
                 contact_person: "",
                 address: "",
                 description: "",
