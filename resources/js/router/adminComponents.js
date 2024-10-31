@@ -20,6 +20,7 @@ export { default as FactoryTrash } from "../Pages/Admin/Factory/Trash.vue";
 export { default as SupplierIndex } from "../Pages/Admin/Supplier/Index.vue";
 export { default as SupplierEdit } from "../Pages/Admin/Supplier/Edit.vue";
 export { default as SupplierCreate } from "../Pages/Components/Admin/Supplier/SupplierCreateFrom.vue";
+export { default as SupplierTrash } from "../Pages/Admin/Supplier/Trash.vue";
 
 // Model components
 export { default as ModelIndex } from "../Pages/Admin/Model/Index.vue";

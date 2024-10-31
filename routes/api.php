@@ -23,6 +23,19 @@ use App\Http\Controllers\Admin\ProductModelController;
 use App\Http\Controllers\Auth\AuthController;
 
 Route::resource('suppliers', SupplierController::class);
+// suppliers Group Controllers start form here
+Route::controller(SupplierController::class)
+->prefix('supplier')
+->as("supplier")
+->group(function () {
+    Route::get('/trashed-count', 'suppliertrashedcount')->name('supplier.trashed.count');
+    Route::get('/trashed', 'suppliertrashed')->name('supplier.trashed');
+    Route::post('{id}/restore', 'supplierrestore')->name('line.Restore');
+    Route::delete('{id}/force-delete', 'supplierforcedelete')->name('supplier.force.delete');
+});
+// suppliers Group Controllers end form here
+
+
 // models
 Route::get('/models/trashed', [ProductModelController::class, 'trashed']);
 Route::post('/models/{id}/restore', [ProductModelController::class, 'restore']);
@@ -67,6 +80,7 @@ Route::resource('technician', TechnicianController::class);
 Route::resource('company', CompanyController::class);
 // Factory
 Route::resource('factory', FactoryController::class);
+
 // Line Group Controllers start form here
 Route::controller(LineController::class)
 ->prefix('lines')
@@ -78,6 +92,7 @@ Route::controller(LineController::class)
     Route::delete('{id}/forceDelete', 'lineforceDelete')->name('line.lineforce.Delete');
 });
 // Line Group Controllers end form here
+
 // Groups Gorup Controller start form here
 Route::controller(GroupController::class)
 ->prefix("groups")
