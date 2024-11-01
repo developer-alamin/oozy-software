@@ -72,3 +72,8 @@ export { default as RentEdit } from "../Pages/Admin/Rents/Edit.vue";
 export { default as RentsTrash } from "../Pages/Admin/Rents/Trash.vue";
 
 
+//Floor Components
+export { default as FloorIndex } from "../Pages/Admin/Floor/Index.vue";
+export { default as FloorCreate } from "../Pages/Admin/Floor/Create.vue";
+export { default as FloorEdit } from "../Pages/Admin/Floor/Edit.vue";
+export { default as FloorTrash } from "../Pages/Admin/Floor/Trash.vue";

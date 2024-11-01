@@ -11,6 +11,7 @@ use App\Http\Controllers\TechnicianController;
 
 use App\Http\Controllers\Admin\LineController;
 use App\Http\Controllers\Admin\GroupController;
+use App\Http\Controllers\Admin\FloorController;
 
 
 use App\Http\Controllers\Admin\AdminController;
@@ -34,6 +35,23 @@ Route::controller(SupplierController::class)
     Route::delete('{id}/force-delete', 'supplierforcedelete')->name('supplier.force.delete');
 });
 // suppliers Group Controllers end form here
+
+
+
+// floor group route declare start form here
+Route::resource('floor', FloorController::class);
+
+Route::controller(FloorController::class)
+->prefix("floors")
+->as("floors")
+->group(function(){
+    Route::get('/trashed-count', 'floortrashedcount')->name('floor.trashed.count');
+    Route::get('/trashed', 'floortrashed')->name('floor.trashed');
+    Route::post('{id}/restore', 'floorrestore')->name('floor.restore');
+    Route::delete('{id}/force-delete', 'floorforcedelete')->name('floor.force.delete');
+});
+// floor group route declare end form here
+
 
 
 // models
@@ -145,3 +163,5 @@ Route::prefix('user')->group(function () {
     Route::post('/logout', [UserAuthController::class, 'logout'])->middleware('auth:user');
     Route::get('/dashboard', [UserController::class, 'dashboard'])->middleware('auth:user');
 });
+
+

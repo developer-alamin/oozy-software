@@ -12,14 +12,14 @@
                     :error-messages="errors.name ? errors.name : ''"
                 >
                     <template v-slot:label>
-                        Name <span style="color: red">*</span>
+                        Number <span style="color: red">*</span>
                     </template>
                 </v-text-field>
 
                 <!-- Technician Autocomplete -->
                 <v-autocomplete
-                    v-model="group.technician_id"
                     :items="technicians"
+                    v-model="group.technician_id"
                     item-value="id"
                     item-title="name"
                     label="Technician"
@@ -108,10 +108,12 @@ export default {
     },
     methods: {
         async fetchTechnicians() {
+            console.log(this.search)
             try {
                 const response = await this.$axios.get("/get-technician", {
                     params: { search: this.search, limit: 10 },
                 });
+                console.log(response.data)
 
                 this.technicians = response.data; // Set fetched technicians
             } catch (error) {

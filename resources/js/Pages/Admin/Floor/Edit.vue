@@ -1,11 +1,11 @@
 <template>
     <v-card outlined class="mx-auto my-5" max-width="900">
-        <v-card-title>Edit Brand</v-card-title>
+        <v-card-title>Edit Floor</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="update">
                 <!-- Name Field -->
                 <v-text-field
-                    v-model="group.name"
+                    v-model="floor.name"
                     :rules="[rules.required]"
                     label="Name"
                     outlined
@@ -18,13 +18,21 @@
 
                 <!-- Description Field -->
                 <v-textarea
-                    v-model="group.description"
+                    v-model="floor.description"
                     label="Description"
                     outlined
                     :error-messages="
                         errors.description ? errors.description : ''
                     "
                 />
+                <v-select
+                    v-model="floor.status"
+                    :items="statusItems"
+                    label="floor Status"
+                    clearable
+                    :error-messages="errors.status ? errors.status : ''"
+                ></v-select>
+
                 <!-- Action Buttons -->
 
                 <v-row class="mt-4">
@@ -43,7 +51,7 @@
                             :disabled="!valid || loading"
                             :loading="loading"
                         >
-                            Update Group
+                            Update Floor
                         </v-btn>
                     </v-col>
                 </v-row>
@@ -58,14 +66,17 @@
 </template>
 
 <script>
+import { toast } from "vue3-toastify";
 export default {
     data() {
         return {
             valid: false,
             loading: false,
-            group: {
+            statusItems: ["Active", "Inactive"],
+            floor: {
                 name: "",
                 description: "",
+                status: false, // Default to false (inactive)
             },
             errors: {},
             serverError: null,
@@ -75,43 +86,48 @@ export default {
         };
     },
     created() {
-        this.fetchGroup();
+        this.fetchFloor();
     },
     methods: {
-        async fetchGroup() {
-            // Fetch the group data to populate the form
-            const brandId = this.$route.params.uuid; // Assuming the group ID is passed in the route params
+        async fetchFloor() {
+            // Fetch the floor data to populate the form
+            const floorId = this.$route.params.uuid; // Assuming the floor ID is passed in the route params
             try {
                 const response = await this.$axios.get(
-                    `/group/${brandId}/edit`
+                    `/floor/${floorId}/edit`
                 );
                 console.log(response.data);
-                this.group = response.data.group; // Populate form with the existing group data
-               
+
+                this.floor = response.data.floor; // Populate form with the existing floor data
+                this.floor.status =
+                    this.floor.status === "Active" ? "Active" : "Inactive";
             } catch (error) {
-                this.serverError = "Error fetching group data.";
+                this.serverError = "Error fetching floor data.";
             }
         },
         async update() {
             this.errors = {}; // Reset errors before submission
             this.serverError = null;
             this.loading = true;
-            const groupId = this.$route.params.uuid; // Assuming group ID is in route params
+            const floorId = this.$route.params.uuid; // Assuming floor ID is in route params
             setTimeout(async () => {
                 try {
                     const response = await this.$axios.put(
-                        `/group/${groupId}`,
-                        this.group
+                        `/floor/${floorId}`,
+                        this.floor
                     );
 
                     if (response.data.success) {
-                        this.$router.push({ name: "GroupIndex" }); // Redirect to brand list page
+                        toast.success("floor update successfully!");
+                        this.$router.push({ name: "FloorIndex" }); // Redirect to floor list page
                     }
                 } catch (error) {
                     if (error.response && error.response.status === 422) {
+                        toast.error("Failed to update floor.");
                         this.errors = error.response.data.errors || {};
                     } else {
-                        this.serverError = "Error updating group.";
+                        toast.error("Error updating floor. Please try again.");
+                        this.serverError = "Error updating floor.";
                     }
                 } finally {
                     // Stop loading after the request (or simulated time) is done
@@ -120,7 +136,7 @@ export default {
             }, 1000);
         },
         resetForm() {
-            this.fetchGroup(); // Reset the form with existing group data
+            this.fetchfloor(); // Reset the form with existing floor data
             this.errors = {};
             this.$refs.form.resetValidation();
         },

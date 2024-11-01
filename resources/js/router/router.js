@@ -364,6 +364,34 @@ const routes = [
                 meta: { title: "Rent Trash" },
                 props:true
             },
+            {
+                path: "floor/index", // New route for Floor index
+                name: "FloorIndex",
+                component: adminComponents.FloorIndex,
+                meta: { title: "Floor index" },
+                props:true
+            },
+            {
+                path: "floor/create", // New route for Floor create
+                name: "FloorCreate",
+                component: adminComponents.FloorCreate,
+                meta: { title: "Floor Create" },
+                props:true
+            },
+            {
+                path: "floor/edit/:uuid", // New route for Floor create
+                name: "FloorEdit",
+                component: adminComponents.FloorEdit,
+                meta: { title: "Floor Edit" },
+                props:true
+            },
+            {
+                path: "floor/trash", // New route for floor trash
+                name: "FloorTrash",
+                component: adminComponents.FloorTrash,
+                meta: { title: "Floor Trash" },
+                props: true,
+            }
 
         ],
     },

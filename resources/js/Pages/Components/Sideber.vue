@@ -402,6 +402,15 @@
                             <i class="bi bi-circle"></i><span>Group</span>
                         </router-link>
                     </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'FloorIndex' }"
+                            active-class="active"
+                            :class="{ active: isFloorIndex }"
+                        >
+                            <i class="bi bi-circle"></i><span>Floor</span>
+                        </router-link>
+                    </li>
                 </ul>
             </li>
             <!-- End Settings Nav -->
