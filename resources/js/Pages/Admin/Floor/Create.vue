@@ -12,7 +12,7 @@
                     :error-messages="errors.name ? errors.name : ''"
                 >
                     <template v-slot:label>
-                        Number <span style="color: red">*</span>
+                        Floor Number <span style="color: red">*</span>
                     </template>
                 </v-text-field>
 

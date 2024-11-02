@@ -12,7 +12,7 @@
                     :error-messages="errors.name ? errors.name : ''"
                 >
                     <template v-slot:label>
-                        Number <span style="color: red">*</span>
+                        Name <span style="color: red">*</span>
                     </template>
                 </v-text-field>
 
@@ -108,12 +108,12 @@ export default {
     },
     methods: {
         async fetchTechnicians() {
-            console.log(this.search)
+            console.log(this.search);
             try {
                 const response = await this.$axios.get("/get-technician", {
                     params: { search: this.search, limit: 10 },
                 });
-                console.log(response.data)
+                console.log(response.data);
 
                 this.technicians = response.data; // Set fetched technicians
             } catch (error) {

@@ -1,5 +1,5 @@
 <template>
-	 <v-card outlined class="mx-auto my-5" max-width="">
+    <v-card outlined class="mx-auto my-5" max-width="">
         <v-card-title>Create Line</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="submit">
@@ -12,15 +12,12 @@
                     :error-messages="errors.name ? errors.name : ''"
                 >
                     <template v-slot:label>
-                        Number <span style="color: red">*</span>
+                        Line Number <span style="color: red">*</span>
                     </template>
                 </v-text-field>
 
                 <!-- Description Field -->
-                <v-textarea
-                    v-model="line.description"
-                    label="Description"
-                />
+                <v-textarea v-model="line.description" label="Description" />
 
                 <!-- Action Buttons -->
                 <v-row class="mt-4">
@@ -110,7 +107,7 @@ export default {
         resetForm() {
             this.line = {
                 name: "",
-                number:'',
+                number: "",
                 description: "",
             };
             this.errors = {}; // Reset errors on form reset

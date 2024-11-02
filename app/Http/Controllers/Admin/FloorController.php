@@ -18,11 +18,6 @@ class FloorController extends Controller
      */
     public function index(Request $request)
     {
-
-
-        dd(Floor::all()->count());
-
-
         $page         = $request->input('page', 1);
         $itemsPerPage = $request->input('itemsPerPage', 5);
         $sortBy       = $request->input('sortBy', 'created_at'); // Default sort by created_at
@@ -151,7 +146,7 @@ class FloorController extends Controller
      */
     public function update(Request $request, Floor $floor)
     {
-        
+
          // Validate the incoming request data
          $validatedData = $request->validate(Floor::validationRules());
 
@@ -300,7 +295,7 @@ class FloorController extends Controller
     // Restore a soft-deleted floor
     public function floorrestore($id)
     {
-        
+
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('admin')->user();
@@ -341,7 +336,7 @@ class FloorController extends Controller
     {
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
-                
+
             $currentUser = Auth::guard('admin')->user();
             $creatorType = Admin::class;
 
@@ -368,7 +363,7 @@ class FloorController extends Controller
             } else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
-        
+
         try {
             // Delete the supplier
             $floor->forceDelete();
@@ -382,6 +377,6 @@ class FloorController extends Controller
                 'message' => 'Error deleting floor: ' . $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-       
+
     }
 }

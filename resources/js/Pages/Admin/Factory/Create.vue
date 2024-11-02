@@ -1,23 +1,57 @@
 <template>
     <v-card outlined class="mx-auto my-5" max-width="">
-        <v-card-title>Create company</v-card-title>
+        <v-card-title>Create factory</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="submit">
+                <v-autocomplete
+                    v-model="factory.company_id"
+                    :items="companys"
+                    item-value="id"
+                    item-title="name"
+                    label="Select Company"
+                    @update:search="fetchCompanys"
+                />
                 <!-- Name Field -->
                 <v-text-field
-                    v-model="company.name"
+                    v-model="factory.name"
                     :rules="[rules.required]"
-                    label="Name"
+                    label="Factory Name"
                     outlined
                     :error-messages="errors.name ? errors.name : ''"
                 >
                     <template v-slot:label>
-                        Name <span style="color: red">*</span>
+                        Factory Name <span style="color: red">*</span>
                     </template>
                 </v-text-field>
+                <v-autocomplete
+                    v-model="factory.floor_id"
+                    :items="floors"
+                    item-value="id"
+                    item-title="name"
+                    label="Select Floor"
+                    @update:search="fetchFloors"
+                />
+                <v-autocomplete
+                    v-model="factory.unit_id"
+                    :items="units"
+                    item-value="id"
+                    item-title="name"
+                    label="Select Unit"
+                    @update:search="fetchUnit"
+                />
+
+                <v-autocomplete
+                    v-model="factory.line_id"
+                    :items="lines"
+                    item-value="id"
+                    item-title="name"
+                    label="Select Line"
+                    @update:search="fetchLines"
+                />
+
                 <!-- Name Field -->
                 <v-text-field
-                    v-model="company.email"
+                    v-model="factory.email"
                     :rules="[rules.required, rules.email]"
                     label="Email"
                     outlined
@@ -29,7 +63,7 @@
                 </v-text-field>
 
                 <v-text-field
-                    v-model="company.phone"
+                    v-model="factory.phone"
                     :rules="[rules.phone]"
                     label="Phone"
                     outlined
@@ -39,48 +73,26 @@
                 </v-text-field>
 
                 <v-text-field
-                    v-model="company.password"
-                    :rules="[rules.required]"
-                    label="Password"
-                    :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
-                    :type="visible ? 'text' : 'password'"
-                    placeholder="Enter your password"
+                    v-model="factory.factory_code"
+                    :rules="[rules.factory_code]"
+                    label="Factory Code"
                     outlined
-                    @click:append-inner="visible = !visible"
-                    :error-messages="errors.password ? errors.password : ''"
-                    ><template v-slot:label>
-                        Password <span style="color: red">*</span></template
-                    ></v-text-field
-                >
-
-                <v-text-field
-                    v-model="company.confirm_password"
-                    :rules="[rules.required, rules.confirm_password]"
-                    label=" Confirm Password "
-                    :append-inner-icon="
-                        confirm_visible ? 'mdi-eye-off' : 'mdi-eye'
-                    "
-                    :type="confirm_visible ? 'text' : 'password'"
-                    placeholder="Enter your Confirm Password "
-                    outlined
-                    @click:append-inner="confirm_visible = !confirm_visible"
                     :error-messages="
-                        errors.confirm_password ? errors.confirm_password : ''
+                        errors.factory_code ? errors.factory_code : ''
                     "
-                    ><template v-slot:label>
-                        Confirm Password
-                    </template></v-text-field
                 >
-                <!-- Description Field -->
+                    <template v-slot:label> Factory Code </template>
+                </v-text-field>
+
                 <v-textarea
-                    v-model="company.address"
-                    label="Address"
-                    :error-messages="errors.description ? errors.address : ''"
+                    v-model="factory.location"
+                    label="Location"
+                    :error-messages="errors.location ? errors.location : ''"
                 />
                 <v-select
-                    v-model="company.status"
+                    v-model="factory.status"
                     :items="statusItems"
-                    label="Company Status"
+                    label="factory Status"
                     clearable
                 ></v-select>
 
@@ -105,7 +117,7 @@
                             :disabled="!valid || loading"
                             :loading="loading"
                         >
-                            Create company
+                            Create factory
                         </v-btn>
                     </v-col>
                 </v-row>
@@ -127,19 +139,28 @@ export default {
             valid: false,
             loading: false, // Controls loading state of the button
             statusItems: ["Active", "Inactive"],
-            company: {
-                role: "admin",
+
+            factory: {
+                company_id: null,
+                floor_id: null,
+                unit_id: null,
+                line_id: null,
                 name: "",
                 email: "",
                 phone: "",
-                password: "",
-                confirm_password: "",
-                photo: "",
-                address: "",
+                location: "",
+                factory_code: "",
                 status: "Active", // New property for checkbox
             },
             errors: {}, // Stores validation errors
             serverError: null, // Stores server-side error messages
+            limit: 5,
+            companys: [], // Array to store Company data
+            floors: [], // Array to store Floor data
+            units: [], // Array to store Unit data
+            lines: [], // Array to store Line data
+            selectedCompany: null, // Bound to selected Company in v-autocomplete
+
             rules: {
                 required: (value) => !!value || "Required.",
                 email: (value) =>
@@ -161,7 +182,7 @@ export default {
             this.loading = true; // Start loading when submit is clicked
 
             const formData = new FormData();
-            Object.entries(this.company).forEach(([key, value]) => {
+            Object.entries(this.factory).forEach(([key, value]) => {
                 formData.append(key, value);
             });
 
@@ -170,22 +191,23 @@ export default {
                 try {
                     // Assuming the actual API call here
                     const response = await this.$axios.post(
-                        "/admin/company/user/store",
+                        "/factory",
                         formData
                     );
+                    console.log(response.data);
 
                     if (response.data.success) {
-                        toast.success("Company create successfully!");
+                        toast.success("Factory create successfully!");
                         // localStorage.setItem("token", response.data.token);
                         this.resetForm();
                     }
                 } catch (error) {
                     if (error.response && error.response.status === 422) {
-                        toast.error("Failed to create company.");
+                        toast.error("Failed to create factory.");
                         // Handle validation errors from the server
                         this.errors = error.response.data.errors || {};
                     } else {
-                        toast.error("Failed to create company.");
+                        toast.error("Failed to create factory.");
                         // Handle other server errors
                         this.serverError =
                             "An error occurred. Please try again.";
@@ -198,18 +220,74 @@ export default {
         },
         resetForm() {
             this.company = {
+                company_id: "",
                 name: "",
                 email: "",
                 phone: "",
-                password: "",
-                confirm_password: "",
-                photo: "",
-                address: "",
+                factory_code: "",
+                location: "",
                 status: "Active", // New property for checkbox
             };
             this.errors = {}; // Reset errors on form reset
             if (this.$refs.form) {
                 this.$refs.form.reset(); // Reset the form via its ref if necessary
+            }
+        },
+
+        async fetchCompanys(search) {
+            try {
+                const response = await this.$axios.get(`/get_companys`, {
+                    params: {
+                        search: search,
+                        limit: this.limit,
+                    },
+                });
+                console.log(response.data);
+                this.companys = response.data;
+            } catch (error) {
+                console.error("Error fetching companys:", error);
+            }
+        },
+        async fetchFloors(search) {
+            try {
+                const response = await this.$axios.get(`/get_floors`, {
+                    params: {
+                        search: search,
+                        limit: this.limit,
+                    },
+                });
+                console.log(response.data);
+                this.floors = response.data;
+            } catch (error) {
+                console.error("Error fetching floors:", error);
+            }
+        },
+        async fetchUnit(search) {
+            try {
+                const response = await this.$axios.get(`/get_units`, {
+                    params: {
+                        search: search,
+                        limit: this.limit,
+                    },
+                });
+                console.log(response.data);
+                this.units = response.data;
+            } catch (error) {
+                console.error("Error fetching units:", error);
+            }
+        },
+        async fetchLines(search) {
+            try {
+                const response = await this.$axios.get(`/get_lines`, {
+                    params: {
+                        search: search,
+                        limit: this.limit,
+                    },
+                });
+                console.log(response.data);
+                this.lines = response.data;
+            } catch (error) {
+                console.error("Error fetching lines:", error);
             }
         },
     },

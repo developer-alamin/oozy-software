@@ -36,9 +36,6 @@ Route::controller(SupplierController::class)
     Route::post('{id}/restore', 'supplierrestore')->name('line.Restore');
     Route::delete('{id}/force-delete', 'supplierforcedelete')->name('supplier.force.delete');
 });
-// suppliers Group Controllers end form here
-
-
 
 // floor group route declare start form here
 Route::resource('floor', FloorController::class);
@@ -77,8 +74,8 @@ Route::prefix("/mechine")->group(function(){
          Route::post('{id}/restore', 'sourcesrestore')->name('source.restore');
          Route::delete('{id}/force-delete', 'sourcesforcedelete')->name('sources.force.delete');
     });
-    
-}); 
+
+});
 //Mechine Group Route declare end form here
 
 
@@ -126,6 +123,10 @@ Route::resource('technician', TechnicianController::class);
 // Company
 Route::resource('company', CompanyController::class);
 // Factory
+Route::get('/get_companys', [FactoryController::class, 'getCompanys']);
+Route::get('/get_floors', [FactoryController::class, 'getFloors']);
+Route::get('/get_units', [FactoryController::class, 'getUnits']);
+Route::get('/get_lines', [FactoryController::class, 'getLines']);
 Route::resource('factory', FactoryController::class);
 
 // Line Group Controllers start form here

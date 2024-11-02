@@ -98,7 +98,7 @@ class RentController extends Controller
              return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
          }
 
-    
+
         $name = $request->name;
         $nameResize = str_replace(" ","", $name);
         $http = "http://" . $_SERVER['HTTP_HOST'] . "/";
@@ -114,7 +114,7 @@ class RentController extends Controller
         }
 
          $validatedData = $request->validate(Rent::validationRules());
-    
+
 
         $rent = new Rent();
         $rent->name = $name;
@@ -130,8 +130,8 @@ class RentController extends Controller
          // Return a success response
         return response()->json(['success' => true, 'message' => 'Brand created successfully.'], 201);
 
-        return response()->json(['success' => true,'message' => 'Rent created successfully.'], 200);
-       
+
+
     }
 
     /**
@@ -232,7 +232,7 @@ class RentController extends Controller
              $endOldImg = end($explodeOldImg);
              $deletePublicPath = public_path("Rents/".$endOldImg);
              if(File::exists($deletePublicPath)){
-                
+
                 File::delete($deletePublicPath);
              }
         }else{
@@ -256,7 +256,7 @@ class RentController extends Controller
 
          // Return a success response
          return response()->json(['success' => true, 'message' => 'Rent updated successfully.', 'rent' => $rent], 200);
-        
+
     }
 
     /**
@@ -264,7 +264,7 @@ class RentController extends Controller
      */
     public function destroy(Rent $rent)
     {
-        
+
         if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('admin')->user();
             // Check if the admin is a superadmin
@@ -289,7 +289,7 @@ class RentController extends Controller
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
 
-       
+
 
         try {
             // Delete the supplier
@@ -416,7 +416,7 @@ class RentController extends Controller
 
          // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
-                
+
             $currentUser = Auth::guard('admin')->user();
             $creatorType = Admin::class;
 
@@ -443,7 +443,7 @@ class RentController extends Controller
             } else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
-        
+
         try {
              // //rent image check and delete
             if ($rent->photo) {
@@ -453,7 +453,7 @@ class RentController extends Controller
                 $deletePath = public_path("Rents/" .$EndImg);
                 if (File::exists($deletePath)) {
                     File::delete($deletePath);
-                }  
+                }
             }
             // Delete the supplier
             $rent->forceDelete();
