@@ -6,35 +6,39 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Support\Str;
 
-
-class Line extends Model
+class Floor extends Model
 {
+     use HasFactory,SoftDeletes,HasUuids;
 
-    use HasFactory,SoftDeletes,HasUuids;
-
-    protected $table = 'lines';
+    public $incrementing = false; // Disable auto-incrementing for UUIDs
+    protected $keyType = 'string'; // Set key type to string for UUIDs
+    // Define the primary key for this model
     protected $primaryKey = 'uuid'; // Assuming you want the uuid as the primary key
 
     protected $fillable = [
         'uuid',
-        'creator_type',
+        'name',
+        'description',
+        'status',  
+        'creator_type',      
         'creator_id',
         'updater_type',
         'updater_id',
-        'name',
-        'number',
-        'description',
     ];
+
 
     public static function validationRules()
     {
         return [
-            'name'         => 'required|string|max:255',
-            'number'       => 'nullable|string',
-            'description'  => 'nullable|string',
+            'name'         => 'required|max:255',
+            'description'  => 'nullable',
+            'status'       => 'nullable',
+
         ];
     }
+
     // Polymorphic relationships
     public function creator()
     {
@@ -45,4 +49,5 @@ class Line extends Model
     {
         return $this->morphTo();
     }
+
 }

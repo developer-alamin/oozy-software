@@ -2,8 +2,8 @@
     <v-card>
         <v-card-title class="pt-5">
             <v-row>
-                <v-col cols="4"><span>Line Trash List</span></v-col>
-                <v-col cols="8" class="d-flex justify-end">
+                <v-col cols="6"><span>Floor Trash List</span></v-col>
+                <v-col cols="6" class="d-flex justify-end">
                     <v-text-field
                         v-model="search"
                         density="compact"
@@ -17,23 +17,7 @@
                         single-line
                         clearable
                     ></v-text-field>
-                    <v-btn
-                        @click="LineIndex"
-                        color="primary"
-                        icon
-                        style="width: 40px; height: 40px"
-                    >
-                        <v-tooltip location="top" activator="parent">
-                            <template v-slot:activator="{ props }">
-                                <v-icon v-bind="props" style="font-size: 20px"
-                                    >mdi-home</v-icon
-                                >
-                            </template>
-                            <span>Line List</span>
-                        </v-tooltip>
-                    </v-btn>
                 </v-col>
-
             </v-row>
         </v-card-title>
 
@@ -48,6 +32,16 @@
             loading-text="Loading... Please wait"
             @update:options="loadItems"
         >
+            <template v-slot:item.status="{ item }">
+                <v-chip
+                    :color="item.status === 'Active' ? 'green' : 'red'"
+                    class="text-uppercase"
+                    size="small"
+                    label
+                >
+                    {{ item.status === "Active" ? "Active" : "Inactive" }}
+                </v-chip>
+            </template>
 
             <template v-slot:item.actions="{ item }">
                 <v-icon @click="showRestoreDialog(item.uuid)" color="green"
@@ -80,7 +74,6 @@
 import { toast } from "vue3-toastify";
 import RestoreConfirmDialog from "../../Components/RestoreConfirmDialog.vue";
 import ConfirmDialog from "../../Components/ConfirmDialog.vue";
-import bus from "./eventBus";
 
 export default {
     components: {
@@ -89,14 +82,20 @@ export default {
     },
     data() {
         return {
-            restroreDialogName:"Are you sure you want to restore this Line?",
-            dialogName:"Are you sure you want to delete this Line ?",
+            restroreDialogName:"Are you sure you want to restore this Floor?",
+            dialogName:"Are you sure you want to delete this Floor ?",
+
             search: "",
             itemsPerPage: 15,
             headers: [
-                { title: "Line Number", key: "name", sortable: true },
+                { title: "Number", key: "name", sortable: true },
                 { title: "Description", key: "description", sortable: false },
-                
+                {
+                    title: "Status",
+                    key: "status",
+                    value: "status",
+                    sortable: true,
+                },
                 { title: "Actions", key: "actions", sortable: false },
             ],
             serverItems: [],
@@ -104,7 +103,7 @@ export default {
             totalItems: 0,
             restoreDialog: false, // Separate state for restore dialog
             deleteDialog: false, // Separate state for delete dialog
-            selectedLineId: null,
+            selectedFloorId: null,
         };
     },
     methods: {
@@ -113,7 +112,7 @@ export default {
             const sortOrder = sortBy.length ? sortBy[0].order : "desc";
             const sortKey = sortBy.length ? sortBy[0].key : "created_at";
             try {
-                const response = await this.$axios.get("/lines/trashed", {
+                const response = await this.$axios.get("/floors/trashed", {
                     params: {
                         page,
                         itemsPerPage,
@@ -131,50 +130,46 @@ export default {
             }
         },
         showRestoreDialog(uuid) {
-            this.selectedLineId = uuid;
+            this.selectedFloorId = uuid;
             this.restoreDialog = true; // Open restore dialog
         },
         showConfirmDialog(uuid) {
-            this.selectedLineId = uuid;
+            this.selectedFloorId = uuid;
             this.deleteDialog = true; // Open delete dialog
         },
         async confirmRestore() {
             this.restoreDialog = false; // Close the restore dialog
             try {
                 await this.$axios.post(
-                    `/lines/${this.selectedLineId}/restore`
+                    `/floors/${this.selectedFloorId}/restore`
                 );
                 this.loadItems({
                     page: 1,
                     itemsPerPage: this.itemsPerPage,
                     sortBy: [],
                 });
-                toast.success("Line restored successfully!");
-                bus.updateCount(bus.trashedLinesCount.value - 1);
+                toast.success("Floor restored successfully!");
             } catch (error) {
-                console.error("Error restoring brand:", error);
-                toast.error("Failed to restore brand.");
+                console.error("Error restoring Floor:", error);
+                toast.error("Failed to restore Floor.");
             }
         },
         async confirmDelete() {
             this.deleteDialog = false; // Close the delete dialog
             try {
                 await this.$axios.delete(
-                    `/lines/${this.selectedLineId}/forceDelete`
+                    `/floors/${this.selectedFloorId}/force-delete`
                 );
                 this.loadItems({
                     page: 1,
                     itemsPerPage: this.itemsPerPage,
                     sortBy: [],
                 });
-                toast.success("Line deleted successfully!");
+                toast.success("Floor deleted successfully!");
             } catch (error) {
-                console.error("Error deleting brand:", error);
-                toast.error("Failed to delete brand.");
+                console.error("Error deleting Floor:", error);
+                toast.error("Failed to delete Floor.");
             }
-        },
-        async LineIndex (){
-            this.$router.push({ name: "LineIndex" });
         }
     },
     created() {

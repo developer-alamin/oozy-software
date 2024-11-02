@@ -92,7 +92,7 @@ export default {
             search: "",
             itemsPerPage: 15,
             headers: [
-                { title: "Group Name", key: "name", sortable: true },
+                { title: "Group  Number", key: "name", sortable: true },
                 { title: "Description", key: "description", sortable: false },
                 { title: "Actions", key: "actions", sortable: false },
             ],

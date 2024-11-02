@@ -5,8 +5,6 @@
             <v-form ref="form" v-model="valid" @submit.prevent="update">
                 <!-- Name Field -->
                 <v-text-field v-model="line.name" label="Name"> </v-text-field>
-                <v-text-field v-model="line.number" label="Number">
-                </v-text-field>
                 <!-- Description Field -->
                 <v-textarea v-model="line.description" label="Description" />
                 <!-- Action Buttons -->
@@ -50,7 +48,6 @@ export default {
             loading: false,
             line: {
                 name: "",
-                number: "",
                 description: "",
             },
             errors: {},

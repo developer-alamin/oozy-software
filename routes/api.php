@@ -11,6 +11,9 @@ use App\Http\Controllers\TechnicianController;
 
 use App\Http\Controllers\Admin\LineController;
 use App\Http\Controllers\Admin\GroupController;
+use App\Http\Controllers\Admin\FloorController;
+use App\Http\Controllers\Admin\Mechine\TypeController;
+use App\Http\Controllers\Admin\SourceController;
 
 
 use App\Http\Controllers\Admin\AdminController;
@@ -34,6 +37,49 @@ Route::controller(SupplierController::class)
     Route::delete('{id}/force-delete', 'supplierforcedelete')->name('supplier.force.delete');
 });
 // suppliers Group Controllers end form here
+
+
+
+// floor group route declare start form here
+Route::resource('floor', FloorController::class);
+
+Route::controller(FloorController::class)
+->prefix("floors")
+->as("floors")
+->group(function(){
+    Route::get('/trashed-count', 'floortrashedcount')->name('floor.trashed.count');
+    Route::get('/trashed', 'floortrashed')->name('floor.trashed');
+    Route::post('{id}/restore', 'floorrestore')->name('floor.restore');
+    Route::delete('{id}/force-delete', 'floorforcedelete')->name('floor.force.delete');
+});
+// floor group route declare end form here
+
+//Mechine Group Route declare start form here
+
+Route::prefix("/mechine")->group(function(){
+    Route::resource('type', TypeController::class);
+    Route::controller(TypeController::class)
+    ->prefix('types')
+    ->as("types")
+    ->group(function () {
+         Route::get('/trashed-count', 'typestrashedcount')->name('types.trashed.count');
+         Route::get('/trashed', 'typestrashed')->name('types.trashed');
+         Route::post('{id}/restore', 'typesrestore')->name('types.restore');
+         Route::delete('{id}/force-delete', 'typesforcedelete')->name('types.force.delete');
+    });
+    Route::resource('source', SourceController::class);
+    Route::controller(SourceController::class)
+    ->prefix('sources')
+    ->as("sources")
+    ->group(function () {
+         Route::get('/trashed-count', 'sourcestrashedcount')->name('sources.trashed.count');
+         Route::get('/trashed', 'sourcestrashed')->name('sources.trashed');
+         Route::post('{id}/restore', 'sourcesrestore')->name('source.restore');
+         Route::delete('{id}/force-delete', 'sourcesforcedelete')->name('sources.force.delete');
+    });
+    
+}); 
+//Mechine Group Route declare end form here
 
 
 // models
@@ -115,7 +161,7 @@ Route::controller(RentController::class)
 ->group(function () {
      Route::get('/trashed-count', 'rentstrashedcount')->name('rents.trashed.count');
      Route::get('/trashed', 'rentstrashed')->name('rents.trashed');
-     Route::post('{id}/restore', 'rentsrestore')->name('line.restore');
+     Route::post('{id}/restore', 'rentsrestore')->name('rents.restore');
      Route::delete('{id}/force-delete', 'rentsforcedelete')->name('rents.force.delete');
 });
 // Group Rents Controller End form here
@@ -145,3 +191,5 @@ Route::prefix('user')->group(function () {
     Route::post('/logout', [UserAuthController::class, 'logout'])->middleware('auth:user');
     Route::get('/dashboard', [UserController::class, 'dashboard'])->middleware('auth:user');
 });
+
+

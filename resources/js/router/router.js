@@ -364,7 +364,90 @@ const routes = [
                 meta: { title: "Rent Trash" },
                 props:true
             },
-
+            {
+                path: "floor/index", // New route for Floor index
+                name: "FloorIndex",
+                component: adminComponents.FloorIndex,
+                meta: { title: "Floor index" },
+                props:true
+            },
+            {
+                path: "floor/create", // New route for Floor create
+                name: "FloorCreate",
+                component: adminComponents.FloorCreate,
+                meta: { title: "Floor Create" },
+                props:true
+            },
+            {
+                path: "floor/edit/:uuid", // New route for Floor create
+                name: "FloorEdit",
+                component: adminComponents.FloorEdit,
+                meta: { title: "Floor Edit" },
+                props:true
+            },
+            {
+                path: "floor/trash", // New route for floor trash
+                name: "FloorTrash",
+                component: adminComponents.FloorTrash,
+                meta: { title: "Floor Trash" },
+                props: true,
+            },
+            {
+                path: "mechine/type/index", // New route for mechine type index
+                name: "MechineTypeIndex",
+                component: adminComponents.MechineTypeIndex,
+                meta: { title: "Mechine Type Index" },
+                props: true,
+            },
+            {
+                path: "mechine/type/create", // New route for mechine type index
+                name: "MechineTypeCreate",
+                component: adminComponents.MechineTypeCreate,
+                meta: { title: "Mechine Type Create" },
+                props: true,
+            },
+            {
+                path: "mechine/type/edit/:uuid", // New route for mechine type index
+                name: "MechineTypeEdit",
+                component: adminComponents.MechineTypeEdit,
+                meta: { title: "Mechine Type Edit" },
+                props: true,
+            },
+            {
+                path: "mechine/type/trash", // New route for floor trash
+                name: "MechineTypeTrash",
+                component: adminComponents.MechineTypeTrash,
+                meta: { title: "Mechine Type Trash" },
+                props: true,
+            },
+            {
+                path: "mechine/source/index", // New route for mechine source index
+                name: "MechineSourceIndex",
+                component: adminComponents.MechineSourceIndex,
+                meta: { title: "Mechine Source Index" },
+                props: true,
+            },
+            {
+                path: "mechine/source/create", // New route for mechine Source index
+                name: "MechineSourceCreate",
+                component: adminComponents.MechineSourceCreate,
+                meta: { title: "Mechine Source Create" },
+                props: true,
+            },
+            {
+                path: "mechine/source/edit/:uuid", // New route for mechine Source index
+                name: "MechineSourceEdit",
+                component: adminComponents.MechineSourceEdit,
+                meta: { title: "Mechine Source Edit" },
+                props: true,
+            },
+            {
+                path: "mechine/source/trash", // New route for Source trash
+                name: "MechineSourceTrash",
+                component: adminComponents.MechineSourceTrash,
+                meta: { title: "Mechine Source Trash" },
+                props: true,
+            }
         ],
     },
     // {

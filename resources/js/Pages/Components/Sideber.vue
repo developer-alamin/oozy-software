@@ -365,6 +365,7 @@
                     </li>
                 </ul>
             </li>
+
             <!-- Start Settings Nav -->
             <li class="nav-item">
                 <a
@@ -402,10 +403,58 @@
                             <i class="bi bi-circle"></i><span>Group</span>
                         </router-link>
                     </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'FloorIndex' }"
+                            active-class="active"
+                            :class="{ active: isFloorIndex }"
+                        >
+                            <i class="bi bi-circle"></i><span>Floor</span>
+                        </router-link>
+                    </li>
                 </ul>
             </li>
             <!-- End Settings Nav -->
-            <!-- Start Rant Nav -->
+             <!-- Start Mechine Nav -->
+            <li class="nav-item">
+                <a
+                    class="nav-link collapsed"
+                    data-bs-target="#mechine-nav"
+                    data-bs-toggle="collapse"
+                    href="#"
+                    :class="{ show: isMechineRouteShow }"
+                >
+                    <i class="bi bi-layout-text-window-reverse"></i
+                    ><span>Mechine</span
+                    ><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul
+                    id="mechine-nav"
+                    class="nav-content collapse"
+                    data-bs-parent="#sidebar-nav"
+                    :class="{ show: isMechineRouteShow }"
+                >
+                    <li>
+                        <router-link
+                            :to="{ name: 'MechineTypeIndex' }"
+                            active-class="active"
+                            :class="{ active: MechineTypeIndex }"
+                        >
+                            <i class="bi bi-circle"></i><span>Type</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'MechineSourceIndex' }"
+                            active-class="active"
+                            :class="{ active: isMechineSourceIndex }"
+                        >
+                            <i class="bi bi-circle"></i><span>Source</span>
+                        </router-link>
+                    </li>
+                </ul>
+            </li>
+            <!-- End Mechine Nav -->
 
             <!-- End Settings Nav -->
 
