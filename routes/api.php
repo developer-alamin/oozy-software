@@ -98,7 +98,7 @@ Route::resource('category', CategoryController::class);
 
 
 Route::resource('line', LineController::class);
-
+Route::get('/get_users', [GroupController::class, 'getUsers']);
 Route::resource('group', GroupController::class);
 
 // Rent
@@ -191,5 +191,3 @@ Route::prefix('user')->group(function () {
     Route::post('/logout', [UserAuthController::class, 'logout'])->middleware('auth:user');
     Route::get('/dashboard', [UserController::class, 'dashboard'])->middleware('auth:user');
 });
-
-

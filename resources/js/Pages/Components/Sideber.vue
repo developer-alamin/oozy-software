@@ -44,7 +44,8 @@
                             active-class="active"
                             :class="{ active: isBrandRoute }"
                         >
-                            <i class="bi bi-circle"></i><span>Brand</span>
+                            <i class="bi bi-circle"></i
+                            ><span>Mechine Brand</span>
                         </router-link>
                     </li>
                     <li>
@@ -82,7 +83,28 @@
                             active-class="active"
                             :class="{ active: isSupplierRoute }"
                         >
-                            <i class="bi bi-circle"></i><span>Supplier</span>
+                            <i class="bi bi-circle"></i
+                            ><span>Mechine Supplier</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'MechineTypeIndex' }"
+                            active-class="active"
+                            :class="{ active: MechineTypeIndex }"
+                        >
+                            <i class="bi bi-circle"></i
+                            ><span>Mechine Type</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'MechineSourceIndex' }"
+                            active-class="active"
+                            :class="{ active: isMechineSourceIndex }"
+                        >
+                            <i class="bi bi-circle"></i
+                            ><span>Mechine Source</span>
                         </router-link>
                     </li>
                 </ul>
@@ -131,7 +153,7 @@
                     class="nav-link collapsed"
                     data-bs-target="#forms-nav"
                     data-bs-toggle="collapse"
-                    href="#"
+                    :class="{ show: isFactoryRouteShow }"
                 >
                     <i class="bi bi-journal-text"></i><span>Factory</span
                     ><i class="bi bi-chevron-down ms-auto"></i>
@@ -140,17 +162,28 @@
                     id="forms-nav"
                     class="nav-content collapse"
                     data-bs-parent="#sidebar-nav"
+                    :class="{ show: isFactoryRouteShow }"
                 >
                     <li>
-                        <a href="forms-elements.html">
-                            <i class="bi bi-circle"></i><span>Add Factory</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="forms-layouts.html">
+                        <router-link
+                            :to="{ name: 'FactoryCreate' }"
+                            active-class="active"
+                            :class="{ active: isFactoryCreateActive }"
+                        >
                             <i class="bi bi-circle"></i
-                            ><span>All Factories </span>
-                        </a>
+                            ><span>Create Factory</span>
+                        </router-link>
+                    </li>
+
+                    <li>
+                        <router-link
+                            :to="{ name: 'FactoryIndex' }"
+                            active-class="active"
+                            :class="{ active: isFactoryIndexActive }"
+                        >
+                            <i class="bi bi-circle"></i
+                            ><span>All Factories</span>
+                        </router-link>
                     </li>
                 </ul>
             </li>
@@ -415,70 +448,6 @@
                 </ul>
             </li>
             <!-- End Settings Nav -->
-             <!-- Start Mechine Nav -->
-            <li class="nav-item">
-                <a
-                    class="nav-link collapsed"
-                    data-bs-target="#mechine-nav"
-                    data-bs-toggle="collapse"
-                    href="#"
-                    :class="{ show: isMechineRouteShow }"
-                >
-                    <i class="bi bi-layout-text-window-reverse"></i
-                    ><span>Mechine</span
-                    ><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul
-                    id="mechine-nav"
-                    class="nav-content collapse"
-                    data-bs-parent="#sidebar-nav"
-                    :class="{ show: isMechineRouteShow }"
-                >
-                    <li>
-                        <router-link
-                            :to="{ name: 'MechineTypeIndex' }"
-                            active-class="active"
-                            :class="{ active: MechineTypeIndex }"
-                        >
-                            <i class="bi bi-circle"></i><span>Type</span>
-                        </router-link>
-                    </li>
-                    <li>
-                        <router-link
-                            :to="{ name: 'MechineSourceIndex' }"
-                            active-class="active"
-                            :class="{ active: isMechineSourceIndex }"
-                        >
-                            <i class="bi bi-circle"></i><span>Source</span>
-                        </router-link>
-                    </li>
-                </ul>
-            </li>
-            <!-- End Mechine Nav -->
-
-            <!-- End Settings Nav -->
-
-            <li class="nav-heading"></li>
-
-            <!-- End Profile Page Nav -->
-
-            <!-- End F.A.Q Page Nav -->
-
-            <!-- End Contact Page Nav -->
-            <!--
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="pages-register.html">
-                    <i class="bi bi-card-list"></i>
-                    <span>Register</span>
-                </a>
-            </li> -->
-            <!-- End Register Page Nav -->
-
-            <!-- End Login Page Nav -->
-
-            <!-- End Error 404 Page Nav -->
-
-            <!-- End Blank Page Nav -->
         </ul>
     </aside>
     <!-- End Sidebar-->
@@ -513,6 +482,12 @@ const isMechineRoute = computed(() => {
         "BrandCreate",
         "BrandEdit",
         "BrandTrash",
+        "MechineTypeIndex",
+        "MechineTypeCreate",
+        "MechineTypeEdit",
+        "MechineSourceIndex",
+        "MechineSourceCreate",
+        "MechineSourceEdit",
     ].includes(route.name);
 });
 
@@ -554,6 +529,17 @@ const isCompanyRouteShow = computed(() => {
 });
 const isCompanyCreateActive = computed(() => route.name === "CompanyCreate");
 const isCompanyIndexActive = computed(() => route.name === "AllCompanyIndex");
+// Company
+const isFactoryRouteShow = computed(() => {
+    return [
+        "FactoryIndex",
+        "FactoryCreate",
+        "FactoryEdit",
+        "FactoryTrash",
+    ].includes(route.name);
+});
+const isFactoryCreateActive = computed(() => route.name === "FactoryCreate");
+const isFactoryIndexActive = computed(() => route.name === "FactoryIndex");
 //
 const isTechnicianRouteShow = computed(() => {
     return [

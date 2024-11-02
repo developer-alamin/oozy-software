@@ -1,20 +1,31 @@
 <template>
     <v-card outlined class="mx-auto my-5" max-width="900">
-        <v-card-title>Edit type</v-card-title>
+        <v-card-title>Edit Mechine Type</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="update">
                 <!-- Name Field -->
-                <v-text-field
-                    v-model="type.name"
-                    :rules="[rules.required]"
-                    label="Name"
-                    outlined
-                    :error-messages="errors.name ? errors.name : ''"
-                >
-                    <template v-slot:label>
-                        Name <span style="color: red">*</span>
-                    </template>
-                </v-text-field>
+                <v-row>
+                    <v-col cols="12" md="6">
+                        <v-text-field
+                            v-model="type.name"
+                            :rules="[rules.required]"
+                            label="Name"
+                            outlined
+                            :error-messages="errors.name ? errors.name : ''"
+                        >
+                            <template v-slot:label>
+                                Name <span style="color: red">*</span>
+                            </template>
+                        </v-text-field>
+                    </v-col>
+                    <v-col cols="12" md="6">
+                        <v-text-field
+                            v-model="type.day"
+                            :rules="day"
+                            label="Days"
+                        ></v-text-field>
+                    </v-col>
+                </v-row>
 
                 <!-- Description Field -->
                 <v-textarea
@@ -29,7 +40,7 @@
                 <v-select
                     v-model="type.status"
                     :items="statusItems"
-                    label="type Status"
+                    label="Type Status"
                     clearable
                     :error-messages="errors.status ? errors.status : ''"
                 ></v-select>
@@ -76,7 +87,7 @@ export default {
             statusItems: ["Active", "Inactive"],
             type: {
                 name: "",
-                day:"",
+                day: "",
                 description: "",
                 status: false, // Default to false (inactive)
             },
@@ -116,7 +127,7 @@ export default {
                         `mechine/type/${typeId}`,
                         this.type
                     );
-                    console.log(response.data)
+                    console.log(response.data);
                     if (response.data.success) {
                         toast.success("type update successfully!");
                         this.$router.push({ name: "MechineTypeIndex" }); // Redirect to type list page

@@ -401,4 +401,6 @@ class GroupController extends Controller
         return response()->json($technicians);
     }
 
+    
+
 }

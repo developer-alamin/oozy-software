@@ -18,16 +18,14 @@
                             </template>
                         </v-text-field>
                     </v-col>
-                     <v-col cols="12" md="6">
-                         <v-text-field
+                    <v-col cols="12" md="6">
+                        <v-text-field
                             v-model="type.day"
                             :rules="day"
-                            label="Day"
-                          ></v-text-field>
+                            label="Days"
+                        ></v-text-field>
                     </v-col>
                 </v-row>
-               
-                
 
                 <!-- Description Field -->
                 <v-textarea
@@ -40,7 +38,7 @@
                 <v-select
                     v-model="type.status"
                     :items="statusItems"
-                    label="type Status"
+                    label="Type Status"
                     @change="updateStatus"
                     clearable
                 ></v-select>
@@ -90,7 +88,7 @@ export default {
             statusItems: ["Active", "Inactive"],
             type: {
                 name: "",
-                day:'',
+                day: "",
                 description: "",
                 status: "Active", // New property for checkbox
             },
@@ -117,8 +115,11 @@ export default {
             setTimeout(async () => {
                 try {
                     // Assuming the actual API call here
-                    const response = await this.$axios.post("mechine/type", formData);
-                    console.log(response.data)
+                    const response = await this.$axios.post(
+                        "mechine/type",
+                        formData
+                    );
+                    console.log(response.data);
                     if (response.data.success) {
                         toast.success("type create successfully!");
                         this.resetForm();
