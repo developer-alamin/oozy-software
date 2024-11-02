@@ -77,3 +77,18 @@ export { default as FloorIndex } from "../Pages/Admin/Floor/Index.vue";
 export { default as FloorCreate } from "../Pages/Admin/Floor/Create.vue";
 export { default as FloorEdit } from "../Pages/Admin/Floor/Edit.vue";
 export { default as FloorTrash } from "../Pages/Admin/Floor/Trash.vue";
+
+
+//Mechine Type Components
+export { default as MechineTypeIndex } from "../Pages/Admin/Mechine/Type/Index.vue";
+export { default as MechineTypeCreate } from "../Pages/Admin/Mechine/Type/Create.vue";
+export { default as MechineTypeEdit } from "../Pages/Admin/Mechine/Type/Edit.vue";
+export { default as MechineTypeTrash } from "../Pages/Admin/Mechine/Type/Trash.vue";
+
+//Mechine Source Components
+export { default as MechineSourceIndex } from "../Pages/Admin/Mechine/Source/Index.vue";
+export { default as MechineSourceCreate } from "../Pages/Admin/Mechine/Source/Create.vue";
+export { default as MechineSourceEdit } from "../Pages/Admin/Mechine/Source/Edit.vue";
+export { default as MechineSourceTrash } from "../Pages/Admin/Mechine/Source/Trash.vue";
+
+

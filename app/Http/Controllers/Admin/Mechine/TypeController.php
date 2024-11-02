@@ -1,28 +1,22 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Admin\Mechine;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Admin;
-use App\Models\Floor;
-use App\Models\Category;
+use App\Models\MechineType;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
-class FloorController extends Controller
+class TypeController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-
-
-        dd(Floor::all()->count());
-
-
         $page         = $request->input('page', 1);
         $itemsPerPage = $request->input('itemsPerPage', 5);
         $sortBy       = $request->input('sortBy', 'created_at'); // Default sort by created_at
@@ -35,33 +29,33 @@ class FloorController extends Controller
             // Check if the admin is a super admin
             if ($currentUser->role === 'superadmin') {
                 // If superadmin, retrieve all technicians
-                $floorsQuery = Floor::query(); // No filters applied
+                $MechineTypesQuery = MechineType::query(); // No filters applied
             } else {
                 // If not superadmin, filter by creator type and id
-                $floorsQuery = Floor::where('creator_type', $creatorType)
+                $MechineTypesQuery = MechineType::where('creator_type', $creatorType)
                     ->where('creator_id', $currentUser->id);
             }
         } elseif (Auth::guard('user')->check()) {
             $currentUser = Auth::guard('user')->user();
             $creatorType = User::class;
             // For regular users, filter by creator type and id
-            $floorsQuery = Floor::where('creator_type', $creatorType)
+            $MechineTypesQuery = MechineType::where('creator_type', $creatorType)
                 ->where('creator_id', $currentUser->id);
         } else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
         // Apply search if the search term is not empty
         if (!empty($search)) {
-            $floorsQuery->where('name', 'LIKE', '%' . $search . '%');
+            $MechineTypesQuery->where('name', 'LIKE', '%' . $search . '%');
         }
         // Apply sorting
-        $floorsQuery->orderBy($sortBy, $sortOrder);
+        $MechineTypesQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $floors = $floorsQuery->with('creator:id,name')->paginate($itemsPerPage);
+        $MechineTypes = $MechineTypesQuery->with('creator:id,name')->paginate($itemsPerPage);
         // Return the response as JSON
         return response()->json([
-            'items' => $floors->items(), // Current page items
-            'total' => $floors->total(), // Total number of records
+            'items' => $MechineTypes->items(), // Current page items
+            'total' => $MechineTypes->total(), // Total number of records
         ]);
     }
 
@@ -70,7 +64,7 @@ class FloorController extends Controller
      */
     public function create()
     {
-        //
+        
     }
 
     /**
@@ -78,7 +72,8 @@ class FloorController extends Controller
      */
     public function store(Request $request)
     {
-        $validatedData = $request->validate(Floor::validationRules());
+
+       $validatedData = $request->validate(MechineType::validationRules());
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
              $creator = Auth::guard('admin')->user();
@@ -96,12 +91,13 @@ class FloorController extends Controller
              return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
          }
          // Create the technician and associate it with the creator
-         $floor = new Floor($validatedData);
-         $floor->creator()->associate($creator);  // Assign creator polymorphically
-         $floor->updater()->associate($creator);  // Associate the updater
-         $floor->save(); // Save the technician to the database
+         $MechineType = new MechineType($validatedData);
+         
+         $MechineType->creator()->associate($creator);  // Assign creator polymorphically
+        $MechineType->updater()->associate($creator);  // Associate the updater
+         $MechineType->save(); // Save the technician to the database
          // Return a success response
-         return response()->json(['success' => true, 'message' => 'Floor created successfully.'], 201);
+         return response()->json(['success' => true, 'message' => 'Mechine Type created successfully.'], 201);
     }
 
     /**
@@ -115,18 +111,20 @@ class FloorController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Floor $floor)
+    public function edit($id)
     {
+        $mechinetype = MechineType::findOrFail($id);
+
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('admin')->user();
             $creatorType = Admin::class;
             // Check if the admin is a super admin
             if ($currentUser->role === 'superadmin') {
-                // Super admins can edit any floor
+                // Super admins can edit any mechinetype
                 return response()->json([
                     'success' => true,
-                    'floor' => $floor
+                    'mechinetype' => $mechinetype
                 ], Response::HTTP_OK);
             }
         } elseif (Auth::guard('user')->check()) {
@@ -135,25 +133,27 @@ class FloorController extends Controller
         } else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
-        // Check if the floor belongs to the current user or admin
-        if ($floor->creator_type !== $creatorType || $floor->creator_id !== $currentUser->id) {
-            return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to edit this floor.'], 403);
+        // Check if the mechinetype belongs to the current user or admin
+        if ($mechinetype->creator_type !== $creatorType || $mechinetype->creator_id !== $currentUser->id) {
+            return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to edit this mechinetype.'], 403);
         }
-        // Return the floor data if authorized
+        // Return the mechinetype data if authorized
         return response()->json([
             'success' => true,
-            'floor'   => $floor
+            'mechinetype' => $mechinetype
         ], Response::HTTP_OK);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Floor $floor)
-    {
-        
-         // Validate the incoming request data
-         $validatedData = $request->validate(Floor::validationRules());
+    public function update(Request $request)
+    {   
+        $mechinetype = MechineType::findOrFail($request->uuid);
+
+    
+       // Validate the incoming request data
+         $validatedData = $request->validate(mechinetype::validationRules());
 
          // Determine the authenticated user (either from 'admin' or 'user' guard)
          if (Auth::guard('admin')->check()) {
@@ -165,8 +165,8 @@ class FloorController extends Controller
                  // Superadmin can update without additional checks
              } else {
                  // Regular admin authorization check
-                 if ($floor->creator_type !== $creatorType || $floor->creator_id !== $currentUser->id) {
-                     return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to update this floor.'], 403);
+                 if ($mechinetype->creator_type !== $creatorType || $mechinetype->creator_id !== $currentUser->id) {
+                     return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to update this mechinetype.'], 403);
                  }
              }
 
@@ -175,36 +175,37 @@ class FloorController extends Controller
              $creatorType = User::class;
 
              // Regular user authorization check
-             if ($floor->creator_type !== $creatorType || $floor->creator_id !== $currentUser->id) {
-                 return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to update this floor.'], 403);
+             if ($mechinetype->creator_type !== $creatorType || $mechinetype->creator_id !== $currentUser->id) {
+                 return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to update this mechinetype.'], 403);
              }
          } else {
              return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
          }
-         // Update the floor's details
-         $floor->fill($validatedData);
-         $floor->updater()->associate($currentUser); // Associate the updater
-         $floor->save();
+         // Update the mechinetype's details
+         $mechinetype->fill($validatedData);
+         $mechinetype->updater()->associate($currentUser); // Associate the updater
+         $mechinetype->save();
 
          // Return a success response
-         return response()->json(['success' => true, 'message' => 'floor updated successfully.', 'floor' => $floor], 200);
+         return response()->json(['success' => true, 'message' => 'mechinetype updated successfully.', 'mechinetype' => $mechinetype], 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Floor $floor)
+    public function destroy(string $uuid)
     {
+        $mechinetype = MechineType::findOrFail($uuid);
         if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('admin')->user();
             // Check if the admin is a superadmin
             if ($currentUser->role === 'superadmin') {
-                // Superadmin can delete any floor without additional checks
+                // Superadmin can delete any mechinetype without additional checks
             } else {
                 $creatorType = Admin::class;
                 // Regular admin authorization check
-                if ($floor->creator_type !== $creatorType || $floor->creator_id !== $currentUser->id) {
-                    return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to delete this floor.'], 403);
+                if ($mechinetype->creator_type !== $creatorType || $mechinetype->creator_id !== $currentUser->id) {
+                    return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to delete this mechinetype.'], 403);
                 }
             }
 
@@ -212,8 +213,8 @@ class FloorController extends Controller
             $currentUser = Auth::guard('user')->user();
             $creatorType = User::class;
             // Regular user authorization check
-            if ($floor->creator_type !== $creatorType || $floor->creator_id !== $currentUser->id) {
-                return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to delete this floor.'], 403);
+            if ($mechinetype->creator_type !== $creatorType || $mechinetype->creator_id !== $currentUser->id) {
+                return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to delete this mechinetype.'], 403);
             }
         } else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
@@ -221,28 +222,28 @@ class FloorController extends Controller
 
         try {
             // Delete the supplier
-            $floor->delete();
+            $mechinetype->delete();
             return response()->json([
                 'success' => true,
-                'message' => 'floor deleted successfully.'
+                'message' => 'mechinetype deleted successfully.'
             ], Response::HTTP_OK);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error deleting floor: ' . $e->getMessage()
+                'message' => 'Error deleting mechinetype: ' . $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    public function floortrashedcount()
+    public function typestrashedcount()
     {
-        // Get the count of soft-deleted floors
-        $trashedCount = Floor::onlyTrashed()->count();
+        // Get the count of soft-deleted MechineTypes
+        $trashedCount = MechineType::onlyTrashed()->count();
 
         return response()->json([
             'trashedCount' => $trashedCount
         ], Response::HTTP_OK);
     }
-    public function floortrashed(Request $request)
+    public function typestrashed(Request $request)
     {
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
@@ -252,10 +253,10 @@ class FloorController extends Controller
             // Superadmin check: Allow access to all soft-deleted technicians
             if ($currentUser->role === 'superadmin') {
                 // Fetch all trashed technicians without additional checks
-                $floorsQuery = Floor::onlyTrashed();
+                $mechineTypesQuery = MechineType::onlyTrashed();
             } else {
                 // Regular admin authorization check
-                $floorsQuery = Floor::onlyTrashed()
+                $mechineTypesQuery = MechineType::onlyTrashed()
                     ->where('creator_id', $currentUser->id)
                     ->where('creator_type', $creatorType); // Only fetch soft-deleted records created by this admin
             }
@@ -265,7 +266,7 @@ class FloorController extends Controller
             $creatorType = User::class;
 
             // Regular user authorization check
-            $floorsQuery = floor::onlyTrashed()
+            $mechineTypesQuery = MechineType::onlyTrashed()
                 ->where('creator_id', $currentUser->id)
                 ->where('creator_type', $creatorType); // Only fetch soft-deleted records created by this user
 
@@ -282,23 +283,73 @@ class FloorController extends Controller
 
         // Apply search if the search term is not empty
         if (!empty($search)) {
-            $floorsQuery->where('name', 'LIKE', '%' . $search . '%'); // Adjust as per your floor fields
+            $mechineTypesQuery->where('name', 'LIKE', '%' . $search . '%'); // Adjust as per your MechineType fields
         }
 
         // Apply sorting
-        $floorsQuery->orderBy($sortBy, $sortOrder);
+        $mechineTypesQuery->orderBy($sortBy, $sortOrder);
 
         // Paginate results
-        $floors = $floorsQuery->paginate($itemsPerPage);
+        $mechinetypes = $mechineTypesQuery->paginate($itemsPerPage);
 
         // Return the response as JSON
         return response()->json([
-            'items' => $floors->items(), // Current page items
-            'total' => $floors->total(), // Total number of trashed records
+            'items' => $mechinetypes->items(), // Current page items
+            'total' => $mechinetypes->total(), // Total number of trashed records
         ]);
+
+
     }
-    // Restore a soft-deleted floor
-    public function floorrestore($id)
+     // Permanently delete a mechine type from trash
+    public function typesforcedelete($id)
+    {
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+                
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
+
+            // Superadmin check: Allow access to all trashed technicians
+            if ($currentUser->role === 'superadmin') {
+                $mechinetypes = MechineType::onlyTrashed()->findOrFail($id);
+            } else {
+                // Regular admin authorization check
+                $mechinetypes = MechineType::onlyTrashed()
+                    ->where('creator_id', $currentUser->id)
+                    ->where('creator_type', $creatorType)
+                    ->findOrFail($id);
+            }
+
+            } elseif (Auth::guard('user')->check()) {
+                $currentUser = Auth::guard('user')->user();
+                $creatorType = User::class;
+
+                // Regular user authorization check
+                $mechinetypes = MechineType::onlyTrashed()
+                    ->where('creator_id', $currentUser->id)
+                    ->where('creator_type', $creatorType)
+                    ->findOrFail($id);
+            } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+        
+        try {
+            // Delete the supplier
+            $mechinetypes->forceDelete();
+            return response()->json([
+                'success' => true,
+                'message' => 'MechineType permanently deleted successfully.'
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting MechineType: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+       
+    }
+      // Restore a soft-deleted MechineType
+    public function typesrestore($id)
     {
         
         // Determine the authenticated user (either from 'admin' or 'user' guard)
@@ -308,10 +359,10 @@ class FloorController extends Controller
 
             // Superadmin check: Allow access to all trashed technicians
             if ($currentUser->role === 'superadmin') {
-                $restored = Floor::onlyTrashed()->findOrFail($id)->restore();
+                $restored = MechineType::onlyTrashed()->findOrFail($id)->restore();
             } else {
                 // Regular admin authorization check
-                $restored = Floor::onlyTrashed()
+                $restored = MechineType::onlyTrashed()
                     ->where('creator_id', $currentUser->id)
                     ->where('creator_type', $creatorType)
                     ->findOrFail($id)
@@ -323,7 +374,7 @@ class FloorController extends Controller
             $creatorType = User::class;
 
             // Regular user authorization check
-            $restored = Floor::onlyTrashed()
+            $restored = MechineType::onlyTrashed()
                 ->where('creator_id', $currentUser->id)
                 ->where('creator_type', $creatorType)
                 ->findOrFail($id)
@@ -332,56 +383,9 @@ class FloorController extends Controller
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
         if ($restored) {
-            return response()->json(['message' => 'Floor restored successfully'], Response::HTTP_OK);
+            return response()->json(['message' => 'MechineType restored successfully'], Response::HTTP_OK);
         }
-        return response()->json(['message' => 'Floor not found or is not trashed'], Response::HTTP_NOT_FOUND);
+        return response()->json(['message' => 'MechineType not found or is not trashed'], Response::HTTP_NOT_FOUND);
     }
-     // Permanently delete a floor from trash
-    public function floorforcedelete($id)
-    {
-        // Determine the authenticated user (either from 'admin' or 'user' guard)
-        if (Auth::guard('admin')->check()) {
-                
-            $currentUser = Auth::guard('admin')->user();
-            $creatorType = Admin::class;
 
-            // Superadmin check: Allow access to all trashed technicians
-            if ($currentUser->role === 'superadmin') {
-                $floor = Floor::onlyTrashed()->findOrFail($id);
-            } else {
-                // Regular admin authorization check
-                $floor = Floor::onlyTrashed()
-                    ->where('creator_id', $currentUser->id)
-                    ->where('creator_type', $creatorType)
-                    ->findOrFail($id);
-            }
-
-            } elseif (Auth::guard('user')->check()) {
-                $currentUser = Auth::guard('user')->user();
-                $creatorType = User::class;
-
-                // Regular user authorization check
-                $floor = Floor::onlyTrashed()
-                    ->where('creator_id', $currentUser->id)
-                    ->where('creator_type', $creatorType)
-                    ->findOrFail($id);
-            } else {
-            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
-        }
-        
-        try {
-            // Delete the supplier
-            $floor->forceDelete();
-            return response()->json([
-                'success' => true,
-                'message' => 'floor permanently deleted successfully.'
-            ], Response::HTTP_OK);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error deleting floor: ' . $e->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-       
-    }
 }

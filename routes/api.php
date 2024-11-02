@@ -12,6 +12,8 @@ use App\Http\Controllers\TechnicianController;
 use App\Http\Controllers\Admin\LineController;
 use App\Http\Controllers\Admin\GroupController;
 use App\Http\Controllers\Admin\FloorController;
+use App\Http\Controllers\Admin\Mechine\TypeController;
+use App\Http\Controllers\Admin\SourceController;
 
 
 use App\Http\Controllers\Admin\AdminController;
@@ -52,6 +54,32 @@ Route::controller(FloorController::class)
 });
 // floor group route declare end form here
 
+//Mechine Group Route declare start form here
+
+Route::prefix("/mechine")->group(function(){
+    Route::resource('type', TypeController::class);
+    Route::controller(TypeController::class)
+    ->prefix('types')
+    ->as("types")
+    ->group(function () {
+         Route::get('/trashed-count', 'typestrashedcount')->name('types.trashed.count');
+         Route::get('/trashed', 'typestrashed')->name('types.trashed');
+         Route::post('{id}/restore', 'typesrestore')->name('types.restore');
+         Route::delete('{id}/force-delete', 'typesforcedelete')->name('types.force.delete');
+    });
+    Route::resource('source', SourceController::class);
+    Route::controller(SourceController::class)
+    ->prefix('sources')
+    ->as("sources")
+    ->group(function () {
+         Route::get('/trashed-count', 'sourcestrashedcount')->name('sources.trashed.count');
+         Route::get('/trashed', 'sourcestrashed')->name('sources.trashed');
+         Route::post('{id}/restore', 'sourcesrestore')->name('source.restore');
+         Route::delete('{id}/force-delete', 'sourcesforcedelete')->name('sources.force.delete');
+    });
+    
+}); 
+//Mechine Group Route declare end form here
 
 
 // models
@@ -133,7 +161,7 @@ Route::controller(RentController::class)
 ->group(function () {
      Route::get('/trashed-count', 'rentstrashedcount')->name('rents.trashed.count');
      Route::get('/trashed', 'rentstrashed')->name('rents.trashed');
-     Route::post('{id}/restore', 'rentsrestore')->name('line.restore');
+     Route::post('{id}/restore', 'rentsrestore')->name('rents.restore');
      Route::delete('{id}/force-delete', 'rentsforcedelete')->name('rents.force.delete');
 });
 // Group Rents Controller End form here

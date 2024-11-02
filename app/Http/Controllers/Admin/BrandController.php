@@ -112,10 +112,6 @@ class BrandController extends Controller
      */
     public function edit(Brand $brand)
     {
-        // return response()->json([
-        //     'success' => true,
-        //     'brand' => $brand
-        // ], Response::HTTP_OK);
 
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
