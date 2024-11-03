@@ -3,20 +3,38 @@
         <v-card-title>Create factory</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="submit">
-                <v-autocomplete
+                <!-- <v-autocomplete
                     v-model="factory.company_id"
                     :items="companys"
                     item-value="id"
                     item-title="name"
                     label="Select Company"
                     @update:search="fetchCompanys"
-                />
-                <!-- Name Field -->
+                /> -->
+                <v-autocomplete
+                    v-model="factory.company_id"
+                    :items="companys"
+                    item-value="id"
+                    item-title="name"
+                    outlined
+                    multiple
+                    clearable
+                    chips
+                    density="comfortable"
+                    :rules="[rules.required]"
+                    :error-messages="errors.company_id ? errors.company_id : ''"
+                    @update:search="fetchCompanys"
+                >
+                    <template v-slot:label>
+                        Select Company <span style="color: red">*</span>
+                    </template>
+                </v-autocomplete>
                 <v-text-field
                     v-model="factory.name"
                     :rules="[rules.required]"
                     label="Factory Name"
                     outlined
+                    density="comfortable"
                     :error-messages="errors.name ? errors.name : ''"
                 >
                     <template v-slot:label>
@@ -24,30 +42,62 @@
                     </template>
                 </v-text-field>
                 <v-autocomplete
-                    v-model="factory.floor_id"
+                    v-model="factory.floor_ids"
                     :items="floors"
                     item-value="id"
                     item-title="name"
                     label="Select Floor"
+                    outlined
+                    multiple
+                    clearable
+                    chips
+                    density="comfortable"
+                    :rules="[rules.required]"
+                    :error-messages="errors.floor_ids ? errors.floor_ids : ''"
                     @update:search="fetchFloors"
-                />
+                >
+                    <template v-slot:label>
+                        Select Floor <span style="color: red">*</span>
+                    </template>
+                </v-autocomplete>
                 <v-autocomplete
-                    v-model="factory.unit_id"
+                    v-model="factory.unit_ids"
                     :items="units"
                     item-value="id"
                     item-title="name"
                     label="Select Unit"
+                    outlined
+                    multiple
+                    clearable
+                    chips
+                    density="comfortable"
+                    :rules="[rules.required]"
+                    :error-messages="errors.unit_ids ? errors.unit_ids : ''"
                     @update:search="fetchUnit"
-                />
+                >
+                    <template v-slot:label>
+                        Select Unit <span style="color: red">*</span>
+                    </template>
+                </v-autocomplete>
 
                 <v-autocomplete
-                    v-model="factory.line_id"
+                    v-model="factory.line_ids"
                     :items="lines"
                     item-value="id"
                     item-title="name"
                     label="Select Line"
+                    density="comfortable"
+                    multiple
+                    clearable
+                    chips
+                    :rules="[rules.required]"
+                    :error-messages="errors.line_ids ? errors.line_ids : ''"
                     @update:search="fetchLines"
-                />
+                >
+                    <template v-slot:label>
+                        Select Line <span style="color: red">*</span>
+                    </template>
+                </v-autocomplete>
 
                 <!-- Name Field -->
                 <v-text-field
@@ -55,6 +105,7 @@
                     :rules="[rules.required, rules.email]"
                     label="Email"
                     outlined
+                    density="comfortable"
                     :error-messages="errors.email ? errors.email : ''"
                 >
                     <template v-slot:label>
@@ -67,6 +118,7 @@
                     :rules="[rules.phone]"
                     label="Phone"
                     outlined
+                    density="comfortable"
                     :error-messages="errors.phone ? errors.phone : ''"
                 >
                     <template v-slot:label> Phone </template>
@@ -77,6 +129,7 @@
                     :rules="[rules.factory_code]"
                     label="Factory Code"
                     outlined
+                    density="comfortable"
                     :error-messages="
                         errors.factory_code ? errors.factory_code : ''
                     "
@@ -87,13 +140,15 @@
                 <v-textarea
                     v-model="factory.location"
                     label="Location"
+                    density="comfortable"
                     :error-messages="errors.location ? errors.location : ''"
                 />
                 <v-select
                     v-model="factory.status"
                     :items="statusItems"
-                    label="factory Status"
+                    label="Factory Status"
                     clearable
+                    density="comfortable"
                 ></v-select>
 
                 <!-- Action Buttons -->
@@ -142,9 +197,9 @@ export default {
 
             factory: {
                 company_id: null,
-                floor_id: null,
-                unit_id: null,
-                line_id: null,
+                floor_ids: null,
+                unit_ids: null,
+                line_ids: null,
                 name: "",
                 email: "",
                 phone: "",
@@ -181,11 +236,18 @@ export default {
             this.serverError = null;
             this.loading = true; // Start loading when submit is clicked
 
+            // const formData = new FormData();
+            // Object.entries(this.factory).forEach(([key, value]) => {
+            //     formData.append(key, value);
+            // });
             const formData = new FormData();
             Object.entries(this.factory).forEach(([key, value]) => {
-                formData.append(key, value);
+                if (Array.isArray(value)) {
+                    value.forEach((val) => formData.append(`${key}[]`, val));
+                } else {
+                    formData.append(key, value);
+                }
             });
-
             // Simulate a 3-second loading time (e.g., for an API call)
             setTimeout(async () => {
                 try {

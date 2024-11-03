@@ -110,16 +110,27 @@ class Admin extends Authenticatable
         return $this->morphMany(Line::class, 'updater');
     }
 
-     // Lines created by this user
-     public function createdGroups(): MorphMany
-     {
-         return $this->morphMany(Line::class, 'creator');
-     }
+    // groups created by this user
+    public function createdGroups(): MorphMany
+    {
+        return $this->morphMany(Group::class, 'creator');
+    }
 
-     // Lines updated by this user
-     public function updatedGroups(): MorphMany
-     {
-         return $this->morphMany(Line::class, 'updater');
-     }
+    // groups updated by this user
+    public function updatedGroups(): MorphMany
+    {
+        return $this->morphMany(Group::class, 'updater');
+    }
+    // factorys created by this user
+    public function createdFactorys(): MorphMany
+    {
+        return $this->morphMany(Factory::class, 'creator');
+    }
+
+    // factorys updated by this user
+    public function updatedFactorys(): MorphMany
+    {
+        return $this->morphMany(Factory::class, 'updater');
+    }
 
 }

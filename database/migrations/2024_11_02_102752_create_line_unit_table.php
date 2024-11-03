@@ -13,8 +13,10 @@ return new class extends Migration
     {
         Schema::create('line_unit', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('unit_id')->constrained()->onDelete('cascade');
-            $table->foreignId('line_id')->constrained()->onDelete('cascade');
+            $table->foreignId('unit_id');
+            $table->foreignId('line_id');
+            
+          
             $table->timestamps();
         });
     }

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Str;
 
 class Floor extends Model
@@ -48,6 +49,15 @@ class Floor extends Model
     public function updater()
     {
         return $this->morphTo();
+    }
+    public function factories(): BelongsToMany
+    {
+        return $this->belongsToMany(Factory::class);
+    }
+
+    public function units(): BelongsToMany
+    {
+        return $this->belongsToMany(Unit::class);
     }
 
 }

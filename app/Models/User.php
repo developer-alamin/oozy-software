@@ -108,14 +108,37 @@ class User extends Authenticatable
          return $this->morphMany(Unit::class, 'updater');
      }
      // Lines created by this user
-     public function createdLines(): MorphMany
+    public function createdLines(): MorphMany
+    {
+        return $this->morphMany(Line::class, 'creator');
+    }
+
+    // Lines updated by this user
+    public function updatedLines(): MorphMany
+    {
+        return $this->morphMany(Line::class, 'updater');
+    }
+     // groups created by this user
+     public function createdGroups(): MorphMany
      {
-         return $this->morphMany(Line::class, 'creator');
+         return $this->morphMany(Group::class, 'creator');
+     }
+ 
+     // groups updated by this user
+     public function updatedGroups(): MorphMany
+     {
+         return $this->morphMany(Group::class, 'updater');
      }
 
-     // Lines updated by this user
-     public function updatedLines(): MorphMany
-     {
-         return $this->morphMany(Line::class, 'updater');
-     }
+      // factorys created by this user
+    public function createdFactorys(): MorphMany
+    {
+        return $this->morphMany(Factory::class, 'creator');
+    }
+
+    // factorys updated by this user
+    public function updatedFactorys(): MorphMany
+    {
+        return $this->morphMany(Factory::class, 'updater');
+    }
 }

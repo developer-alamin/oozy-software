@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('factories', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid')->unique();
             $table->string('company_id');
             $table->string('name'); // Name of the factory
             $table->string('factory_code');
@@ -23,6 +24,7 @@ return new class extends Migration
             $table->text('meta_data')->nullable();
             $table->morphs('creator'); // Polymorphic relationship for creator
             $table->morphs('updater'); // Polymorphic relationship for updater
+            $table->enum('status', ['Active', 'Inactive'])->default('Inactive');
             $table->timestamps();
         });
     }
