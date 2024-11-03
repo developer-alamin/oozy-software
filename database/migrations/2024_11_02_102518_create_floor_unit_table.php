@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('floor_unit', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('floor_id')->constrained()->onDelete('cascade');
-            $table->foreignId('unit_id')->constrained()->onDelete('cascade');
+            $table->uuid('floor_uuid');
+            $table->uuid('unit_uuid');
             $table->timestamps();
         });
     }

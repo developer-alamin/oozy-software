@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('factory_floor', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('factory_id')->constrained()->onDelete('cascade');
-            $table->foreignId('floor_id')->constrained()->onDelete('cascade');
+            $table->uuid('factory_uuid');
+            $table->uuid('floor_uuid');
             $table->timestamps();
         });
     }

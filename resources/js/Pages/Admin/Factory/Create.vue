@@ -17,7 +17,6 @@
                     item-value="id"
                     item-title="name"
                     outlined
-                    multiple
                     clearable
                     chips
                     density="comfortable"

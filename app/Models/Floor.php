@@ -11,19 +11,16 @@ use Illuminate\Support\Str;
 
 class Floor extends Model
 {
-     use HasFactory,SoftDeletes,HasUuids;
+     use HasFactory,SoftDeletes;
 
-    public $incrementing = false; // Disable auto-incrementing for UUIDs
-    protected $keyType = 'string'; // Set key type to string for UUIDs
-    // Define the primary key for this model
-    protected $primaryKey = 'uuid'; // Assuming you want the uuid as the primary key
+
 
     protected $fillable = [
         'uuid',
         'name',
         'description',
-        'status',  
-        'creator_type',      
+        'status',
+        'creator_type',
         'creator_id',
         'updater_type',
         'updater_id',

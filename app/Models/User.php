@@ -101,7 +101,7 @@ class User extends Authenticatable
      {
          return $this->morphMany(Unit::class, 'creator');
      }
- 
+
      // Units updated by this user
      public function updatedUnits(): MorphMany
      {
@@ -123,7 +123,7 @@ class User extends Authenticatable
      {
          return $this->morphMany(Group::class, 'creator');
      }
- 
+
      // groups updated by this user
      public function updatedGroups(): MorphMany
      {

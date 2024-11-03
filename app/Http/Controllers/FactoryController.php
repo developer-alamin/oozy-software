@@ -19,7 +19,7 @@ class FactoryController extends Controller
      */
     public function index()
     {
-        //
+
     }
 
     /**
@@ -33,36 +33,100 @@ class FactoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    // public function store(Request $request)
-    // {
-    //     $factory = $request->all();
+    public function stored(Request $request)
+    {
+        $factory = $request->all();
 
-    //     return response()->json([
-    //         'success' => true,
-    //         'message' => 'factory updated successfully.',
-    //         'factory' => $factory
-    //     ]);
+        return response()->json([
+            'success' => true,
+            'message' => 'factory updated successfully.',
+            'factory' => $factory
+        ]);
 
-    // }
+    }
     public function store(Request $request)
+    {
+        // Validate request data
+        $validator = Validator::make($request->all(), [
+            'company_id'   => 'required', // Expecting an array for JSON storage
+            'name'         => 'required|string|max:255',
+            'email'        => 'nullable|email',
+            'phone'        => 'nullable|string|max:15',
+            'location'     => 'nullable|string',
+            'factory_code' => 'required|string|max:50',
+            'status'       => 'required|in:Active,Inactive',
+            'floor_ids'    => 'array',
+            'unit_ids'     => 'array',
+            'line_ids'     => 'array',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+        if (Auth::guard('admin')->check()) {
+            $creator = Auth::guard('admin')->user();
+            // Additional checks can be implemented here for admin roles if needed
+        } elseif (Auth::guard('user')->check()) {
+            $creator = Auth::guard('user')->user();
+            // User-specific checks can be added here if needed
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        try {
+            DB::beginTransaction();
+            // Convert company_id to JSON
+            $factoryData = $request->only([
+                'company_id','name', 'email', 'phone', 'location', 'factory_code', 'status'
+            ]);
+
+            $factory         = Factory::create($factoryData);
+            $factory['uuid'] = HelperController::generateUuid();
+            // Associate creator and updater with the factory
+            $factory->creator()->associate($creator);
+            $factory->updater()->associate($creator);
+            $factory->save();
+
+            $factory->floors()->sync($request->floor_ids);
+            // Attach units to each floor
+            foreach ($request->floor_ids as $floorId) {
+                $floor = Floor::find($floorId);
+                // Attach units to the floor
+                $floor->units()->sync( $request->unit_ids);
+                // Attach lines to each unit
+                foreach ( $request->unit_ids as $unitId) {
+                    $unit = Unit::find($unitId);
+                    // Attach lines to the unit
+                    $unit->lines()->sync($request->line_ids);
+                }
+            }
+                DB::commit();
+                return response()->json(['success' => true, 'message' => 'Factory created successfully.','factory' => $factory],200);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return response()->json(['success' => false, 'message' => 'Failed to create factory', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function storede(Request $request)
     {
         // Validate the incoming request data
         $data = $request->validate([
-            'company_id' => 'required', // Expect an for JSON storage
-            'name' => 'required|string|max:255',
+            'company_id'   => 'required', // Expect an for JSON storage
+            'name'         => 'required|string|max:255',
             'factory_code' => 'required|string|max:50|unique:factories,factory_code',
-            'email' => 'nullable|email',
-            'phone' => 'nullable|string|max:15',
-            'location' => 'nullable|string|max:255',
-            'status' => 'required|string|in:Active,Inactive',
-            'floor_ids' => 'required',
-            'floor_ids.*' => 'exists:floors,id',
-            'unit_ids' => 'required',
-            'unit_ids.*' => 'exists:units,id',
-            'line_ids' => 'required',
-            'line_ids.*' => 'exists:lines,id',
+            'email'        => 'nullable|email',
+            'phone'        => 'nullable|string|max:15',
+            'location'     => 'nullable|string|max:255',
+            'status'       => 'required|string|in:Active,Inactive',
+            'floor_ids'    => 'required',
+            // 'floor_ids.*' => 'exists:floors,id',
+            'unit_ids'     => 'required',
+            // 'unit_ids.*' => 'exists:units,id',
+            'line_ids'     => 'required',
+            // 'line_ids.*' => 'exists:lines,id',
         ]);
-   
+
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
             $creator = Auth::guard('admin')->user();
@@ -73,10 +137,10 @@ class FactoryController extends Controller
         } else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
-    
+
         try {
-            \DB::beginTransaction();
-    
+            DB::beginTransaction();
+
             // Create the factory
             $factory = new Factory([
                 'company_id'   => json_encode($data['company_id']), // Convert array to JSON
@@ -87,75 +151,64 @@ class FactoryController extends Controller
                 'location' => $data['location'],
                 'status' => $data['status'],
             ]);
-            
             // Associate creator and updater polymorphically
             $factory->creator()->associate($creator);
             $factory->updater()->associate($creator);
             $factory->save(); // Save the factory to the database
-            
-                // Insert entries into the factory_floor pivot table
-        foreach ($data['floor_ids'] as $floorId) {
-            \DB::table('factory_floor')->insert([
-                'factory_id' => $factoryId,
-                'floor_id' => $floorId,
-            ]);
-        }
 
-        // Attach units to each floor
-        // foreach ($data['floor_ids'] as $floorId) {
-        //     foreach ($data['unit_ids'] as $unitId) {
-        //         \DB::table('floor_unit')->insert([ // Assuming you have a pivot table called 'floor_unit'
-        //             'floor_id' => $floorId,
-        //             'unit_id' => $unitId,
-        //         ]);
+            $factoryId = Factory::where('uuid',$factory->uuid)->first()->id;
+            foreach ($data['floor_ids'] as $floorId) {
+                DB::table('factory_floor')->insert([
+                    'factory_id' => $factoryId,
+                    'floor_id'   => $floorId,
+                ]);
+            }
 
-        //         // Attach lines to each unit
-        //         foreach ($data['line_ids'] as $lineId) {
-        //             \DB::table('unit_line')->insert([ // Assuming you have a pivot table called 'unit_line'
-        //                 'unit_id' => $unitId,
-        //                 'line_id' => $lineId,
-        //             ]);
-        //         }
-        //     }
-        // }
+            // Attach units to each floor
+            foreach ($data['floor_ids'] as $floorId) {
+                foreach ($data['unit_ids'] as $unitId) {
+                    DB::table('floor_unit')->insert([ // Assuming you have a pivot table called 'floor_unit'
+                        'floor_id' => $floorId,
+                        'unit_id'  => $unitId,
+                    ]);
 
-
-
-
+                    // Attach lines to each unit
+                    foreach ($data['line_ids'] as $lineId) {
+                        DB::table('unit_line')->insert([ // Assuming you have a pivot table called 'unit_line'
+                            'unit_id' => $unitId,
+                            'line_id' => $lineId,
+                        ]);
+                    }
+                }
+            }
             // if ($factory) {
             //     $factoryId = Factory::where('uuid',$factory->uuid)->first();
             //     $
             // }
+            // Sync floors with the factory
+            $factory->floors()->sync($data['floor_ids']);
+            // Attach units to each floor
+            foreach ($data['floor_ids'] as $floorId) {
+                $floor = Floor::find($floorId);
+                // Attach units to the floor
+                $floor->units()->sync($data['unit_ids']);
 
-            
-    
-            // // Sync floors with the factory
-            // $factory->floors()->sync($data['floor_ids']);
-    
-            // // Attach units to each floor
-            // foreach ($data['floor_ids'] as $floorId) {
-            //     $floor = Floor::find($floorId);
-            //     // Attach units to the floor
-            //     $floor->units()->sync($data['unit_ids']);
-                
-            //     // Attach lines to each unit
-            //     foreach ($data['unit_ids'] as $unitId) {
-            //         $unit = Unit::find($unitId);
-            //         // Attach lines to the unit
-            //         $unit->lines()->sync($data['line_ids']);
-            //     }
-            // }
-    
-            \DB::commit();
-    
+                // Attach lines to each unit
+                foreach ($data['unit_ids'] as $unitId) {
+                    $unit = Unit::find($unitId);
+                    // Attach lines to the unit
+                    $unit->lines()->sync($data['line_ids']);
+                }
+            }
+            DB::commit();
             // Return a success response
             return response()->json(['success' => true, 'message' => 'Factory created successfully.']);
         } catch (\Exception $e) {
-            \DB::rollBack();
+            DB::rollBack();
             return response()->json(['success' => false, 'message' => 'Failed to create factory', 'error' => $e->getMessage()], 500);
         }
     }
-    
+
 
 
     /**

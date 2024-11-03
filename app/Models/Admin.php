@@ -92,7 +92,7 @@ class Admin extends Authenticatable
      {
          return $this->morphMany(Unit::class, 'creator');
      }
- 
+
      // Units updated by this user
      public function updatedUnits(): MorphMany
      {
