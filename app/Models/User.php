@@ -141,4 +141,8 @@ class User extends Authenticatable
     {
         return $this->morphMany(Factory::class, 'updater');
     }
+
+    public function factories(){
+        return $this->hasMany(Factory::class,);
+    }
 }

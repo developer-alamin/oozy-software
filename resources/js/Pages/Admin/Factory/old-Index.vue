@@ -48,6 +48,28 @@
                             <span>Add a new Factory</span>
                         </v-tooltip>
                     </v-btn>
+
+                    <v-badge :content="trashedCount" color="red" overlap>
+                        <v-btn
+                            @click="viewTrash"
+                            color="red"
+                            icon
+                            class="ml-2"
+                            style="width: 40px; height: 40px"
+                        >
+                            <v-tooltip location="top" activator="parent">
+                                <template v-slot:activator="{ props }">
+                                    <v-icon
+                                        v-bind="props"
+                                        style="font-size: 20px"
+                                    >
+                                        mdi-trash-can-outline
+                                    </v-icon>
+                                </template>
+                                <span>View Trashed Factories</span>
+                            </v-tooltip>
+                        </v-btn>
+                    </v-badge>
                 </v-col>
             </v-row>
         </v-card-title>
@@ -63,13 +85,19 @@
             loading-text="Loading... Please wait"
             @update:options="loadItems"
         >
-            <template v-slot:item.name="{ item }">
+            <template v-slot:item.creator_name="{ item }">
+                <span>{{ item.creator ? item.creator : "Unknown" }}</span>
+            </template>
+            <template v-slot:item.factory_name="{ item }">
                 <span
                     @click="showFloors(item)"
                     style="cursor: pointer; color: blue"
                 >
                     {{ item.name }}
                 </span>
+            </template>
+            <template v-slot:item.factory_code="{ item }">
+                <span>{{ item.factory_code || "" }}</span>
             </template>
             <template v-slot:item.actions="{ item }">
                 <v-icon @click="editFactory(item.uuid)" class="mr-2"
@@ -81,24 +109,30 @@
             </template>
         </v-data-table-server>
 
-        <FactoryFloorsModal
-            :visible="showModal"
-            :factory="selectedFactory"
-            @update:visible="showModal = $event"
-            @close="showModal = false"
+        <ConfirmDialog
+            :dialogName="dialogName"
+            v-model:modelValue="dialog"
+            :onConfirm="confirmDelete"
+            :onCancel="
+                () => {
+                    dialog = false;
+                }
+            "
         />
     </v-card>
 </template>
 
 <script>
-import FactoryFloorsModal from "../../Components/FactoryFloorsModal.vue";
+import { toast } from "vue3-toastify";
+import ConfirmDialog from "../../Components/ConfirmDialog.vue";
 
 export default {
     components: {
-        FactoryFloorsModal,
+        ConfirmDialog,
     },
     data() {
         return {
+            dialogName: "Are you sure you want to delete this Factory ?",
             search: "",
             factoryCode: "",
             itemsPerPage: 15,
@@ -114,8 +148,9 @@ export default {
             serverItems: [],
             loading: true,
             totalItems: 0,
-            showModal: false,
-            selectedFactory: {},
+            dialog: false,
+            selectedFactoryId: null,
+            trashedCount: 0,
         };
     },
     methods: {
@@ -134,22 +169,19 @@ export default {
                         factory_code: this.factoryCode,
                     },
                 });
-                console.log(response.data.items);
-
+                // console.log(response.data.items);
                 this.serverItems = response.data.items || [];
                 this.totalItems = response.data.total || 0;
+                this.fetchTrashedFactorysCount();
             } catch (error) {
                 console.error("Error loading items:", error);
             } finally {
                 this.loading = false;
             }
         },
-        showFloors(factory) {
-            this.selectedFactory = factory; // Set the selected factory
-            this.showModal = true; // Show the modal
-        },
         searchByFactoryCode() {
-            this.search = ""; // Reset other search filters if desired
+            // Reset other search filters if desired
+            this.search = "";
             this.loadItems({
                 page: 1,
                 itemsPerPage: this.itemsPerPage,
@@ -159,6 +191,9 @@ export default {
         FactoryCreate() {
             this.$router.push({ name: "FactoryCreate" });
         },
+        viewTrash() {
+            this.$router.push({ name: "FactoryTrash" });
+        },
         editFactory(uuid) {
             this.$router.push({ name: "FactoryEdit", params: { uuid } });
         },
@@ -166,13 +201,39 @@ export default {
             this.selectedFactoryId = uuid;
             this.dialog = true;
         },
+        async confirmDelete() {
+            this.dialog = false; // Close the dialog
+            try {
+                await this.$axios.delete(`/factory/${this.selectedFactoryId}`);
+                this.loadItems({
+                    page: 1,
+                    itemsPerPage: this.itemsPerPage,
+                    sortBy: [],
+                });
+                toast.success("Factory deleted successfully!");
+            } catch (error) {
+                toast.error("Failed to delete factory.");
+            }
+        },
+        async fetchTrashedFactorysCount() {
+            try {
+                const response = await this.$axios.get(
+                    "/factory/trashed-count"
+                );
+                this.trashedCount = response.data.trashedCount;
+            } catch (error) {
+                console.error("Error fetching trashed factory count:", error);
+            }
+        },
     },
+
     created() {
         this.loadItems({
             page: 1,
             itemsPerPage: this.itemsPerPage,
             sortBy: [],
         });
+        this.fetchTrashedFactorysCount();
     },
 };
 </script>

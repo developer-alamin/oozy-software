@@ -15,7 +15,7 @@ class Line extends Model
     use HasFactory,SoftDeletes;
 
     protected $table = 'lines';
-    protected $primaryKey = 'id'; 
+    protected $primaryKey = 'id';
 
 
     protected $fillable = [
@@ -47,8 +47,9 @@ class Line extends Model
     {
         return $this->morphTo();
     }
-    public function units()
+    public function lines()
     {
-        return $this->belongsToMany(Unit::class, 'line_unit', 'line_id', 'unit_id');
+        return $this->belongsToMany(Line::class, 'line_unit', 'unit_id', 'line_id')
+                    ->withPivot('unit_id', 'line_id');
     }
 }

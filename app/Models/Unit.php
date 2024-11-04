@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Unit extends Model
 {
     use HasFactory,SoftDeletes;
-    protected $primaryKey = 'id'; 
+    protected $primaryKey = 'id';
 
 
     protected $fillable = [
@@ -53,9 +53,10 @@ class Unit extends Model
         return $this->belongsToMany(Floor::class);
     }
 
-    public function lines(): BelongsToMany
+    public function lines()
     {
-        return $this->belongsToMany(Line::class, 'line_unit', 'unit_id', 'line_id');
+        return $this->belongsToMany(Line::class, 'line_unit', 'unit_id', 'line_id')
+                    ->withPivot('unit_id', 'line_id');
     }
 
 }

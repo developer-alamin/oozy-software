@@ -10,10 +10,6 @@ use Illuminate\Support\Str;
 
 class Factory extends Model
 {
-    // public $incrementing = false; // Disable auto-incrementing for UUIDs
-    // protected $keyType = 'string'; // Set key type to string for UUIDs
-    // Define the primary key for this model
-    // protected $primaryKey = 'id'; // Assuming you want the uuid as the primary key
     use HasFactory;
 
     protected $fillable = ['uuid','company_id', 'name', 'factory_code', 'email', 'phone', 'location', 'status'];
@@ -27,9 +23,13 @@ class Factory extends Model
         return $this->belongsToMany(Unit::class);
     }
 
-    public function lines()
+    // public function lines()
+    // {
+    //     return $this->belongsToMany(Line::class);
+    // }
+    public function user()
     {
-        return $this->belongsToMany(Line::class);
+        return $this->belongsTo(User::class, 'company_id'); // Adjust 'company_id' if the foreign key is different
     }
     public function creator()
     {
@@ -40,14 +40,5 @@ class Factory extends Model
     {
         return $this->morphTo();
     }
-    // protected static function boot()
-    // {
-    //     parent::boot();
 
-    //     static::creating(function ($model) {
-    //         if (empty($model->uuid)) {
-    //             $model->uuid = (string) Str::uuid();
-    //         }
-    //     });
-    // }
 }

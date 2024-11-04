@@ -26,6 +26,7 @@ class FactoryController extends Controller
         $sortBy       = $request->input('sortBy', 'created_at'); // Default sort by created_at
         $sortOrder    = $request->input('sortOrder', 'desc');    // Default sort order is descending
         $search       = $request->input('search', '');           // Search term, default is empty
+        $factoryCode  = $request->input('factory_code', '');
 
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
@@ -50,14 +51,24 @@ class FactoryController extends Controller
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
         // Apply search if the search term is not empty
-        if (!empty($search)) {
-            $factoriesQuery->where('name', 'LIKE', '%' . $search . '%');
+        if (!empty($factoryCode)) {
+            $factoriesQuery->where('factory_code', $factoryCode);
+        }elseif(!empty($search)){
+            $factoriesQuery->where(function ($query) use ($search) {
+                $query->where('name', 'LIKE', "%$search%")
+                      ->orWhere('email', 'LIKE', "%search%")
+                      ->orWhere('factory_code', 'LIKE', "%$search%")
+                      ->orWhere('phone', 'LIKE', "%search%")
+                      ->orWhereHas('user', function ($q) use ($search) {
+                          $q->where('name', 'LIKE', "%$search%");
+                      });
+            });
         }
         // Apply sorting
         $factoriesQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
         $factories = $factoriesQuery
-        ->with(['floors.units', 'creator:id,name']) // Eager load relationships and creator's name
+        ->with(['floors.units.lines', 'creator:id,name','user:id,name']) // Eager load relationships and creator's name
         ->paginate($itemsPerPage, ['*'], 'page', $page);
         // Return the response as JSON
         return response()->json([
@@ -90,7 +101,7 @@ class FactoryController extends Controller
     }
     public function store(FactoryStoreRequest $request)
     {
-       
+
         if (Auth::guard('admin')->check()) {
             $creator = Auth::guard('admin')->user();
             // Additional checks can be implemented here for admin roles if needed
@@ -114,7 +125,7 @@ class FactoryController extends Controller
                 'phone'        => $validated['phone'],
                 'location'     => $validated['location'],
                 'status'       => $validated['status'],
-                
+
             ]);
             // Associate creator and updater with the factory
             $factory->creator()->associate($creator);
