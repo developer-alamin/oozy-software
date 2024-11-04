@@ -15,7 +15,8 @@ class Line extends Model
     use HasFactory,SoftDeletes;
 
     protected $table = 'lines';
- // Assuming you want the uuid as the primary key
+    protected $primaryKey = 'id'; 
+
 
     protected $fillable = [
         'uuid',
@@ -46,8 +47,8 @@ class Line extends Model
     {
         return $this->morphTo();
     }
-    public function units(): BelongsToMany
+    public function units()
     {
-        return $this->belongsToMany(Unit::class);
+        return $this->belongsToMany(Unit::class, 'line_unit', 'line_id', 'unit_id');
     }
 }

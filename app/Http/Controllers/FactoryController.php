@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\FactoryStoreRequest;
+use App\Models\Admin;
 use App\Models\Factory;
 use App\Models\Floor;
 use App\Models\Line;
@@ -17,9 +19,51 @@ class FactoryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $page         = $request->input('page', 1);
+        $itemsPerPage = $request->input('itemsPerPage', 5);
+        $sortBy       = $request->input('sortBy', 'created_at'); // Default sort by created_at
+        $sortOrder    = $request->input('sortOrder', 'desc');    // Default sort order is descending
+        $search       = $request->input('search', '');           // Search term, default is empty
 
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
+            // Check if the admin is a super admin
+            if ($currentUser->role === 'superadmin') {
+                // If superadmin, retrieve all technicians
+                $factoriesQuery = Factory::query(); // No filters applied
+            } else {
+                // If not superadmin, filter by creator type and id
+                $factoriesQuery = Factory::where('creator_type', $creatorType)
+                    ->where('creator_id', $currentUser->id);
+            }
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+            // For regular users, filter by creator type and id
+            $factoriesQuery = Factory::where('creator_type', $creatorType)
+                ->where('creator_id', $currentUser->id);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+        // Apply search if the search term is not empty
+        if (!empty($search)) {
+            $factoriesQuery->where('name', 'LIKE', '%' . $search . '%');
+        }
+        // Apply sorting
+        $factoriesQuery->orderBy($sortBy, $sortOrder);
+        // Paginate results
+        $factories = $factoriesQuery
+        ->with(['floors.units', 'creator:id,name']) // Eager load relationships and creator's name
+        ->paginate($itemsPerPage, ['*'], 'page', $page);
+        // Return the response as JSON
+        return response()->json([
+            'items' => $factories->items(), // Current page items
+            'total' => $factories->total(), // Total number of records
+        ]);
     }
 
     /**
@@ -44,25 +88,9 @@ class FactoryController extends Controller
         ]);
 
     }
-    public function store(Request $request)
+    public function store(FactoryStoreRequest $request)
     {
-        // Validate request data
-        $validator = Validator::make($request->all(), [
-            'company_id'   => 'required', // Expecting an array for JSON storage
-            'name'         => 'required|string|max:255',
-            'email'        => 'nullable|email',
-            'phone'        => 'nullable|string|max:15',
-            'location'     => 'nullable|string',
-            'factory_code' => 'required|string|max:50',
-            'status'       => 'required|in:Active,Inactive',
-            'floor_ids'    => 'array',
-            'unit_ids'     => 'array',
-            'line_ids'     => 'array',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
+       
         if (Auth::guard('admin')->check()) {
             $creator = Auth::guard('admin')->user();
             // Additional checks can be implemented here for admin roles if needed
@@ -75,13 +103,19 @@ class FactoryController extends Controller
 
         try {
             DB::beginTransaction();
-            // Convert company_id to JSON
-            $factoryData = $request->only([
-                'company_id','name', 'email', 'phone', 'location', 'factory_code', 'status'
+            $validated = $request->validated();
+            // $factory         = Factory::create($factoryData);
+            $factory = new Factory([
+                'uuid'         => HelperController::generateUuid(),
+                'company_id'   => $validated['company_id'], // Convert array to JSON
+                'name'         => $validated['name'],
+                'factory_code' => $validated['factory_code'],
+                'email'        => $validated['email'],
+                'phone'        => $validated['phone'],
+                'location'     => $validated['location'],
+                'status'       => $validated['status'],
+                
             ]);
-
-            $factory         = Factory::create($factoryData);
-            $factory['uuid'] = HelperController::generateUuid();
             // Associate creator and updater with the factory
             $factory->creator()->associate($creator);
             $factory->updater()->associate($creator);

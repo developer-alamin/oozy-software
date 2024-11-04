@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Unit extends Model
 {
     use HasFactory,SoftDeletes;
+    protected $primaryKey = 'id'; 
 
 
     protected $fillable = [
@@ -54,7 +55,7 @@ class Unit extends Model
 
     public function lines(): BelongsToMany
     {
-        return $this->belongsToMany(Line::class);
+        return $this->belongsToMany(Line::class, 'line_unit', 'unit_id', 'line_id');
     }
 
 }
