@@ -23,10 +23,10 @@ class Factory extends Model
         return $this->belongsToMany(Unit::class);
     }
 
-    // public function lines()
-    // {
-    //     return $this->belongsToMany(Line::class);
-    // }
+    public function lines()
+    {
+        return $this->belongsToMany(Line::class);
+    }
     public function user()
     {
         return $this->belongsTo(User::class, 'company_id'); // Adjust 'company_id' if the foreign key is different

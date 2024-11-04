@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\HelperController;
 use Illuminate\Http\Request;
 use App\Models\Line;
 use App\Models\Admin;
@@ -96,7 +97,8 @@ class LineController extends Controller
 
 
 
-         $line = new Line($validatedData);
+         $line       = new Line($validatedData);
+         $line->uuid = HelperController::generateUuid();
          $line->creator()->associate($creator);  // Assign creator polymorphically
          $line->updater()->associate($creator);  // Associate the updater
          $line->save(); // Save the technician to the database
@@ -114,13 +116,10 @@ class LineController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Line $line)
+    public function edit($uuid)
     {
-        //  return response()->json([
-        //     'success' => true,
-        //     'line' => $line
-        // ], Response::HTTP_OK);
 
+        $line = Line::where('uuid', $uuid)->firstOrFail();
          if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('admin')->user();
             $creatorType = Admin::class;
@@ -152,8 +151,10 @@ class LineController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Line $line)
+    public function update(Request $request, $uuid)
     {
+        // Retrieve the Line model by uuid
+        $line = Line::where('uuid', $uuid)->firstOrFail();
         // Validate the incoming request data
          $validatedData = $request->validate(Line::validationRules());
 
@@ -190,20 +191,6 @@ class LineController extends Controller
 
          // Return a success response
          return response()->json(['success' => true, 'message' => 'Line updated successfully.', 'line' => $line], 200);
-
-
-
-
-        //  $validatedData = $request->validate(Line::validationRules());
-
-        //  // Update the product model with the validated data
-        //  $line->update($validatedData);
-
-        // // Return a success response
-        //  return response()->json([
-        //    'success' => true,
-        //     'message' => 'Line updated successfully.',
-        //  ]);
     }
 
     /**

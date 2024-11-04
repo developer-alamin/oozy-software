@@ -15,7 +15,7 @@ class Line extends Model
     use HasFactory,SoftDeletes;
 
     protected $table = 'lines';
-    protected $primaryKey = 'id';
+    // protected $primaryKey = 'id';
 
 
     protected $fillable = [

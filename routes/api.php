@@ -94,6 +94,8 @@ Route::resource('category', CategoryController::class);
 
 
 
+Route::get('/line/{uuid}/edit', [LineController::class, 'edit'])->name('lines.edit');
+Route::put('/line/{uuid}', [LineController::class, 'update'])->name('lines.update');
 Route::resource('line', LineController::class);
 Route::get('/get_users', [GroupController::class, 'getUsers']);
 Route::resource('group', GroupController::class);
