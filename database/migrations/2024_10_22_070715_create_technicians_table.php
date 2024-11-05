@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('technicians', function (Blueprint $table) {
             $table->id();
+            $table->string('uuid')->unique();
             $table->morphs('creator');
-            $table->morphs('updater'); 
-            $table->bigInteger('group_id');
+            $table->morphs('updater');
             $table->string('name');
             $table->string('email')->nullable();
             $table->string('phone')->nullable();

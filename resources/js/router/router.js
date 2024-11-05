@@ -103,7 +103,7 @@ const routes = [
                 meta: { title: "Factory Create" },
             },
             {
-                path: "factory/edit/:id", // Dynamic route for Factory Edit
+                path: "factory/:uuid/edit", // Dynamic route for Factory Edit
                 name: "FactoryEdit",
                 component: adminComponents.FactoryEdit,
                 meta: { title: "Edit Factory" },
@@ -262,7 +262,7 @@ const routes = [
                 meta: { title: "Technician Create" },
             },
             {
-                path: "technician/edit/:id", // Dynamic route for Technician Edit
+                path: "technician/edit/:uuid", // Dynamic route for Technician Edit
                 name: "TechnicianEdit",
                 component: adminComponents.TechnicianEdit,
                 meta: { title: "Edit Technician" },
@@ -341,7 +341,7 @@ const routes = [
                 component: adminComponents.RentIndex,
 
                 meta: { title: "Rent index" },
-                props:true
+                props: true,
             },
             {
                 path: "rent/create", // New route for rent Create
@@ -355,35 +355,35 @@ const routes = [
                 name: "RentEdit",
                 component: adminComponents.RentEdit,
                 meta: { title: "Rent Edit" },
-                props:true
+                props: true,
             },
             {
                 path: "rent/trash", // New route for rent trash
                 name: "RentsTrash",
                 component: adminComponents.RentsTrash,
                 meta: { title: "Rent Trash" },
-                props:true
+                props: true,
             },
             {
                 path: "floor/index", // New route for Floor index
                 name: "FloorIndex",
                 component: adminComponents.FloorIndex,
                 meta: { title: "Floor index" },
-                props:true
+                props: true,
             },
             {
                 path: "floor/create", // New route for Floor create
                 name: "FloorCreate",
                 component: adminComponents.FloorCreate,
                 meta: { title: "Floor Create" },
-                props:true
+                props: true,
             },
             {
                 path: "floor/edit/:uuid", // New route for Floor create
                 name: "FloorEdit",
                 component: adminComponents.FloorEdit,
                 meta: { title: "Floor Edit" },
-                props:true
+                props: true,
             },
             {
                 path: "floor/trash", // New route for floor trash
@@ -447,7 +447,7 @@ const routes = [
                 component: adminComponents.MechineSourceTrash,
                 meta: { title: "Mechine Source Trash" },
                 props: true,
-            }
+            },
         ],
     },
     // {

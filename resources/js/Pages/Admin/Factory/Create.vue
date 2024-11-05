@@ -3,14 +3,6 @@
         <v-card-title>Create factory</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="submit">
-                <!-- <v-autocomplete
-                    v-model="factory.company_id"
-                    :items="companys"
-                    item-value="id"
-                    item-title="name"
-                    label="Select Company"
-                    @update:search="fetchCompanys"
-                /> -->
                 <v-autocomplete
                     v-model="factory.company_id"
                     :items="companys"

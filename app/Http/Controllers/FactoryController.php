@@ -267,11 +267,15 @@ class FactoryController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Factory $factory)
+    public function edit($uuid)
     {
-        //
-    }
+        $factory = Factory::where('uuid', $uuid)->with(['floors.units.lines', 'creator', 'user'])->firstOrFail();
+        if (!$factory) {
+            return response()->json(['success' => false, 'message' => 'Factory not found.'], 404);
+        }
 
+        return response()->json(['success' => true, 'factory' => $factory], 200);
+    }
     /**
      * Update the specified resource in storage.
      */

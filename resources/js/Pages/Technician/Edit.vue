@@ -3,42 +3,53 @@
         <v-card-title>Edit Technician</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="update">
+                <!-- Company Selection -->
+                <v-autocomplete
+                    v-model="technician.company_id"
+                    :items="companys"
+                    item-value="id"
+                    item-title="name"
+                    outlined
+                    clearable
+                    density="comfortable"
+                    :rules="[rules.required]"
+                    :error-messages="errors.company_id ? errors.company_id : ''"
+                    @update:search="fetchCompanys"
+                    label="Select Company *"
+                ></v-autocomplete>
+
                 <!-- Name Field -->
                 <v-text-field
                     v-model="technician.name"
                     :rules="[rules.required]"
-                    label="Name"
+                    label="Name *"
                     outlined
                     :error-messages="errors.name ? errors.name : ''"
-                >
-                    <template v-slot:label>
-                        Name <span style="color: red">*</span>
-                    </template>
-                </v-text-field>
+                ></v-text-field>
+
+                <!-- Email Field -->
                 <v-text-field
                     v-model="technician.email"
                     label="Email"
                     outlined
                     :error-messages="errors.email ? errors.email : ''"
-                >
-                    <template v-slot:label> Email </template>
-                </v-text-field>
+                ></v-text-field>
 
+                <!-- Phone Field -->
                 <v-text-field
                     v-model="technician.phone"
                     label="Phone"
                     outlined
                     :error-messages="errors.phone ? errors.phone : ''"
-                >
-                    <template v-slot:label> Phone </template>
-                </v-text-field>
+                ></v-text-field>
 
-                <!-- Description Field -->
+                <!-- Address Field -->
                 <v-textarea
                     v-model="technician.address"
                     label="Address"
-                    :error-messages="errors.description ? errors.address : ''"
-                />
+                    outlined
+                    :error-messages="errors.address ? errors.address : ''"
+                ></v-textarea>
 
                 <!-- Description Field -->
                 <v-textarea
@@ -48,14 +59,9 @@
                     :error-messages="
                         errors.description ? errors.description : ''
                     "
-                />
+                ></v-textarea>
 
-                <!-- Status Field (Checkbox) -->
-                <!-- <v-checkbox
-                    v-model="technician.status"
-                    label="Status"
-                    :error-messages="errors.status ? errors.status : ''"
-                /> -->
+                <!-- Status Field -->
                 <v-select
                     v-model="technician.status"
                     :items="statusItems"
@@ -64,7 +70,6 @@
                 ></v-select>
 
                 <!-- Action Buttons -->
-
                 <v-row class="mt-4">
                     <v-col cols="12" class="text-right">
                         <v-btn
@@ -97,6 +102,7 @@
 
 <script>
 import { toast } from "vue3-toastify";
+
 export default {
     data() {
         return {
@@ -104,15 +110,15 @@ export default {
             loading: false,
             statusItems: ["Active", "Inactive"],
             technician: {
-                group_id: "",
+                company_id: null,
                 name: "",
                 email: "",
                 phone: "",
-                photo: "",
                 address: "",
                 description: "",
-                status: false, // Default to false (inactive)
+                status: "Inactive", // Default status
             },
+            companys: [],
             errors: {},
             serverError: null,
             rules: {
@@ -121,56 +127,67 @@ export default {
         };
     },
     created() {
-        this.fetchTechnician();
+        this.fetchCompanys().then(() => {
+            this.fetchTechnician();
+        });
     },
     methods: {
         async fetchTechnician() {
-            // Fetch the technician data to populate the form
-            const technicianId = this.$route.params.id; // Assuming the technician ID is passed in the route params
+            const technicianId = this.$route.params.uuid;
             try {
                 const response = await this.$axios.get(
                     `/technician/${technicianId}/edit`
                 );
-                // console.log(response.data);
-
-                this.technician = response.data.technician; // Populate form with the existing technician data
+                this.technician = response.data.technician;
                 this.technician.status =
-                    this.technician.status === "Active"
-                        ? "Active"
-                        : "In-Active";
+                    this.technician.status === "Active" ? "Active" : "Inactive";
+
+                // Set the selected company based on the company_id
+                const selectedCompany = this.companys.find(
+                    (c) => c.id === this.technician.company_id
+                );
+                if (selectedCompany) {
+                    this.technician.company_id = selectedCompany.id; // Set the company_id for v-autocomplete
+                }
             } catch (error) {
                 this.serverError = "Error fetching technician data.";
             }
         },
+        async fetchCompanys(search = "") {
+            try {
+                const response = await this.$axios.get(`/get_companys`, {
+                    params: { search, limit: 10 },
+                });
+                this.companys = response.data;
+            } catch (error) {
+                console.error("Error fetching companies:", error);
+            }
+        },
         async update() {
-            this.errors = {}; // Reset errors before submission
+            this.errors = {};
             this.serverError = null;
             this.loading = true;
-            const technicianId = this.$route.params.id; // Assuming technician ID is in route params
-            setTimeout(async () => {
-                try {
-                    const response = await this.$axios.put(
-                        `/technician/${technicianId}`,
-                        this.technician
-                    );
-
-                    if (response.data.success) {
-                        this.$router.push({ name: "TechnicianIndex" }); // Redirect to technician list page
-                        toast.success("Technician Update successfully!");
-                    }
-                } catch (error) {
-                    if (error.response && error.response.status === 422) {
-                        this.errors = error.response.data.errors || {};
-                        toast.error("Failed to Update technician.");
-                    } else {
-                        toast.error("Failed to Update technician.");
-                        this.serverError = "Error updating technician.";
-                    }
-                } finally {
-                    // Stop loading after the request (or simulated time) is done
-                    this.loading = false;
+            const technicianId = this.$route.params.uuid;
+            try {
+                const response = await this.$axios.put(
+                    `/technician/${technicianId}`,
+                    this.technician
+                );
+                if (response.data.success) {
+                    this.$router.push({ name: "TechnicianIndex" });
+                    toast.success("Technician updated successfully!");
                 }
-            }, 1000);
+            } catch (error) {
+                if (error.response && error.response.status === 422) {
+                    this.errors = error.response.data.errors || {};
+                    toast.error("Failed to update technician.");
+                } else {
+                    this.serverError = "Error updating technician.";
+                    toast.error(this.serverError);
+                }
+            } finally {
+                this.loading = false;
+            }
         },
         resetForm() {
             this.fetchTechnician(); // Reset the form with existing technician data

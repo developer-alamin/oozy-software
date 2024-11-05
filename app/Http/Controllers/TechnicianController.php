@@ -105,7 +105,8 @@ class TechnicianController extends Controller
         }
 
         // Create the technician and associate it with the creator
-        $technician = new Technician($validatedData);
+        $technician       = new Technician($validatedData);
+        $technician->uuid = HelperController::generateUuid();
         $technician->creator()->associate($creator);  // Assign creator polymorphically
         $technician->updater()->associate($creator);  // Associate the updater
         $technician->save(); // Save the technician to the database
@@ -126,8 +127,9 @@ class TechnicianController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Technician $technician)
+    public function edit($uuid)
     {
+        $technician = Technician::where('uuid', $uuid)->firstOrFail();
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('admin')->user();
@@ -162,11 +164,11 @@ class TechnicianController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Technician $technician)
+    public function update(Request $request,$uuid)
     {
         // Validate the incoming request data
         $validatedData = $request->validate(Technician::validationRules());
-
+        $technician = Technician::where('uuid', $uuid)->firstOrFail();
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('admin')->user();

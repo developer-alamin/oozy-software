@@ -3,6 +3,22 @@
         <v-card-title>Create technician</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="submit">
+                <v-autocomplete
+                    v-model="technician.company_id"
+                    :items="companys"
+                    item-value="id"
+                    item-title="name"
+                    outlined
+                    clearable
+                    density="comfortable"
+                    :rules="[rules.required]"
+                    :error-messages="errors.company_id ? errors.company_id : ''"
+                    @update:search="fetchCompanys"
+                >
+                    <template v-slot:label>
+                        Select Company <span style="color: red">*</span>
+                    </template>
+                </v-autocomplete>
                 <!-- Name Field -->
                 <v-text-field
                     v-model="technician.name"
@@ -100,7 +116,7 @@ export default {
             loading: false, // Controls loading state of the button
             statusItems: ["Active", "Inactive"],
             technician: {
-                group_id: "",
+                company_id: "",
                 name: "",
                 email: "",
                 phone: "",
@@ -109,6 +125,7 @@ export default {
                 description: "",
                 status: "Active", // New property for checkbox
             },
+            companys: [],
             errors: {}, // Stores validation errors
             serverError: null, // Stores server-side error messages
             rules: {
@@ -158,6 +175,21 @@ export default {
                 }
             }, 1000); // Simulates a 3-second loading duration
         },
+        async fetchCompanys(search) {
+            try {
+                const response = await this.$axios.get(`/get_companys`, {
+                    params: {
+                        search: search,
+                        limit: this.limit,
+                    },
+                });
+                console.log(response.data);
+                this.companys = response.data;
+            } catch (error) {
+                console.error("Error fetching companys:", error);
+            }
+        },
+
         resetForm() {
             this.technician = {
                 name: "",

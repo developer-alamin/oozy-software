@@ -11,6 +11,8 @@ class Technician extends Model
     use HasFactory,SoftDeletes;
 
     protected $fillable = [
+        'uuid',
+        'company_id',
         'name',
         'email',
         'phone',
@@ -41,6 +43,8 @@ class Technician extends Model
     public static function validationRules()
     {
         return [
+            'uuid'          => 'nullable',
+            'company_id'    => 'required',
             'name'          => 'required|string|max:255',
             'email'         => 'required|string|max:255',
             'phone'         => 'required|string|max:25',
