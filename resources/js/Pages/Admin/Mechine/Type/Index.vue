@@ -88,13 +88,13 @@
                 <v-icon @click="editMechineType(item.uuid)" class="mr-2"
                     >mdi-pencil</v-icon
                 >
-                <v-icon @click="showConfirmDialog(item.uuid)" color="red"
+                <v-icon @click="showConfirmDialog(item.id)" color="red"
                     >mdi-delete</v-icon
                 >
             </template>
         </v-data-table-server>
 
-         <ConfirmDialog
+        <ConfirmDialog
             :dialogName="dialogName"
             v-model:modelValue="dialog"
             :onConfirm="confirmDelete"
@@ -118,8 +118,8 @@ export default {
     },
     data() {
         return {
-            dialogName:"Are you sure you want to delete this Type ?",
-            search: "", 
+            dialogName: "Are you sure you want to delete this Type ?",
+            search: "",
             itemsPerPage: 15,
             headers: [
                 { title: "Name", key: "name", sortable: true },
@@ -196,7 +196,9 @@ export default {
         },
         async fetchTrashedTypesCount() {
             try {
-                const response = await this.$axios.get("/mechine/types/trashed-count");
+                const response = await this.$axios.get(
+                    "/mechine/types/trashed-count"
+                );
                 this.trashedCount = response.data.trashedCount;
             } catch (error) {
                 console.error("Error fetching trashed Types count:", error);

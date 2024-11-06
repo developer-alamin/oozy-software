@@ -44,10 +44,10 @@
             </template>
 
             <template v-slot:item.actions="{ item }">
-                <v-icon @click="showRestoreDialog(item.uuid)" color="green"
+                <v-icon @click="showRestoreDialog(item.id)" color="green"
                     >mdi-restore</v-icon
                 >
-                <v-icon @click="showConfirmDialog(item.uuid)" color="red"
+                <v-icon @click="showConfirmDialog(item.id)" color="red"
                     >mdi-delete</v-icon
                 >
             </template>
@@ -82,8 +82,8 @@ export default {
     },
     data() {
         return {
-            restroreDialogName:"Are you sure you want to restore this Floor?",
-            dialogName:"Are you sure you want to delete this Floor ?",
+            restroreDialogName: "Are you sure you want to restore this Floor?",
+            dialogName: "Are you sure you want to delete this Floor ?",
 
             search: "",
             itemsPerPage: 15,
@@ -129,12 +129,12 @@ export default {
                 this.loading = false;
             }
         },
-        showRestoreDialog(uuid) {
-            this.selectedFloorId = uuid;
+        showRestoreDialog(id) {
+            this.selectedFloorId = id;
             this.restoreDialog = true; // Open restore dialog
         },
-        showConfirmDialog(uuid) {
-            this.selectedFloorId = uuid;
+        showConfirmDialog(id) {
+            this.selectedFloorId = id;
             this.deleteDialog = true; // Open delete dialog
         },
         async confirmRestore() {
@@ -170,7 +170,7 @@ export default {
                 console.error("Error deleting Floor:", error);
                 toast.error("Failed to delete Floor.");
             }
-        }
+        },
     },
     created() {
         this.loadItems({

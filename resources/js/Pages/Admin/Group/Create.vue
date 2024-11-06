@@ -3,6 +3,26 @@
         <v-card-title>Create Group</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="submit">
+                <!-- Technician Autocomplete -->
+                <v-autocomplete
+                    v-model="group.technician_id"
+                    :items="technicians"
+                    item-value="id"
+                    item-title="name"
+                    outlined
+                    clearable
+                    density="comfortable"
+                    :rules="[rules.required]"
+                    :error-messages="
+                        errors.technician_id ? errors.technician_id : ''
+                    "
+                    @update:search="fetchTechnicians"
+                >
+                    <template v-slot:label>
+                        Select Technician <span style="color: red">*</span>
+                    </template>
+                </v-autocomplete>
+
                 <!-- Name Field -->
                 <v-text-field
                     v-model="group.name"
@@ -16,19 +36,6 @@
                     </template>
                 </v-text-field>
 
-                <!-- Technician Autocomplete -->
-                <v-autocomplete
-                    :items="technicians"
-                    v-model="group.technician_id"
-                    item-value="id"
-                    item-title="name"
-                    label="Technician"
-                    :search-input.sync="search"
-                    @update:search-input="fetchTechnicians"
-                    clearable
-                    chips
-                ></v-autocomplete>
-
                 <!-- Description Field -->
                 <v-textarea
                     v-model="group.description"
@@ -37,6 +44,13 @@
                         errors.description ? errors.description : ''
                     "
                 />
+                <v-select
+                    v-model="group.status"
+                    :items="statusItems"
+                    label="Group Status"
+                    @change="updateStatus"
+                    clearable
+                ></v-select>
 
                 <!-- Action Buttons -->
                 <v-row class="mt-4">
@@ -78,10 +92,12 @@ export default {
             valid: false,
             loading: false,
             loadingTechnicians: false,
+            statusItems: ["Active", "Inactive"],
             group: {
+                technician_id: null,
                 name: "",
                 description: "",
-                technician_id: null,
+                status: "Active",
             },
             technicians: [], // Stores original technician data from the API
             errors: {},
@@ -91,7 +107,6 @@ export default {
                 required: (value) => !!value || "Required.",
             },
         };
-        console.log();
     },
     computed: {
         filteredTechnicians() {
@@ -107,18 +122,18 @@ export default {
         },
     },
     methods: {
-        async fetchTechnicians() {
-            console.log(this.search);
+        async fetchTechnicians(search) {
             try {
-                const response = await this.$axios.get("/get-technician", {
-                    params: { search: this.search, limit: 10 },
+                const response = await this.$axios.get(`/get-technician`, {
+                    params: {
+                        search: search,
+                        limit: this.limit,
+                    },
                 });
                 console.log(response.data);
-
-                this.technicians = response.data; // Set fetched technicians
+                this.technicians = response.data;
             } catch (error) {
                 console.error("Error fetching technicians:", error);
-                this.serverError = "Failed to fetch technicians.";
             }
         },
         async submit() {
@@ -130,24 +145,25 @@ export default {
             Object.entries(this.group).forEach(([key, value]) => {
                 formData.append(key, value);
             });
-
-            try {
-                const response = await this.$axios.post("/group", formData);
-                if (response.data.success) {
-                    this.resetForm();
-                    toast.success("Group Created successfully!");
+            setTimeout(async () => {
+                try {
+                    const response = await this.$axios.post("/group", formData);
+                    if (response.data.success) {
+                        this.resetForm();
+                        toast.success("Group Created successfully!");
+                    }
+                } catch (error) {
+                    if (error.response && error.response.status === 422) {
+                        this.errors = error.response.data.errors || {};
+                    } else {
+                        console.log(error);
+                        this.serverError =
+                            "An error occurred. Please try again.";
+                    }
+                } finally {
+                    this.loading = false;
                 }
-            } catch (error) {
-                if (error.response && error.response.status === 422) {
-                    this.errors = error.response.data.errors || {};
-                } else {
-                    console.log(error);
-
-                    this.serverError = "An error occurred. Please try again.";
-                }
-            } finally {
-                this.loading = false;
-            }
+            }, 1000); // Delay time in milliseconds
         },
         resetForm() {
             this.group.name = "";
@@ -158,10 +174,6 @@ export default {
                 this.$refs.form.reset();
             }
         },
-    },
-    mounted() {
-        // Fetch initial list of technicians when the component mounts
-        this.fetchTechnicians();
     },
 };
 </script>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\Mechine;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\HelperController;
 use App\Models\Admin;
 use App\Models\MechineType;
 use App\Models\User;
@@ -64,7 +65,7 @@ class TypeController extends Controller
      */
     public function create()
     {
-        
+
     }
 
     /**
@@ -91,10 +92,10 @@ class TypeController extends Controller
              return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
          }
          // Create the technician and associate it with the creator
-         $MechineType = new MechineType($validatedData);
-         
+         $MechineType       = new MechineType($validatedData);
+         $MechineType->uuid = HelperController::generateUuid();
          $MechineType->creator()->associate($creator);  // Assign creator polymorphically
-        $MechineType->updater()->associate($creator);  // Associate the updater
+         $MechineType->updater()->associate($creator);  // Associate the updater
          $MechineType->save(); // Save the technician to the database
          // Return a success response
          return response()->json(['success' => true, 'message' => 'Mechine Type created successfully.'], 201);
@@ -111,10 +112,9 @@ class TypeController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($id)
+    public function edit($uuid)
     {
-        $mechinetype = MechineType::findOrFail($id);
-
+        $mechinetype = MechineType::where('uuid', $uuid)->firstOrFail();
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('admin')->user();
@@ -123,7 +123,7 @@ class TypeController extends Controller
             if ($currentUser->role === 'superadmin') {
                 // Super admins can edit any mechinetype
                 return response()->json([
-                    'success' => true,
+                    'success'     => true,
                     'mechinetype' => $mechinetype
                 ], Response::HTTP_OK);
             }
@@ -147,11 +147,9 @@ class TypeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request)
-    {   
-        $mechinetype = MechineType::findOrFail($request->uuid);
-
-    
+    public function update(Request $request,$uuid)
+    {
+        $mechinetype = MechineType::where('uuid', $uuid)->firstOrFail();
        // Validate the incoming request data
          $validatedData = $request->validate(mechinetype::validationRules());
 
@@ -305,7 +303,7 @@ class TypeController extends Controller
     {
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
-                
+
             $currentUser = Auth::guard('admin')->user();
             $creatorType = Admin::class;
 
@@ -332,7 +330,7 @@ class TypeController extends Controller
             } else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
-        
+
         try {
             // Delete the supplier
             $mechinetypes->forceDelete();
@@ -346,12 +344,12 @@ class TypeController extends Controller
                 'message' => 'Error deleting MechineType: ' . $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-       
+
     }
       // Restore a soft-deleted MechineType
     public function typesrestore($id)
     {
-        
+
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('admin')->user();

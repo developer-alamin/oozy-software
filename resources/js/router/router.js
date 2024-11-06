@@ -405,7 +405,7 @@ const routes = [
                 props: true,
             },
             {
-                path: "floor/edit/:uuid", // New route for Floor create
+                path: "floor/:uuid/edit", // New route for Floor create
                 name: "FloorEdit",
                 component: adminComponents.FloorEdit,
                 meta: { title: "Floor Edit" },

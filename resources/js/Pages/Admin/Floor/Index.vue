@@ -88,13 +88,13 @@
                 <v-icon @click="editFloor(item.uuid)" class="mr-2"
                     >mdi-pencil</v-icon
                 >
-                <v-icon @click="showConfirmDialog(item.uuid)" color="red"
+                <v-icon @click="showConfirmDialog(item.id)" color="red"
                     >mdi-delete</v-icon
                 >
             </template>
         </v-data-table-server>
 
-         <ConfirmDialog
+        <ConfirmDialog
             :dialogName="dialogName"
             v-model:modelValue="dialog"
             :onConfirm="confirmDelete"
@@ -118,7 +118,7 @@ export default {
     },
     data() {
         return {
-            dialogName:"Are you sure you want to delete this Floor ?",
+            dialogName: "Are you sure you want to delete this Floor ?",
             search: "",
             itemsPerPage: 15,
             headers: [
@@ -174,8 +174,8 @@ export default {
         editFloor(uuid) {
             this.$router.push({ name: "FloorEdit", params: { uuid } });
         },
-        showConfirmDialog(uuid) {
-            this.selectedBrandId = uuid;
+        showConfirmDialog(id) {
+            this.selectedBrandId = id;
             this.dialog = true;
         },
         async confirmDelete() {

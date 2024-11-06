@@ -1,6 +1,6 @@
 <template>
     <v-card outlined class="mx-auto my-5" max-width="900">
-        <v-card-title>Edit Brand</v-card-title>
+        <v-card-title>Edit Group</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="update">
                 <!-- Name Field -->
@@ -25,6 +25,13 @@
                         errors.description ? errors.description : ''
                     "
                 />
+                <v-select
+                    v-model="group.status"
+                    :items="statusItems"
+                    label="Group Status"
+                    clearable
+                    :error-messages="errors.status ? errors.status : ''"
+                ></v-select>
                 <!-- Action Buttons -->
 
                 <v-row class="mt-4">
@@ -63,9 +70,11 @@ export default {
         return {
             valid: false,
             loading: false,
+            statusItems: ["Active", "Inactive"],
             group: {
                 name: "",
                 description: "",
+                status: "Active",
             },
             errors: {},
             serverError: null,
@@ -85,9 +94,10 @@ export default {
                 const response = await this.$axios.get(
                     `/group/${brandId}/edit`
                 );
-                console.log(response.data);
+                // console.log(response.data);
                 this.group = response.data.group; // Populate form with the existing group data
-               
+                this.group.status =
+                    this.group.status === "Active" ? "Active" : "Inactive";
             } catch (error) {
                 this.serverError = "Error fetching group data.";
             }

@@ -156,41 +156,38 @@ class LineController extends Controller
         // Retrieve the Line model by uuid
         $line = Line::where('uuid', $uuid)->firstOrFail();
         // Validate the incoming request data
-         $validatedData = $request->validate(Line::validationRules());
-
+        $validatedData = $request->validate(Line::validationRules());
          // Determine the authenticated user (either from 'admin' or 'user' guard)
-         if (Auth::guard('admin')->check()) {
-             $currentUser = Auth::guard('admin')->user();
-             $creatorType = Admin::class;
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
 
-             // Check if the admin is a superadmin
-             if ($currentUser->role === 'superadmin') {
-                 // Superadmin can update without additional checks
-             } else {
-                 // Regular admin authorization check
-                 if ($line->creator_type !== $creatorType || $line->creator_id !== $currentUser->id) {
-                     return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to update this line.'], 403);
-                 }
-             }
+            // Check if the admin is a superadmin
+            if ($currentUser->role === 'superadmin') {
+                // Superadmin can update without additional checks
+            } else {
+                // Regular admin authorization check
+                if ($line->creator_type !== $creatorType || $line->creator_id !== $currentUser->id) {
+                    return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to update this line.'], 403);
+                }
+            }
 
-         } elseif (Auth::guard('user')->check()) {
-             $currentUser = Auth::guard('user')->user();
-             $creatorType = User::class;
-
-             // Regular user authorization check
-             if ($line->creator_type !== $creatorType || $line->creator_id !== $currentUser->id) {
-                 return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to update this line.'], 403);
-             }
-         } else {
-             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
-         }
-         // Update the line's details
-         $line->fill($validatedData);
-         $line->updater()->associate($currentUser); // Associate the updater
-         $line->save();
-
-         // Return a success response
-         return response()->json(['success' => true, 'message' => 'Line updated successfully.', 'line' => $line], 200);
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+            // Regular user authorization check
+            if ($line->creator_type !== $creatorType || $line->creator_id !== $currentUser->id) {
+                return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to update this line.'], 403);
+            }
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+        // Update the line's details
+        $line->fill($validatedData);
+        $line->updater()->associate($currentUser); // Associate the updater
+        $line->save();
+        // Return a success response
+        return response()->json(['success' => true, 'message' => 'Line updated successfully.', 'line' => $line], 200);
     }
 
     /**

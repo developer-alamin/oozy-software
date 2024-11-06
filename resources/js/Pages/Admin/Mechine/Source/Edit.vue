@@ -29,7 +29,7 @@
                 <v-select
                     v-model="source.status"
                     :items="statusItems"
-                    label="source Status"
+                    label="Source Status"
                     clearable
                     :error-messages="errors.status ? errors.status : ''"
                 ></v-select>
@@ -115,7 +115,7 @@ export default {
                         `mechine/source/${sourceId}`,
                         this.source
                     );
-                    console.log(response.data)
+                    console.log(response.data);
                     if (response.data.success) {
                         toast.success("source update successfully!");
                         this.$router.push({ name: "MechineSourceIndex" }); // Redirect to source list page

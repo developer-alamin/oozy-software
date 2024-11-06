@@ -11,17 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('floors', function (Blueprint $table) {
-            $table->id();
-            $table->uuid('uuid')->unique();
-            $table->string('name');
-            $table->text('description')->nullable();
+        Schema::table('lines', function (Blueprint $table) {
             $table->enum('status', ['Active', 'Inactive', 'Pending'])->default('Inactive');
-            $table->morphs('creator');
-            $table->morphs('updater');
-            $table->softDeletes();
-            $table->timestamps();
-
         });
     }
 
@@ -30,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('floors');
+        Schema::table('lines', function (Blueprint $table) {
+            $table->dropColumn('status');
+        });
     }
 };

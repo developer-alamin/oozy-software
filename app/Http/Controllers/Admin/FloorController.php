@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\HelperController;
 use Illuminate\Http\Request;
 use App\Models\Admin;
 use App\Models\Floor;
@@ -92,6 +93,7 @@ class FloorController extends Controller
          }
          // Create the technician and associate it with the creator
          $floor = new Floor($validatedData);
+         $floor->uuid = HelperController::generateUuid();
          $floor->creator()->associate($creator);  // Assign creator polymorphically
          $floor->updater()->associate($creator);  // Associate the updater
          $floor->save(); // Save the technician to the database
@@ -110,9 +112,11 @@ class FloorController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Floor $floor)
+    public function edit($uuid)
     {
+        $floor = Floor::where('uuid', $uuid)->firstOrFail();
         // Determine the authenticated user (either from 'admin' or 'user' guard)
+
         if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('admin')->user();
             $creatorType = Admin::class;
@@ -144,9 +148,9 @@ class FloorController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Floor $floor)
+    public function update(Request $request,$uuid)
     {
-
+        $floor = Floor::where('uuid', $uuid)->firstOrFail();
          // Validate the incoming request data
          $validatedData = $request->validate(Floor::validationRules());
 

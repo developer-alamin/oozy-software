@@ -39,8 +39,8 @@ Route::controller(SupplierController::class)
 });
 
 // floor group route declare start form here
-Route::resource('floor', FloorController::class);
-
+Route::get('/floor/{uuid}/edit', [FloorController::class, 'edit'])->name('floor.edit');
+Route::put('/floor/{uuid}', [FloorController::class, 'update'])->name('floor.update');
 Route::controller(FloorController::class)
 ->prefix("floors")
 ->as("floors")
@@ -50,11 +50,15 @@ Route::controller(FloorController::class)
     Route::post('{id}/restore', 'floorrestore')->name('floor.restore');
     Route::delete('{id}/force-delete', 'floorforcedelete')->name('floor.force.delete');
 });
+Route::resource('floor', FloorController::class);
+
 // floor group route declare end form here
 
 //Mechine Group Route declare start form here
 
 Route::prefix("/mechine")->group(function(){
+    Route::get('/type/{uuid}/edit', [TypeController::class, 'edit'])->name('type.edit');
+    Route::put('/type/{uuid}', [TypeController::class, 'update'])->name('type.update');
     Route::resource('type', TypeController::class);
     Route::controller(TypeController::class)
     ->prefix('types')
@@ -94,7 +98,7 @@ Route::get('/category/trashed-count', [CategoryController::class, 'trashedcatego
 Route::resource('category', CategoryController::class);
 
 
-
+// Line Route
 Route::get('/line/{uuid}/edit', [LineController::class, 'edit'])->name('lines.edit');
 Route::put('/line/{uuid}', [LineController::class, 'update'])->name('lines.update');
 // Line Group Controllers start form here
@@ -109,7 +113,23 @@ Route::controller(LineController::class)
 });
 // Line Group Controllers end form here
 Route::resource('line', LineController::class);
+
+// Groups Route
 Route::get('/get_users', [GroupController::class, 'getUsers']);
+Route::get('/group/{uuid}/edit', [GroupController::class, 'edit'])->name('group.edit');
+Route::put('/group/{uuid}', [GroupController::class, 'update'])->name('group.update');
+// Groups Gorup Controller start form here
+Route::controller(GroupController::class)
+->prefix("groups")
+->as("groups")
+->group(function () {
+    Route::get('/trashed-count', 'groupsTrashedCount')->name('groups.Trashed.Count');
+    Route::get('/trashed', 'groupsTrashed')->name('groups.Trashed');
+    Route::post('{id}/restore', 'groupsRestore')->name('groups.Restore');
+    Route::delete('{id}/forceDelete', 'groupsforceDelete')->name('groups.groupsforce.Delete');
+});
+Route::get('get-technician', [GroupController::class, 'getTechnician']);
+// Groups Gorup Controller end form here
 Route::resource('group', GroupController::class);
 
 // Rent
@@ -158,18 +178,6 @@ Route::resource('factory', FactoryController::class);
 
 
 
-// Groups Gorup Controller start form here
-Route::controller(GroupController::class)
-->prefix("groups")
-->as("groups")
-->group(function () {
-    Route::get('/trashed-count', 'groupsTrashedCount')->name('groups.Trashed.Count');
-    Route::get('/trashed', 'groupsTrashed')->name('groups.Trashed');
-    Route::post('{id}/restore', 'groupsRestore')->name('groups.Restore');
-    Route::delete('{id}/forceDelete', 'groupsforceDelete')->name('groups.groupsforce.Delete');
-});
-Route::get('get-technician', [GroupController::class, 'getTechnician']);
-// Groups Gorup Controller end form here
 
 
 // Group Rents Controller start form here

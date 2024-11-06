@@ -40,7 +40,6 @@ class Technician extends Model
         return $this->morphTo();
     }
 
-
     public static function validationRules()
     {
         return [

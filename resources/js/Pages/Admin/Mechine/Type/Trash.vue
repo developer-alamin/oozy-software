@@ -44,10 +44,10 @@
             </template>
 
             <template v-slot:item.actions="{ item }">
-                <v-icon @click="showRestoreDialog(item.uuid)" color="green"
+                <v-icon @click="showRestoreDialog(item.id)" color="green"
                     >mdi-restore</v-icon
                 >
-                <v-icon @click="showConfirmDialog(item.uuid)" color="red"
+                <v-icon @click="showConfirmDialog(item.id)" color="red"
                     >mdi-delete</v-icon
                 >
             </template>
@@ -82,8 +82,8 @@ export default {
     },
     data() {
         return {
-            restroreDialogName:"Are you sure you want to restore this Type?",
-            dialogName:"Are you sure you want to delete this Type ?",
+            restroreDialogName: "Are you sure you want to restore this Type?",
+            dialogName: "Are you sure you want to delete this Type ?",
 
             search: "",
             itemsPerPage: 15,
@@ -113,15 +113,18 @@ export default {
             const sortOrder = sortBy.length ? sortBy[0].order : "desc";
             const sortKey = sortBy.length ? sortBy[0].key : "created_at";
             try {
-                const response = await this.$axios.get("/mechine/types/trashed", {
-                    params: {
-                        page,
-                        itemsPerPage,
-                        sortBy: sortKey,
-                        sortOrder,
-                        search: this.search,
-                    },
-                });
+                const response = await this.$axios.get(
+                    "/mechine/types/trashed",
+                    {
+                        params: {
+                            page,
+                            itemsPerPage,
+                            sortBy: sortKey,
+                            sortOrder,
+                            search: this.search,
+                        },
+                    }
+                );
                 this.serverItems = response.data.items || [];
                 this.totalItems = response.data.total || 0;
             } catch (error) {
@@ -130,12 +133,12 @@ export default {
                 this.loading = false;
             }
         },
-        showRestoreDialog(uuid) {
-            this.selectedTypeId = uuid;
+        showRestoreDialog(id) {
+            this.selectedTypeId = id;
             this.restoreDialog = true; // Open restore dialog
         },
-        showConfirmDialog(uuid) {
-            this.selectedTypeId = uuid;
+        showConfirmDialog(id) {
+            this.selectedTypeId = id;
             this.deleteDialog = true; // Open delete dialog
         },
         async confirmRestore() {
@@ -171,7 +174,7 @@ export default {
                 console.error("Error deleting Type:", error);
                 toast.error("Failed to delete Type.");
             }
-        }
+        },
     },
     created() {
         this.loadItems({

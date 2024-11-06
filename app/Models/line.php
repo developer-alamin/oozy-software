@@ -25,7 +25,7 @@ class Line extends Model
         'updater_type',
         'updater_id',
         'name',
-        'number',
+        'status',
         'description',
     ];
 
@@ -33,7 +33,7 @@ class Line extends Model
     {
         return [
             'name'         => 'required|string|max:255',
-            'number'       => 'nullable|string',
+            'status'       => 'nullable|string',
             'description'  => 'nullable|string',
         ];
     }

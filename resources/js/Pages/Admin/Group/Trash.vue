@@ -48,10 +48,10 @@
             @update:options="loadItems"
         >
             <template v-slot:item.actions="{ item }">
-                <v-icon @click="showRestoreDialog(item.uuid)" color="green"
+                <v-icon @click="showRestoreDialog(item.id)" color="green"
                     >mdi-restore</v-icon
                 >
-                <v-icon @click="showConfirmDialog(item.uuid)" color="red"
+                <v-icon @click="showConfirmDialog(item.id)" color="red"
                     >mdi-delete</v-icon
                 >
             </template>
@@ -87,8 +87,8 @@ export default {
     },
     data() {
         return {
-            restroreDialogName:"Are you sure you want to restore this Group?",
-            dialogName:"Are you sure you want to delete this Group ?",
+            restroreDialogName: "Are you sure you want to restore this Group?",
+            dialogName: "Are you sure you want to delete this Group ?",
             search: "",
             itemsPerPage: 15,
             headers: [
@@ -127,12 +127,12 @@ export default {
                 this.loading = false;
             }
         },
-        showRestoreDialog(uuid) {
-            this.selectedGroupId = uuid;
+        showRestoreDialog(id) {
+            this.selectedGroupId = id;
             this.restoreDialog = true; // Open restore dialog
         },
-        showConfirmDialog(uuid) {
-            this.selectedGroupId = uuid;
+        showConfirmDialog(id) {
+            this.selectedGroupId = id;
             this.deleteDialog = true; // Open delete dialog
         },
         async confirmRestore() {
@@ -170,9 +170,9 @@ export default {
                 toast.error("Failed to delete brand.");
             }
         },
-         async GroupIndex (){
+        async GroupIndex() {
             this.$router.push({ name: "GroupIndex" });
-        }
+        },
     },
     created() {
         this.loadItems({

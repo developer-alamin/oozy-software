@@ -69,6 +69,17 @@
             loading-text="Loading... Please wait"
             @update:options="loadItems"
         >
+            <template v-slot:item.status="{ item }">
+                <v-chip
+                    :color="item.status === 'Active' ? 'green' : 'red'"
+                    class="text-uppercase"
+                    size="small"
+                    label
+                >
+                    {{ item.status === "Active" ? "Active" : "Inactive" }}
+                </v-chip>
+            </template>
+
             <template v-slot:item.creator_name="{ item }">
                 <span>{{ item.creator ? item.creator : "Unknown" }}</span>
             </template>
@@ -76,13 +87,13 @@
                 <v-icon @click="editGroup(item.uuid)" class="mr-2"
                     >mdi-pencil</v-icon
                 >
-                <v-icon @click="showConfirmDialog(item.uuid)" color="red"
+                <v-icon @click="showConfirmDialog(item.id)" color="red"
                     >mdi-delete</v-icon
                 >
             </template>
         </v-data-table-server>
 
-         <ConfirmDialog
+        <ConfirmDialog
             :dialogName="dialogName"
             v-model:modelValue="dialog"
             :onConfirm="confirmDelete"
@@ -106,12 +117,28 @@ export default {
     },
     data() {
         return {
-            dialogName:"Are you sure you want to delete this Group ?",
+            dialogName: "Are you sure you want to delete this Group ?",
             search: "",
             itemsPerPage: 15,
             headers: [
-                { title: "Group Number", key: "name", sortable: true },
+                { title: "Group", key: "name", sortable: true },
+                {
+                    title: "Technician Name",
+                    key: "technicians.name",
+                    sortable: false,
+                },
+                {
+                    title: "Technician Type",
+                    key: "technicians.type",
+                    sortable: false,
+                },
                 { title: "Description", key: "description", sortable: false },
+                {
+                    title: "Status",
+                    key: "status",
+                    value: "status",
+                    sortable: true,
+                },
                 { title: "Creator", key: "creator.name", sortable: false },
                 { title: "Actions", key: "actions", sortable: false },
             ],
@@ -138,7 +165,7 @@ export default {
                         search: this.search,
                     },
                 });
-                console.log(response.data.items)
+                console.log(response.data.items);
                 this.serverItems = response.data.items || [];
                 this.totalItems = response.data.total || 0;
                 this.fetchTrashedGroupsCount();
@@ -157,8 +184,8 @@ export default {
         editGroup(uuid) {
             this.$router.push({ name: "GroupEdit", params: { uuid } });
         },
-        showConfirmDialog(uuid) {
-            this.selectedGroupId = uuid;
+        showConfirmDialog(id) {
+            this.selectedGroupId = id;
             this.dialog = true;
         },
         async confirmDelete() {
