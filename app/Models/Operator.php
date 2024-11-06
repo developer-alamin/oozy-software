@@ -3,10 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Technician extends Model
+class Operator extends Model
 {
     use HasFactory,SoftDeletes;
 
@@ -26,8 +26,6 @@ class Technician extends Model
         'updater_id',
         'updater_type',
     ];
-
-
 
     // Polymorphic relationships
     public function creator()
@@ -61,10 +59,4 @@ class Technician extends Model
             'meta_data'     => 'nullable',
         ];
     }
-
-
-    // public function updater()
-    // {
-    //     return $this->morphTo();
-    // }
 }

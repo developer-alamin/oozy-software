@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\Admin\ProductModelController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\OperatorController;
 
 Route::resource('suppliers', SupplierController::class);
 // suppliers Group Controllers start form here
@@ -131,9 +132,18 @@ Route::get('/technician/trashed', [TechnicianController::class, 'trashed']);
 Route::post('/technician/{id}/restore', [TechnicianController::class, 'restore']);
 Route::delete('/technician/{id}/force-delete', [TechnicianController::class, 'forceDelete']);
 Route::get('/technician/trashed-count', [TechnicianController::class, 'trashedTechniciansCount']);
-Route::get('/technician/{uuid}/edit', [TechnicianController::class, 'edit'])->name('lines.edit');
-Route::put('/technician/{uuid}', [TechnicianController::class, 'update'])->name('lines.update');
+Route::get('/technician/{uuid}/edit', [TechnicianController::class, 'edit'])->name('technician.edit');
+Route::put('/technician/{uuid}', [TechnicianController::class, 'update'])->name('technician.update');
 Route::resource('technician', TechnicianController::class);
+// operator
+Route::get('/operator/trashed', [OperatorController::class, 'trashed']);
+Route::post('/operator/{id}/restore', [OperatorController::class, 'restore']);
+Route::delete('/operator/{id}/force-delete', [OperatorController::class, 'forceDelete']);
+Route::get('/operator/trashed-count', [OperatorController::class, 'trashedOperatorsCount']);
+Route::get('/operator/{uuid}/edit', [OperatorController::class, 'edit'])->name('operator.edit');
+Route::put('/operator/{uuid}', [OperatorController::class, 'update'])->name('operator.update');
+Route::resource('operator', OperatorController::class);
+
 
 // Company
 Route::resource('company', CompanyController::class);

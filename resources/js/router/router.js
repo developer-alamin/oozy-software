@@ -274,6 +274,32 @@ const routes = [
                 component: adminComponents.TechnicianTrash,
                 meta: { title: "Technician Trash" },
             },
+            // operator
+            {
+                path: "operator/index", // New route for Contact
+                name: "OperatorIndex",
+                component: adminComponents.OperatorIndex,
+                meta: { title: "Operator Index" },
+            },
+            {
+                path: "operator/create", // New route for Contact
+                name: "OperatorCreate",
+                component: adminComponents.OperatorCreate,
+                meta: { title: "Operator Create" },
+            },
+            {
+                path: "operator/edit/:uuid", // Dynamic route for operator Edit
+                name: "OperatorEdit",
+                component: adminComponents.OperatorEdit,
+                meta: { title: "Edit Operator" },
+                props: true, // Enables passing route params as props
+            },
+            {
+                path: "operator/trash", // New route for Contact
+                name: "OperatorTrash",
+                component: adminComponents.OperatorTrash,
+                meta: { title: "Operator Trash" },
+            },
             {
                 path: "contact", // New route for Contact
                 name: "Contact",

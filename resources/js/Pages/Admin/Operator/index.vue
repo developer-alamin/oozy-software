@@ -2,7 +2,7 @@
     <v-card>
         <v-card-title class="pt-5">
             <v-row>
-                <v-col cols="4"><span>Technician List</span></v-col>
+                <v-col cols="4"><span>Operator List</span></v-col>
                 <v-col cols="8" class="d-flex justify-end">
                     <v-text-field
                         v-model="search"
@@ -19,7 +19,7 @@
                     ></v-text-field>
                     <v-btn
                         v-if="isAuthorized"
-                        @click="createTechnician"
+                        @click="createOperator"
                         color="primary"
                         icon
                         style="width: 40px; height: 40px"
@@ -30,7 +30,7 @@
                                     >mdi-plus</v-icon
                                 >
                             </template>
-                            <span>Add a new technician</span>
+                            <span>Add a new operator</span>
                         </v-tooltip>
                     </v-btn>
 
@@ -51,7 +51,7 @@
                                         mdi-trash-can-outline
                                     </v-icon>
                                 </template>
-                                <span>View trashed technicians</span>
+                                <span>View trashed operators</span>
                             </v-tooltip>
                         </v-btn>
                     </v-badge>
@@ -82,7 +82,7 @@
             </template>
 
             <template v-slot:item.actions="{ item }">
-                <v-icon @click="editTechnician(item.uuid)" class="mr-2"
+                <v-icon @click="editOperator(item.uuid)" class="mr-2"
                     >mdi-pencil</v-icon
                 >
                 <v-icon @click="showConfirmDialog(item.id)" color="red"
@@ -106,7 +106,7 @@
 
 <script>
 import { toast } from "vue3-toastify";
-import ConfirmDialog from "./../Components/ConfirmDialog.vue";
+import ConfirmDialog from "../../Components/ConfirmDialog.vue";
 
 export default {
     components: {
@@ -114,7 +114,7 @@ export default {
     },
     data() {
         return {
-            dialogName: "Are you sure you want to delete this Technician ?",
+            dialogName: "Are you sure you want to delete this Operator ?",
             search: "",
             itemsPerPage: 15,
             headers: [
@@ -134,13 +134,13 @@ export default {
             loading: true,
             totalItems: 0,
             dialog: false,
-            selectedTechnicianId: null,
+            selectedOperatorId: null,
             trashedCount: 0,
             user: {},
         };
     },
     computed: {
-        // Check if the user is authorized to create technicians
+        // Check if the user is authorized to create Operators
         isAuthorized() {
             // You can customize the logic based on your needs
             return (
@@ -157,7 +157,7 @@ export default {
             const sortOrder = sortBy.length ? sortBy[0].order : "desc";
             const sortKey = sortBy.length ? sortBy[0].key : "created_at";
             try {
-                const response = await this.$axios.get("/technician", {
+                const response = await this.$axios.get("/operator", {
                     params: {
                         page,
                         itemsPerPage,
@@ -168,56 +168,53 @@ export default {
                 });
                 this.serverItems = response.data.items || [];
                 this.totalItems = response.data.total || 0;
-                this.fetchTrashedTechniciansCount();
+                this.fetchTrashedOperatorsCount();
             } catch (error) {
                 console.error("Error loading items:", error);
             } finally {
                 this.loading = false;
             }
         },
-        createTechnician() {
-            this.$router.push({ name: "TechnicianCreate" });
+        createOperator() {
+            this.$router.push({ name: "OperatorCreate" });
         },
         viewTrash() {
-            this.$router.push({ name: "TechnicianTrash" });
+            this.$router.push({ name: "OperatorTrash" });
         },
-        editTechnician(uuid) {
-            this.$router.push({ name: "TechnicianEdit", params: { uuid } });
+        editOperator(uuid) {
+            this.$router.push({ name: "OperatorEdit", params: { uuid } });
         },
         showConfirmDialog(id) {
-            this.selectedTechnicianId = id;
+            this.selectedOperatorId = id;
             this.dialog = true;
         },
         async confirmDelete() {
             this.dialog = false; // Close the dialog
             try {
                 await this.$axios.delete(
-                    `/technician/${this.selectedTechnicianId}`
+                    `/operator/${this.selectedOperatorId}`
                 );
                 this.loadItems({
                     page: 1,
                     itemsPerPage: this.itemsPerPage,
                     sortBy: [],
                 });
-                toast.success("Technician deleted successfully!");
+                toast.success("Operator deleted successfully!");
             } catch (error) {
-                console.error("Error deleting Technician:", error);
-                toast.error("Failed to delete Technician.");
+                console.error("Error deleting Operator:", error);
+                toast.error("Failed to delete Operator.");
             }
         },
-        async fetchTrashedTechniciansCount() {
+        async fetchTrashedOperatorsCount() {
             try {
                 const response = await this.$axios.get(
-                    "/technician/trashed-count"
+                    "/operator/trashed-count"
                 );
                 this.trashedCount = response.data.trashedCount
                     ? response.data.trashedCount
                     : 0;
             } catch (error) {
-                console.error(
-                    "Error fetching trashed technicians count:",
-                    error
-                );
+                console.error("Error fetching trashed operators count:", error);
             }
         },
         async fetchUserInfo() {
@@ -237,7 +234,7 @@ export default {
             sortBy: [],
         });
         this.fetchUserInfo();
-        this.fetchTrashedTechniciansCount();
+        this.fetchTrashedOperatorsCount();
     },
 };
 </script>

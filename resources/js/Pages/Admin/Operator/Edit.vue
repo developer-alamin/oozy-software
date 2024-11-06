@@ -1,11 +1,11 @@
 <template>
     <v-card outlined class="mx-auto my-5" max-width="900">
-        <v-card-title>Edit Technician</v-card-title>
+        <v-card-title>Edit Operator</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="update">
                 <!-- Company Selection -->
                 <v-autocomplete
-                    v-model="technician.company_id"
+                    v-model="operator.company_id"
                     :items="companys"
                     item-value="id"
                     item-title="name"
@@ -16,31 +16,40 @@
                     :error-messages="errors.company_id ? errors.company_id : ''"
                     @update:search="fetchCompanys"
                     label="Select Company *"
-                ></v-autocomplete>
+                >
+                    <template v-slot:label>
+                        Select Company <span style="color: red">*</span>
+                    </template>
+                </v-autocomplete>
 
                 <!-- Name Field -->
                 <v-text-field
-                    v-model="technician.name"
+                    v-model="operator.name"
                     :rules="[rules.required]"
                     label="Name *"
                     outlined
                     :error-messages="errors.name ? errors.name : ''"
-                ></v-text-field>
+                >
+                    <template v-slot:label>
+                        Name <span style="color: red">*</span>
+                    </template>
+                </v-text-field>
                 <v-select
-                    v-model="technician.type"
+                    v-model="operator.type"
                     :items="typeItems"
                     :rules="[rules.required]"
-                    label="Technician Type"
+                    label="Operator Type"
                     clearable
                 >
                     <template v-slot:label>
-                        Technician Type <span style="color: red">*</span>
+                        Operator Type <span style="color: red">*</span>
                     </template>
                 </v-select>
 
                 <!-- Email Field -->
                 <v-text-field
-                    v-model="technician.email"
+                    v-model="operator.email"
+                    :rules="[rules.email]"
                     label="Email"
                     outlined
                     :error-messages="errors.email ? errors.email : ''"
@@ -48,7 +57,7 @@
 
                 <!-- Phone Field -->
                 <v-text-field
-                    v-model="technician.phone"
+                    v-model="operator.phone"
                     label="Phone"
                     outlined
                     :error-messages="errors.phone ? errors.phone : ''"
@@ -56,7 +65,7 @@
 
                 <!-- Address Field -->
                 <v-textarea
-                    v-model="technician.address"
+                    v-model="operator.address"
                     label="Address"
                     outlined
                     :error-messages="errors.address ? errors.address : ''"
@@ -64,7 +73,7 @@
 
                 <!-- Description Field -->
                 <v-textarea
-                    v-model="technician.description"
+                    v-model="operator.description"
                     label="Description"
                     outlined
                     :error-messages="
@@ -74,9 +83,9 @@
 
                 <!-- Status Field -->
                 <v-select
-                    v-model="technician.status"
+                    v-model="operator.status"
                     :items="statusItems"
-                    label="Technician Status"
+                    label="Operator Status"
                     clearable
                 ></v-select>
 
@@ -97,7 +106,7 @@
                             :disabled="!valid || loading"
                             :loading="loading"
                         >
-                            Update Technician
+                            Update Operator
                         </v-btn>
                     </v-col>
                 </v-row>
@@ -121,7 +130,7 @@ export default {
             loading: false,
             statusItems: ["Active", "Inactive"],
             typeItems: ["General", "Special", "Manager"],
-            technician: {
+            operator: {
                 company_id: null,
                 name: "",
                 email: "",
@@ -136,34 +145,36 @@ export default {
             serverError: null,
             rules: {
                 required: (value) => !!value || "Required.",
+                email: (value) =>
+                    /.+@.+\..+/.test(value) || "E-mail must be valid.",
             },
         };
     },
     created() {
         this.fetchCompanys().then(() => {
-            this.fetchTechnician();
+            this.fetchOperator();
         });
     },
     methods: {
-        async fetchTechnician() {
-            const technicianId = this.$route.params.uuid;
+        async fetchOperator() {
+            const operatorId = this.$route.params.uuid;
             try {
                 const response = await this.$axios.get(
-                    `/technician/${technicianId}/edit`
+                    `/operator/${operatorId}/edit`
                 );
-                this.technician = response.data.technician;
-                this.technician.status =
-                    this.technician.status === "Active" ? "Active" : "Inactive";
+                this.operator = response.data.operator;
+                this.operator.status =
+                    this.operator.status === "Active" ? "Active" : "Inactive";
 
                 // Set the selected company based on the company_id
                 const selectedCompany = this.companys.find(
-                    (c) => c.id === this.technician.company_id
+                    (c) => c.id === this.operator.company_id
                 );
                 if (selectedCompany) {
-                    this.technician.company_id = selectedCompany.id; // Set the company_id for v-autocomplete
+                    this.operator.company_id = selectedCompany.id; // Set the company_id for v-autocomplete
                 }
             } catch (error) {
-                this.serverError = "Error fetching technician data.";
+                this.serverError = "Error fetching operator data.";
             }
         },
         async fetchCompanys(search = "") {
@@ -180,22 +191,22 @@ export default {
             this.errors = {};
             this.serverError = null;
             this.loading = true;
-            const technicianId = this.$route.params.uuid;
+            const operatorId = this.$route.params.uuid;
             try {
                 const response = await this.$axios.put(
-                    `/technician/${technicianId}`,
-                    this.technician
+                    `/operator/${operatorId}`,
+                    this.operator
                 );
                 if (response.data.success) {
-                    this.$router.push({ name: "TechnicianIndex" });
-                    toast.success("Technician updated successfully!");
+                    this.$router.push({ name: "OperatorIndex" });
+                    toast.success("Operator updated successfully!");
                 }
             } catch (error) {
                 if (error.response && error.response.status === 422) {
                     this.errors = error.response.data.errors || {};
-                    toast.error("Failed to update technician.");
+                    toast.error("Failed to update operator.");
                 } else {
-                    this.serverError = "Error updating technician.";
+                    this.serverError = "Error updating operator.";
                     toast.error(this.serverError);
                 }
             } finally {
@@ -203,7 +214,7 @@ export default {
             }
         },
         resetForm() {
-            this.fetchTechnician(); // Reset the form with existing technician data
+            this.fetchOperator(); // Reset the form with existing operator data
             this.errors = {};
             this.$refs.form.resetValidation();
         },

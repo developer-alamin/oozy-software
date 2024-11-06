@@ -51,6 +51,17 @@ class Admin extends Authenticatable
     {
         return $this->morphMany(Technician::class, 'updater');
     }
+     // Operators created by this user
+     public function createdOperators(): MorphMany
+     {
+         return $this->morphMany(Operator::class, 'creator');
+     }
+ 
+     // Operators updated by this user
+     public function updatedOperators(): MorphMany
+     {
+         return $this->morphMany(Operator::class, 'updater');
+     }
     // Brands created by this user
     public function createdBrands(): MorphMany
     {

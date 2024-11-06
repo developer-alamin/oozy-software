@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Admin;
-use App\Models\User;
-use App\Models\Category;
-use App\Models\Technician;
+use App\Models\Operator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Response;
+use App\Models\Admin;
+use App\Models\User;
 
-class TechnicianController extends Controller
+class OperatorController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -31,11 +30,11 @@ class TechnicianController extends Controller
 
             // Check if the admin is a super admin
             if ($currentUser->role === 'superadmin') {
-                // If superadmin, retrieve all technicians
-                $techniciansQuery = Technician::query(); // No filters applied
+                // If superadmin, retrieve all operators
+                $operatorsQuery = Operator::query(); // No filters applied
             } else {
                 // If not superadmin, filter by creator type and id
-                $techniciansQuery = Technician::where('creator_type', $creatorType)
+                $operatorsQuery = Operator::where('creator_type', $creatorType)
                     ->where('creator_id', $currentUser->id);
             }
         } elseif (Auth::guard('user')->check()) {
@@ -43,7 +42,7 @@ class TechnicianController extends Controller
             $creatorType = User::class;
 
             // For regular users, filter by creator type and id
-            $techniciansQuery = Technician::where('creator_type', $creatorType)
+            $operatorsQuery = Operator::where('creator_type', $creatorType)
                 ->where('creator_id', $currentUser->id);
         } else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
@@ -51,30 +50,27 @@ class TechnicianController extends Controller
 
         // Apply search if the search term is not empty
         if (!empty($search)) {
-            $techniciansQuery->where('name', 'LIKE', '%' . $search . '%');
+            $operatorsQuery->where('name', 'LIKE', '%' . $search . '%');
         }
 
         // Apply sorting
-        $techniciansQuery->orderBy($sortBy, $sortOrder);
+        $operatorsQuery->orderBy($sortBy, $sortOrder);
 
         // Paginate results
-        $technicians = $techniciansQuery->paginate($itemsPerPage);
+        $operators = $operatorsQuery->paginate($itemsPerPage);
 
         // Return the response as JSON
         return response()->json([
-            'items' => $technicians->items(), // Current page items
-            'total' => $technicians->total(), // Total number of records
+            'items' => $operators->items(), // Current page items
+            'total' => $operators->total(), // Total number of records
         ]);
     }
-
-
-
     /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
-
+        //
     }
 
     /**
@@ -83,7 +79,7 @@ class TechnicianController extends Controller
     public function store(Request $request)
     {
         // Validate the incoming request data
-        $validatedData = $request->validate(Technician::validationRules());
+        $validatedData = $request->validate(Operator::validationRules());
 
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
@@ -91,7 +87,7 @@ class TechnicianController extends Controller
 
             // Check if the admin is a superadmin
             if ($creator->role === 'superadmin') {
-                // Superadmin can create technician without additional checks
+                // Superadmin can create Operator without additional checks
             } else {
                 // Regular admin authorization check can be implemented here if needed
             }
@@ -104,24 +100,23 @@ class TechnicianController extends Controller
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
 
-        // Create the technician and associate it with the creator
-        $technician       = new Technician($validatedData);
-        $technician->uuid = HelperController::generateUuid();
-        $technician->creator()->associate($creator);  // Assign creator polymorphically
-        $technician->updater()->associate($creator);  // Associate the updater
-        $technician->save(); // Save the technician to the database
+        // Create the Operator and associate it with the creator
+        $operator       = new Operator($validatedData);
+        $operator->uuid = HelperController::generateUuid();
+        $operator->creator()->associate($creator);  // Assign creator polymorphically
+        $operator->updater()->associate($creator);  // Associate the updater
+        $operator->save(); // Save the Operator to the database
 
         // Return a success response
-        return response()->json(['success' => true, 'message' => 'Technician created successfully.'], 201);
+        return response()->json(['success' => true, 'message' => 'Operator created successfully.'], 201);
     }
-
 
     /**
      * Display the specified resource.
      */
-    public function show(Technician $technician)
+    public function show(Operator $operator)
     {
-
+        //
     }
 
     /**
@@ -129,17 +124,17 @@ class TechnicianController extends Controller
      */
     public function edit($uuid)
     {
-        $technician = Technician::where('uuid', $uuid)->firstOrFail();
+        $operator = Operator::where('uuid', $uuid)->firstOrFail();
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('admin')->user();
             $creatorType = Admin::class;
             // Check if the admin is a super admin
             if ($currentUser->role === 'superadmin') {
-                // Super admins can edit any technician
+                // Super admins can edit any operator
                 return response()->json([
                     'success' => true,
-                    'technician' => $technician
+                    'operator' => $operator
                 ], Response::HTTP_OK);
             }
         } elseif (Auth::guard('user')->check()) {
@@ -148,18 +143,16 @@ class TechnicianController extends Controller
         } else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
-        // Check if the technician belongs to the current user or admin
-        if ($technician->creator_type !== $creatorType || $technician->creator_id !== $currentUser->id) {
-            return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to edit this technician.'], 403);
+        // Check if the operator belongs to the current user or admin
+        if ($operator->creator_type !== $creatorType || $operator->creator_id !== $currentUser->id) {
+            return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to edit this operator.'], 403);
         }
-        // Return the technician data if authorized
+        // Return the operator data if authorized
         return response()->json([
             'success' => true,
-            'technician' => $technician
+            'operator' => $operator
         ], Response::HTTP_OK);
     }
-
-
 
     /**
      * Update the specified resource in storage.
@@ -167,8 +160,8 @@ class TechnicianController extends Controller
     public function update(Request $request,$uuid)
     {
         // Validate the incoming request data
-        $validatedData = $request->validate(Technician::validationRules());
-        $technician = Technician::where('uuid', $uuid)->firstOrFail();
+        $validatedData = $request->validate(Operator::validationRules());
+        $operator = Operator::where('uuid', $uuid)->firstOrFail();
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('admin')->user();
@@ -179,8 +172,8 @@ class TechnicianController extends Controller
                 // Superadmin can update without additional checks
             } else {
                 // Regular admin authorization check
-                if ($technician->creator_type !== $creatorType || $technician->creator_id !== $currentUser->id) {
-                    return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to update this technician.'], 403);
+                if ($operator->creator_type !== $creatorType || $operator->creator_id !== $currentUser->id) {
+                    return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to update this operator.'], 403);
                 }
             }
 
@@ -189,37 +182,37 @@ class TechnicianController extends Controller
             $creatorType = User::class;
 
             // Regular user authorization check
-            if ($technician->creator_type !== $creatorType || $technician->creator_id !== $currentUser->id) {
-                return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to update this technician.'], 403);
+            if ($operator->creator_type !== $creatorType || $operator->creator_id !== $currentUser->id) {
+                return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to update this operator.'], 403);
             }
         } else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
 
-        // Update the technician's details
-        $technician->fill($validatedData);
-        $technician->updater()->associate($currentUser); // Associate the updater
-        $technician->save();
+        // Update the operator's details
+        $operator->fill($validatedData);
+        $operator->updater()->associate($currentUser); // Associate the updater
+        $operator->save();
 
         // Return a success response
-        return response()->json(['success' => true, 'message' => 'Technician updated successfully.', 'technician' => $technician], 200);
+        return response()->json(['success' => true, 'message' => 'operator updated successfully.', 'operator' => $operator], 200);
     }
+
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Technician $technician)
+    public function destroy(Operator $operator)
     {
-    // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('admin')->user();
             // Check if the admin is a superadmin
             if ($currentUser->role === 'superadmin') {
-                // Superadmin can delete any technician without additional checks
+                // Superadmin can delete any operator without additional checks
             } else {
                 $creatorType = Admin::class;
                 // Regular admin authorization check
-                if ($technician->creator_type !== $creatorType || $technician->creator_id !== $currentUser->id) {
-                    return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to delete this technician.'], 403);
+                if ($operator->creator_type !== $creatorType || $operator->creator_id !== $currentUser->id) {
+                    return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to delete this operator.'], 403);
                 }
             }
 
@@ -228,19 +221,27 @@ class TechnicianController extends Controller
             $creatorType = User::class;
 
             // Regular user authorization check
-            if ($technician->creator_type !== $creatorType || $technician->creator_id !== $currentUser->id) {
-                return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to delete this technician.'], 403);
+            if ($operator->creator_type !== $creatorType || $operator->creator_id !== $currentUser->id) {
+                return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to delete this operator.'], 403);
             }
         } else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
-        // Delete the technician
-        $technician->delete();
+        // Delete the operator
+        $operator->delete();
         // Return a success response
-        return response()->json(['success' => true, 'message' => 'Technician deleted successfully.'], 200);
+        return response()->json(['success' => true, 'message' => 'operator deleted successfully.'], 200);
     }
 
+    public function trashedOperatorsCount()
+    {
+        // Get the count of soft-deleted Operators
+        $trashedCount = Operator::onlyTrashed()->count();
 
+        return response()->json([
+            'trashedCount' => $trashedCount
+        ], Response::HTTP_OK);
+    }
     public function trashed(Request $request)
     {
         // Determine the authenticated user (either from 'admin' or 'user' guard)
@@ -248,13 +249,13 @@ class TechnicianController extends Controller
             $currentUser = Auth::guard('admin')->user();
             $creatorType = Admin::class;
 
-            // Superadmin check: Allow access to all soft-deleted technicians
+            // Superadmin check: Allow access to all soft-deleted operators
             if ($currentUser->role === 'superadmin') {
-                // Fetch all trashed technicians without additional checks
-                $techniciansQuery = Technician::onlyTrashed();
+                // Fetch all trashed operators without additional checks
+                $operatorsQuery = Operator::onlyTrashed();
             } else {
                 // Regular admin authorization check
-                $techniciansQuery = Technician::onlyTrashed()
+                $operatorsQuery = Operator::onlyTrashed()
                     ->where('creator_id', $currentUser->id)
                     ->where('creator_type', $creatorType); // Only fetch soft-deleted records created by this admin
             }
@@ -264,7 +265,7 @@ class TechnicianController extends Controller
             $creatorType = User::class;
 
             // Regular user authorization check
-            $techniciansQuery = Technician::onlyTrashed()
+            $operatorsQuery = Operator::onlyTrashed()
                 ->where('creator_id', $currentUser->id)
                 ->where('creator_type', $creatorType); // Only fetch soft-deleted records created by this user
 
@@ -281,33 +282,22 @@ class TechnicianController extends Controller
 
         // Apply search if the search term is not empty
         if (!empty($search)) {
-            $techniciansQuery->where('name', 'LIKE', '%' . $search . '%'); // Adjust as per your Technician fields
+            $operatorsQuery->where('name', 'LIKE', '%' . $search . '%'); // Adjust as per your Operator fields
         }
 
         // Apply sorting
-        $techniciansQuery->orderBy($sortBy, $sortOrder);
+        $operatorsQuery->orderBy($sortBy, $sortOrder);
 
         // Paginate results
-        $technicians = $techniciansQuery->paginate($itemsPerPage);
+        $operators = $operatorsQuery->paginate($itemsPerPage);
 
         // Return the response as JSON
         return response()->json([
-            'items' => $technicians->items(), // Current page items
-            'total' => $technicians->total(), // Total number of trashed records
+            'items' => $operators->items(), // Current page items
+            'total' => $operators->total(), // Total number of trashed records
         ]);
     }
 
-    public function trashedTechniciansCount()
-    {
-        // Get the count of soft-deleted technicians
-        $trashedCount = Technician::onlyTrashed()->count();
-
-        return response()->json([
-            'trashedCount' => $trashedCount
-        ], Response::HTTP_OK);
-    }
-
-    // Permanently delete a technician from trash
     public function forceDelete($id)
     {
         // Determine the authenticated user (either from 'admin' or 'user' guard)
@@ -315,12 +305,12 @@ class TechnicianController extends Controller
             $currentUser = Auth::guard('admin')->user();
             $creatorType = Admin::class;
 
-            // Superadmin check: Allow access to all trashed technicians
+            // Superadmin check: Allow access to all trashed operators
             if ($currentUser->role === 'superadmin') {
-                $technician = Technician::onlyTrashed()->findOrFail($id);
+                $operator = Operator::onlyTrashed()->findOrFail($id);
             } else {
                 // Regular admin authorization check
-                $technician = Technician::onlyTrashed()
+                $operator = Operator::onlyTrashed()
                     ->where('creator_id', $currentUser->id)
                     ->where('creator_type', $creatorType)
                     ->findOrFail($id);
@@ -331,7 +321,7 @@ class TechnicianController extends Controller
             $creatorType = User::class;
 
             // Regular user authorization check
-            $technician = Technician::onlyTrashed()
+            $operator = Operator::onlyTrashed()
                 ->where('creator_id', $currentUser->id)
                 ->where('creator_type', $creatorType)
                 ->findOrFail($id);
@@ -339,13 +329,12 @@ class TechnicianController extends Controller
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
 
-        // Permanently delete the technician
-        $technician->forceDelete(); // Permanent delete
+        // Permanently delete the operator
+        $operator->forceDelete(); // Permanent delete
 
-        return response()->json(['message' => 'Technician permanently deleted'], Response::HTTP_OK);
+        return response()->json(['message' => 'Operator permanently deleted'], Response::HTTP_OK);
     }
-
-    // Restore a soft-deleted technician
+    // Restore a soft-deleted operator
     public function restore($id)
     {
         // Determine the authenticated user (either from 'admin' or 'user' guard)
@@ -353,12 +342,12 @@ class TechnicianController extends Controller
             $currentUser = Auth::guard('admin')->user();
             $creatorType = Admin::class;
 
-            // Superadmin check: Allow access to all trashed technicians
+            // Superadmin check: Allow access to all trashed operators
             if ($currentUser->role === 'superadmin') {
-                $restored = Technician::onlyTrashed()->findOrFail($id)->restore();
+                $restored = Operator::onlyTrashed()->findOrFail($id)->restore();
             } else {
                 // Regular admin authorization check
-                $restored = Technician::onlyTrashed()
+                $restored = Operator::onlyTrashed()
                     ->where('creator_id', $currentUser->id)
                     ->where('creator_type', $creatorType)
                     ->findOrFail($id)
@@ -370,7 +359,7 @@ class TechnicianController extends Controller
             $creatorType = User::class;
 
             // Regular user authorization check
-            $restored = Technician::onlyTrashed()
+            $restored = Operator::onlyTrashed()
                 ->where('creator_id', $currentUser->id)
                 ->where('creator_type', $creatorType)
                 ->findOrFail($id)
@@ -380,12 +369,11 @@ class TechnicianController extends Controller
         }
 
         if ($restored) {
-            return response()->json(['message' => 'Technician restored successfully'], Response::HTTP_OK);
+            return response()->json(['message' => 'Operator restored successfully'], Response::HTTP_OK);
         }
 
-        return response()->json(['message' => 'Technician not found or is not trashed'], Response::HTTP_NOT_FOUND);
+        return response()->json(['message' => 'Operator not found or is not trashed'], Response::HTTP_NOT_FOUND);
     }
-
 
 
 }

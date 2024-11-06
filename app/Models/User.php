@@ -145,4 +145,15 @@ class User extends Authenticatable
     public function factories(){
         return $this->hasMany(Factory::class,);
     }
+     // Operators created by this user
+     public function createdOperators(): MorphMany
+     {
+         return $this->morphMany(Operator::class, 'creator');
+     }
+ 
+     // Operators updated by this user
+     public function updatedOperators(): MorphMany
+     {
+         return $this->morphMany(Operator::class, 'updater');
+     }
 }

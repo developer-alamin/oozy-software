@@ -366,6 +366,46 @@
             <li class="nav-item">
                 <a
                     class="nav-link collapsed"
+                    data-bs-target="#tables-nav-tt"
+                    data-bs-toggle="collapse"
+                    href="#"
+                    :class="{ show: isOperatorRouteShow }"
+                >
+                    <i class="bi bi-layout-text-window-reverse"></i
+                    ><span>Operator</span
+                    ><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul
+                    id="tables-nav-tt"
+                    class="nav-content collapse"
+                    data-bs-parent="#sidebar-nav"
+                    :class="{ show: isOperatorRouteShow }"
+                >
+                    <li>
+                        <router-link
+                            :to="{ name: 'OperatorCreate' }"
+                            active-class="active"
+                            :class="{ active: isOperatorCreateActive }"
+                        >
+                            <i class="bi bi-circle"></i
+                            ><span>Add Operator </span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'OperatorIndex' }"
+                            active-class="active"
+                            :class="{ active: isOperatorIndexActive }"
+                        >
+                            <i class="bi bi-circle"></i
+                            ><span>All Operators</span>
+                        </router-link>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a
+                    class="nav-link collapsed"
                     data-bs-target="#rant-nav"
                     data-bs-toggle="collapse"
                     href="#"
@@ -540,7 +580,7 @@ const isFactoryRouteShow = computed(() => {
 });
 const isFactoryCreateActive = computed(() => route.name === "FactoryCreate");
 const isFactoryIndexActive = computed(() => route.name === "FactoryIndex");
-//
+//technician
 const isTechnicianRouteShow = computed(() => {
     return [
         "TechnicianIndex",
@@ -555,6 +595,18 @@ const isTechnicianCreateActive = computed(
 const isTechnicianIndexActive = computed(
     () => route.name === "TechnicianIndex"
 );
+
+//technician
+const isOperatorRouteShow = computed(() => {
+    return [
+        "OperatorIndex",
+        "OperatorCreate",
+        "OperatorEdit",
+        "OperatorTrash",
+    ].includes(route.name);
+});
+const isOperatorCreateActive = computed(() => route.name === "OperatorCreate");
+const isOperatorIndexActive = computed(() => route.name === "OperatorIndex");
 
 // Company
 const isAdminUserRouteShow = computed(() => {

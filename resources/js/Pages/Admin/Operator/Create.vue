@@ -1,10 +1,10 @@
 <template>
     <v-card outlined class="mx-auto my-5" max-width="">
-        <v-card-title>Create technician</v-card-title>
+        <v-card-title>Create operator</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="submit">
                 <v-autocomplete
-                    v-model="technician.company_id"
+                    v-model="operator.company_id"
                     :items="companys"
                     item-value="id"
                     item-title="name"
@@ -21,7 +21,7 @@
                 </v-autocomplete>
                 <!-- Name Field -->
                 <v-text-field
-                    v-model="technician.name"
+                    v-model="operator.name"
                     :rules="[rules.required]"
                     label="Name"
                     outlined
@@ -32,19 +32,20 @@
                     </template>
                 </v-text-field>
                 <v-select
-                    v-model="technician.type"
+                    v-model="operator.type"
                     :items="typeItems"
                     :rules="[rules.required]"
-                    label="Technician Type"
+                    label="Operator Type"
                     clearable
                 >
                     <template v-slot:label>
-                        Technician Type <span style="color: red">*</span>
+                        Operator Type <span style="color: red">*</span>
                     </template>
                 </v-select>
                 <!-- Name Field -->
                 <v-text-field
-                    v-model="technician.email"
+                    v-model="operator.email"
+                    :rules="[rules.email]"
                     label="Email"
                     outlined
                     :error-messages="errors.email ? errors.email : ''"
@@ -53,7 +54,7 @@
                 </v-text-field>
 
                 <v-text-field
-                    v-model="technician.phone"
+                    v-model="operator.phone"
                     label="Phone"
                     outlined
                     :error-messages="errors.phone ? errors.phone : ''"
@@ -63,13 +64,13 @@
 
                 <!-- Description Field -->
                 <v-textarea
-                    v-model="technician.address"
+                    v-model="operator.address"
                     label="Address"
                     :error-messages="errors.description ? errors.address : ''"
                 />
                 <!-- Description Field -->
                 <v-textarea
-                    v-model="technician.description"
+                    v-model="operator.description"
                     label="Description"
                     :error-messages="
                         errors.description ? errors.description : ''
@@ -77,9 +78,9 @@
                 />
 
                 <v-select
-                    v-model="technician.status"
+                    v-model="operator.status"
                     :items="statusItems"
-                    label="Technician Status"
+                    label="Operator Status"
                     clearable
                 ></v-select>
 
@@ -104,7 +105,7 @@
                             :disabled="!valid || loading"
                             :loading="loading"
                         >
-                            Create technician
+                            Create operator
                         </v-btn>
                     </v-col>
                 </v-row>
@@ -127,7 +128,7 @@ export default {
             loading: false, // Controls loading state of the button
             statusItems: ["Active", "Inactive"],
             typeItems: ["General", "Special", "Manager"],
-            technician: {
+            operator: {
                 company_id: "",
                 name: "",
                 type: "General",
@@ -143,6 +144,8 @@ export default {
             serverError: null, // Stores server-side error messages
             rules: {
                 required: (value) => !!value || "Required.",
+                email: (value) =>
+                    /.+@.+\..+/.test(value) || "E-mail must be valid.",
             },
         };
     },
@@ -154,7 +157,7 @@ export default {
             this.loading = true; // Start loading when submit is clicked
 
             const formData = new FormData();
-            Object.entries(this.technician).forEach(([key, value]) => {
+            Object.entries(this.operator).forEach(([key, value]) => {
                 formData.append(key, value);
             });
 
@@ -163,21 +166,21 @@ export default {
                 try {
                     // Assuming the actual API call here
                     const response = await this.$axios.post(
-                        "/technician",
+                        "/operator",
                         formData
                     );
 
                     if (response.data.success) {
-                        toast.success("Technician create successfully!");
+                        toast.success("Operator create successfully!");
                         this.resetForm();
                     }
                 } catch (error) {
                     if (error.response && error.response.status === 422) {
-                        toast.error("Failed to create technician.");
+                        toast.error("Failed to create operator.");
                         // Handle validation errors from the server
                         this.errors = error.response.data.errors || {};
                     } else {
-                        toast.error("Failed to create technician.");
+                        toast.error("Failed to create operator.");
                         // Handle other server errors
                         this.serverError =
                             "An error occurred. Please try again.";
@@ -204,7 +207,7 @@ export default {
         },
 
         resetForm() {
-            this.technician = {
+            this.operator = {
                 name: "",
                 email: "",
                 phone: "",

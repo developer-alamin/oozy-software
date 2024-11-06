@@ -51,6 +51,11 @@ export { default as TechnicianIndex } from "../Pages/Technician/Index.vue";
 export { default as TechnicianCreate } from "../Pages/Technician/Create.vue";
 export { default as TechnicianEdit } from "../Pages/Technician/Edit.vue";
 export { default as TechnicianTrash } from "../Pages/Technician/Trash.vue";
+// Operator components
+export { default as OperatorIndex } from "../Pages/Admin/Operator/Index.vue";
+export { default as OperatorCreate } from "../Pages/Admin/Operator/Create.vue";
+export { default as OperatorEdit } from "../Pages/Admin/Operator/Edit.vue";
+export { default as OperatorTrash } from "../Pages/Admin/Operator/Trash.vue";
 
 // Line components
 export { default as LineIndex } from "../Pages/Admin/Line/Index.vue";
@@ -71,13 +76,11 @@ export { default as RentCreate } from "../Pages/Admin/Rents/Create.vue";
 export { default as RentEdit } from "../Pages/Admin/Rents/Edit.vue";
 export { default as RentsTrash } from "../Pages/Admin/Rents/Trash.vue";
 
-
 //Floor Components
 export { default as FloorIndex } from "../Pages/Admin/Floor/Index.vue";
 export { default as FloorCreate } from "../Pages/Admin/Floor/Create.vue";
 export { default as FloorEdit } from "../Pages/Admin/Floor/Edit.vue";
 export { default as FloorTrash } from "../Pages/Admin/Floor/Trash.vue";
-
 
 //Mechine Type Components
 export { default as MechineTypeIndex } from "../Pages/Admin/Mechine/Type/Index.vue";
@@ -90,5 +93,3 @@ export { default as MechineSourceIndex } from "../Pages/Admin/Mechine/Source/Ind
 export { default as MechineSourceCreate } from "../Pages/Admin/Mechine/Source/Create.vue";
 export { default as MechineSourceEdit } from "../Pages/Admin/Mechine/Source/Edit.vue";
 export { default as MechineSourceTrash } from "../Pages/Admin/Mechine/Source/Trash.vue";
-
-
