@@ -20,11 +20,13 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Auth\UserAuthController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\MechineAssingController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\Admin\ProductModelController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\OperatorController;
+use App\Models\MechineAssing;
 
 Route::resource('suppliers', SupplierController::class);
 // suppliers Group Controllers start form here
@@ -52,7 +54,14 @@ Route::controller(FloorController::class)
 });
 Route::resource('floor', FloorController::class);
 
-// floor group route declare end form here
+Route::get('/get_factories', [MechineAssingController::class, 'getFactories']);
+Route::get('/get_brands', [MechineAssingController::class, 'getBrands']);
+Route::get('/get_models', [MechineAssingController::class, 'getModels']);
+Route::get('/get_types', [MechineAssingController::class, 'getTypes']);
+Route::get('/get_sources', [MechineAssingController::class, 'getSources']);
+Route::get('/get_suppliers', [MechineAssingController::class, 'getSuppliers']);
+Route::get('/get_rents', [MechineAssingController::class, 'getRents']);
+Route::resource('mechine-assing',MechineAssingController::class);
 
 //Mechine Group Route declare start form here
 

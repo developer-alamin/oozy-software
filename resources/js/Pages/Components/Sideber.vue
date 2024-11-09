@@ -28,15 +28,15 @@
                     data-bs-parent="#sidebar-nav"
                 >
                     <li>
-                        <router-link to="#">
-                            <i class="bi bi-circle"></i><span>Add Mechine</span>
+                        <router-link :to="{ name: 'MechineCreate' }">
+                            <i class="bi bi-circle"></i><span>Mechine Assing</span>
                         </router-link>
                     </li>
                     <li>
-                        <a href="#">
+                        <router-link :to="{ name: 'MechineIndex' }">
                             <i class="bi bi-circle"></i
-                            ><span>All Mechines </span>
-                        </a>
+                            ><span>All Mechine List </span>
+                        </router-link>
                     </li>
                     <li>
                         <router-link

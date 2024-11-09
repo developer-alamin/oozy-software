@@ -89,13 +89,14 @@ const routes = [
                 component: adminComponents.AllCompanyIndex,
                 meta: { title: "All Company Index" },
             },
+            // factory
             {
                 path: "factory/index", // New route for Contact
                 name: "FactoryIndex",
                 component: adminComponents.FactoryIndex,
                 meta: { title: "Factory Index" },
             },
-            // factory
+
             {
                 path: "factory/create", // New route for Factory
                 name: "FactoryCreate",
@@ -115,6 +116,33 @@ const routes = [
                 component: adminComponents.FactoryTrash,
                 meta: { title: "Factory Trash" },
             },
+            // factory
+            {
+                path: "mechine/index", // New route for Contact
+                name: "MechineIndex",
+                component: adminComponents.MechineIndex,
+                meta: { title: "Mechine Index" },
+            },
+
+            {
+                path: "mechine/create", // New route for Factory
+                name: "MechineCreate",
+                component: adminComponents.MechineCreate,
+                meta: { title: "Mechine Create" },
+            },
+            // {
+            //     path: "factory/:uuid/edit", // Dynamic route for Factory Edit
+            //     name: "FactoryEdit",
+            //     component: adminComponents.FactoryEdit,
+            //     meta: { title: "Edit Factory" },
+            //     props: true, // Enables passing route params as props
+            // },
+            // {
+            //     path: "factory/trash", // New route for Contact
+            //     name: "FactoryTrash",
+            //     component: adminComponents.FactoryTrash,
+            //     meta: { title: "Factory Trash" },
+            // },
 
             {
                 path: "supplier/index", // New route for Contact
