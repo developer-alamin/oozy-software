@@ -9,9 +9,11 @@ use App\Models\Factory;
 use App\Models\MechineType;
 use App\Models\ProductModel;
 use App\Models\Rent;
+use Carbon\Carbon;
 use App\Models\Source;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class MechineAssingController extends Controller
 {
@@ -34,9 +36,45 @@ class MechineAssingController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+
+
     public function store(Request $request)
     {
-        //
+        if (Auth::guard('admin')->check()) {
+            $creator = Auth::guard('admin')->user();
+            // Additional checks can be implemented here for admin roles if needed
+        } elseif (Auth::guard('user')->check()) {
+            $creator = Auth::guard('user')->user();
+            // User-specific checks can be added here if needed
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+        $mechineAssingData = $request->all();
+        // Convert dates to Carbon instances (or the desired format)
+        if (isset($mechineAssing['purchase_date'])) {
+            // Remove the timezone name (in parentheses) to prevent the double timezone specification issue
+            $purchaseDate = preg_replace('/\s*\(.*\)$/', '', $mechineAssing['purchase_date']);
+            $mechineAssing['purchase_date'] = Carbon::parse($purchaseDate)->format('Y-m-d');
+        }
+        if (isset($mechineAssing['rent_date'])) {
+            // Remove the timezone name (in parentheses) to prevent the double timezone specification issue
+            $rentDate = preg_replace('/\s*\(.*\)$/', '', $mechineAssing['rent_date']);
+            $mechineAssing['rent_date'] = Carbon::parse($rentDate)->format('Y-m-d');
+        }
+        // Create the new MechineAssing record
+        $mechineAssing = MechineAssing::create($mechineAssingData);
+        // Associate creator and updater
+        $mechineAssing->creator()->associate($creator);
+        $mechineAssing->updater()->associate($creator);
+        // Save the updated record with the associations
+        $mechineAssing->save();
+
+        // Return a success response
+        return response()->json([
+            'success'        => true,
+            'message'        => 'Mechine Assing created successfully.',
+            'mechine_assing' => $mechineAssing
+        ], 200);
     }
 
     /**

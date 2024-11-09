@@ -150,10 +150,20 @@ class User extends Authenticatable
      {
          return $this->morphMany(Operator::class, 'creator');
      }
- 
+
      // Operators updated by this user
      public function updatedOperators(): MorphMany
      {
          return $this->morphMany(Operator::class, 'updater');
      }
+    // mechine assing created by this user
+    public function createdMechineAssings(): MorphMany
+    {
+        return $this->morphMany(MechineAssing::class, 'creator');
+    }
+    // mechine assing updated by this user
+    public function updatedMechineAssings(): MorphMany
+    {
+        return $this->morphMany(MechineAssing::class, 'updater');
+    }
 }

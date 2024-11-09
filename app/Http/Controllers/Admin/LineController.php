@@ -94,9 +94,6 @@ class LineController extends Controller
          } else {
              return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
          }
-
-
-
          $line       = new Line($validatedData);
          $line->uuid = HelperController::generateUuid();
          $line->creator()->associate($creator);  // Assign creator polymorphically

@@ -84,7 +84,7 @@
                     </template>
                 </v-autocomplete>
                 <v-autocomplete
-                    v-model="mechine_assing.type_id"
+                    v-model="mechine_assing.mechine_type_id"
                     :items="types"
                     item-value="id"
                     item-title="name"
@@ -92,7 +92,9 @@
                     density="comfortable"
                     clearable
                     :rules="[rules.required]"
-                    :error-messages="errors.type_id ? errors.type_id : ''"
+                    :error-messages="
+                        errors.mechine_type_id ? errors.mechine_type_id : ''
+                    "
                     @update:search="fetchTypes"
                     @update:model-value="updatePreventiveServiceDays"
                 >
@@ -120,7 +122,7 @@
                 </v-text-field>
 
                 <v-autocomplete
-                    v-model="mechine_assing.source_id"
+                    v-model="mechine_assing.mechine_source_id"
                     :items="sources"
                     item-value="id"
                     item-title="name"
@@ -128,7 +130,9 @@
                     density="comfortable"
                     clearable
                     :rules="[rules.required]"
-                    :error-messages="errors.source_id ? errors.source_id : ''"
+                    :error-messages="
+                        errors.mechine_source_id ? errors.mechine_source_id : ''
+                    "
                     @update:search="fetchSources"
                 >
                     <template v-slot:label>
@@ -136,14 +140,16 @@
                     </template>
                 </v-autocomplete>
                 <v-autocomplete
-                    v-model="mechine_assing.supplie_id"
+                    v-model="mechine_assing.supplier_id"
                     :items="suppliers"
                     item-value="id"
                     item-title="name"
                     label="Select Supplier"
                     density="comfortable"
                     clearable
-                    :error-messages="errors.supplie_id ? errors.supplie_id : ''"
+                    :error-messages="
+                        errors.supplier_id ? errors.supplier_id : ''
+                    "
                     @update:search="fetchSuppliers"
                 >
                     <!-- <template v-slot:label>
@@ -179,16 +185,66 @@
                     "
                 >
                 </v-text-field>
-
                 <v-text-field
-                    v-model="mechine_assing.phone"
-                    label="Phone"
+                    v-model="mechine_assing.purchase_price"
+                    label="Purchase Price"
                     outlined
                     density="comfortable"
-                    :error-messages="errors.phone ? errors.phone : ''"
+                    :error-messages="
+                        errors.purchase_price ? errors.purchase_price : ''
+                    "
                 >
-                    <template v-slot:label> Phone </template>
+                    <template v-slot:label> Purchase Price </template>
                 </v-text-field>
+
+                <!-- <v-text-field
+                    v-model="mechine_assing.purchase_date"
+                    label="Purchase Date"
+                    type="date"
+                    outlined
+                    density="comfortable"
+                    :rules="[rules.required]"
+                    :error-messages="
+                        errors.purchase_date ? errors.purchase_date : ''
+                    "
+                >
+                    <template v-slot:label>
+                        Purchase Date <span style="color: red">*</span>
+                    </template>
+                </v-text-field>
+                <v-text-field
+                    v-model="mechine_assing.rent_date"
+                    label="Rent Date"
+                    type="date"
+                    outlined
+                    density="comfortable"
+                    :rules="[rules.required]"
+                    :error-messages="errors.rent_date ? errors.rent_date : ''"
+                >
+                    <template v-slot:label>
+                        Rent Date <span style="color: red">*</span>
+                    </template>
+                </v-text-field> -->
+                <v-row>
+                    <v-col col="6">
+                        <v-date-input
+                            v-model="mechine_assing.purchase_date"
+                            label="Purchase Date"
+                            :error-messages="
+                                errors.purchase_date ? errors.purchase_date : ''
+                            "
+                        />
+                    </v-col>
+                    <v-col>
+                        <v-date-input
+                            v-model="mechine_assing.rent_date"
+                            label="Rent Date"
+                            :error-messages="
+                                errors.rent_date ? errors.rent_date : ''
+                            "
+                        />
+                    </v-col>
+                </v-row>
 
                 <v-text-field
                     v-model="mechine_assing.factory_code"
@@ -212,7 +268,7 @@
                 <v-select
                     v-model="mechine_assing.status"
                     :items="statusItems"
-                    label="Factory Status"
+                    label="Mechine Status"
                     clearable
                     density="comfortable"
                 ></v-select>
@@ -254,23 +310,40 @@
 <script>
 import { ref } from "vue";
 import { toast } from "vue3-toastify";
+// import VDateInput from "../../Components/VDateInput.vue";
+
 export default {
+    // components: {
+    //     VDateInput,
+    // },
     data() {
         return {
             valid: false,
             loading: false, // Controls loading state of the button
-            statusItems: ["Active", "Inactive"],
+            statusItems: [
+                "Preventive",
+                "Production",
+                "Breakdown",
+                "Under Maintenance",
+                "Loan",
+                "Idol",
+                "AsFactory",
+                "Scraped",
+            ],
 
             mechine_assing: {
+                rent_date: null,
+                purchase_date: null,
                 name: "",
+                date: null,
                 company_id: null,
                 factory_id: null,
                 brand_id: null,
                 model_id: null,
-                type_id: null,
+                mechine_type_id: null,
                 preventive_service_days: "",
-                source_id: null,
-                supplie_id: null,
+                mechine_source_id: null,
+                supplier_id: null,
                 rent_id: null,
                 mechine_code: "",
                 phone: "",
@@ -304,6 +377,14 @@ export default {
             confirm_visible: false,
         };
     },
+    computed: {
+        // Function to limit the allowed dates within the min and max date range
+        allowedDates() {
+            return (date) => {
+                return date >= new Date();
+            };
+        },
+    },
     methods: {
         async submit() {
             // Reset errors and loading state before submission
@@ -311,18 +392,18 @@ export default {
             this.serverError = null;
             this.loading = true; // Start loading when submit is clicked
 
+            const formData = new FormData();
+            Object.entries(this.mechine_assing).forEach(([key, value]) => {
+                formData.append(key, value);
+            });
             // const formData = new FormData();
             // Object.entries(this.factory).forEach(([key, value]) => {
-            //     formData.append(key, value);
+            //     if (Array.isArray(value)) {
+            //         value.forEach((val) => formData.append(`${key}[]`, val));
+            //     } else {
+            //         formData.append(key, value);
+            //     }
             // });
-            const formData = new FormData();
-            Object.entries(this.factory).forEach(([key, value]) => {
-                if (Array.isArray(value)) {
-                    value.forEach((val) => formData.append(`${key}[]`, val));
-                } else {
-                    formData.append(key, value);
-                }
-            });
             // Simulate a 3-second loading time (e.g., for an API call)
             setTimeout(async () => {
                 try {
@@ -443,7 +524,7 @@ export default {
         },
         updatePreventiveServiceDays() {
             const selectedType = this.types.find(
-                (type) => type.id === this.mechine_assing.type_id
+                (type) => type.id === this.mechine_assing.mechine_type_id
             );
             console.log("Selected Type:", selectedType); // Debugging log
 

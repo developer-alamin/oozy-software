@@ -56,7 +56,7 @@ class Admin extends Authenticatable
      {
          return $this->morphMany(Operator::class, 'creator');
      }
- 
+
      // Operators updated by this user
      public function updatedOperators(): MorphMany
      {
@@ -143,5 +143,16 @@ class Admin extends Authenticatable
     {
         return $this->morphMany(Factory::class, 'updater');
     }
+
+     // factorys created by this user
+     public function createdMechineAssings(): MorphMany
+     {
+         return $this->morphMany(MechineAssing::class, 'creator');
+     }
+     // factorys updated by this user
+     public function updatedMechineAssings(): MorphMany
+     {
+         return $this->morphMany(MechineAssing::class, 'updater');
+     }
 
 }

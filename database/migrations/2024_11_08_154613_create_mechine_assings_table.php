@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('mechine_assings', function (Blueprint $table) {
             $table->id();
-            $table->uuid('uuid')->unique();
+            $table->uuid('uuid')->unique()->nullable();
             $table->bigInteger('company_id');
             $table->bigInteger('factory_id');
             $table->bigInteger('brand_id');
@@ -22,18 +22,19 @@ return new class extends Migration
             $table->bigInteger('mechine_source_id');
             $table->bigInteger('supplier_id')->nullable();
             $table->bigInteger('rent_id')->nullable();
+            $table->dateTime('rent_date')->nullable();
             $table->string('name');
             $table->string('mechine_code')->nullable();
             $table->string('serial_number')->nullable();
             $table->string('preventive_service_days')->nullable();
             $table->decimal('purchace_price')->default(0);
             $table->dateTime('purchase_date')->nullable();
-            $table->dateTime('date')->nullable();
             $table->enum('status',['Preventive','Production','Breakdown','Under Maintenance','Loan','Idol','AsFactory','Scraped']);
             $table->text('note')->nullable();
             $table->morphs('creator');
             $table->morphs('updater');
             $table->softDeletes();
+            $table->text('meta_data')->nullable();
             $table->timestamps();
         });
     }
