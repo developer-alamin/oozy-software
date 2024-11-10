@@ -239,7 +239,7 @@ class LineController extends Controller
             'trashedCount' => $trashedCount
         ], Response::HTTP_OK);
     }
-      public function lineTrashed(Request $request)
+    public function lineTrashed(Request $request)
     {
 
         // Determine the authenticated user (either from 'admin' or 'user' guard)
@@ -350,53 +350,53 @@ class LineController extends Controller
     }
 
     public function LineForceDelete($id)
-     {
+    {
 
 
-        // Determine the authenticated user (either from 'admin' or 'user' guard)
-        if (Auth::guard('admin')->check()) {
+    // Determine the authenticated user (either from 'admin' or 'user' guard)
+    if (Auth::guard('admin')->check()) {
 
-            $currentUser = Auth::guard('admin')->user();
-            $creatorType = Admin::class;
+        $currentUser = Auth::guard('admin')->user();
+        $creatorType = Admin::class;
 
-            // Superadmin check: Allow access to all trashed technicians
-            if ($currentUser->role === 'superadmin') {
-                $line = Line::onlyTrashed()->findOrFail($id);
-            } else {
-                // Regular admin authorization check
-                $line = Line::onlyTrashed()
-                    ->where('creator_id', $currentUser->id)
-                    ->where('creator_type', $creatorType)
-                    ->findOrFail($id);
-            }
-
-            } elseif (Auth::guard('user')->check()) {
-                $currentUser = Auth::guard('user')->user();
-                $creatorType = User::class;
-
-                // Regular user authorization check
-                $line = line::onlyTrashed()
-                    ->where('creator_id', $currentUser->id)
-                    ->where('creator_type', $creatorType)
-                    ->findOrFail($id);
-            } else {
-            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        // Superadmin check: Allow access to all trashed technicians
+        if ($currentUser->role === 'superadmin') {
+            $line = Line::onlyTrashed()->findOrFail($id);
+        } else {
+            // Regular admin authorization check
+            $line = Line::onlyTrashed()
+                ->where('creator_id', $currentUser->id)
+                ->where('creator_type', $creatorType)
+                ->findOrFail($id);
         }
 
-        try {
-            // Delete the supplier
-            $line->forceDelete();
-            return response()->json([
-                'success' => true,
-                'message' => 'Line permanently deleted successfully.'
-            ], Response::HTTP_OK);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error deleting Brand: ' . $e->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
 
-         return response()->json(['message' => 'Line permanently deleted']);
-     }
+            // Regular user authorization check
+            $line = line::onlyTrashed()
+                ->where('creator_id', $currentUser->id)
+                ->where('creator_type', $creatorType)
+                ->findOrFail($id);
+        } else {
+        return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+    }
+
+    try {
+        // Delete the supplier
+        $line->forceDelete();
+        return response()->json([
+            'success' => true,
+            'message' => 'Line permanently deleted successfully.'
+        ], Response::HTTP_OK);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error deleting Brand: ' . $e->getMessage()
+        ], Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
+
+        return response()->json(['message' => 'Line permanently deleted']);
+    }
 }

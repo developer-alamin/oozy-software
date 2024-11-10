@@ -137,12 +137,12 @@ const routes = [
             //     meta: { title: "Edit Factory" },
             //     props: true, // Enables passing route params as props
             // },
-            // {
-            //     path: "factory/trash", // New route for Contact
-            //     name: "FactoryTrash",
-            //     component: adminComponents.FactoryTrash,
-            //     meta: { title: "Factory Trash" },
-            // },
+            {
+                path: "mechine/trash", // New route for Contact
+                name: "MechineTrash",
+                component: adminComponents.MechineTrash,
+                meta: { title: "Mechine Trash" },
+            },
 
             {
                 path: "supplier/index", // New route for Contact

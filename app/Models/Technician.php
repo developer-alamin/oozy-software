@@ -60,7 +60,10 @@ class Technician extends Model
             'meta_data'     => 'nullable',
         ];
     }
-
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'company_id');
+    }
 
     // public function updater()
     // {

@@ -57,7 +57,7 @@ class OperatorController extends Controller
         $operatorsQuery->orderBy($sortBy, $sortOrder);
 
         // Paginate results
-        $operators = $operatorsQuery->paginate($itemsPerPage);
+        $operators = $operatorsQuery->with('creator:id,name','user:id,name')->paginate($itemsPerPage);
 
         // Return the response as JSON
         return response()->json([
@@ -289,7 +289,7 @@ class OperatorController extends Controller
         $operatorsQuery->orderBy($sortBy, $sortOrder);
 
         // Paginate results
-        $operators = $operatorsQuery->paginate($itemsPerPage);
+        $operators = $operatorsQuery->with('creator:id,name','user:id,name')->paginate($itemsPerPage);
 
         // Return the response as JSON
         return response()->json([

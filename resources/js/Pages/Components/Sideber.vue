@@ -29,7 +29,8 @@
                 >
                     <li>
                         <router-link :to="{ name: 'MechineCreate' }">
-                            <i class="bi bi-circle"></i><span>Mechine Assing</span>
+                            <i class="bi bi-circle"></i
+                            ><span>Mechine Assing</span>
                         </router-link>
                     </li>
                     <li>
@@ -38,35 +39,7 @@
                             ><span>All Mechine List </span>
                         </router-link>
                     </li>
-                    <li>
-                        <router-link
-                            :to="{ name: 'BrandIndex' }"
-                            active-class="active"
-                            :class="{ active: isBrandRoute }"
-                        >
-                            <i class="bi bi-circle"></i
-                            ><span>Mechine Brand</span>
-                        </router-link>
-                    </li>
-                    <li>
-                        <router-link
-                            :to="{ name: 'CategoryIndex' }"
-                            active-class="active"
-                            :class="{ active: isCategoryRoute }"
-                        >
-                            <i class="bi bi-circle"></i><span>Category</span>
-                        </router-link>
-                    </li>
-                    <li>
-                        <router-link
-                            :to="{ name: 'ModelIndex' }"
-                            active-class="active"
-                            :class="{ active: isModelRoute }"
-                        >
-                            <i class="bi bi-circle"></i
-                            ><span>Mechine Model</span>
-                        </router-link>
-                    </li>
+
                     <li>
                         <router-link
                             :to="{ name: 'UnitIndex' }"
@@ -77,16 +50,7 @@
                             ><span>Mechine Unit</span>
                         </router-link>
                     </li>
-                    <li>
-                        <router-link
-                            :to="{ name: 'SupplierIndex' }"
-                            active-class="active"
-                            :class="{ active: isSupplierRoute }"
-                        >
-                            <i class="bi bi-circle"></i
-                            ><span>Mechine Supplier</span>
-                        </router-link>
-                    </li>
+
                     <li>
                         <router-link
                             :to="{ name: 'MechineTypeIndex' }"
@@ -460,9 +424,45 @@
                 >
                     <li>
                         <router-link
+                            :to="{ name: 'BrandIndex' }"
+                            active-class="active"
+                            :class="{ active: isBrandRoute }"
+                        >
+                            <i class="bi bi-circle"></i><span>Brand</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'CategoryIndex' }"
+                            active-class="active"
+                            :class="{ active: isCategoryRoute }"
+                        >
+                            <i class="bi bi-circle"></i><span>Category</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'ModelIndex' }"
+                            active-class="active"
+                            :class="{ active: isModelRoute }"
+                        >
+                            <i class="bi bi-circle"></i><span>Model</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'SupplierIndex' }"
+                            active-class="active"
+                            :class="{ active: isSupplierRoute }"
+                        >
+                            <i class="bi bi-circle"></i><span>Supplier</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link
                             :to="{ name: 'LineIndex' }"
                             active-class="active"
-                            :class="{ active: isLineIndex }"
+                            :class="{ active: isLineRoute }"
                         >
                             <i class="bi bi-circle"></i><span>Line</span>
                         </router-link>
@@ -471,7 +471,7 @@
                         <router-link
                             :to="{ name: 'GroupIndex' }"
                             active-class="active"
-                            :class="{ active: isGroupIndex }"
+                            :class="{ active: isGroupRoute }"
                         >
                             <i class="bi bi-circle"></i><span>Group</span>
                         </router-link>
@@ -480,7 +480,7 @@
                         <router-link
                             :to="{ name: 'FloorIndex' }"
                             active-class="active"
-                            :class="{ active: isFloorIndex }"
+                            :class="{ active: isFloorRoute }"
                         >
                             <i class="bi bi-circle"></i><span>Floor</span>
                         </router-link>
@@ -503,25 +503,10 @@ const route = useRoute();
 // Check if the current route is part of the Mechine-related routes
 const isMechineRoute = computed(() => {
     return [
-        "ModelIndex",
-        "ModelCreate",
-        "ModelEdit",
-        "ModelTrash",
-        "SupplierIndex",
-        "SupplierCreate",
-        "SupplierEdit",
-        "CategoryIndex",
-        "CategoryCreate",
-        "CategoryEdit",
-        "CategoryTrash",
         "UnitIndex",
         "UnitCreate",
         "UnitEdit",
         "UnitTrash",
-        "BrandIndex",
-        "BrandCreate",
-        "BrandEdit",
-        "BrandTrash",
         "MechineTypeIndex",
         "MechineTypeCreate",
         "MechineTypeEdit",
@@ -552,6 +537,19 @@ const isCategoryRoute = computed(() =>
 );
 const isBrandRoute = computed(() =>
     ["BrandIndex", "BrandCreate", "BrandEdit", "BrandTrash"].includes(
+        route.name
+    )
+);
+const isLineRoute = computed(() =>
+    ["LineIndex", "LineCreate", "LineEdit", "LineTrash"].includes(route.name)
+);
+const isGroupRoute = computed(() =>
+    ["GroupIndex", "GroupCreate", "GroupEdit", "GroupTrash"].includes(
+        route.name
+    )
+);
+const isFloorRoute = computed(() =>
+    ["FloorIndex", "FloorCreate", "FloorEdit", "FloorTrash"].includes(
         route.name
     )
 );
@@ -630,6 +628,22 @@ const isUserIndexActive = computed(() => route.name === "AllUserIndex");
 
 const isSettingRouteShow = computed(() => {
     return [
+        "BrandIndex",
+        "BrandCreate",
+        "BrandEdit",
+        "BrandTrash",
+        "ModelIndex",
+        "ModelCreate",
+        "ModelEdit",
+        "ModelTrash",
+        "CategoryIndex",
+        "CategoryCreate",
+        "CategoryEdit",
+        "CategoryTrash",
+        "SupplierIndex",
+        "SupplierCreate",
+        "SupplierEdit",
+        "SupplierTrash",
         "LineIndex",
         "LineCreate",
         "LineEdit",
@@ -637,6 +651,9 @@ const isSettingRouteShow = computed(() => {
         "GroupIndex",
         "GroupEdit",
         "GroupTrash",
+        "FloorIndex",
+        "FloorEdit",
+        "FloorTrash",
     ].includes(route.name);
 });
 </script>

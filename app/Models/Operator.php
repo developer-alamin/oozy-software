@@ -26,18 +26,19 @@ class Operator extends Model
         'updater_id',
         'updater_type',
     ];
-
     // Polymorphic relationships
     public function creator()
     {
         return $this->morphTo();
     }
-
     public function updater()
     {
         return $this->morphTo();
     }
-
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'company_id');
+    }
 
     public static function validationRules()
     {

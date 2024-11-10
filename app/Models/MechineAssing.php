@@ -37,6 +37,14 @@ class MechineAssing extends Model
     //     'purchase_date' => 'datetime',
     // ];
 
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'company_id');
+    }
+    public function factory()
+    {
+        return $this->belongsTo(Factory::class, 'factory_id');
+    }
     public function creator()
     {
         return $this->morphTo();
@@ -46,4 +54,6 @@ class MechineAssing extends Model
     {
         return $this->morphTo();
     }
+
+
 }

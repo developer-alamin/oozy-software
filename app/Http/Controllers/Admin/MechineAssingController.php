@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\HelperController;
+use App\Models\Admin;
 use App\Models\MechineAssing;
 use App\Models\Brand;
 use App\Models\Factory;
@@ -12,7 +13,9 @@ use App\Models\MechineType;
 use App\Models\ProductModel;
 use App\Models\Rent;
 use Carbon\Carbon;
+use Illuminate\Http\Response;
 use App\Models\Source;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -22,9 +25,48 @@ class MechineAssingController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $page         = $request->input('page', 1);
+        $itemsPerPage = $request->input('itemsPerPage', 5);
+        $sortBy       = $request->input('sortBy', 'created_at'); // Default sort by created_at
+        $sortOrder    = $request->input('sortOrder', 'desc');    // Default sort order is descending
+        $search       = $request->input('search', '');           // Search term, default is empty
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
+            // Check if the admin is a super admin
+            if ($currentUser->role === 'superadmin') {
+                // If superadmin, retrieve all technicians
+                $mechineAssingQuery = MechineAssing::query(); // No filters applied
+            } else {
+                // If not superadmin, filter by creator type and id
+                $mechineAssingQuery = MechineAssing::where('creator_type', $creatorType)
+                    ->where('creator_id', $currentUser->id);
+            }
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+            // For regular users, filter by creator type and id
+            $mechineAssingQuery = MechineAssing::where('creator_type', $creatorType)
+                ->where('creator_id', $currentUser->id);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+        // Apply search if the search term is not empty
+        if (!empty($search)) {
+            $mechineAssingQuery->where('name', 'LIKE', '%' . $search . '%');
+        }
+        // Apply sorting
+        $mechineAssingQuery->orderBy($sortBy, $sortOrder);
+        // Paginate results
+        $mechineAssing = $mechineAssingQuery->with('creator:id,name','user:id,name','factory:id,name')->paginate($itemsPerPage);
+        // Return the response as JSON
+        return response()->json([
+            'items' => $mechineAssing->items(), // Current page items
+            'total' => $mechineAssing->total(), // Total number of records
+        ]);
     }
 
     /**
@@ -101,7 +143,7 @@ class MechineAssingController extends Controller
             'type'              => "mechine",
             'status'            => 'in_stock',  // Adjust status as needed
         ]);
-        
+
         $stock->creator()->associate($creator);
         $stock->updater()->associate($creator);
         $stock->save();
@@ -143,9 +185,202 @@ class MechineAssingController extends Controller
      */
     public function destroy(MechineAssing $mechineAssing)
     {
-        //
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            // Check if the admin is a superadmin
+            if ($currentUser->role === 'superadmin') {
+                // Superadmin can delete any brand without additional checks
+            } else {
+                $creatorType = Admin::class;
+                // Regular admin authorization check
+                if ($mechineAssing->creator_type !== $creatorType || $mechineAssing->creator_id !== $currentUser->id) {
+                    return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to delete this brand.'], 403);
+                }
+            }
+
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+            // Regular user authorization check
+            if ($mechineAssing->creator_type !== $creatorType || $mechineAssing->creator_id !== $currentUser->id) {
+                return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to delete this brand.'], 403);
+            }
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        try {
+            // Delete the supplier
+            $mechineAssing->delete();
+            return response()->json([
+                'success' => true,
+                'message' => 'mechine assing deleted successfully.'
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting mechine assing: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
+    public function mechineTrashedCount()
+    {
+         // Get the count of soft-deleted brands
+        $trashedCount = MechineAssing::onlyTrashed()->count();
+
+        return response()->json([
+            'trashedCount' => $trashedCount
+        ], Response::HTTP_OK);
+    }
+
+    public function mechineAssingTrashed(Request $request)
+    {
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
+
+            // Superadmin check: Allow access to all soft-deleted technicians
+            if ($currentUser->role === 'superadmin') {
+                // Fetch all trashed technicians without additional checks
+                $mechinsQuery = MechineAssing::onlyTrashed();
+            } else {
+                // Regular admin authorization check
+                $mechinsQuery = MechineAssing::onlyTrashed()
+                    ->where('creator_id', $currentUser->id)
+                    ->where('creator_type', $creatorType); // Only fetch soft-deleted records created by this admin
+            }
+
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+            // Regular user authorization check
+            $mechinsQuery = MechineAssing::onlyTrashed()
+                ->where('creator_id', $currentUser->id)
+                ->where('creator_type', $creatorType); // Only fetch soft-deleted records created by this user
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+        // Get parameters from the request
+        $page         = $request->input('page', 1);
+        $itemsPerPage = $request->input('itemsPerPage', 5);
+        $sortBy       = $request->input('sortBy', 'created_at'); // Default sort by created_at
+        $sortOrder    = $request->input('sortOrder', 'desc'); // Default order is descending
+        $search       = $request->input('search', ''); // Search term, default is empty
+        // Apply search if the search term is not empty
+        if (!empty($search)) {
+            $mechinsQuery->where('name', 'LIKE', '%' . $search . '%'); // Adjust as per your brand fields
+        }
+        // Apply sorting
+        $mechinsQuery->orderBy($sortBy, $sortOrder);
+        // Paginate results
+        $mechins = $mechinsQuery->with('creator:id,name','user:id,name','factory:id,name')->paginate($itemsPerPage);
+
+        // Return the response as JSON
+        return response()->json([
+            'items' => $mechins->items(), // Current page items
+            'total' => $mechins->total(), // Total number of trashed records
+        ]);
+    }
+
+    public function mechineAssingRestore($id)
+    {
+
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
+
+            // Superadmin check: Allow access to all trashed technicians
+            if ($currentUser->role === 'superadmin') {
+                $restored = MechineAssing::onlyTrashed()->findOrFail($id)->restore();
+            } else {
+                // Regular admin authorization check
+                $restored = MechineAssing::onlyTrashed()
+                    ->where('creator_id', $currentUser->id)
+                    ->where('creator_type', $creatorType)
+                    ->findOrFail($id)
+                    ->restore();
+            }
+
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+
+            // Regular user authorization check
+            $restored = MechineAssing::onlyTrashed()
+                ->where('creator_id', $currentUser->id)
+                ->where('creator_type', $creatorType)
+                ->findOrFail($id)
+                ->restore();
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+        if ($restored) {
+            return response()->json(['message' => 'mechine assing restored successfully'], Response::HTTP_OK);
+        }
+        return response()->json(['message' => 'mechine assing not found or is not trashed'], Response::HTTP_NOT_FOUND);
+
+        // Attempt to restore the brand using the static method on the model
+        $mechineAssingRestored = MechineAssing::onlyTrashed()->find($id);
+
+        if ($mechineAssingRestored) {
+            $mechineAssingRestored->restore();
+            return response()->json(['message' => 'mechine assing restored successfully'], 200);
+        }
+
+        return response()->json(['message' => 'mechine assing not found or is not trashed'], 404);
+    }
+
+    public function mechineAssingforceDelete($id)
+    {
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
+
+            // Superadmin check: Allow access to all trashed technicians
+            if ($currentUser->role === 'superadmin') {
+                $mechineAssing = MechineAssing::onlyTrashed()->findOrFail($id);
+            } else {
+                // Regular admin authorization check
+                $mechineAssing = MechineAssing::onlyTrashed()
+                    ->where('creator_id', $currentUser->id)
+                    ->where('creator_type', $creatorType)
+                    ->findOrFail($id);
+            }
+
+            } elseif (Auth::guard('user')->check()) {
+                $currentUser = Auth::guard('user')->user();
+                $creatorType = User::class;
+
+                // Regular user authorization check
+                $mechineAssing = MechineAssing::onlyTrashed()
+                    ->where('creator_id', $currentUser->id)
+                    ->where('creator_type', $creatorType)
+                    ->findOrFail($id);
+            } else {
+        return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+    }
+
+    try {
+        // Delete the supplier
+        $mechineAssing->forceDelete();
+        return response()->json([
+            'success' => true,
+            'message' => 'mechineAssing permanently deleted successfully.'
+        ], Response::HTTP_OK);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error deleting Brand: ' . $e->getMessage()
+        ], Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
+
+        return response()->json(['message' => 'mechineAssing permanently deleted']);
+    }
 
     public function getFactories(Request $request){
 

@@ -118,6 +118,7 @@ export default {
             search: "",
             itemsPerPage: 15,
             headers: [
+                { title: "Company Name", key: "user.name", sortable: false },
                 { title: "Name", key: "name", sortable: true },
                 { title: "Email", key: "email", sortable: true },
                 { title: "Phone", key: "phone", sortable: true },
@@ -128,6 +129,7 @@ export default {
                     value: "status",
                     sortable: true,
                 },
+                { title: "Creator", key: "creator.name", sortable: false },
                 { title: "Actions", key: "actions", sortable: false },
             ],
             serverItems: [],

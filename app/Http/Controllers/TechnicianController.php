@@ -48,26 +48,20 @@ class TechnicianController extends Controller
         } else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
-
         // Apply search if the search term is not empty
         if (!empty($search)) {
             $techniciansQuery->where('name', 'LIKE', '%' . $search . '%');
         }
-
         // Apply sorting
         $techniciansQuery->orderBy($sortBy, $sortOrder);
-
         // Paginate results
-        $technicians = $techniciansQuery->paginate($itemsPerPage);
-
+        $technicians = $techniciansQuery->with('creator:id,name','user:id,name')->paginate($itemsPerPage);
         // Return the response as JSON
         return response()->json([
             'items' => $technicians->items(), // Current page items
             'total' => $technicians->total(), // Total number of records
         ]);
     }
-
-
 
     /**
      * Show the form for creating a new resource.
@@ -288,7 +282,7 @@ class TechnicianController extends Controller
         $techniciansQuery->orderBy($sortBy, $sortOrder);
 
         // Paginate results
-        $technicians = $techniciansQuery->paginate($itemsPerPage);
+        $technicians = $techniciansQuery->with('creator:id,name','user:id,name')->paginate($itemsPerPage);
 
         // Return the response as JSON
         return response()->json([

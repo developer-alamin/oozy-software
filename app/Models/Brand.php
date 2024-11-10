@@ -21,6 +21,7 @@ class Brand extends Model
     protected $fillable = [
         'uuid',
         'name',
+        'type',
         'description',
         'status',
         'meta_data',
@@ -45,6 +46,7 @@ class Brand extends Model
     {
         return [
             'name'         => 'required|string|max:255',
+            'type'         => 'required|in:Mechine,Parse',
             'description'  => 'nullable|string',
             'status'       => 'nullable|in:Active,Inactive',
             'meta_data'    => 'nullable',

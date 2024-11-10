@@ -2,8 +2,8 @@
     <v-card>
         <v-card-title class="pt-5">
             <v-row>
-                <v-col cols="6"><span>Operator Trash List</span></v-col>
-                <v-col cols="6" class="d-flex justify-end">
+                <v-col cols="4"><span>Mechine Trash List</span></v-col>
+                <v-col cols="8" class="d-flex justify-end">
                     <v-text-field
                         v-model="search"
                         density="compact"
@@ -17,6 +17,21 @@
                         single-line
                         clearable
                     ></v-text-field>
+                    <v-btn
+                        @click="MechineIndex"
+                        color="primary"
+                        icon
+                        style="width: 40px; height: 40px"
+                    >
+                        <v-tooltip location="top" activator="parent">
+                            <template v-slot:activator="{ props }">
+                                <v-icon v-bind="props" style="font-size: 20px"
+                                    >mdi-home</v-icon
+                                >
+                            </template>
+                            <span>Mechine List</span>
+                        </v-tooltip>
+                    </v-btn>
                 </v-col>
             </v-row>
         </v-card-title>
@@ -34,15 +49,14 @@
         >
             <template v-slot:item.status="{ item }">
                 <v-chip
-                    :color="item.status === 'Active' ? 'green' : 'red'"
+                    :color="getStatusColor(item.status)"
                     class="text-uppercase"
                     size="small"
                     label
                 >
-                    {{ item.status === "Active" ? "Active" : "Inactive" }}
+                    {{ item.status }}
                 </v-chip>
             </template>
-
             <template v-slot:item.actions="{ item }">
                 <v-icon @click="showRestoreDialog(item.id)" color="green"
                     >mdi-restore</v-icon
@@ -83,22 +97,17 @@ export default {
     data() {
         return {
             restroreDialogName:
-                "Are you sure you want to restore this Operator?",
-            dialogName: "Are you sure you want to delete this Operator ?",
+                "Are you sure you want to restore this mechine asssing ?",
+            dialogName:
+                "Are you sure you want to delete this mechine asssing ?",
             search: "",
             itemsPerPage: 15,
             headers: [
                 { title: "Company Name", key: "user.name", sortable: false },
-                { title: "Operator Name", key: "name", sortable: true },
-                { title: "Email", key: "email", sortable: true },
-                { title: "Phone", key: "phone", sortable: true },
-                { title: "Description", key: "description", sortable: false },
-                {
-                    title: "Status",
-                    key: "status",
-                    value: "status",
-                    sortable: true,
-                },
+                { title: "Factory Name", key: "factory.name", sortable: false },
+                { title: "Mechine Name", key: "name", sortable: true },
+                { title: "Mechine Code", key: "mechine_code", sortable: false },
+                { title: "Status", key: "status", sortable: true },
                 { title: "Creator", key: "creator.name", sortable: false },
                 { title: "Actions", key: "actions", sortable: false },
             ],
@@ -107,7 +116,7 @@ export default {
             totalItems: 0,
             restoreDialog: false, // Separate state for restore dialog
             deleteDialog: false, // Separate state for delete dialog
-            selectedOperatorId: null,
+            selectedMechineAsssingId: null,
         };
     },
     methods: {
@@ -116,15 +125,18 @@ export default {
             const sortOrder = sortBy.length ? sortBy[0].order : "desc";
             const sortKey = sortBy.length ? sortBy[0].key : "created_at";
             try {
-                const response = await this.$axios.get("/operator/trashed", {
-                    params: {
-                        page,
-                        itemsPerPage,
-                        sortBy: sortKey,
-                        sortOrder,
-                        search: this.search,
-                    },
-                });
+                const response = await this.$axios.get(
+                    "/mechine/assing/trashed",
+                    {
+                        params: {
+                            page,
+                            itemsPerPage,
+                            sortBy: sortKey,
+                            sortOrder,
+                            search: this.search,
+                        },
+                    }
+                );
                 this.serverItems = response.data.items || [];
                 this.totalItems = response.data.total || 0;
             } catch (error) {
@@ -134,49 +146,71 @@ export default {
             }
         },
         showRestoreDialog(id) {
-            this.selectedOperatorId = id;
+            this.selectedMechineAsssingId = id;
             this.restoreDialog = true; // Open restore dialog
         },
         showConfirmDialog(id) {
-            this.selectedOperatorId = id;
+            this.selectedMechineAsssingId = id;
             this.deleteDialog = true; // Open delete dialog
         },
         async confirmRestore() {
             this.restoreDialog = false; // Close the restore dialog
             try {
                 await this.$axios.post(
-                    `/operator/${this.selectedOperatorId}/restore`
+                    `/mechine/assing/${this.selectedMechineAsssingId}/restore`
                 );
                 this.loadItems({
                     page: 1,
                     itemsPerPage: this.itemsPerPage,
                     sortBy: [],
                 });
-                toast.success("Operator restored successfully!");
+                toast.success("Mechine Asssing restored successfully!");
             } catch (error) {
-                console.error("Error restoring Operator:", error);
-                toast.error("Failed to restore Operator.");
+                console.error("Error restoring brand:", error);
+                toast.error("Failed to restore brand.");
             }
         },
         async confirmDelete() {
             this.deleteDialog = false; // Close the delete dialog
             try {
                 await this.$axios.delete(
-                    `/operator/${this.selectedOperatorId}/force-delete`
+                    `/mechine/assing/${this.selectedMechineAsssingId}/forceDelete`
                 );
                 this.loadItems({
                     page: 1,
                     itemsPerPage: this.itemsPerPage,
                     sortBy: [],
                 });
-                toast.success("Operator deleted successfully!");
+                toast.success("MechineAsssing deleted successfully!");
             } catch (error) {
-                console.error("Error deleting Operator:", error);
-                toast.error("Failed to delete Operator.");
+                console.error("Error deleting brand:", error);
+                toast.error("Failed to delete brand.");
             }
         },
-        editOperator(id) {
-            this.$router.push({ name: "OperatorEdit", params: { id } });
+        async MechineIndex() {
+            this.$router.push({ name: "MechineIndex" });
+        },
+        getStatusColor(status) {
+            switch (status) {
+                case "Preventive":
+                    return "blue";
+                case "Production":
+                    return "green";
+                case "Breakdown":
+                    return "red";
+                case "Under Maintenance":
+                    return "orange";
+                case "Loan":
+                    return "purple";
+                case "Idol":
+                    return "grey";
+                case "AsFactory":
+                    return "cyan";
+                case "Scraped":
+                    return "brown";
+                default:
+                    return "black"; // Default color if status doesn't match
+            }
         },
     },
     created() {

@@ -9,16 +9,38 @@
                     :rules="[rules.required]"
                     label="Name"
                     outlined
+                    density="comfortable"
                     :error-messages="errors.name ? errors.name : ''"
                 >
                     <template v-slot:label>
                         Name <span style="color: red">*</span>
                     </template>
                 </v-text-field>
+                <v-select
+                    v-model="brand.type"
+                    :rules="[rules.required]"
+                    :items="statusTypeItems"
+                    label="Brand Type"
+                    density="comfortable"
+                    clearable
+                >
+                    <template v-slot:label>
+                        Brand Type <span style="color: red">*</span>
+                    </template>
+                </v-select>
+                <v-select
+                    v-model="brand.status"
+                    :items="statusItems"
+                    label="Brand Status"
+                    @change="updateStatus"
+                    density="comfortable"
+                    clearable
+                ></v-select>
 
                 <!-- Description Field -->
                 <v-textarea
                     v-model="brand.description"
+                    density="comfortable"
                     label="Description"
                     :error-messages="
                         errors.description ? errors.description : ''
@@ -32,13 +54,6 @@
                     :error-messages="errors.status ? errors.status : ''"
                 >
                 </v-checkbox> -->
-                <v-select
-                    v-model="brand.status"
-                    :items="statusItems"
-                    label="Brand Status"
-                    @change="updateStatus"
-                    clearable
-                ></v-select>
 
                 <!-- Action Buttons -->
                 <v-row class="mt-4">
@@ -83,8 +98,10 @@ export default {
             valid: false,
             loading: false, // Controls loading state of the button
             statusItems: ["Active", "Inactive"],
+            statusTypeItems: ["Mechine", "Parse"],
             brand: {
                 name: "",
+                type: "Mechine",
                 description: "",
                 status: "Active", // New property for checkbox
             },
@@ -139,6 +156,7 @@ export default {
             this.brand = {
                 name: "",
                 description: "",
+                type: "",
                 status: "", // Reset checkbox on form reset
             };
             this.errors = {}; // Reset errors on form reset

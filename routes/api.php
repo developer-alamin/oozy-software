@@ -61,6 +61,11 @@ Route::get('/get_types', [MechineAssingController::class, 'getTypes']);
 Route::get('/get_sources', [MechineAssingController::class, 'getSources']);
 Route::get('/get_suppliers', [MechineAssingController::class, 'getSuppliers']);
 Route::get('/get_rents', [MechineAssingController::class, 'getRents']);
+
+Route::get('/mechine/assing/trashed-count', [MechineAssingController::class,'mechineTrashedCount'])->name('mechine.assing.trashed.count');
+Route::get('/mechine/assing/trashed', [MechineAssingController::class,'mechineAssingTrashed'])->name('mechine.assing.trashed');
+Route::post('/mechine/assing/{id}/restore', [MechineAssingController::class,'mechineAssingRestore'])->name('mechine.assing.restore');
+Route::delete('/mechine/assing/{id}/forceDelete', [MechineAssingController::class,'mechineAssingforceDelete'])->name('mechine.assing.force.Delete');
 Route::resource('mechine-assing',MechineAssingController::class);
 
 //Mechine Group Route declare start form here

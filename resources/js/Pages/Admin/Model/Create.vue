@@ -26,6 +26,18 @@
                     "
                     required
                 />
+                <v-select
+                    v-model="model.type"
+                    :rules="[rules.required]"
+                    :items="statusModelItems"
+                    label="Model Type"
+                    density="comfortable"
+                    clearable
+                >
+                    <template v-slot:label>
+                        Model Type <span style="color: red">*</span>
+                    </template>
+                </v-select>
 
                 <!-- Description Field -->
                 <v-textarea
@@ -86,9 +98,11 @@ export default {
             valid: false,
             loading: false, // Controls loading state of the button
             statusItems: ["Active", "Inactive"],
+            statusModelItems: ["Mechine", "Parse"],
             model: {
                 name: "",
                 model_number: "",
+                type: "Mechine",
                 description: "",
                 status: "Active", // New property for checkbox
             },
@@ -145,6 +159,7 @@ export default {
             this.model = {
                 name: "",
                 model_number: "",
+                type: "",
                 description: "",
                 status: "", // Reset checkbox on form reset
             };

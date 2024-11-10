@@ -94,7 +94,7 @@
             </template>
         </v-data-table-server>
 
-         <ConfirmDialog
+        <ConfirmDialog
             :dialogName="dialogName"
             v-model:modelValue="dialog"
             :onConfirm="confirmDelete"
@@ -110,7 +110,6 @@
 <script>
 import { toast } from "vue3-toastify";
 import ConfirmDialog from "../../Components/ConfirmDialog.vue";
-import bus from "./eventBus";
 
 export default {
     components: {
@@ -118,11 +117,12 @@ export default {
     },
     data() {
         return {
-            dialogName:"Are you sure you want to delete this Brand ?",
+            dialogName: "Are you sure you want to delete this Brand ?",
             search: "",
             itemsPerPage: 15,
             headers: [
                 { title: "Brand Name", key: "name", sortable: true },
+                { title: "Brand Type", key: "type", sortable: false },
                 { title: "Description", key: "description", sortable: false },
                 {
                     title: "Status",
