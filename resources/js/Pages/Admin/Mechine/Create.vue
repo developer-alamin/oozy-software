@@ -15,187 +15,212 @@
                         Mechine Name <span style="color: red">*</span>
                     </template>
                 </v-text-field>
-                <v-autocomplete
-                    v-model="mechine_assing.company_id"
-                    :items="companys"
-                    item-value="id"
-                    item-title="name"
-                    outlined
-                    clearable
-                    density="comfortable"
-                    :rules="[rules.required]"
-                    :error-messages="errors.company_id ? errors.company_id : ''"
-                    @update:search="fetchCompanys"
-                >
-                    <template v-slot:label>
-                        Select Company <span style="color: red">*</span>
-                    </template>
-                </v-autocomplete>
+                <v-row>
+                    <v-col cols="6">
+                        <v-autocomplete
+                            v-model="mechine_assing.company_id"
+                            :items="companys"
+                            item-value="id"
+                            item-title="name"
+                            outlined
+                            clearable
+                            density="comfortable"
+                            :rules="[rules.required]"
+                            :error-messages="
+                                errors.company_id ? errors.company_id : ''
+                            "
+                            @update:search="fetchCompanys"
+                        >
+                            <template v-slot:label>
+                                Select Company <span style="color: red">*</span>
+                            </template>
+                        </v-autocomplete>
+                    </v-col>
+                    <v-col cols="6">
+                        <v-autocomplete
+                            v-model="mechine_assing.factory_id"
+                            :items="factories"
+                            item-value="id"
+                            item-title="name"
+                            label="Select Factory"
+                            outlined
+                            clearable
+                            density="comfortable"
+                            :rules="[rules.required]"
+                            :error-messages="
+                                errors.factory_id ? errors.factory_id : ''
+                            "
+                            @update:search="fetchFactories"
+                        >
+                            <template v-slot:label>
+                                Select Factory <span style="color: red">*</span>
+                            </template>
+                        </v-autocomplete>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="6">
+                        <v-autocomplete
+                            v-model="mechine_assing.brand_id"
+                            :items="brands"
+                            item-value="id"
+                            item-title="name"
+                            label="Select Mechine Brand"
+                            outlined
+                            clearable
+                            density="comfortable"
+                            :rules="[rules.required]"
+                            :error-messages="
+                                errors.brand_id ? errors.brand_id : ''
+                            "
+                            @update:search="fetchBrands"
+                        >
+                            <template v-slot:label>
+                                Select Mechine Brand
+                                <span style="color: red">*</span>
+                            </template>
+                        </v-autocomplete>
+                    </v-col>
+                    <v-col cols="6">
+                        <v-autocomplete
+                            v-model="mechine_assing.model_id"
+                            :items="models"
+                            item-value="id"
+                            item-title="name"
+                            label="Select Mechine Model"
+                            density="comfortable"
+                            clearable
+                            :rules="[rules.required]"
+                            :error-messages="
+                                errors.model_id ? errors.model_id : ''
+                            "
+                            @update:search="fetchModels"
+                        >
+                            <template v-slot:label>
+                                Select Mechine Model
+                                <span style="color: red">*</span>
+                            </template>
+                        </v-autocomplete>
+                    </v-col>
+                </v-row>
 
-                <v-autocomplete
-                    v-model="mechine_assing.factory_id"
-                    :items="factories"
-                    item-value="id"
-                    item-title="name"
-                    label="Select Factory"
-                    outlined
-                    clearable
-                    density="comfortable"
-                    :rules="[rules.required]"
-                    :error-messages="errors.factory_id ? errors.factory_id : ''"
-                    @update:search="fetchFactories"
-                >
-                    <template v-slot:label>
-                        Select Factory <span style="color: red">*</span>
-                    </template>
-                </v-autocomplete>
-                <v-autocomplete
-                    v-model="mechine_assing.brand_id"
-                    :items="brands"
-                    item-value="id"
-                    item-title="name"
-                    label="Select Mechine Brand"
-                    outlined
-                    clearable
-                    density="comfortable"
-                    :rules="[rules.required]"
-                    :error-messages="errors.brand_id ? errors.brand_id : ''"
-                    @update:search="fetchBrands"
-                >
-                    <template v-slot:label>
-                        Select Mechine Brand <span style="color: red">*</span>
-                    </template>
-                </v-autocomplete>
+                <v-row>
+                    <v-col cols="6">
+                        <v-autocomplete
+                            v-model="mechine_assing.mechine_type_id"
+                            :items="types"
+                            item-value="id"
+                            item-title="name"
+                            label="Select Mechine Type"
+                            density="comfortable"
+                            clearable
+                            :rules="[rules.required]"
+                            :error-messages="
+                                errors.mechine_type_id
+                                    ? errors.mechine_type_id
+                                    : ''
+                            "
+                            @update:search="fetchTypes"
+                            @update:model-value="updatePreventiveServiceDays"
+                        >
+                            <template v-slot:label>
+                                Select Mechine Type
+                                <span style="color: red">*</span>
+                            </template>
+                        </v-autocomplete>
+                    </v-col>
+                    <v-col cols="6">
+                        <v-text-field
+                            v-model="mechine_assing.preventive_service_days"
+                            :rules="[rules.required]"
+                            label="Mechine Preventive Service Days"
+                            outlined
+                            density="comfortable"
+                            :error-messages="
+                                errors.preventive_service_days
+                                    ? errors.preventive_service_days
+                                    : ''
+                            "
+                        >
+                            <template v-slot:label>
+                                Mechine Preventive Service Days
+                                <span style="color: red">*</span>
+                            </template>
+                        </v-text-field>
+                    </v-col>
+                </v-row>
 
-                <v-autocomplete
-                    v-model="mechine_assing.model_id"
-                    :items="models"
-                    item-value="id"
-                    item-title="name"
-                    label="Select Mechine Model"
-                    density="comfortable"
-                    clearable
-                    :rules="[rules.required]"
-                    :error-messages="errors.model_id ? errors.model_id : ''"
-                    @update:search="fetchModels"
-                >
-                    <template v-slot:label>
-                        Select Mechine Model <span style="color: red">*</span>
-                    </template>
-                </v-autocomplete>
-                <v-autocomplete
-                    v-model="mechine_assing.mechine_type_id"
-                    :items="types"
-                    item-value="id"
-                    item-title="name"
-                    label="Select Mechine Type"
-                    density="comfortable"
-                    clearable
-                    :rules="[rules.required]"
-                    :error-messages="
-                        errors.mechine_type_id ? errors.mechine_type_id : ''
-                    "
-                    @update:search="fetchTypes"
-                    @update:model-value="updatePreventiveServiceDays"
-                >
-                    <template v-slot:label>
-                        Select Mechine Type <span style="color: red">*</span>
-                    </template>
-                </v-autocomplete>
-
-                <v-text-field
-                    v-model="mechine_assing.preventive_service_days"
-                    :rules="[rules.required]"
-                    label="Mechine Preventive Service Days"
-                    outlined
-                    density="comfortable"
-                    :error-messages="
-                        errors.preventive_service_days
-                            ? errors.preventive_service_days
-                            : ''
-                    "
-                >
-                    <template v-slot:label>
-                        Mechine Preventive Service Days
-                        <span style="color: red">*</span>
-                    </template>
-                </v-text-field>
-
-                <v-autocomplete
-                    v-model="mechine_assing.mechine_source_id"
-                    :items="sources"
-                    item-value="id"
-                    item-title="name"
-                    label="Select Mechine Source"
-                    density="comfortable"
-                    clearable
-                    :rules="[rules.required]"
-                    :error-messages="
-                        errors.mechine_source_id ? errors.mechine_source_id : ''
-                    "
-                    @update:search="fetchSources"
-                >
-                    <template v-slot:label>
-                        Select Mechine Source <span style="color: red">*</span>
-                    </template>
-                </v-autocomplete>
-                <v-autocomplete
-                    v-model="mechine_assing.supplier_id"
-                    :items="suppliers"
-                    item-value="id"
-                    item-title="name"
-                    label="Select Supplier"
-                    density="comfortable"
-                    clearable
-                    :error-messages="
-                        errors.supplier_id ? errors.supplier_id : ''
-                    "
-                    @update:search="fetchSuppliers"
-                >
-                    <!-- <template v-slot:label>
-                        Select Supplier
-                        <span style="color: red">*</span>
-                    </template> -->
-                </v-autocomplete>
-                <v-autocomplete
-                    v-model="mechine_assing.rent_id"
-                    :items="rents"
-                    item-value="id"
-                    item-title="name"
-                    label="Select Rent"
-                    density="comfortable"
-                    clearable
-                    :error-messages="errors.rent_id ? errors.rent_id : ''"
-                    @update:search="fetchRents"
-                >
-                    <!-- <template v-slot:label>
+                <v-row>
+                    <v-col cols="6">
+                        <v-text-field
+                            v-model="mechine_assing.mechine_code"
+                            label="Mechine Code"
+                            outlined
+                            density="comfortable"
+                            :error-messages="
+                                errors.mechine_code ? errors.mechine_code : ''
+                            "
+                        >
+                        </v-text-field>
+                    </v-col>
+                    <v-col cols="6">
+                        <v-autocomplete
+                            v-model="mechine_assing.mechine_source_id"
+                            :items="sources"
+                            item-value="id"
+                            item-title="name"
+                            label="Select Mechine Source"
+                            density="comfortable"
+                            clearable
+                            :rules="[rules.required]"
+                            :error-messages="
+                                errors.mechine_source_id
+                                    ? errors.mechine_source_id
+                                    : ''
+                            "
+                            @update:search="fetchSources"
+                        >
+                            <template v-slot:label>
+                                Select Mechine Source
+                                <span style="color: red">*</span>
+                            </template>
+                        </v-autocomplete>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="6">
+                        <v-autocomplete
+                            v-model="mechine_assing.rent_id"
+                            :items="rents"
+                            item-value="id"
+                            item-title="name"
+                            label="Select Rent"
+                            density="comfortable"
+                            clearable
+                            :error-messages="
+                                errors.rent_id ? errors.rent_id : ''
+                            "
+                            @update:search="fetchRents"
+                        >
+                            <!-- <template v-slot:label>
                         Select Rent
                         <span style="color: red">*</span>
                     </template> -->
-                </v-autocomplete>
+                        </v-autocomplete>
+                    </v-col>
+                    <v-col cols="6">
+                        <v-date-input
+                            v-model="mechine_assing.rent_date"
+                            label="Rent Date"
+                            density="comfortable"
+                            :error-messages="
+                                errors.rent_date ? errors.rent_date : ''
+                            "
+                        />
+                    </v-col>
+                </v-row>
 
                 <!-- Name Field -->
-                <v-text-field
-                    v-model="mechine_assing.mechine_code"
-                    label="Mechine Code"
-                    outlined
-                    density="comfortable"
-                    :error-messages="
-                        errors.mechine_code ? errors.mechine_code : ''
-                    "
-                >
-                </v-text-field>
-                <v-text-field
-                    v-model="mechine_assing.purchase_price"
-                    label="Purchase Price"
-                    outlined
-                    density="comfortable"
-                    :error-messages="
-                        errors.purchase_price ? errors.purchase_price : ''
-                    "
-                >
-                    <template v-slot:label> Purchase Price </template>
-                </v-text-field>
 
                 <!-- <v-text-field
                     v-model="mechine_assing.purchase_date"
@@ -226,27 +251,54 @@
                     </template>
                 </v-text-field> -->
                 <v-row>
-                    <v-col col="6">
+                    <v-col cols="4">
+                        <v-autocomplete
+                            v-model="mechine_assing.supplier_id"
+                            :items="suppliers"
+                            item-value="id"
+                            item-title="name"
+                            label="Select Supplier"
+                            density="comfortable"
+                            clearable
+                            :error-messages="
+                                errors.supplier_id ? errors.supplier_id : ''
+                            "
+                            @update:search="fetchSuppliers"
+                        >
+                            <!-- <template v-slot:label>
+                        Select Supplier
+                        <span style="color: red">*</span>
+                    </template> -->
+                        </v-autocomplete>
+                    </v-col>
+                    <v-col cols="4">
                         <v-date-input
                             v-model="mechine_assing.purchase_date"
                             label="Purchase Date"
+                            density="comfortable"
                             :error-messages="
                                 errors.purchase_date ? errors.purchase_date : ''
                             "
                         />
                     </v-col>
-                    <v-col>
-                        <v-date-input
-                            v-model="mechine_assing.rent_date"
-                            label="Rent Date"
+                    <v-col cols="4">
+                        <v-text-field
+                            v-model="mechine_assing.purchace_price"
+                            label="Purchase Price"
+                            outlined
+                            density="comfortable"
                             :error-messages="
-                                errors.rent_date ? errors.rent_date : ''
+                                errors.purchace_price
+                                    ? errors.purchace_price
+                                    : ''
                             "
-                        />
+                        >
+                            <template v-slot:label> Purchase Price </template>
+                        </v-text-field>
                     </v-col>
                 </v-row>
 
-                <v-text-field
+                <!-- <v-text-field
                     v-model="mechine_assing.factory_code"
                     :rules="[rules.factory_code]"
                     label="Factory Code"
@@ -257,7 +309,7 @@
                     "
                 >
                     <template v-slot:label> Factory Code </template>
-                </v-text-field>
+                </v-text-field> -->
 
                 <v-textarea
                     v-model="mechine_assing.note"
@@ -334,6 +386,7 @@ export default {
             mechine_assing: {
                 rent_date: null,
                 purchase_date: null,
+                purchace_price: 0,
                 name: "",
                 date: null,
                 company_id: null,
@@ -349,7 +402,7 @@ export default {
                 phone: "",
                 note: "",
                 factory_code: "",
-                status: "Active", // New property for checkbox
+                status: "Preventive", // New property for checkbox
             },
             errors: {}, // Stores validation errors
             serverError: null, // Stores server-side error messages
@@ -444,7 +497,7 @@ export default {
                 phone: "",
                 factory_code: "",
                 location: "",
-                status: "Active", // New property for checkbox
+                status: "Preventive", // New property for checkbox
             };
             this.errors = {}; // Reset errors on form reset
             if (this.$refs.form) {

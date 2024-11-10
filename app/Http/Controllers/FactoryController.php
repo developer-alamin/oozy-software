@@ -191,10 +191,10 @@ class FactoryController extends Controller
                 'company_id'   => json_encode($data['company_id']), // Convert array to JSON
                 'name'         => $data['name'],
                 'factory_code' => $data['factory_code'],
-                'email' => $data['email'],
-                'phone' => $data['phone'],
-                'location' => $data['location'],
-                'status' => $data['status'],
+                'email'        => $data['email'],
+                'phone'        => $data['phone'],
+                'location'     => $data['location'],
+                'status'       => $data['status'],
             ]);
             // Associate creator and updater polymorphically
             $factory->creator()->associate($creator);

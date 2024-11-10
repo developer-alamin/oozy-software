@@ -36,4 +36,14 @@ class MechineAssing extends Model
     //     'rent_date'     => 'datetime',
     //     'purchase_date' => 'datetime',
     // ];
+
+    public function creator()
+    {
+        return $this->morphTo();
+    }
+
+    public function updater()
+    {
+        return $this->morphTo();
+    }
 }

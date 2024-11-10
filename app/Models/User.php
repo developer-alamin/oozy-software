@@ -166,4 +166,15 @@ class User extends Authenticatable
     {
         return $this->morphMany(MechineAssing::class, 'updater');
     }
+
+    // mechine Stock created by this user
+    public function createdMechineStocks(): MorphMany
+    {
+        return $this->morphMany(MechineStock::class, 'creator');
+    }
+    //  mechine Stock updated by this user
+    public function updatedMechineStocks(): MorphMany
+    {
+        return $this->morphMany(MechineStock::class, 'updater');
+    }
 }

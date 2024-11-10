@@ -144,15 +144,26 @@ class Admin extends Authenticatable
         return $this->morphMany(Factory::class, 'updater');
     }
 
-     // factorys created by this user
+     // mechine assing created by this user
      public function createdMechineAssings(): MorphMany
      {
          return $this->morphMany(MechineAssing::class, 'creator');
      }
-     // factorys updated by this user
+     //  mechine assing updated by this user
      public function updatedMechineAssings(): MorphMany
      {
          return $this->morphMany(MechineAssing::class, 'updater');
      }
 
+
+      // mechine Stock created by this user
+      public function createdMechineStocks(): MorphMany
+      {
+          return $this->morphMany(MechineStock::class, 'creator');
+      }
+      //  mechine Stock updated by this user
+      public function updatedMechineStocks(): MorphMany
+      {
+          return $this->morphMany(MechineStock::class, 'updater');
+      }
 }
