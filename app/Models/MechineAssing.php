@@ -29,6 +29,7 @@ class MechineAssing extends Model
         'purchase_date',
         'status',
         'note',
+        'mechine_status'
     ];
 
     // Optionally, cast some fields to specific types (e.g., dates)

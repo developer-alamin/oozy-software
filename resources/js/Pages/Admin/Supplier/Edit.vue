@@ -138,9 +138,7 @@ export default {
             },
         };
     },
-    created() {
-        this.loadSupplier();
-    },
+
     methods: {
         async onFilePicked(e) {
             const files = e.target.files;
@@ -203,6 +201,9 @@ export default {
                 }, 1000);
             }
         },
+    },
+    created() {
+        this.loadSupplier();
     },
 };
 </script>

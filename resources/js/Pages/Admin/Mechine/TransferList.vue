@@ -2,7 +2,7 @@
     <v-card>
         <v-card-title class="pt-5">
             <v-row>
-                <v-col cols="4"><span>Mechine Assing List</span></v-col>
+                <v-col cols="4"><span>Mechine Transfer List</span></v-col>
                 <v-col cols="8" class="d-flex justify-end">
                     <v-text-field
                         v-model="search"
@@ -17,7 +17,7 @@
                         single-line
                         clearable
                     ></v-text-field>
-                    <v-btn
+                    <!-- <v-btn
                         @click="createMechine"
                         color="primary"
                         icon
@@ -31,7 +31,7 @@
                             </template>
                             <span>Add New a Mechine</span>
                         </v-tooltip>
-                    </v-btn>
+                    </v-btn> -->
 
                     <v-badge :content="trashedCount" color="red" overlap>
                         <v-btn
@@ -148,15 +148,18 @@ export default {
             const sortOrder = sortBy.length ? sortBy[0].order : "desc";
             const sortKey = sortBy.length ? sortBy[0].key : "created_at";
             try {
-                const response = await this.$axios.get("/mechine-assing", {
-                    params: {
-                        page,
-                        itemsPerPage,
-                        sortBy: sortKey,
-                        sortOrder,
-                        search: this.search,
-                    },
-                });
+                const response = await this.$axios.get(
+                    "/mechine/transfer/list",
+                    {
+                        params: {
+                            page,
+                            itemsPerPage,
+                            sortBy: sortKey,
+                            sortOrder,
+                            search: this.search,
+                        },
+                    }
+                );
                 this.serverItems = response.data.items || [];
                 this.totalItems = response.data.total || 0;
                 this.fetchTrashedMechinesCount();

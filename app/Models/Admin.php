@@ -98,17 +98,27 @@ class Admin extends Authenticatable
     {
         return $this->morphMany(Category::class, 'updater');
     }
-     // Units created by this user
-     public function createdUnits(): MorphMany
-     {
-         return $this->morphMany(Unit::class, 'creator');
-     }
+    // Units created by this user
+    public function createdUnits(): MorphMany
+    {
+        return $this->morphMany(Unit::class, 'creator');
+    }
 
-     // Units updated by this user
-     public function updatedUnits(): MorphMany
-     {
-         return $this->morphMany(Unit::class, 'updater');
-     }
+    // Units updated by this user
+    public function updatedUnits(): MorphMany
+    {
+        return $this->morphMany(Unit::class, 'updater');
+    }
+    // Parse Units created by this user
+    public function createdParseUnits(): MorphMany
+    {
+        return $this->morphMany(Unit::class, 'creator');
+    }
+    // Parse Units updated by this user
+    public function updatedParseUnits(): MorphMany
+    {
+        return $this->morphMany(Unit::class, 'updater');
+    }
     // Lines created by this user
     public function createdLines(): MorphMany
     {

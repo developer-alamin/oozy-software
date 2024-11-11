@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\HelperController;
+use App\Http\Requests\MechineTransferStore;
 use App\Models\Admin;
 use App\Models\MechineAssing;
 use App\Models\Brand;
@@ -61,7 +62,101 @@ class MechineAssingController extends Controller
         // Apply sorting
         $mechineAssingQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $mechineAssing = $mechineAssingQuery->with('creator:id,name','user:id,name','factory:id,name')->paginate($itemsPerPage);
+        $mechineAssing = $mechineAssingQuery->where('mechine_status','Assing')->with('creator:id,name','user:id,name','factory:id,name')->paginate($itemsPerPage);
+        // Return the response as JSON
+        return response()->json([
+            'items' => $mechineAssing->items(), // Current page items
+            'total' => $mechineAssing->total(), // Total number of records
+        ]);
+    }
+
+      /**
+     * Display a listing of the resource.
+     */
+    public function mechineTransferList(Request $request)
+    {
+        $page         = $request->input('page', 1);
+        $itemsPerPage = $request->input('itemsPerPage', 5);
+        $sortBy       = $request->input('sortBy', 'created_at'); // Default sort by created_at
+        $sortOrder    = $request->input('sortOrder', 'desc');    // Default sort order is descending
+        $search       = $request->input('search', '');           // Search term, default is empty
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
+            // Check if the admin is a super admin
+            if ($currentUser->role === 'superadmin') {
+                // If superadmin, retrieve all technicians
+                $mechineAssingQuery = MechineAssing::query(); // No filters applied
+            } else {
+                // If not superadmin, filter by creator type and id
+                $mechineAssingQuery = MechineAssing::where('creator_type', $creatorType)
+                    ->where('creator_id', $currentUser->id);
+            }
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+            // For regular users, filter by creator type and id
+            $mechineAssingQuery = MechineAssing::where('creator_type', $creatorType)
+                ->where('creator_id', $currentUser->id);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+        // Apply search if the search term is not empty
+        if (!empty($search)) {
+            $mechineAssingQuery->where('name', 'LIKE', '%' . $search . '%');
+        }
+        // Apply sorting
+        $mechineAssingQuery->orderBy($sortBy, $sortOrder);
+        // Paginate results
+        $mechineAssing = $mechineAssingQuery->where('mechine_status','Transferred')->with('creator:id,name','user:id,name','factory:id,name')->paginate($itemsPerPage);
+        // Return the response as JSON
+        return response()->json([
+            'items' => $mechineAssing->items(), // Current page items
+            'total' => $mechineAssing->total(), // Total number of records
+        ]);
+    }
+
+      /**
+     * Display a listing of the resource.
+     */
+    public function mechineHistoryList(Request $request)
+    {
+        $page         = $request->input('page', 1);
+        $itemsPerPage = $request->input('itemsPerPage', 5);
+        $sortBy       = $request->input('sortBy', 'created_at'); // Default sort by created_at
+        $sortOrder    = $request->input('sortOrder', 'desc');    // Default sort order is descending
+        $search       = $request->input('search', '');           // Search term, default is empty
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
+            // Check if the admin is a super admin
+            if ($currentUser->role === 'superadmin') {
+                // If superadmin, retrieve all technicians
+                $mechineAssingQuery = MechineAssing::query(); // No filters applied
+            } else {
+                // If not superadmin, filter by creator type and id
+                $mechineAssingQuery = MechineAssing::where('creator_type', $creatorType)
+                    ->where('creator_id', $currentUser->id);
+            }
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+            // For regular users, filter by creator type and id
+            $mechineAssingQuery = MechineAssing::where('creator_type', $creatorType)
+                ->where('creator_id', $currentUser->id);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+        // Apply search if the search term is not empty
+        if (!empty($search)) {
+            $mechineAssingQuery->where('name', 'LIKE', '%' . $search . '%');
+        }
+        // Apply sorting
+        $mechineAssingQuery->orderBy($sortBy, $sortOrder);
+        // Paginate results
+        $mechineAssing = $mechineAssingQuery->where('mechine_status','History')->with('creator:id,name','user:id,name','factory:id,name')->paginate($itemsPerPage);
         // Return the response as JSON
         return response()->json([
             'items' => $mechineAssing->items(), // Current page items
@@ -111,6 +206,7 @@ class MechineAssingController extends Controller
             'purchase_date'           => 'nullable',
             'status'                  => 'nullable',  // Example: assumes "status" has specific values
             'note'                    => 'nullable|string',
+            'mechine_status'          => 'nullable',
         ]);
 
         // Process dates to handle timezone issues and format them properly
@@ -130,6 +226,7 @@ class MechineAssingController extends Controller
         $mechineAssing       = new MechineAssing($validatedData);
         // Associate the creator and updater polymorphically
         $mechineAssing->uuid = HelperController::generateUuid();
+        $mechineAssing->mechine_status = "Assing";
         $mechineAssing->creator()->associate($creator);
         $mechineAssing->updater()->associate($creator);
 
@@ -171,7 +268,101 @@ class MechineAssingController extends Controller
     {
         //
     }
+    public function mechineTransfer($uuid){
 
+        $mechineTransfer = MechineAssing::where('uuid', $uuid)->firstOrFail();
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
+            // Check if the admin is a super admin
+            if ($currentUser->role === 'superadmin') {
+                // Super admins can edit any mechineTransfer
+                return response()->json([
+                    'success' => true,
+                    'mechineTransfer' => $mechineTransfer
+                ], Response::HTTP_OK);
+            }
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+        // Check if the mechineTransfer belongs to the current user or admin
+        if ($mechineTransfer->creator_type !== $creatorType || $mechineTransfer->creator_id !== $currentUser->id) {
+            return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to edit this mechineTransfer.'], 403);
+        }
+        // Return the mechineTransfer data if authorized
+        return response()->json([
+            'success' => true,
+            'mechineTransfer' => $mechineTransfer
+        ], Response::HTTP_OK);
+    }
+
+    public function mechineTransferStore(MechineTransferStore $request,$uuid){
+        // dd($request->all());
+        $mechine = MechineAssing::where('uuid', $uuid)->firstOrFail();
+        // dd($mechine);
+        // Check which authentication guard is in use and set the creator
+        if (Auth::guard('admin')->check()) {
+            $creator = Auth::guard('admin')->user();
+        } elseif (Auth::guard('user')->check()) {
+            $creator = Auth::guard('user')->user();
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        // validataion
+        $validatedData = $request->validated();
+        if (isset($validatedData['purchase_date'])) {
+            $validatedData['purchase_date'] = Carbon::parse(
+                preg_replace('/\s*\(.*\)$/', '', $validatedData['purchase_date'])
+            )->format('Y-m-d');
+        }
+
+        if (isset($validatedData['rent_date'])) {
+            $validatedData['rent_date'] = Carbon::parse(
+                preg_replace('/\s*\(.*\)$/', '', $validatedData['rent_date'])
+            )->format('Y-m-d');
+        }
+         // Update the original machine status to "history"
+
+
+        $mechineTransfer                            = new MechineAssing();
+        $mechineTransfer->uuid                      = HelperController::generateUuid();
+        $mechineTransfer->company_id                = $request->company_id;
+        $mechineTransfer->factory_id                = $request->factory_id;
+        $mechineTransfer->brand_id                  = $request->brand_id;
+        $mechineTransfer->model_id                  = $request->model_id;
+        $mechineTransfer->mechine_type_id           = $request->mechine_type_id;
+        $mechineTransfer->mechine_source_id         = $request->mechine_source_id;
+        $mechineTransfer->supplier_id               = $request->supplier_id;
+        $mechineTransfer->rent_id                   = $request->rent_id;
+        $mechineTransfer->rent_date                 = $request->rent_date;
+        $mechineTransfer->name                      = $request->name;
+        $mechineTransfer->mechine_code              = $request->mechine_code;
+        $mechineTransfer->preventive_service_days   = $request->preventive_service_days;
+        $mechineTransfer->purchace_price            = $request->purchace_price;
+        $mechineTransfer->purchase_date             = $request->purchase_date;
+        $mechineTransfer->status                    = $request->status;
+        $mechineTransfer->note                      = $request->note;
+        $mechineTransfer->mechine_transfer_id       = $mechine->id;
+        $mechineTransfer->mechine_status            = "Transferred";
+
+        $mechineTransfer->creator()->associate($creator);
+        $mechineTransfer->updater()->associate($creator);
+        $mechineTransfer->save();
+
+        $mechine->update(['mechine_status' => 'History']);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Mechine Transfer  successfully.',
+        ], 200);
+
+
+    }
     /**
      * Update the specified resource in storage.
      */

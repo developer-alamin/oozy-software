@@ -14,6 +14,9 @@ export { default as CompanyCreate } from "../Pages/Admin/Company/Create.vue";
 export { default as MechineIndex } from "../Pages/Admin/Mechine/Index.vue";
 export { default as MechineCreate } from "../Pages/Admin/Mechine/Create.vue";
 export { default as MechineTrash } from "../Pages/Admin/Mechine/Trash.vue";
+export { default as MechineTransfer } from "../Pages/Admin/Mechine/Transfer.vue";
+export { default as MechineTransferList } from "../Pages/Admin/Mechine/TransferList.vue";
+export { default as MechineHistoryList } from "../Pages/Admin/Mechine/History.vue";
 
 // Factory components
 export { default as FactoryIndex } from "../Pages/Admin/Factory/Index.vue";
@@ -44,6 +47,12 @@ export { default as BrandIndex } from "../Pages/Admin/Brand/Index.vue";
 export { default as BrandTrash } from "../Pages/Admin/Brand/Trash.vue";
 export { default as BrandCreate } from "../Pages/Admin/Brand/Create.vue";
 export { default as BrandEdit } from "../Pages/Admin/Brand/Edit.vue";
+
+// Parse Unit components
+export { default as ParseUnitIndex } from "../Pages/Admin/ParseUnit/Index.vue";
+export { default as ParseUnitCreate } from "../Pages/Admin/ParseUnit/Create.vue";
+export { default as ParseUnitEdit } from "../Pages/Admin/ParseUnit/Edit.vue";
+export { default as ParseUnitTrash } from "../Pages/Admin/ParseUnit/Trash.vue";
 
 // Unit components
 export { default as UnitIndex } from "../Pages/Admin/Unit/Index.vue";

@@ -116,12 +116,24 @@ const routes = [
                 component: adminComponents.FactoryTrash,
                 meta: { title: "Factory Trash" },
             },
-            // factory
+            // mechine
             {
                 path: "mechine/index", // New route for Contact
                 name: "MechineIndex",
                 component: adminComponents.MechineIndex,
                 meta: { title: "Mechine Index" },
+            },
+            {
+                path: "mechine/transfer/list", // New route for Contact
+                name: "MechineTransferList",
+                component: adminComponents.MechineTransferList,
+                meta: { title: "Mechine Transfer List" },
+            },
+            {
+                path: "mechine/history/list", // New route for Contact
+                name: "MechineHistoryList",
+                component: adminComponents.MechineHistoryList,
+                meta: { title: "Mechine History List" },
             },
 
             {
@@ -137,6 +149,13 @@ const routes = [
             //     meta: { title: "Edit Factory" },
             //     props: true, // Enables passing route params as props
             // },
+            {
+                path: "mechine/:uuid/transfer", // Dynamic route for mechine transfer
+                name: "MechineTransfer",
+                component: adminComponents.MechineTransfer,
+                meta: { title: "Mechine Transfer" },
+                props: true, // Enables passing route params as props
+            },
             {
                 path: "mechine/trash", // New route for Contact
                 name: "MechineTrash",
@@ -275,6 +294,32 @@ const routes = [
                 name: "UnitTrash",
                 component: adminComponents.UnitTrash,
                 meta: { title: "Unit Trash" },
+            },
+            // parse unit
+            {
+                path: "parse/unit/index", // New route for Contact
+                name: "ParseUnitIndex",
+                component: adminComponents.ParseUnitIndex,
+                meta: { title: "Parse Unit Index" },
+            },
+            {
+                path: "parse/unit/create", // New route for Contact
+                name: "ParseUnitCreate",
+                component: adminComponents.ParseUnitCreate,
+                meta: { title: "ParseUnit Create" },
+            },
+            {
+                path: "parse/unit/edit/:uuid", // Dynamic route for Unit Edit
+                name: "ParseUnitEdit",
+                component: adminComponents.ParseUnitEdit,
+                meta: { title: "Edit Parse Unit" },
+                props: true, // Enables passing route params as props
+            },
+            {
+                path: "parse/unit/trash", // New route for Contact
+                name: "ParseUnitTrash",
+                component: adminComponents.ParseUnitTrash,
+                meta: { title: "Parse Unit Trash" },
             },
             // technician
             {

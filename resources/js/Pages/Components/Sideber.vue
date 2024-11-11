@@ -36,7 +36,19 @@
                     <li>
                         <router-link :to="{ name: 'MechineIndex' }">
                             <i class="bi bi-circle"></i
-                            ><span>All Mechine List </span>
+                            ><span> Mechine Assing List </span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link :to="{ name: 'MechineTransferList' }">
+                            <i class="bi bi-circle"></i
+                            ><span> Mechine Transfer List </span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link :to="{ name: 'MechineHistoryList' }">
+                            <i class="bi bi-circle"></i
+                            ><span> Mechine History List </span>
                         </router-link>
                     </li>
 
@@ -460,6 +472,15 @@
                     </li>
                     <li>
                         <router-link
+                            :to="{ name: 'ParseUnitIndex' }"
+                            active-class="active"
+                            :class="{ active: isParseUnitRoute }"
+                        >
+                            <i class="bi bi-circle"></i><span>Parse Unit</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link
                             :to="{ name: 'LineIndex' }"
                             active-class="active"
                             :class="{ active: isLineRoute }"
@@ -525,7 +546,12 @@ const isModelRoute = computed(() =>
 
 // Check if the current route is for a specific supplier-related route
 const isSupplierRoute = computed(() =>
-    ["SupplierIndex", "SupplierCreate", "SupplierEdit"].includes(route.name)
+    [
+        "SupplierIndex",
+        "SupplierCreate",
+        "SupplierEdit",
+        "SupplierTrash",
+    ].includes(route.name)
 );
 const isCategoryRoute = computed(() =>
     [
@@ -555,6 +581,14 @@ const isFloorRoute = computed(() =>
 );
 const isUnitRoute = computed(() =>
     ["UnitIndex", "UnitCreate", "UnitEdit", "UnitTrash"].includes(route.name)
+);
+const isParseUnitRoute = computed(() =>
+    [
+        "ParseUnitIndex",
+        "ParseUnitCreate",
+        "ParseUnitEdit",
+        "ParseUnitTrash",
+    ].includes(route.name)
 );
 // Company
 const isCompanyRouteShow = computed(() => {
@@ -654,6 +688,10 @@ const isSettingRouteShow = computed(() => {
         "FloorIndex",
         "FloorEdit",
         "FloorTrash",
+        "ParseUnitIndex",
+        "ParseUnitCreate",
+        "ParseUnitEdit",
+        "ParseUnitTrash",
     ].includes(route.name);
 });
 </script>

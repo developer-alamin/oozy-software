@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Auth\UserAuthController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\MechineAssingController;
+use App\Http\Controllers\Admin\ParseUnitController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\Admin\ProductModelController;
@@ -31,7 +32,6 @@ use App\Models\MechineAssing;
 
 Route::get('/suppliers/{uuid}/edit', [SupplierController::class, 'edit'])->name('suppliers.edit');
 Route::put('/suppliers/{uuid}', [SupplierController::class, 'update'])->name('suppliers.update');
-Route::resource('suppliers', SupplierController::class);
 // suppliers Group Controllers start form here
 Route::controller(SupplierController::class)
 ->prefix('supplier')
@@ -42,6 +42,7 @@ Route::controller(SupplierController::class)
     Route::post('{id}/restore', 'supplierrestore')->name('line.Restore');
     Route::delete('{id}/force-delete', 'supplierforcedelete')->name('supplier.force.delete');
 });
+Route::resource('suppliers', SupplierController::class);
 
 // floor group route declare start form here
 Route::get('/floor/{uuid}/edit', [FloorController::class, 'edit'])->name('floor.edit');
@@ -65,10 +66,14 @@ Route::get('/get_sources', [MechineAssingController::class, 'getSources']);
 Route::get('/get_suppliers', [MechineAssingController::class, 'getSuppliers']);
 Route::get('/get_rents', [MechineAssingController::class, 'getRents']);
 
+Route::get('/mechine/{uuid}/transfer', [MechineAssingController::class, 'mechineTransfer'])->name('mechine.transfer');
+Route::post('/mechine/transfer/{uuid}', [MechineAssingController::class, 'mechineTransferStore'])->name('mechine.transfer.store');
 Route::get('/mechine/assing/trashed-count', [MechineAssingController::class,'mechineTrashedCount'])->name('mechine.assing.trashed.count');
 Route::get('/mechine/assing/trashed', [MechineAssingController::class,'mechineAssingTrashed'])->name('mechine.assing.trashed');
 Route::post('/mechine/assing/{id}/restore', [MechineAssingController::class,'mechineAssingRestore'])->name('mechine.assing.restore');
-Route::delete('/mechine/assing/{id}/forceDelete', [MechineAssingController::class,'mechineAssingforceDelete'])->name('mechine.assing.force.Delete');
+Route::delete('/mechine/assing/{id}/forceDelete', [MechineAssingController::class,'mechineAssingforceDelete'])->name('mechine.transfer.list');
+Route::get('/mechine/transfer/list', [MechineAssingController::class,'mechineTransferList'])->name('mechine.transfer.list');
+Route::get('/mechine/history/list', [MechineAssingController::class,'mechineHistoryList'])->name('mechine.assing.trashed');
 Route::resource('mechine-assing',MechineAssingController::class);
 
 //Mechine Group Route declare start form here
@@ -170,6 +175,14 @@ Route::post('/units/{id}/restore', [UnitController::class, 'restore']);
 Route::delete('/units/{id}/force-delete', [UnitController::class, 'forceDelete']);
 Route::get('/units/trashed-count', [UnitController::class, 'trashedUnitsCount']);
 Route::resource('units', UnitController::class);
+
+Route::get('/parse/unit/trashed', [ParseUnitController::class, 'trashed']);
+Route::post('/parse/unit/{id}/restore', [ParseUnitController::class, 'restore']);
+Route::delete('/parse/unit/{id}/force-delete', [ParseUnitController::class, 'forceDelete']);
+Route::get('/parse/unit/trashed-count', [ParseUnitController::class, 'trashedUnitsCount']);
+Route::get('/parse/unit/{uuid}/edit', [ParseUnitController::class, 'edit'])->name('parse.unit.edit');
+Route::put('/parse/unit/{uuid}', [ParseUnitController::class, 'update'])->name('parse.unit.update');
+Route::resource('parse-unit', ParseUnitController::class);
 // Technician
 Route::get('/technician/trashed', [TechnicianController::class, 'trashed']);
 Route::post('/technician/{id}/restore', [TechnicianController::class, 'restore']);

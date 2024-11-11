@@ -2,7 +2,7 @@
     <v-card>
         <v-card-title class="pt-5">
             <v-row>
-                <v-col cols="4"><span>Mechine Assing List</span></v-col>
+                <v-col cols="4"><span>Parse Unit List</span></v-col>
                 <v-col cols="8" class="d-flex justify-end">
                     <v-text-field
                         v-model="search"
@@ -18,7 +18,7 @@
                         clearable
                     ></v-text-field>
                     <v-btn
-                        @click="createMechine"
+                        @click="createUnit"
                         color="primary"
                         icon
                         style="width: 40px; height: 40px"
@@ -29,7 +29,7 @@
                                     >mdi-plus</v-icon
                                 >
                             </template>
-                            <span>Add New a Mechine</span>
+                            <span>Add a new Unit</span>
                         </v-tooltip>
                     </v-btn>
 
@@ -50,7 +50,7 @@
                                         mdi-trash-can-outline
                                     </v-icon>
                                 </template>
-                                <span>View trashed Mechines</span>
+                                <span>View trashed categories </span>
                             </v-tooltip>
                         </v-btn>
                     </v-badge>
@@ -71,25 +71,21 @@
         >
             <template v-slot:item.status="{ item }">
                 <v-chip
-                    :color="getStatusColor(item.status)"
+                    :color="item.status === 'Active' ? 'green' : 'red'"
                     class="text-uppercase"
                     size="small"
                     label
                 >
-                    {{ item.status }}
+                    {{ item.status === "Active" ? "Active" : "Inactive" }}
                 </v-chip>
             </template>
+
             <template v-slot:item.creator_name="{ item }">
                 <span>{{ item.creator ? item.creator.name : "Unknown" }}</span>
             </template>
+
             <template v-slot:item.actions="{ item }">
-                <v-icon
-                    @click="transferMachine(item.uuid)"
-                    color="blue"
-                    class="mr-2"
-                    >mdi-transfer</v-icon
-                >
-                <v-icon @click="editMechine(item.uuid)" class="mr-2"
+                <v-icon @click="editUnit(item.uuid)" class="mr-2"
                     >mdi-pencil</v-icon
                 >
                 <v-icon @click="showConfirmDialog(item.id)" color="red"
@@ -121,16 +117,18 @@ export default {
     },
     data() {
         return {
-            dialogName: "Are you sure you want to delete this Mechine ?",
-
+            dialogName: "Are you sure you want to delete this Parse Unit ?",
             search: "",
-            itemsPerPage: 10,
+            itemsPerPage: 15,
             headers: [
-                { title: "Company Name", key: "user.name", sortable: false },
-                { title: "Factory Name", key: "factory.name", sortable: false },
-                { title: "Mechine Name", key: "name", sortable: true },
-                { title: "Mechine Code", key: "mechine_code", sortable: false },
-                { title: "Status", key: "status", sortable: true },
+                { title: "Parse Unit Name", key: "name", sortable: true },
+                { title: "Description", key: "description", sortable: false },
+                {
+                    title: "Status",
+                    key: "status",
+                    value: "status",
+                    sortable: true,
+                },
                 { title: "Creator", key: "creator.name", sortable: false },
                 { title: "Actions", key: "actions", sortable: false },
             ],
@@ -138,7 +136,7 @@ export default {
             loading: true,
             totalItems: 0,
             dialog: false,
-            selectedMechineId: null,
+            selectedUnitId: null,
             trashedCount: 0,
         };
     },
@@ -148,7 +146,7 @@ export default {
             const sortOrder = sortBy.length ? sortBy[0].order : "desc";
             const sortKey = sortBy.length ? sortBy[0].key : "created_at";
             try {
-                const response = await this.$axios.get("/mechine-assing", {
+                const response = await this.$axios.get("/parse-unit", {
                     params: {
                         page,
                         itemsPerPage,
@@ -159,80 +157,52 @@ export default {
                 });
                 this.serverItems = response.data.items || [];
                 this.totalItems = response.data.total || 0;
-                this.fetchTrashedMechinesCount();
+                this.fetchTrashedUnitsCount();
             } catch (error) {
                 console.error("Error loading items:", error);
             } finally {
                 this.loading = false;
             }
         },
-        createMechine() {
-            this.$router.push({ name: "MechineCreate" });
+        createUnit() {
+            this.$router.push({ name: "ParseUnitCreate" });
         },
         viewTrash() {
-            this.$router.push({ name: "MechineTrash" });
+            this.$router.push({ name: "ParseUnitTrash" });
         },
-        editMechine(uuid) {
-            this.$router.push({ name: "MechineEdit", params: { uuid } });
-        },
-        transferMachine(uuid) {
-            this.$router.push({ name: "MechineTransfer", params: { uuid } });
+        editUnit(uuid) {
+            this.$router.push({ name: "ParseUnitEdit", params: { uuid } });
         },
         showConfirmDialog(id) {
-            this.selectedMechineId = id;
+            this.selectedUnitId = id;
             this.dialog = true;
         },
         async confirmDelete() {
             this.dialog = false; // Close the dialog
             try {
-                const response = await this.$axios.delete(
-                    `/mechine-assing/${this.selectedMechineId}`
-                );
+                await this.$axios.delete(`/parse-unit/${this.selectedUnitId}`);
                 this.loadItems({
                     page: 1,
                     itemsPerPage: this.itemsPerPage,
                     sortBy: [],
                 });
-                console.log(response.data);
-                toast.success("Mechine deleted successfully!");
+                toast.success("Parse Unit deleted successfully!");
             } catch (error) {
-                console.error("Error deleting Mechine:", error);
-                toast.error("Failed to delete Mechine.");
+                console.error("Error deleting Parse Unit:", error);
+                toast.error("Failed to delete Parse Unit.");
             }
         },
-        async fetchTrashedMechinesCount() {
+        async fetchTrashedUnitsCount() {
             try {
                 const response = await this.$axios.get(
-                    "mechine/assing/trashed-count"
+                    "/parse/unit/trashed-count"
                 );
-                this.trashedCount = response.data.trashedCount
-                    ? response.data.trashedCount
-                    : 0;
+                this.trashedCount = response.data.trashedCount;
             } catch (error) {
-                console.error("Error fetching trashed Mechine count:", error);
-            }
-        },
-
-        getStatusColor(status) {
-            switch (status) {
-                case "Preventive":
-                    return "blue";
-                case "Production":
-                    return "green";
-                case "Breakdown":
-                    return "red";
-                case "Under Maintenance":
-                    return "orange";
-                case "Loan":
-                    return "purple";
-                case "Idol":
-                    return "grey";
-                case "AsFactory":
-                    return "cyan";
-                case "Scraped":
-                    return "brown";
-                default:
-                    return "black"; // Default color if status doesn't match
+                console.error(
+                    "Error fetching trashed parse units count:",
+                    error
+                );
             }
         },
     },
@@ -243,7 +213,7 @@ export default {
             itemsPerPage: this.itemsPerPage,
             sortBy: [],
         });
-        this.fetchTrashedMechinesCount();
+        this.fetchTrashedUnitsCount();
     },
 };
 </script>

@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Auth;
 
 class SupplierController extends Controller
 {
-  
+
 
     public function index(Request $request)
     {
@@ -63,7 +63,7 @@ class SupplierController extends Controller
             'suppliers' => $suppliers->items(), // Current page items
             'total' => $suppliers->total(), // Total number of records
         ]);
-       
+
     }
 
 
@@ -159,9 +159,8 @@ class SupplierController extends Controller
      */
     public function edit($uuid)
     {
-        
+
         $supplier = Supplier::where('uuid', $uuid)->firstOrFail();
-       
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('admin')->user();
@@ -170,8 +169,8 @@ class SupplierController extends Controller
             if ($currentUser->role === 'superadmin') {
                 // Super admins can edit any brand
                 return response()->json([
-                    'success' => true,
-                    'brand' => $supplier
+                    'success'  => true,
+                    'supplier' => $supplier
                 ], Response::HTTP_OK);
             }
         } elseif (Auth::guard('user')->check()) {
@@ -182,10 +181,10 @@ class SupplierController extends Controller
         }
         // Check if the brand belongs to the current user or admin
         if ($supplier->creator_type !== $creatorType || $supplier->creator_id !== $currentUser->id) {
-            return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to edit this brand.'], 403);
+            return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to edit this supplier.'], 403);
         }
-        dd($supplier);
-        // Return the brand data if authorized
+
+        // Return the supplier data if authorized
         return response()->json([
             'success'    => true,
             'supplier'   => $supplier
@@ -256,7 +255,7 @@ class SupplierController extends Controller
              $endOldImg        = end($explodeOldImg);
              $deletePublicPath = public_path("Supplier/".$endOldImg);
              if(File::exists($deletePublicPath)){
-                
+
                 File::delete($deletePublicPath);
              }
         }else{
@@ -288,7 +287,7 @@ class SupplierController extends Controller
             $currentUser = Auth::guard('admin')->user();
             // Check if the admin is a superadmin
             if ($currentUser->role === 'superadmin') {
-                // Superadmin can delete any brand without additional checks
+                // Superadmin can delete any supplier without additional checks
             } else {
                 $creatorType = Admin::class;
                 // Regular admin authorization check
@@ -308,7 +307,7 @@ class SupplierController extends Controller
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
 
-        
+
         try {
             // Delete the supplier from the database
             $supplier->delete();
@@ -433,7 +432,7 @@ class SupplierController extends Controller
 
          // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
-                
+
             $currentUser = Auth::guard('admin')->user();
             $creatorType = Admin::class;
 
@@ -460,7 +459,7 @@ class SupplierController extends Controller
             } else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
-        
+
         try {
              // //rent image check and delete
             if ($supplier->photo) {
@@ -468,10 +467,10 @@ class SupplierController extends Controller
                 $explodeImg = explode("/", $img);
                 $EndImg     = end($explodeImg);
                 $deletePath = public_path("Rents/" .$EndImg);
-                
+
                 if (File::exists($deletePath)) {
                     File::delete($deletePath);
-                }  
+                }
             }
             // Delete the supplier
             $supplier->forceDelete();
