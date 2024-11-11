@@ -44,10 +44,10 @@
             </template>
 
             <template v-slot:item.actions="{ item }">
-                <v-icon @click="showRestoreDialog(item.uuid)" color="green"
+                <v-icon @click="showRestoreDialog(item.id)" color="green"
                     >mdi-restore</v-icon
                 >
-                <v-icon @click="showConfirmDialog(item.uuid)" color="red"
+                <v-icon @click="showConfirmDialog(item.id)" color="red"
                     >mdi-delete</v-icon
                 >
             </template>
@@ -129,12 +129,12 @@ export default {
                 this.loading = false;
             }
         },
-        showRestoreDialog(uuid) {
-            this.selectedCategoryId = uuid;
+        showRestoreDialog(id) {
+            this.selectedCategoryId = id;
             this.restoreDialog = true; // Open restore dialog
         },
-        showConfirmDialog(uuid) {
-            this.selectedCategoryId = uuid;
+        showConfirmDialog(id) {
+            this.selectedCategoryId = id;
             this.deleteDialog = true; // Open delete dialog
         },
         async confirmRestore() {
@@ -171,8 +171,8 @@ export default {
                 toast.error("Failed to delete category.");
             }
         },
-        editCategory(uuid) {
-            this.$router.push({ name: "CategoryEdit", params: { uuid } });
+        editCategory(id) {
+            this.$router.push({ name: "CategoryEdit", params: { id } });
         },
     },
     created() {

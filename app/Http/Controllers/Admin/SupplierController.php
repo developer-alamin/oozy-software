@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
-
+use App\Http\Controllers\HelperController;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Admin;
@@ -14,22 +14,11 @@ use App\Models\Category;
 use App\Models\User;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\File;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 
 class SupplierController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    // public function index()
-    // {
-    //     $suppliers = Supplier::all()->map(function ($supplier) {
-    //         $supplier->photo = $supplier->photo ? asset('storage/' . $supplier->photo) : null;
-    //         return $supplier;
-    //     });
-    //     return response()->json(['suppliers' => $suppliers, 'total' => $suppliers->count()]);
-    // }
-
+  
 
     public function index(Request $request)
     {
@@ -74,70 +63,9 @@ class SupplierController extends Controller
             'suppliers' => $suppliers->items(), // Current page items
             'total' => $suppliers->total(), // Total number of records
         ]);
-
-
-        // // Validate incoming request parameters
-
-        // $request->validate([
-        //     'search'       => 'nullable|string|max:255',
-        //     'itemsPerPage' => 'nullable|integer|min:1|max:100',
-        // ]);
-
-        // $query = Supplier::query();
-
-        // // Search functionality
-        // if ($request->filled('search')) {
-        //     $query->where('name', 'like', '%' . $request->search . '%')
-        //         ->orWhere('description', 'like', '%' . $request->search . '%');
-        // }
-
-        // // Sorting
-        // if ($request->filled('sortBy')) {
-        //     $query->orderBy($request->sortBy, $request->sortDesc ? 'desc' : 'asc');
-        // }
-
-        // // Pagination
-        // $itemsPerPage = $request->input('itemsPerPage', 15); // Default items per page
-        // $suppliers    = $query->paginate($itemsPerPage);
-
-        // return response()->json([
-        //     'suppliers' => $suppliers->items(),
-        //     'total'     => $suppliers->total(), // Total count for pagination
-        // ]);
+       
     }
 
-
-    // public function index(Request $request)
-    // {
-    //     $query = Supplier::query();
-    
-    //     // Apply search if provided
-    //     if ($request->has('search') && $request->search !== '') {
-    //         $search = $request->search;
-    //         $query->where(function ($q) use ($search) {
-    //             $q->where('name', 'LIKE', "%$search%")
-    //               ->orWhere('email', 'LIKE', "%$search%")
-    //               ->orWhere('phone', 'LIKE', "%$search%")
-    //               ->orWhere('contact_person', 'LIKE', "%$search%");
-    //         });
-    //     }
-    
-    //     // Apply sorting
-    //     if ($request->has('sortBy')) {
-    //         $sortBy = $request->sortBy;
-    //         $sortDesc = $request->sortDesc ? 'desc' : 'asc';
-    //         $query->orderBy($sortBy, $sortDesc);
-    //     }
-    
-    //     // Pagination
-    //     $suppliers = $query->paginate($request->get('itemsPerPage', 10)); // Default 10 items per page
-    
-    //     return response()->json([
-    //         'suppliers' => $suppliers->items(),
-    //         'total' => $suppliers->total(),
-    //     ]);
-    // }
-    
 
     /**
      * Show the form for creating a new resource.
@@ -152,15 +80,14 @@ class SupplierController extends Controller
      */
     public function store(Request $request)
     {
-
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:suppliers',
-            'phone' => 'required|string',
+            'name'           => 'required|string|max:255',
+            'email'          => 'required|string|email|max:255|unique:suppliers',
+            'phone'          => 'required|string',
             'contact_person' => 'nullable|string|max:255',
-            'address' => 'nullable|string',
-            'description' => 'nullable|string',
-            'imageFile' => 'nullable|image|max:2048',
+            'address'        => 'nullable|string',
+            'description'    => 'nullable|string',
+            'imageFile'      => 'nullable|image|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -185,40 +112,35 @@ class SupplierController extends Controller
              return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
          }
 
-        $name = $request->name;
+        $name       = $request->name;
         $nameResize = str_replace(" ","", $name);
-        $http = "http://" . $_SERVER['HTTP_HOST'] . "/";
+        $http       = "http://" . $_SERVER['HTTP_HOST'] . "/";
 
         if ($request->file("imageFile")) {
-            $img = $request->file("imageFile");
+            $img         = $request->file("imageFile");
             $imgPathName = $img->getClientOriginalName();
-            $ExplodeImg = explode(".", $imgPathName);
-            $endImg = end($ExplodeImg);
-            $RandomPath = $nameResize.'Img'. rand(5,150) . "." . $endImg;
-            $uploadImg = $http . "Supplier/" . $RandomPath;
+            $ExplodeImg  = explode(".", $imgPathName);
+            $endImg      = end($ExplodeImg);
+            $RandomPath  = $nameResize.'Img'. rand(5,150) . "." . $endImg;
+            $uploadImg   = $http . "Supplier/" . $RandomPath;
            $img->move(public_path("Supplier/"), $RandomPath);
         }else{
             $uploadImg = null;
         }
 
-        $supplier = new Supplier();
-        $supplier->name = $name;
-        $supplier->email = $request->email;
-        $supplier->phone = $request->contact_person;
+        $supplier                 = new Supplier();
+        $supplier->uuid           = HelperController::generateUuid();
+        $supplier->name           = $name;
+        $supplier->email          = $request->email;
+        $supplier->phone          = $request->contact_person;
         $supplier->contact_person = $request->phone;
-        $supplier->address = $request->address;
-        $supplier->description = $request->description;
-        $supplier->photo = $uploadImg;
+        $supplier->address        = $request->address;
+        $supplier->description    = $request->description;
+        $supplier->photo          = $uploadImg;
 
         $supplier->creator()->associate($creator);  // Assign creator polymorphically
         $supplier->updater()->associate($creator);  // Associate the updater
         $supplier->save();
-
-         // $supplier = new Supplier($request->all());
-        // if ($request->hasFile('imageFile')) {
-        //     $supplier->imageFile = $request->file('imageFile')->store('photos', 'public');
-        // }
-        // $supplier->save();
         return response()->json(['success' => true, 'supplier' => $supplier], 201);
     }
 
@@ -235,11 +157,11 @@ class SupplierController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Supplier $supplier)
+    public function edit($uuid)
     {
-        // return response()->json([
-        //     'supplier' => $supplier
-        // ]);
+        
+        $supplier = Supplier::where('uuid', $uuid)->firstOrFail();
+       
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('admin')->user();
@@ -262,9 +184,10 @@ class SupplierController extends Controller
         if ($supplier->creator_type !== $creatorType || $supplier->creator_id !== $currentUser->id) {
             return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to edit this brand.'], 403);
         }
+        dd($supplier);
         // Return the brand data if authorized
         return response()->json([
-            'success' => true,
+            'success'    => true,
             'supplier'   => $supplier
         ], Response::HTTP_OK);
     }
@@ -272,19 +195,18 @@ class SupplierController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Supplier $supplier)
+    public function update(Request $request,$uuid)
     {
-
-
+        $supplier = Supplier::where('uuid', $uuid)->firstOrFail();
          //Validate the incoming data
         $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:suppliers,email,' . $supplier->id,
-            'phone' => 'required|string|max:20',
+            'name'           => 'required|string|max:255',
+            'email'          => 'required|email|unique:suppliers,email,' . $supplier->id,
+            'phone'          => 'required|string|max:20',
             'contact_person' => 'nullable|string|max:255',
-            'address' => 'nullable|string',
-            'description' => 'nullable|string',
-            'imageFile' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Optional validation for photo
+            'address'        => 'nullable|string',
+            'description'    => 'nullable|string',
+            'imageFile'      => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Optional validation for photo
         ]);
 
          // Determine the authenticated user (either from 'admin' or 'user' guard)
@@ -314,24 +236,24 @@ class SupplierController extends Controller
              return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
          }
 
-        $name = $request->name;
-        $http = "http://" . $_SERVER['HTTP_HOST'] . "/";
+        $name       = $request->name;
+        $http       = "http://" . $_SERVER['HTTP_HOST'] . "/";
         $nameResize = str_replace(" ","", $name);
 
         // Rent Image Updated
         if ($request->file("imageFile")) {
-            $img = $request->file("imageFile");
+            $img         = $request->file("imageFile");
             $imgPathName = $img->getClientOriginalName();
-            $ExplodeImg = explode(".", $imgPathName);
-            $endImg = end($ExplodeImg);
-            $RandomPath = $nameResize.'Img'. rand(5,150) . "." . $endImg;
-            $uploadImg = $http . "Supplier/" . $RandomPath;
+            $ExplodeImg  = explode(".", $imgPathName);
+            $endImg      = end($ExplodeImg);
+            $RandomPath  = $nameResize.'Img'. rand(5,150) . "." . $endImg;
+            $uploadImg   = $http . "Supplier/" . $RandomPath;
             $img->move(public_path("Supplier/"), $RandomPath);
 
             // old image delete system
-             $oldImg = $request->oldImg;
-             $explodeOldImg = explode("/", $oldImg);
-             $endOldImg = end($explodeOldImg);
+             $oldImg           = $request->oldImg;
+             $explodeOldImg    = explode("/", $oldImg);
+             $endOldImg        = end($explodeOldImg);
              $deletePublicPath = public_path("Supplier/".$endOldImg);
              if(File::exists($deletePublicPath)){
                 
@@ -341,13 +263,13 @@ class SupplierController extends Controller
             $uploadImg = $request->oldImg;
         }
         // Update the Rent Date
-        $supplier->name = $name;
-        $supplier->email = $request->email;
-        $supplier->phone = $request->phone;
+        $supplier->name           = $name;
+        $supplier->email          = $request->email;
+        $supplier->phone          = $request->phone;
         $supplier->contact_person = $request->contact_person;
-        $supplier->address = $request->address;
-        $supplier->description = $request->description;
-        $supplier->photo = $uploadImg;
+        $supplier->address        = $request->address;
+        $supplier->description    = $request->description;
+        $supplier->photo          = $uploadImg;
         $supplier->updater()->associate($currentUser); // Associate the updater
         $supplier->update();
 
@@ -390,7 +312,6 @@ class SupplierController extends Controller
         try {
             // Delete the supplier from the database
             $supplier->delete();
-    
             // Return a success response
             return response()->json([
                 'success' => true,
@@ -410,7 +331,6 @@ class SupplierController extends Controller
     {
         // Get the count of soft-deleted rents
         $trashedCount = Supplier::onlyTrashed()->count();
-
         return response()->json([
             'trashedCount' => $trashedCount
         ], Response::HTTP_OK);
@@ -457,15 +377,12 @@ class SupplierController extends Controller
 
         // Apply search if the search term is not empty
         if (!empty($search)) {
-            $rentsQuery->where('name', 'LIKE', '%' . $search . '%'); // Adjust as per your brand fields
+            $suppliersQuery->where('name', 'LIKE', '%' . $search . '%'); // Adjust as per your brand fields
         }
-
         // Apply sorting
         $suppliersQuery->orderBy($sortBy, $sortOrder);
-
         // Paginate results
         $suppliers = $suppliersQuery->paginate($itemsPerPage);
-
         // Return the response as JSON
         return response()->json([
             'items' => $suppliers->items(), // Current page items
@@ -547,10 +464,11 @@ class SupplierController extends Controller
         try {
              // //rent image check and delete
             if ($supplier->photo) {
-                $img = $supplier->photo;
+                $img        = $supplier->photo;
                 $explodeImg = explode("/", $img);
-                $EndImg = end($explodeImg);
+                $EndImg     = end($explodeImg);
                 $deletePath = public_path("Rents/" .$EndImg);
+                
                 if (File::exists($deletePath)) {
                     File::delete($deletePath);
                 }  

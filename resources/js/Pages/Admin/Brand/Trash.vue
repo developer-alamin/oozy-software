@@ -44,10 +44,10 @@
             </template>
 
             <template v-slot:item.actions="{ item }">
-                <v-icon @click="showRestoreDialog(item.uuid)" color="green"
+                <v-icon @click="showRestoreDialog(item.id)" color="green"
                     >mdi-restore</v-icon
                 >
-                <v-icon @click="showConfirmDialog(item.uuid)" color="red"
+                <v-icon @click="showConfirmDialog(item.id)" color="red"
                     >mdi-delete</v-icon
                 >
             </template>
@@ -82,8 +82,8 @@ export default {
     },
     data() {
         return {
-            restroreDialogName:"Are you sure you want to restore this brand?",
-            dialogName:"Are you sure you want to delete this Brand ?",
+            restroreDialogName: "Are you sure you want to restore this brand?",
+            dialogName: "Are you sure you want to delete this Brand ?",
 
             search: "",
             itemsPerPage: 15,
@@ -129,12 +129,12 @@ export default {
                 this.loading = false;
             }
         },
-        showRestoreDialog(uuid) {
-            this.selectedBrandId = uuid;
+        showRestoreDialog(id) {
+            this.selectedBrandId = id;
             this.restoreDialog = true; // Open restore dialog
         },
-        showConfirmDialog(uuid) {
-            this.selectedBrandId = uuid;
+        showConfirmDialog(id) {
+            this.selectedBrandId = id;
             this.deleteDialog = true; // Open delete dialog
         },
         async confirmRestore() {
@@ -171,8 +171,8 @@ export default {
                 toast.error("Failed to delete brand.");
             }
         },
-        editBrand(uuid) {
-            this.$router.push({ name: "BrandEdit", params: { uuid } });
+        editBrand(id) {
+            this.$router.push({ name: "BrandEdit", params: { id } });
         },
     },
     created() {

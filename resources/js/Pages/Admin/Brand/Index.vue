@@ -88,7 +88,7 @@
                 <v-icon @click="editBrand(item.uuid)" class="mr-2"
                     >mdi-pencil</v-icon
                 >
-                <v-icon @click="showConfirmDialog(item.uuid)" color="red"
+                <v-icon @click="showConfirmDialog(item.id)" color="red"
                     >mdi-delete</v-icon
                 >
             </template>
@@ -174,8 +174,8 @@ export default {
         editBrand(uuid) {
             this.$router.push({ name: "BrandEdit", params: { uuid } });
         },
-        showConfirmDialog(uuid) {
-            this.selectedBrandId = uuid;
+        showConfirmDialog(id) {
+            this.selectedBrandId = id;
             this.dialog = true;
         },
         async confirmDelete() {

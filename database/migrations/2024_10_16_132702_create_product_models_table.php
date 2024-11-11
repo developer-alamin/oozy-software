@@ -17,7 +17,6 @@ return new class extends Migration
             $table->morphs('creator');
             $table->morphs('updater');
             $table->string('name');
-            $table->string('model_number')->unique();
             $table->text('description')->nullable();
             $table->enum('status', ['Active', 'Inactive', 'Pending'])->default('Inactive');
             $table->text('meta_data')->nullable();

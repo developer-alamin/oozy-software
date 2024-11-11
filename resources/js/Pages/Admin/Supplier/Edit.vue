@@ -2,23 +2,20 @@
     <v-container>
         <v-card>
             <v-card-title>
-            <v-row>
-                <v-col cols="12" md="6">
-                     Edit Supplier
-                </v-col>
-                 <v-col cols="12" md="6">
-                    <v-img
-                      :width="50"
-                      aspect-ratio="16/9"
-                      cover
-                      :src="newImg" 
-                      style="margin-left:auto"
-                      v-if="newImg"
-                      ></v-img>
-                </v-col>
-            </v-row>
-        </v-card-title>
-
+                <v-row>
+                    <v-col cols="12" md="6"> Edit Supplier </v-col>
+                    <v-col cols="12" md="6">
+                        <v-img
+                            :width="50"
+                            aspect-ratio="16/9"
+                            cover
+                            :src="newImg"
+                            style="margin-left: auto"
+                            v-if="newImg"
+                        ></v-img>
+                    </v-col>
+                </v-row>
+            </v-card-title>
 
             <v-card-text>
                 <v-form
@@ -26,14 +23,14 @@
                     v-model="valid"
                     @submit.prevent="updateSupplier"
                 >
-                <v-file-input
+                    <v-file-input
                         accept="image/png, image/jpeg, image/bmp"
                         label="Photo"
                         placeholder="Pick an avatar"
                         prepend-icon="mdi-camera"
                         @change="onFilePicked($event)"
-                    >    
-                </v-file-input>
+                    >
+                    </v-file-input>
                     <v-text-field
                         label="Name"
                         v-model="supplier.name"
@@ -119,16 +116,16 @@ export default {
     props: ["uuid"], // Capture the :id from the route
     data() {
         return {
-            newImg:'',
+            newImg: "",
             supplier: {
                 name: "",
                 email: "",
                 phone: "",
-                oldImg:'',
+                oldImg: "",
                 contact_person: "",
                 address: "",
                 description: "",
-                imageFile:''
+                imageFile: "",
             },
             valid: false,
             loading: false,
@@ -145,22 +142,26 @@ export default {
         this.loadSupplier();
     },
     methods: {
-        async onFilePicked(e){
-           const files = e.target.files;
-           if(files[0] !== undefined){
-              const fr = new FileReader();
-              fr.readAsDataURL(files[0]);
-               fr.addEventListener('load', () => {
-                  this.newImg = fr.result;
-                  this.supplier.imageFile = files[0];
-                })
-           }
+        async onFilePicked(e) {
+            const files = e.target.files;
+            if (files[0] !== undefined) {
+                const fr = new FileReader();
+                fr.readAsDataURL(files[0]);
+                fr.addEventListener("load", () => {
+                    this.newImg = fr.result;
+                    this.supplier.imageFile = files[0];
+                });
+            }
         },
         async loadSupplier() {
             try {
-                const response = await this.$axios.get(`/suppliers/${this.uuid}`);
+                const response = await this.$axios.get(
+                    `/suppliers/${this.uuid}/edit`
+                );
                 this.supplier = response.data.supplier;
-                this.newImg = this.supplier.photo;
+                console.log(response.data.supplier);
+
+                this.newImg = this.supplier.photo ? this.supplier.photo : "";
                 this.supplier.oldImg = this.supplier.photo;
             } catch (error) {
                 console.error("Failed to load supplier:", error);
@@ -173,19 +174,19 @@ export default {
             const formData = new FormData();
             Object.entries(this.supplier).forEach(([key, value]) => {
                 formData.append(key, value);
-                formData.append("_method","PUT");
+                formData.append("_method", "PUT");
             });
 
             // Perform client-side validation
             if (this.$refs.form.validate()) {
                 setTimeout(async () => {
                     try {
-                       const response = await this.$axios.post(
+                        const response = await this.$axios.post(
                             `/suppliers/${this.uuid}`,
                             formData
                         );
-                       console.log(response.data)
-                     this.$router.push({ name: "SupplierIndex" }); // Redirect after update
+                        console.log(response.data);
+                        this.$router.push({ name: "SupplierIndex" }); // Redirect after update
                     } catch (error) {
                         if (error.response && error.response.status === 422) {
                             // Handle validation errors from the backend

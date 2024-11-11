@@ -1,19 +1,3 @@
-<!-- <template>
-    <v-container>
-        <supplier-index ref="SupplierIndex" />
-    </v-container>
-</template>
-
-<script>
-import SupplierIndex from "../../Components/Admin/Supplier/SupplierIndex.vue";
-
-export default {
-    components: {
-        SupplierIndex,
-    },
-};
-</script> -->
-
 <template>
     <v-card outlined class="mx-auto my-5" max-width="900">
         <v-card-title class="pt-5">
@@ -50,7 +34,7 @@ export default {
                             <span>Add a new Supplier</span>
                         </v-tooltip>
                     </v-btn>
-                     <v-badge :content="trashedCount" color="red" overlap>
+                    <v-badge :content="trashedCount" color="red" overlap>
                         <v-btn
                             @click="viewTrash"
                             color="red"
@@ -84,22 +68,21 @@ export default {
             class="elevation-1"
             @update:options="updateOptions"
         >
-         <template v-slot:item.creator_name="{ item }">
+            <template v-slot:item.creator_name="{ item }">
                 <span>{{ item.creator ? item.creator : "Unknown" }}</span>
             </template>
             <template v-slot:item.photo="{ item }">
-                <img class="rentsImg" :src="item.photo" alt="">
+                <img class="rentsImg" :src="item.photo" alt="" />
             </template>
 
             <template v-slot:item.actions="{ item }">
                 <v-icon @click="editSupplier(item.uuid)" class="mr-2"
                     >mdi-pencil</v-icon
                 >
-                <v-icon @click="showConfirmDialog(item.uuid)" color="red"
+                <v-icon @click="showConfirmDialog(item.id)" color="red"
                     >mdi-delete</v-icon
                 >
             </template>
-            
         </v-data-table>
         <ConfirmDialog
             :dialogName="dialogName"
@@ -122,7 +105,7 @@ export default {
     },
     data() {
         return {
-            dialogName:"Are you sure you want to delete this suppliers ?",
+            dialogName: "Are you sure you want to delete this suppliers ?",
             dialog: false,
             suppliers: [],
             search: "",
@@ -207,20 +190,22 @@ export default {
         editSupplier(uuid) {
             this.$router.push({ name: "SupplierEdit", params: { uuid } });
         },
-        async showConfirmDialog(uuid) {
-            this.selectedSupplierId = uuid;
+        async showConfirmDialog(id) {
+            this.selectedSupplierId = id;
             this.dialog = true;
         },
         async confirmDelete() {
             this.dialog = false; // Close the dialog
             try {
-                const response = await this.$axios.delete(`/suppliers/${this.selectedSupplierId}`);
+                const response = await this.$axios.delete(
+                    `/suppliers/${this.selectedSupplierId}`
+                );
                 this.fetchSuppliers({
                     page: 1,
                     itemsPerPage: this.itemsPerPage,
                     sortBy: [],
                 });
-                this.fetchTrashedSupplierCount()
+                this.fetchTrashedSupplierCount();
                 toast.success("suppliers deleted successfully!");
             } catch (error) {
                 console.error("Error deleting Rent:", error);
@@ -229,7 +214,9 @@ export default {
         },
         async fetchTrashedSupplierCount() {
             try {
-                const response = await this.$axios.get("/supplier/trashed-count");
+                const response = await this.$axios.get(
+                    "/supplier/trashed-count"
+                );
                 this.trashedCount = response.data.trashedCount;
             } catch (error) {
                 console.error("Error fetching trashed supplier count:", error);

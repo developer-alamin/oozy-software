@@ -32,17 +32,15 @@
             loading-text="Loading... Please wait"
             @update:options="loadItems"
         >
-           
             <template v-slot:item.photo="{ item }">
-                <img class="rentsImg" :src="item.photo" alt="">
+                <img class="rentsImg" :src="item.photo" alt="" />
             </template>
 
-
             <template v-slot:item.actions="{ item }">
-                <v-icon @click="showRestoreDialog(item.uuid)" color="green"
+                <v-icon @click="showRestoreDialog(item.id)" color="green"
                     >mdi-restore</v-icon
                 >
-                <v-icon @click="showConfirmDialog(item.uuid)" color="red"
+                <v-icon @click="showConfirmDialog(item.id)" color="red"
                     >mdi-delete</v-icon
                 >
             </template>
@@ -77,8 +75,8 @@ export default {
     },
     data() {
         return {
-            restroreDialogName:"Are you sure you want to restore this Rents?",
-            dialogName:"Are you sure you want to delete this Rents ?",
+            restroreDialogName: "Are you sure you want to restore this Rents?",
+            dialogName: "Are you sure you want to delete this Rents ?",
             search: "",
             itemsPerPage: 15,
             headers: [
@@ -92,7 +90,7 @@ export default {
                     align: "start",
                 },
                 { title: "Photo", key: "photo", sortable: false },
-                
+
                 { title: "Actions", key: "actions", sortable: false },
             ],
             serverItems: [],
@@ -126,12 +124,12 @@ export default {
                 this.loading = false;
             }
         },
-        showRestoreDialog(uuid) {
-            this.selectedSupplierId = uuid;
+        showRestoreDialog(id) {
+            this.selectedSupplierId = id;
             this.restoreDialog = true; // Open restore dialog
         },
-        showConfirmDialog(uuid) {
-            this.selectedSupplierId = uuid;
+        showConfirmDialog(id) {
+            this.selectedSupplierId = id;
             this.deleteDialog = true; // Open delete dialog
         },
         async confirmRestore() {
@@ -154,7 +152,7 @@ export default {
         async confirmDelete() {
             this.deleteDialog = false; // Close the delete dialog
             try {
-               const response = await this.$axios.delete(
+                const response = await this.$axios.delete(
                     `/supplier/${this.selectedSupplierId}/force-delete`
                 );
                 this.loadItems({
@@ -162,14 +160,13 @@ export default {
                     itemsPerPage: this.itemsPerPage,
                     sortBy: [],
                 });
-                
-                toast.success("Supplier deleted successfully!");
 
+                toast.success("Supplier deleted successfully!");
             } catch (error) {
                 console.error("Error deleting Supplier:", error);
                 toast.error("Failed to delete Supplier.");
             }
-        }
+        },
     },
     created() {
         this.loadItems({

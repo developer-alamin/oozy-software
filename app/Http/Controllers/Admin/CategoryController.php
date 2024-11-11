@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\HelperController;
 use App\Models\Admin;
 use App\Models\Category;
 use App\Models\User;
@@ -90,7 +91,8 @@ class CategoryController extends Controller
              return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
          }
          // Create the technician and associate it with the creator
-         $category = new Category($validatedData);
+         $category       = new Category($validatedData);
+         $category->uuid = HelperController::generateUuid();
          $category->creator()->associate($creator);  // Assign creator polymorphically
          $category->updater()->associate($creator);  // Associate the updater
          $category->save(); // Save the technician to the database
@@ -110,8 +112,9 @@ class CategoryController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Category $category)
+    public function edit($uuid)
     {
+        $category = Category::where('uuid', $uuid)->firstOrFail();
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('admin')->user();
@@ -144,12 +147,11 @@ class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Category $category)
+    public function update(Request $request,$uuid)
     {
-
+        $category = Category::where('uuid', $uuid)->firstOrFail();
          // Validate the incoming request data
          $validatedData = $request->validate(Category::validationRules());
-
          // Determine the authenticated user (either from 'admin' or 'user' guard)
          if (Auth::guard('admin')->check()) {
              $currentUser = Auth::guard('admin')->user();

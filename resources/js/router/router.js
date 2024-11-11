@@ -157,7 +157,7 @@ const routes = [
                 meta: { title: "Supplier Create" },
             },
             {
-                path: "supplier/edit/:uuid", // Dynamic route for Supplier Edit
+                path: "supplier/:uuid/edit", // Dynamic route for Supplier Edit
                 name: "SupplierEdit",
                 component: adminComponents.SupplierEdit,
                 meta: { title: "Edit Supplier" },

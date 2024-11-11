@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\HelperController;
 use App\Models\Admin;
 use App\Models\Brand;
 use App\Models\Category;
@@ -90,7 +91,8 @@ class BrandController extends Controller
              return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
          }
          // Create the technician and associate it with the creator
-         $brand = new Brand($validatedData);
+         $brand       = new Brand($validatedData);
+         $brand->uuid = HelperController::generateUuid();
          $brand->creator()->associate($creator);  // Assign creator polymorphically
          $brand->updater()->associate($creator);  // Associate the updater
          $brand->save(); // Save the technician to the database
@@ -110,9 +112,9 @@ class BrandController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Brand $brand)
+    public function edit($uuid)
     {
-
+        $brand = Brand::where('uuid', $uuid)->firstOrFail();
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('admin')->user();
@@ -145,9 +147,9 @@ class BrandController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Brand $brand)
+    public function update(Request $request, $uuid)
     {
-
+        $brand = Brand::where('uuid', $uuid)->firstOrFail();
          // Validate the incoming request data
          $validatedData = $request->validate(Brand::validationRules());
 

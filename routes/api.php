@@ -28,6 +28,9 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\OperatorController;
 use App\Models\MechineAssing;
 
+
+Route::get('/suppliers/{uuid}/edit', [SupplierController::class, 'edit'])->name('suppliers.edit');
+Route::put('/suppliers/{uuid}', [SupplierController::class, 'update'])->name('suppliers.update');
 Route::resource('suppliers', SupplierController::class);
 // suppliers Group Controllers start form here
 Route::controller(SupplierController::class)
@@ -99,12 +102,16 @@ Route::prefix("/mechine")->group(function(){
 
 
 // models
+Route::get('/models/{uuid}/edit', [ProductModelController::class, 'edit'])->name('models.edit');
+Route::put('/models/{uuid}', [ProductModelController::class, 'update'])->name('models.update');
 Route::get('/models/trashed', [ProductModelController::class, 'trashed']);
 Route::post('/models/{id}/restore', [ProductModelController::class, 'restore']);
 Route::delete('/models/{id}/force-delete', [ProductModelController::class, 'forceDelete']);
 Route::get('/models/trashed-count', [ProductModelController::class, 'trashedModelsCount']);
 Route::resource('models', ProductModelController::class);
 // category
+Route::get('/category/{uuid}/edit', [CategoryController::class, 'edit'])->name('category.edit');
+Route::put('/category/{uuid}', [CategoryController::class, 'update'])->name('category.update');
 Route::get('/category/trashed', [CategoryController::class, 'trashed']);
 Route::post('/category/{id}/restore', [CategoryController::class, 'restore']);
 Route::delete('/category/{id}/force-delete', [CategoryController::class, 'forceDelete']);
@@ -150,6 +157,8 @@ Route::resource('group', GroupController::class);
 Route::resource('rent', RentController::class);
 
 // brand
+Route::get('/brand/{uuid}/edit', [BrandController::class, 'edit'])->name('brand.edit');
+Route::put('/brand/{uuid}', [BrandController::class, 'update'])->name('brand.update');
 Route::get('/brand/trashed', [BrandController::class, 'trashed']);
 Route::post('/brand/{id}/restore', [BrandController::class, 'restore']);
 Route::delete('/brand/{id}/force-delete', [BrandController::class, 'forceDelete']);

@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('brands', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
-            // $table->bigInteger('brand_id');
             $table->morphs('creator');
             $table->morphs('updater'); 
             $table->string('name');

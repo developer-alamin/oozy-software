@@ -5,16 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Support\Str;
 
 class Supplier extends Model
 {
-    use HasFactory,SoftDeletes,HasUuids;
+    use HasFactory,SoftDeletes;
 
-    // Define the table associated with the model (optional)
-    protected $table = 'suppliers'; // Only necessary if the table name is not the plural form of the model
-     protected $primaryKey = 'uuid'; // Assuming you want the uuid as the primary key
     // Specify the fillable attributes
     protected $fillable = [
         'uuid',
@@ -44,13 +39,13 @@ class Supplier extends Model
     public static function rules()
     {
         return [
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:suppliers,email',
-            'phone' => 'required|string|max:20',
+            'name'           => 'required|string|max:255',
+            'email'          => 'required|email|max:255|unique:suppliers,email',
+            'phone'          => 'required|string|max:20',
             'contact_person' => 'nullable|string|max:255',
-            'address' => 'nullable|string|max:255',
-            'description' => 'nullable|string|max:500',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Example for image validation
+            'address'        => 'nullable|string|max:255',
+            'description'    => 'nullable|string|max:500',
+            'photo'          => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Example for image validation
         ];
     }
 

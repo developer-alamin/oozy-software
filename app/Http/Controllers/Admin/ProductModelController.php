@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\HelperController;
 use App\Models\Admin;
 use App\Models\User;
 use App\Models\ProductModel;
@@ -88,7 +89,8 @@ class ProductModelController extends Controller
              return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
          }
          // Create the technician and associate it with the creator
-         $model = new ProductModel($validatedData);
+         $model       = new ProductModel($validatedData);
+         $model->uuid = HelperController::generateUuid();
          $model->creator()->associate($creator);  // Assign creator polymorphically
          $model->updater()->associate($creator);  // Associate the updater
          $model->save(); // Save the technician to the database
@@ -108,9 +110,9 @@ class ProductModelController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(ProductModel $model)
+    public function edit($uuid)
     {
-
+        $model = ProductModel::where('uuid', $uuid)->firstOrFail();
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('admin')->user();
@@ -143,9 +145,9 @@ class ProductModelController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, ProductModel $model)
+    public function update(Request $request,$uuid)
     {
-
+        $model = ProductModel::where('uuid', $uuid)->firstOrFail();
          // Validate the incoming request data
          $validatedData = $request->validate(ProductModel::validationRules());
 

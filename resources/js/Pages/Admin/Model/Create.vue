@@ -8,6 +8,7 @@
                     v-model="model.name"
                     :rules="[rules.required]"
                     label="Name"
+                    density="comfortable"
                     outlined
                     :error-messages="errors.name ? errors.name : ''"
                 >
@@ -16,16 +17,6 @@
                     </template>
                 </v-text-field>
 
-                <!-- Model Number Field -->
-                <v-text-field
-                    v-model="model.model_number"
-                    label="Model Number"
-                    :rules="[rules.required]"
-                    :error-messages="
-                        errors.model_number ? errors.model_number : ''
-                    "
-                    required
-                />
                 <v-select
                     v-model="model.type"
                     :rules="[rules.required]"
@@ -38,23 +29,24 @@
                         Model Type <span style="color: red">*</span>
                     </template>
                 </v-select>
+                <!-- Featured Checkbox -->
+                <v-select
+                    v-model="model.status"
+                    density="comfortable"
+                    :items="statusItems"
+                    label="Model Status"
+                    clearable
+                ></v-select>
 
                 <!-- Description Field -->
                 <v-textarea
                     v-model="model.description"
+                    density="comfortable"
                     label="Description"
                     :error-messages="
                         errors.description ? errors.description : ''
                     "
                 />
-
-                <!-- Featured Checkbox -->
-                <v-select
-                    v-model="model.status"
-                    :items="statusItems"
-                    label="Model Status"
-                    clearable
-                ></v-select>
 
                 <!-- Action Buttons -->
                 <v-row class="mt-4">
