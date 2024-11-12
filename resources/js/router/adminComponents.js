@@ -48,6 +48,12 @@ export { default as BrandTrash } from "../Pages/Admin/Brand/Trash.vue";
 export { default as BrandCreate } from "../Pages/Admin/Brand/Create.vue";
 export { default as BrandEdit } from "../Pages/Admin/Brand/Edit.vue";
 
+// Parse  components
+export { default as ParseIndex } from "../Pages/Admin/Parse/Index.vue";
+export { default as ParseCreate } from "../Pages/Admin/Parse/Create.vue";
+export { default as ParseEdit } from "../Pages/Admin/Parse/Edit.vue";
+export { default as ParseTrash } from "../Pages/Admin/Parse/Trash.vue";
+
 // Parse Unit components
 export { default as ParseUnitIndex } from "../Pages/Admin/ParseUnit/Index.vue";
 export { default as ParseUnitCreate } from "../Pages/Admin/ParseUnit/Create.vue";

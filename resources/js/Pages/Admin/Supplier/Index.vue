@@ -1,5 +1,5 @@
 <template>
-    <v-card outlined class="mx-auto my-5" max-width="900">
+    <v-card outlined class="mx-auto my-5">
         <v-card-title class="pt-5">
             <v-row>
                 <v-col cols="6"><span>Supplier List</span></v-col>
@@ -119,6 +119,7 @@ export default {
             sortDesc: false, // Default sort direction
             trashedCount: 0,
             headers: [
+                { title: "Type", key: "type", sortable: false },
                 {
                     title: "Name",
                     value: "name",

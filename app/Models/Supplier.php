@@ -20,10 +20,12 @@ class Supplier extends Model
         'address',
         'description',
         'photo', // For the uploaded photo
+        'type',
         'creator_type',
         'creator_id',
         'updater_type',
         'updater_id'
+
     ];
 
     // Specify the hidden attributes (optional)
@@ -34,12 +36,13 @@ class Supplier extends Model
 
     // Optionally, you can define any relationships here
     // For example, if the Supplier model has many Products:
-    
+
     // Optionally, you can define validation rules for creating/updating a Supplier
     public static function rules()
     {
         return [
             'name'           => 'required|string|max:255',
+            'type'           => 'nullable',
             'email'          => 'required|email|max:255|unique:suppliers,email',
             'phone'          => 'required|string|max:20',
             'contact_person' => 'nullable|string|max:255',

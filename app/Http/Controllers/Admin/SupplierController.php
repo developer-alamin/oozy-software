@@ -81,6 +81,7 @@ class SupplierController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
+            'type'           => 'required|string|max:255',
             'name'           => 'required|string|max:255',
             'email'          => 'required|string|email|max:255|unique:suppliers',
             'phone'          => 'required|string',
@@ -130,6 +131,7 @@ class SupplierController extends Controller
 
         $supplier                 = new Supplier();
         $supplier->uuid           = HelperController::generateUuid();
+        $supplier->type           = $request->type;
         $supplier->name           = $name;
         $supplier->email          = $request->email;
         $supplier->phone          = $request->contact_person;
@@ -199,6 +201,7 @@ class SupplierController extends Controller
         $supplier = Supplier::where('uuid', $uuid)->firstOrFail();
          //Validate the incoming data
         $validatedData = $request->validate([
+            'type'           => 'required|string|max:255',
             'name'           => 'required|string|max:255',
             'email'          => 'required|email|unique:suppliers,email,' . $supplier->id,
             'phone'          => 'required|string|max:20',
@@ -262,6 +265,7 @@ class SupplierController extends Controller
             $uploadImg = $request->oldImg;
         }
         // Update the Rent Date
+        $supplier->type           = $request->type;
         $supplier->name           = $name;
         $supplier->email          = $request->email;
         $supplier->phone          = $request->phone;

@@ -543,7 +543,7 @@ class MechineAssingController extends Controller
                     ->findOrFail($id);
             }
 
-            } elseif (Auth::guard('user')->check()) {
+        } elseif (Auth::guard('user')->check()) {
                 $currentUser = Auth::guard('user')->user();
                 $creatorType = User::class;
 
@@ -553,24 +553,24 @@ class MechineAssingController extends Controller
                     ->where('creator_type', $creatorType)
                     ->findOrFail($id);
             } else {
-        return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
-    }
+                return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+            }
 
-    try {
-        // Delete the supplier
-        $mechineAssing->forceDelete();
-        return response()->json([
-            'success' => true,
-            'message' => 'mechineAssing permanently deleted successfully.'
-        ], Response::HTTP_OK);
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Error deleting Brand: ' . $e->getMessage()
-        ], Response::HTTP_INTERNAL_SERVER_ERROR);
-    }
+            try {
+                // Delete the supplier
+                $mechineAssing->forceDelete();
+                return response()->json([
+                    'success' => true,
+                    'message' => 'mechineAssing permanently deleted successfully.'
+                ], Response::HTTP_OK);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error deleting Brand: ' . $e->getMessage()
+                ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
 
-        return response()->json(['message' => 'mechineAssing permanently deleted']);
+            return response()->json(['message' => 'mechineAssing permanently deleted']);
     }
 
     public function getFactories(Request $request){

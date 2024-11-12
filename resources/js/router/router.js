@@ -295,6 +295,32 @@ const routes = [
                 component: adminComponents.UnitTrash,
                 meta: { title: "Unit Trash" },
             },
+            // parse
+            {
+                path: "parse/index", // New route for Contact
+                name: "ParseIndex",
+                component: adminComponents.ParseIndex,
+                meta: { title: "Parse Index" },
+            },
+            {
+                path: "parse/create", // New route for Contact
+                name: "ParseCreate",
+                component: adminComponents.ParseCreate,
+                meta: { title: "Parse Create" },
+            },
+            {
+                path: "parse/:uuid/edit", // Dynamic route for  Edit
+                name: "ParseEdit",
+                component: adminComponents.ParseEdit,
+                meta: { title: "Edit Parse " },
+                props: true, // Enables passing route params as props
+            },
+            {
+                path: "parse/trash", // New route for Contact
+                name: "ParseTrash",
+                component: adminComponents.ParseTrash,
+                meta: { title: "Parse Trash" },
+            },
             // parse unit
             {
                 path: "parse/unit/index", // New route for Contact

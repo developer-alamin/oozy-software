@@ -2,7 +2,7 @@
     <v-card>
         <v-card-title class="pt-5">
             <v-row>
-                <v-col cols="4"><span>Parse List</span></v-col>
+                <v-col cols="4"><span>Parse Trash List</span></v-col>
                 <v-col cols="8" class="d-flex justify-end">
                     <v-text-field
                         v-model="search"
@@ -18,7 +18,7 @@
                         clearable
                     ></v-text-field>
                     <v-btn
-                        @click="createParse"
+                        @click="ParseIndex"
                         color="primary"
                         icon
                         style="width: 40px; height: 40px"
@@ -26,34 +26,12 @@
                         <v-tooltip location="top" activator="parent">
                             <template v-slot:activator="{ props }">
                                 <v-icon v-bind="props" style="font-size: 20px"
-                                    >mdi-plus</v-icon
+                                    >mdi-home</v-icon
                                 >
                             </template>
-                            <span>Add New a Parse</span>
+                            <span>Parse List</span>
                         </v-tooltip>
                     </v-btn>
-
-                    <v-badge :content="trashedCount" color="red" overlap>
-                        <v-btn
-                            @click="viewTrash"
-                            color="red"
-                            icon
-                            class="ml-2"
-                            style="width: 40px; height: 40px"
-                        >
-                            <v-tooltip location="top" activator="parent">
-                                <template v-slot:activator="{ props }">
-                                    <v-icon
-                                        v-bind="props"
-                                        style="font-size: 20px"
-                                    >
-                                        mdi-trash-can-outline
-                                    </v-icon>
-                                </template>
-                                <span>View trashed Parses</span>
-                            </v-tooltip>
-                        </v-btn>
-                    </v-badge>
                 </v-col>
             </v-row>
         </v-card-title>
@@ -79,18 +57,9 @@
                     {{ item.status === "Active" ? "Active" : "Inactive" }}
                 </v-chip>
             </template>
-            <template v-slot:item.creator_name="{ item }">
-                <span>{{ item.creator ? item.creator.name : "Unknown" }}</span>
-            </template>
             <template v-slot:item.actions="{ item }">
-                <!-- <v-icon
-                    @click="transferMachine(item.uuid)"
-                    color="blue"
-                    class="mr-2"
-                    >mdi-transfer</v-icon
-                > -->
-                <v-icon @click="editParse(item.uuid)" class="mr-2"
-                    >mdi-pencil</v-icon
+                <v-icon @click="showRestoreDialog(item.id)" color="green"
+                    >mdi-restore</v-icon
                 >
                 <v-icon @click="showConfirmDialog(item.id)" color="red"
                     >mdi-delete</v-icon
@@ -98,33 +67,40 @@
             </template>
         </v-data-table-server>
 
+        <!-- Restore Confirmation Dialog -->
+        <RestoreConfirmDialog
+            :restroreDialogName="restroreDialogName"
+            v-model:modelValue="restoreDialog"
+            :onConfirm="confirmRestore"
+            :onCancel="() => (restoreDialog = false)"
+        />
+        <!-- Delete Confirmation Dialog -->
         <ConfirmDialog
             :dialogName="dialogName"
-            v-model:modelValue="dialog"
+            v-model:modelValue="deleteDialog"
             :onConfirm="confirmDelete"
-            :onCancel="
-                () => {
-                    dialog = false;
-                }
-            "
+            :onCancel="() => (deleteDialog = false)"
         />
     </v-card>
 </template>
 
 <script>
 import { toast } from "vue3-toastify";
+import RestoreConfirmDialog from "../../Components/RestoreConfirmDialog.vue";
 import ConfirmDialog from "../../Components/ConfirmDialog.vue";
 
 export default {
     components: {
+        RestoreConfirmDialog,
         ConfirmDialog,
     },
     data() {
         return {
-            dialogName: "Are you sure you want to delete this Parse ?",
-
+            restroreDialogName:
+                "Are you sure you want to restore this Parse asssing ?",
+            dialogName: "Are you sure you want to delete this Parse asssing ?",
             search: "",
-            itemsPerPage: 10,
+            itemsPerPage: 15,
             headers: [
                 { title: "Company Name", key: "user.name", sortable: false },
                 // { title: "Factory Name", key: "factory.name", sortable: false },
@@ -152,9 +128,9 @@ export default {
             serverItems: [],
             loading: true,
             totalItems: 0,
-            dialog: false,
-            selectedParseId: null,
-            trashedCount: 0,
+            restoreDialog: false, // Separate state for restore dialog
+            deleteDialog: false, // Separate state for delete dialog
+            selectedParseAsssingId: null,
         };
     },
     methods: {
@@ -163,7 +139,7 @@ export default {
             const sortOrder = sortBy.length ? sortBy[0].order : "desc";
             const sortKey = sortBy.length ? sortBy[0].key : "created_at";
             try {
-                const response = await this.$axios.get("/parse", {
+                const response = await this.$axios.get("/parse/trashed", {
                     params: {
                         page,
                         itemsPerPage,
@@ -174,70 +150,86 @@ export default {
                 });
                 this.serverItems = response.data.items || [];
                 this.totalItems = response.data.total || 0;
-                this.fetchTrashedParsesCount();
             } catch (error) {
                 console.error("Error loading items:", error);
             } finally {
                 this.loading = false;
             }
         },
-        createParse() {
-            this.$router.push({ name: "ParseCreate" });
-        },
-        viewTrash() {
-            this.$router.push({ name: "ParseTrash" });
-        },
-        editParse(uuid) {
-            this.$router.push({ name: "ParseEdit", params: { uuid } });
-        },
-        transferMachine(uuid) {
-            this.$router.push({ name: "ParseTransfer", params: { uuid } });
+        showRestoreDialog(id) {
+            this.selectedParseAsssingId = id;
+            this.restoreDialog = true; // Open restore dialog
         },
         showConfirmDialog(id) {
-            this.selectedParseId = id;
-            this.dialog = true;
+            this.selectedParseAsssingId = id;
+            this.deleteDialog = true; // Open delete dialog
         },
-        async confirmDelete() {
-            this.dialog = false; // Close the dialog
+        async confirmRestore() {
+            this.restoreDialog = false; // Close the restore dialog
             try {
-                const response = await this.$axios.delete(
-                    `/parse/${this.selectedParseId}`
+                await this.$axios.post(
+                    `/parse/${this.selectedParseAsssingId}/restore`
                 );
                 this.loadItems({
                     page: 1,
                     itemsPerPage: this.itemsPerPage,
                     sortBy: [],
                 });
-                console.log(response.data);
-                toast.success("Parse deleted successfully!");
+                toast.success("Parse  restored successfully!");
             } catch (error) {
-                console.error("Error deleting Parse:", error);
-                toast.error("Failed to delete Parse.");
+                console.error("Error restoring parse:", error);
+                toast.error("Failed to restore parse.");
             }
         },
-        async fetchTrashedParsesCount() {
+        async confirmDelete() {
+            this.deleteDialog = false; // Close the delete dialog
             try {
-                const response = await this.$axios.get("parse/trashed-count");
-                this.trashedCount = response.data.trashedCount
-                    ? response.data.trashedCount
-                    : 0;
+                await this.$axios.delete(
+                    `/parse/${this.selectedParseAsssingId}/force-delete`
+                );
+                this.loadItems({
+                    page: 1,
+                    itemsPerPage: this.itemsPerPage,
+                    sortBy: [],
+                });
+                toast.success("Parse deleted successfully!");
             } catch (error) {
-                console.error("Error fetching trashed Parse count:", error);
+                console.error("Error deleting parse:", error);
+                toast.error("Failed to delete parse.");
+            }
+        },
+        async ParseIndex() {
+            this.$router.push({ name: "ParseIndex" });
+        },
+        getStatusColor(status) {
+            switch (status) {
+                case "Preventive":
+                    return "blue";
+                case "Production":
+                    return "green";
+                case "Breakdown":
+                    return "red";
+                case "Under Maintenance":
+                    return "orange";
+                case "Loan":
+                    return "purple";
+                case "Idol":
+                    return "grey";
+                case "AsFactory":
+                    return "cyan";
+                case "Scraped":
+                    return "brown";
+                default:
+                    return "black"; // Default color if status doesn't match
             }
         },
     },
-
     created() {
         this.loadItems({
             page: 1,
             itemsPerPage: this.itemsPerPage,
             sortBy: [],
         });
-        this.fetchTrashedParsesCount();
     },
 };
 </script>
-
-<style scoped>
-/* Optional: Add styles for the main component */
-</style>

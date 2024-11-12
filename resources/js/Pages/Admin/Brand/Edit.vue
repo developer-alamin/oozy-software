@@ -96,7 +96,7 @@ export default {
             statusTypeItems: ["Mechine", "Parse"],
             brand: {
                 name: "",
-                type: null,
+                type: false,
                 description: "",
                 status: false, // Default to false (inactive)
             },
@@ -124,7 +124,7 @@ export default {
                 this.brand.status =
                     this.brand.status === "Active" ? "Active" : "Inactive";
                 this.brand.type =
-                    this.brand.status === "Mechine" ? "Mechine" : "Parse";
+                    this.brand.type === "Mechine" ? "Mechine" : "Parse";
             } catch (error) {
                 this.serverError = "Error fetching brand data.";
             }

@@ -165,6 +165,47 @@
             </li>
             <!-- End Forms Nav -->
 
+            <!-- parse -->
+
+            <li class="nav-item">
+                <a
+                    class="nav-link collapsed"
+                    data-bs-target="#tables-nav-parse"
+                    data-bs-toggle="collapse"
+                    href="#"
+                >
+                    <i class="bi bi-layout-text-window-reverse"></i
+                    ><span>Parse</span
+                    ><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul
+                    id="tables-nav-parse"
+                    class="nav-content collapse"
+                    data-bs-parent="#sidebar-nav"
+                >
+                    <li>
+                        <router-link
+                            :to="{ name: 'ParseCreate' }"
+                            active-class="active"
+                            :class="{ active: isParseCreateActive }"
+                        >
+                            <i class="bi bi-circle"></i
+                            ><span>Create Parse</span>
+                        </router-link>
+                    </li>
+
+                    <li>
+                        <router-link
+                            :to="{ name: 'ParseIndex' }"
+                            active-class="active"
+                            :class="{ active: isParseIndexActive }"
+                        >
+                            <i class="bi bi-circle"></i><span>All Parse</span>
+                        </router-link>
+                    </li>
+                </ul>
+            </li>
+
             <li class="nav-item">
                 <a
                     class="nav-link collapsed"

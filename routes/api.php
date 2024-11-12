@@ -8,19 +8,18 @@ use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\Admin\UnitController;
 use App\Http\Controllers\TechnicianController;
 
-
 use App\Http\Controllers\Admin\LineController;
 use App\Http\Controllers\Admin\GroupController;
 use App\Http\Controllers\Admin\FloorController;
 use App\Http\Controllers\Admin\Mechine\TypeController;
 use App\Http\Controllers\Admin\SourceController;
 
-
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Auth\UserAuthController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\MechineAssingController;
+use App\Http\Controllers\Admin\ParseController;
 use App\Http\Controllers\Admin\ParseUnitController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Auth\AdminAuthController;
@@ -29,7 +28,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\OperatorController;
 use App\Models\MechineAssing;
 
-
+// --------------------------------------------supplier route statr here-------------------------------------------------------------------
 Route::get('/suppliers/{uuid}/edit', [SupplierController::class, 'edit'])->name('suppliers.edit');
 Route::put('/suppliers/{uuid}', [SupplierController::class, 'update'])->name('suppliers.update');
 // suppliers Group Controllers start form here
@@ -44,7 +43,8 @@ Route::controller(SupplierController::class)
 });
 Route::resource('suppliers', SupplierController::class);
 
-// floor group route declare start form here
+// --------------------------------------------Floor route statr here-------------------------------------------------------------------
+
 Route::get('/floor/{uuid}/edit', [FloorController::class, 'edit'])->name('floor.edit');
 Route::put('/floor/{uuid}', [FloorController::class, 'update'])->name('floor.update');
 Route::controller(FloorController::class)
@@ -57,6 +57,8 @@ Route::controller(FloorController::class)
     Route::delete('{id}/force-delete', 'floorforcedelete')->name('floor.force.delete');
 });
 Route::resource('floor', FloorController::class);
+
+// --------------------------------------------Mechine route statr here-------------------------------------------------------------------
 
 Route::get('/get_factories', [MechineAssingController::class, 'getFactories']);
 Route::get('/get_brands', [MechineAssingController::class, 'getBrands']);
@@ -76,7 +78,8 @@ Route::get('/mechine/transfer/list', [MechineAssingController::class,'mechineTra
 Route::get('/mechine/history/list', [MechineAssingController::class,'mechineHistoryList'])->name('mechine.assing.trashed');
 Route::resource('mechine-assing',MechineAssingController::class);
 
-//Mechine Group Route declare start form here
+
+// -------------------------------------------- mechine typeroute statr here-------------------------------------------------------------------
 
 Route::prefix("/mechine")->group(function(){
     Route::get('/type/{uuid}/edit', [TypeController::class, 'edit'])->name('type.edit');
@@ -91,6 +94,9 @@ Route::prefix("/mechine")->group(function(){
          Route::post('{id}/restore', 'typesrestore')->name('types.restore');
          Route::delete('{id}/force-delete', 'typesforcedelete')->name('types.force.delete');
     });
+
+    // --------------------------------------------mechine source route statr here-------------------------------------------------------------------
+
     Route::resource('source', SourceController::class);
     Route::controller(SourceController::class)
     ->prefix('sources')
@@ -103,10 +109,9 @@ Route::prefix("/mechine")->group(function(){
     });
 
 });
-//Mechine Group Route declare end form here
 
+// --------------------------------------------Models route statr here-------------------------------------------------------------------
 
-// models
 Route::get('/models/{uuid}/edit', [ProductModelController::class, 'edit'])->name('models.edit');
 Route::put('/models/{uuid}', [ProductModelController::class, 'update'])->name('models.update');
 Route::get('/models/trashed', [ProductModelController::class, 'trashed']);
@@ -114,7 +119,9 @@ Route::post('/models/{id}/restore', [ProductModelController::class, 'restore']);
 Route::delete('/models/{id}/force-delete', [ProductModelController::class, 'forceDelete']);
 Route::get('/models/trashed-count', [ProductModelController::class, 'trashedModelsCount']);
 Route::resource('models', ProductModelController::class);
-// category
+
+// --------------------------------------------Category route statr here-------------------------------------------------------------------
+
 Route::get('/category/{uuid}/edit', [CategoryController::class, 'edit'])->name('category.edit');
 Route::put('/category/{uuid}', [CategoryController::class, 'update'])->name('category.update');
 Route::get('/category/trashed', [CategoryController::class, 'trashed']);
@@ -123,8 +130,8 @@ Route::delete('/category/{id}/force-delete', [CategoryController::class, 'forceD
 Route::get('/category/trashed-count', [CategoryController::class, 'trashedcategorysCount']);
 Route::resource('category', CategoryController::class);
 
+// --------------------------------------------Line route statr here-------------------------------------------------------------------
 
-// Line Route
 Route::get('/line/{uuid}/edit', [LineController::class, 'edit'])->name('lines.edit');
 Route::put('/line/{uuid}', [LineController::class, 'update'])->name('lines.update');
 // Line Group Controllers start form here
@@ -140,7 +147,8 @@ Route::controller(LineController::class)
 // Line Group Controllers end form here
 Route::resource('line', LineController::class);
 
-// Groups Route
+// --------------------------------------------Group route statr here-------------------------------------------------------------------
+
 Route::get('/get_users', [GroupController::class, 'getUsers']);
 Route::get('/group/{uuid}/edit', [GroupController::class, 'edit'])->name('group.edit');
 Route::put('/group/{uuid}', [GroupController::class, 'update'])->name('group.update');
@@ -158,10 +166,21 @@ Route::get('get-technician', [GroupController::class, 'getTechnician']);
 // Groups Gorup Controller end form here
 Route::resource('group', GroupController::class);
 
-// Rent
+// --------------------------------------------Rent route statr here-------------------------------------------------------------------
+// Group Rents Controller start form here
+Route::controller(RentController::class)
+->prefix('rents')
+->as("rents")
+->group(function () {
+     Route::get('/trashed-count', 'rentstrashedcount')->name('rents.trashed.count');
+     Route::get('/trashed', 'rentstrashed')->name('rents.trashed');
+     Route::post('{id}/restore', 'rentsrestore')->name('rents.restore');
+     Route::delete('{id}/force-delete', 'rentsforcedelete')->name('rents.force.delete');
+});
 Route::resource('rent', RentController::class);
 
-// brand
+// --------------------------------------------Brand route statr here-------------------------------------------------------------------
+
 Route::get('/brand/{uuid}/edit', [BrandController::class, 'edit'])->name('brand.edit');
 Route::put('/brand/{uuid}', [BrandController::class, 'update'])->name('brand.update');
 Route::get('/brand/trashed', [BrandController::class, 'trashed']);
@@ -176,6 +195,31 @@ Route::delete('/units/{id}/force-delete', [UnitController::class, 'forceDelete']
 Route::get('/units/trashed-count', [UnitController::class, 'trashedUnitsCount']);
 Route::resource('units', UnitController::class);
 
+/// --------------------------------------------Parse route statr here-------------------------------------------------------------------
+
+Route::get('/parse/trashed', [ParseController::class, 'trashed']);
+Route::post('/parse/{id}/restore', [ParseController::class, 'restore']);
+Route::delete('/parse/{id}/force-delete', [ParseController::class, 'forceDelete']);
+Route::get('/parse/trashed-count', [ParseController::class, 'trashedParseCount']);
+Route::get('/parse/{uuid}/edit', [ParseController::class, 'edit'])->name('parse.edit');
+Route::put('/parse/{uuid}', [ParseController::class, 'update'])->name('parse.update');
+
+Route::get('/parse/get_category', [ParseController::class, 'getCategory']);
+Route::get('/parse/get_brands', [ParseController::class, 'getBrands']);
+Route::get('/parse/get_models', [ParseController::class, 'getModels']);
+Route::get('/parse/get_suppliers', [ParseController::class, 'getSuppliers']);
+Route::get('/parse/units', [ParseController::class, 'getParseUnit']);
+
+Route::resource('parse', ParseController::class);
+
+
+
+
+
+
+// --------------------------------------------Parse Unit route statr here-------------------------------------------------------------------
+
+// parse unit
 Route::get('/parse/unit/trashed', [ParseUnitController::class, 'trashed']);
 Route::post('/parse/unit/{id}/restore', [ParseUnitController::class, 'restore']);
 Route::delete('/parse/unit/{id}/force-delete', [ParseUnitController::class, 'forceDelete']);
@@ -183,7 +227,9 @@ Route::get('/parse/unit/trashed-count', [ParseUnitController::class, 'trashedUni
 Route::get('/parse/unit/{uuid}/edit', [ParseUnitController::class, 'edit'])->name('parse.unit.edit');
 Route::put('/parse/unit/{uuid}', [ParseUnitController::class, 'update'])->name('parse.unit.update');
 Route::resource('parse-unit', ParseUnitController::class);
-// Technician
+
+// --------------------------------------------Technician route statr here-------------------------------------------------------------------
+
 Route::get('/technician/trashed', [TechnicianController::class, 'trashed']);
 Route::post('/technician/{id}/restore', [TechnicianController::class, 'restore']);
 Route::delete('/technician/{id}/force-delete', [TechnicianController::class, 'forceDelete']);
@@ -191,7 +237,9 @@ Route::get('/technician/trashed-count', [TechnicianController::class, 'trashedTe
 Route::get('/technician/{uuid}/edit', [TechnicianController::class, 'edit'])->name('technician.edit');
 Route::put('/technician/{uuid}', [TechnicianController::class, 'update'])->name('technician.update');
 Route::resource('technician', TechnicianController::class);
-// operator
+
+// --------------------------------------------Operator route statr here-------------------------------------------------------------------
+
 Route::get('/operator/trashed', [OperatorController::class, 'trashed']);
 Route::post('/operator/{id}/restore', [OperatorController::class, 'restore']);
 Route::delete('/operator/{id}/force-delete', [OperatorController::class, 'forceDelete']);
@@ -200,10 +248,10 @@ Route::get('/operator/{uuid}/edit', [OperatorController::class, 'edit'])->name('
 Route::put('/operator/{uuid}', [OperatorController::class, 'update'])->name('operator.update');
 Route::resource('operator', OperatorController::class);
 
-
-// Company
+// --------------------------------------------Company route statr here-------------------------------------------------------------------
 Route::resource('company', CompanyController::class);
-// Factory
+
+// --------------------------------------------Factory route statr here-------------------------------------------------------------------
 Route::get('/get_companys', [FactoryController::class, 'getCompanys']);
 Route::get('/get_floors', [FactoryController::class, 'getFloors']);
 Route::get('/get_units', [FactoryController::class, 'getUnits']);
@@ -212,20 +260,6 @@ Route::get('/factory/edit/{uuid}', [FactoryController::class, 'edit'])->name('fa
 Route::put('/factory/{uuid}', [FactoryController::class, 'update'])->name('factory.update');
 Route::resource('factory', FactoryController::class);
 
-
-
-
-
-// Group Rents Controller start form here
-Route::controller(RentController::class)
-->prefix('rents')
-->as("rents")
-->group(function () {
-     Route::get('/trashed-count', 'rentstrashedcount')->name('rents.trashed.count');
-     Route::get('/trashed', 'rentstrashed')->name('rents.trashed');
-     Route::post('{id}/restore', 'rentsrestore')->name('rents.restore');
-     Route::delete('{id}/force-delete', 'rentsforcedelete')->name('rents.force.delete');
-});
 // Group Rents Controller End form here
 
 // Admin Auth Routes

@@ -92,6 +92,7 @@ export default {
             statusItems: ["Active", "Inactive"],
             statusTypeItems: ["Mechine", "Parse"],
             model: {
+                type: "",
                 name: "",
                 model_number: "",
                 description: "",
@@ -122,7 +123,7 @@ export default {
                 this.model.status =
                     this.model.status === "Active" ? "Active" : "Inactive";
                 this.model.type =
-                    this.model.status === "Mechine" ? "Mechine" : "Parse";
+                    this.model.type === "Mechine" ? "Mechine" : "Parse";
             } catch (error) {
                 this.serverError = "Error fetching model data.";
             }

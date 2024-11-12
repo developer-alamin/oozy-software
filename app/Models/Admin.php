@@ -164,6 +164,25 @@ class Admin extends Authenticatable
      {
          return $this->morphMany(MechineAssing::class, 'updater');
      }
+    //Parse created by this user
+    public function createdParses(): MorphMany
+    {
+        return $this->morphMany(Parse::class, 'creator');
+    }
+    //  mechine assing updated by this user
+    public function updatedParses(): MorphMany
+    {
+        return $this->morphMany(Parse::class, 'updater');
+    }
+    public function createdParseInStocks(): MorphMany
+    {
+        return $this->morphMany(ParseStockIn::class, 'creator');
+    }
+    //  mechine assing updated by this user
+    public function updatedParseInStocks(): MorphMany
+    {
+        return $this->morphMany(ParseStockIn::class, 'updater');
+    }
 
 
       // mechine Stock created by this user

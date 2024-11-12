@@ -17,6 +17,7 @@ class ProductModel extends Model
         'name',
         'description',
         'status',
+        'type',
         'meta_data',
         'creator_id',
         'creator_type',

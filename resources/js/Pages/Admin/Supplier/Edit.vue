@@ -23,14 +23,19 @@
                     v-model="valid"
                     @submit.prevent="updateSupplier"
                 >
-                    <v-file-input
-                        accept="image/png, image/jpeg, image/bmp"
-                        label="Photo"
-                        placeholder="Pick an avatar"
-                        prepend-icon="mdi-camera"
-                        @change="onFilePicked($event)"
+                    <v-select
+                        v-model="supplier.type"
+                        :rules="[rules.required]"
+                        :items="statusTypeItems"
+                        label="Supplier Type"
+                        density="comfortable"
+                        clearable
                     >
-                    </v-file-input>
+                        <template v-slot:label>
+                            Supplier Type <span style="color: red">*</span>
+                        </template>
+                    </v-select>
+
                     <v-text-field
                         label="Name"
                         v-model="supplier.name"
@@ -69,6 +74,14 @@
                         label="Description"
                         v-model="supplier.description"
                     ></v-textarea>
+                    <v-file-input
+                        accept="image/png, image/jpeg, image/bmp"
+                        label="Photo"
+                        placeholder="Pick an avatar"
+                        prepend-icon="mdi-camera"
+                        @change="onFilePicked($event)"
+                    >
+                    </v-file-input>
 
                     <v-alert v-if="serverError" type="error" class="mt-4">
                         {{ serverError }}
@@ -117,7 +130,9 @@ export default {
     data() {
         return {
             newImg: "",
+            statusTypeItems: ["Mechine", "Parse"],
             supplier: {
+                type: false,
                 name: "",
                 email: "",
                 phone: "",
@@ -157,10 +172,12 @@ export default {
                     `/suppliers/${this.uuid}/edit`
                 );
                 this.supplier = response.data.supplier;
-                console.log(response.data.supplier);
+                // console.log(response.data.supplier);
 
                 this.newImg = this.supplier.photo ? this.supplier.photo : "";
                 this.supplier.oldImg = this.supplier.photo;
+                this.supplier.type =
+                    this.supplier.type === "Mechine" ? "Mechine" : "Parse";
             } catch (error) {
                 console.error("Failed to load supplier:", error);
             }
