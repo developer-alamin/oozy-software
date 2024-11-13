@@ -89,13 +89,14 @@ const routes = [
                 component: adminComponents.AllCompanyIndex,
                 meta: { title: "All Company Index" },
             },
+            // factory
             {
                 path: "factory/index", // New route for Contact
                 name: "FactoryIndex",
                 component: adminComponents.FactoryIndex,
                 meta: { title: "Factory Index" },
             },
-            // factory
+
             {
                 path: "factory/create", // New route for Factory
                 name: "FactoryCreate",
@@ -103,7 +104,7 @@ const routes = [
                 meta: { title: "Factory Create" },
             },
             {
-                path: "factory/edit/:id", // Dynamic route for Factory Edit
+                path: "factory/:uuid/edit", // Dynamic route for Factory Edit
                 name: "FactoryEdit",
                 component: adminComponents.FactoryEdit,
                 meta: { title: "Edit Factory" },
@@ -114,6 +115,52 @@ const routes = [
                 name: "FactoryTrash",
                 component: adminComponents.FactoryTrash,
                 meta: { title: "Factory Trash" },
+            },
+            // mechine
+            {
+                path: "mechine/index", // New route for Contact
+                name: "MechineIndex",
+                component: adminComponents.MechineIndex,
+                meta: { title: "Mechine Index" },
+            },
+            {
+                path: "mechine/transfer/list", // New route for Contact
+                name: "MechineTransferList",
+                component: adminComponents.MechineTransferList,
+                meta: { title: "Mechine Transfer List" },
+            },
+            {
+                path: "mechine/history/list", // New route for Contact
+                name: "MechineHistoryList",
+                component: adminComponents.MechineHistoryList,
+                meta: { title: "Mechine History List" },
+            },
+
+            {
+                path: "mechine/create", // New route for Factory
+                name: "MechineCreate",
+                component: adminComponents.MechineCreate,
+                meta: { title: "Mechine Create" },
+            },
+            {
+                path: "mechine/:uuid/edit", // Dynamic route for Factory Edit
+                name: "MechineEdit",
+                component: adminComponents.MechineEdit,
+                meta: { title: "Edit Mechine" },
+                props: true, // Enables passing route params as props
+            },
+            {
+                path: "mechine/:uuid/transfer", // Dynamic route for mechine transfer
+                name: "MechineTransfer",
+                component: adminComponents.MechineTransfer,
+                meta: { title: "Mechine Transfer" },
+                props: true, // Enables passing route params as props
+            },
+            {
+                path: "mechine/trash", // New route for Contact
+                name: "MechineTrash",
+                component: adminComponents.MechineTrash,
+                meta: { title: "Mechine Trash" },
             },
 
             {
@@ -129,12 +176,20 @@ const routes = [
                 meta: { title: "Supplier Create" },
             },
             {
-                path: "supplier/edit/:id", // Dynamic route for Supplier Edit
+                path: "supplier/:uuid/edit", // Dynamic route for Supplier Edit
                 name: "SupplierEdit",
                 component: adminComponents.SupplierEdit,
                 meta: { title: "Edit Supplier" },
                 props: true, // Enables passing route params as props
             },
+            {
+                path: "supplier/trash", // Dynamic route for Supplier Edit
+                name: "SupplierTrash",
+                component: adminComponents.SupplierTrash,
+                meta: { title: "Trash Supplier" },
+                props: true, // Enables passing route params as props
+            },
+
             {
                 path: "model/index", // New route for Contact
                 name: "ModelIndex",
@@ -240,6 +295,58 @@ const routes = [
                 component: adminComponents.UnitTrash,
                 meta: { title: "Unit Trash" },
             },
+            // parse
+            {
+                path: "parse/index", // New route for Contact
+                name: "ParseIndex",
+                component: adminComponents.ParseIndex,
+                meta: { title: "Parse Index" },
+            },
+            {
+                path: "parse/create", // New route for Contact
+                name: "ParseCreate",
+                component: adminComponents.ParseCreate,
+                meta: { title: "Parse Create" },
+            },
+            {
+                path: "parse/:uuid/edit", // Dynamic route for  Edit
+                name: "ParseEdit",
+                component: adminComponents.ParseEdit,
+                meta: { title: "Edit Parse " },
+                props: true, // Enables passing route params as props
+            },
+            {
+                path: "parse/trash", // New route for Contact
+                name: "ParseTrash",
+                component: adminComponents.ParseTrash,
+                meta: { title: "Parse Trash" },
+            },
+            // parse unit
+            {
+                path: "parse/unit/index", // New route for Contact
+                name: "ParseUnitIndex",
+                component: adminComponents.ParseUnitIndex,
+                meta: { title: "Parse Unit Index" },
+            },
+            {
+                path: "parse/unit/create", // New route for Contact
+                name: "ParseUnitCreate",
+                component: adminComponents.ParseUnitCreate,
+                meta: { title: "ParseUnit Create" },
+            },
+            {
+                path: "parse/unit/edit/:uuid", // Dynamic route for Unit Edit
+                name: "ParseUnitEdit",
+                component: adminComponents.ParseUnitEdit,
+                meta: { title: "Edit Parse Unit" },
+                props: true, // Enables passing route params as props
+            },
+            {
+                path: "parse/unit/trash", // New route for Contact
+                name: "ParseUnitTrash",
+                component: adminComponents.ParseUnitTrash,
+                meta: { title: "Parse Unit Trash" },
+            },
             // technician
             {
                 path: "technician/index", // New route for Contact
@@ -254,7 +361,7 @@ const routes = [
                 meta: { title: "Technician Create" },
             },
             {
-                path: "technician/edit/:id", // Dynamic route for Technician Edit
+                path: "technician/edit/:uuid", // Dynamic route for Technician Edit
                 name: "TechnicianEdit",
                 component: adminComponents.TechnicianEdit,
                 meta: { title: "Edit Technician" },
@@ -265,6 +372,32 @@ const routes = [
                 name: "TechnicianTrash",
                 component: adminComponents.TechnicianTrash,
                 meta: { title: "Technician Trash" },
+            },
+            // operator
+            {
+                path: "operator/index", // New route for Contact
+                name: "OperatorIndex",
+                component: adminComponents.OperatorIndex,
+                meta: { title: "Operator Index" },
+            },
+            {
+                path: "operator/create", // New route for Contact
+                name: "OperatorCreate",
+                component: adminComponents.OperatorCreate,
+                meta: { title: "Operator Create" },
+            },
+            {
+                path: "operator/edit/:uuid", // Dynamic route for operator Edit
+                name: "OperatorEdit",
+                component: adminComponents.OperatorEdit,
+                meta: { title: "Edit Operator" },
+                props: true, // Enables passing route params as props
+            },
+            {
+                path: "operator/trash", // New route for Contact
+                name: "OperatorTrash",
+                component: adminComponents.OperatorTrash,
+                meta: { title: "Operator Trash" },
             },
             {
                 path: "contact", // New route for Contact
@@ -333,7 +466,7 @@ const routes = [
                 component: adminComponents.RentIndex,
 
                 meta: { title: "Rent index" },
-                props:true
+                props: true,
             },
             {
                 path: "rent/create", // New route for rent Create
@@ -347,16 +480,99 @@ const routes = [
                 name: "RentEdit",
                 component: adminComponents.RentEdit,
                 meta: { title: "Rent Edit" },
-                props:true
+                props: true,
             },
             {
                 path: "rent/trash", // New route for rent trash
                 name: "RentsTrash",
                 component: adminComponents.RentsTrash,
                 meta: { title: "Rent Trash" },
-                props:true
+                props: true,
             },
-
+            {
+                path: "floor/index", // New route for Floor index
+                name: "FloorIndex",
+                component: adminComponents.FloorIndex,
+                meta: { title: "Floor index" },
+                props: true,
+            },
+            {
+                path: "floor/create", // New route for Floor create
+                name: "FloorCreate",
+                component: adminComponents.FloorCreate,
+                meta: { title: "Floor Create" },
+                props: true,
+            },
+            {
+                path: "floor/:uuid/edit", // New route for Floor create
+                name: "FloorEdit",
+                component: adminComponents.FloorEdit,
+                meta: { title: "Floor Edit" },
+                props: true,
+            },
+            {
+                path: "floor/trash", // New route for floor trash
+                name: "FloorTrash",
+                component: adminComponents.FloorTrash,
+                meta: { title: "Floor Trash" },
+                props: true,
+            },
+            {
+                path: "mechine/type/index", // New route for mechine type index
+                name: "MechineTypeIndex",
+                component: adminComponents.MechineTypeIndex,
+                meta: { title: "Mechine Type Index" },
+                props: true,
+            },
+            {
+                path: "mechine/type/create", // New route for mechine type index
+                name: "MechineTypeCreate",
+                component: adminComponents.MechineTypeCreate,
+                meta: { title: "Mechine Type Create" },
+                props: true,
+            },
+            {
+                path: "mechine/type/edit/:uuid", // New route for mechine type index
+                name: "MechineTypeEdit",
+                component: adminComponents.MechineTypeEdit,
+                meta: { title: "Mechine Type Edit" },
+                props: true,
+            },
+            {
+                path: "mechine/type/trash", // New route for floor trash
+                name: "MechineTypeTrash",
+                component: adminComponents.MechineTypeTrash,
+                meta: { title: "Mechine Type Trash" },
+                props: true,
+            },
+            {
+                path: "mechine/source/index", // New route for mechine source index
+                name: "MechineSourceIndex",
+                component: adminComponents.MechineSourceIndex,
+                meta: { title: "Mechine Source Index" },
+                props: true,
+            },
+            {
+                path: "mechine/source/create", // New route for mechine Source index
+                name: "MechineSourceCreate",
+                component: adminComponents.MechineSourceCreate,
+                meta: { title: "Mechine Source Create" },
+                props: true,
+            },
+            {
+                path: "mechine/source/edit/:uuid", // New route for mechine Source index
+                name: "MechineSourceEdit",
+                component: adminComponents.MechineSourceEdit,
+                meta: { title: "Mechine Source Edit" },
+                props: true,
+            },
+            {
+                path: "mechine/source/trash", // New route for Source trash
+                name: "MechineSourceTrash",
+                component: adminComponents.MechineSourceTrash,
+                meta: { title: "Mechine Source Trash" },
+                props: true,
+            },
         ],
     },
     // {

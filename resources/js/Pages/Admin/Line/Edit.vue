@@ -4,23 +4,21 @@
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="update">
                 <!-- Name Field -->
-                <v-text-field
-                    v-model="line.name"
-                    label="Name"
-                >
-                </v-text-field>
-                <v-text-field
-                    v-model="line.number"
-                    label="Number"
-                >
+                <v-text-field v-model="line.name" label="Line Number">
+                    <template v-slot:label>
+                        Line Number <span style="color: red">*</span>
+                    </template>
                 </v-text-field>
                 <!-- Description Field -->
-                <v-textarea
-                    v-model="line.description"
-                    label="Description"
-                />
+                <v-textarea v-model="line.description" label="Description" />
                 <!-- Action Buttons -->
-
+                <v-select
+                    v-model="line.status"
+                    :items="statusItems"
+                    label="Line Status"
+                    clearable
+                    :error-messages="errors.status ? errors.status : ''"
+                ></v-select>
                 <v-row class="mt-4">
                     <v-col cols="12" class="text-right">
                         <v-btn
@@ -58,14 +56,14 @@ export default {
         return {
             valid: false,
             loading: false,
+            statusItems: ["Active", "Inactive"],
             line: {
                 name: "",
-                number:"",
                 description: "",
+                status: false,
             },
             errors: {},
             serverError: null,
-            
         };
     },
     created() {
@@ -76,10 +74,10 @@ export default {
             // Fetch the brand data to populate the form
             const lineId = this.$route.params.uuid; // Assuming the brand ID is passed in the route params
             try {
-                const response = await this.$axios.get(
-                    `/line/${lineId}/edit`
-                );
+                const response = await this.$axios.get(`/line/${lineId}/edit`);
                 this.line = response.data.line;
+                this.line.status =
+                    this.line.status === "Active" ? "Active" : "Inactive";
                 // Populate form with the existing brand data
             } catch (error) {
                 this.serverError = "Error fetching brand data.";
@@ -96,6 +94,7 @@ export default {
                         `/line/${lineId}`,
                         this.line
                     );
+
                     if (response.data.success) {
                         this.$router.push({ name: "LineIndex" }); // Redirect to brand list page
                         toast.success("Line Updated successfully!");

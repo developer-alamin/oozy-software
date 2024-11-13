@@ -33,7 +33,7 @@
                         </v-tooltip>
                     </v-btn>
 
-                     <v-badge :content="trashedCount" color="red" overlap>
+                    <v-badge :content="trashedCount" color="red" overlap>
                         <v-btn
                             @click="viewTrash"
                             color="red"
@@ -69,6 +69,16 @@
             loading-text="Loading... Please wait"
             @update:options="loadItems"
         >
+            <template v-slot:item.status="{ item }">
+                <v-chip
+                    :color="item.status === 'Active' ? 'green' : 'red'"
+                    class="text-uppercase"
+                    size="small"
+                    label
+                >
+                    {{ item.status === "Active" ? "Active" : "Inactive" }}
+                </v-chip>
+            </template>
             <template v-slot:item.creator_name="{ item }">
                 <span>{{ item.creator ? item.creator.name : "Unknown" }}</span>
             </template>
@@ -76,7 +86,7 @@
                 <v-icon @click="editLine(item.uuid)" class="mr-2"
                     >mdi-pencil</v-icon
                 >
-                <v-icon @click="showConfirmDialog(item.uuid)" color="red"
+                <v-icon @click="showConfirmDialog(item.id)" color="red"
                     >mdi-delete</v-icon
                 >
             </template>
@@ -105,15 +115,14 @@ export default {
     },
     data() {
         return {
-            dialogName:"Are you sure you want to delete this Line ?",
+            dialogName: "Are you sure you want to delete this Line ?",
 
             search: "",
             itemsPerPage: 10,
             headers: [
-                { title: "Name", key: "name", sortable: true },
-                { title: "Number ",key: "number",value: "number",sortable: false,},
+                { title: "Number", key: "name", sortable: true },
                 { title: "Description", key: "description", sortable: false },
-                
+                { title: "status", key: "status", sortable: false },
                 { title: "Creator", key: "creator.name", sortable: false },
                 { title: "Actions", key: "actions", sortable: false },
             ],
@@ -158,27 +167,29 @@ export default {
         editLine(uuid) {
             this.$router.push({ name: "LineEdit", params: { uuid } });
         },
-        showConfirmDialog(uuid) {
-            this.selectedlineId = uuid;
+        showConfirmDialog(id) {
+            this.selectedlineId = id;
             this.dialog = true;
         },
         async confirmDelete() {
             this.dialog = false; // Close the dialog
             try {
-               const response = await this.$axios.delete(`/line/${this.selectedlineId}`);
+                const response = await this.$axios.delete(
+                    `/line/${this.selectedlineId}`
+                );
                 this.loadItems({
                     page: 1,
                     itemsPerPage: this.itemsPerPage,
                     sortBy: [],
                 });
-                console.log(response.data)
+                console.log(response.data);
                 toast.success("Line deleted successfully!");
             } catch (error) {
                 console.error("Error deleting Line:", error);
                 toast.error("Failed to delete Line.");
             }
         },
-         async fetchTrashedLinesCount() {
+        async fetchTrashedLinesCount() {
             try {
                 const response = await this.$axios.get("lines/trashed-count");
                 this.trashedCount = response.data.trashedCount;

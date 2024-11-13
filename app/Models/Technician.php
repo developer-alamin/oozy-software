@@ -11,7 +11,10 @@ class Technician extends Model
     use HasFactory,SoftDeletes;
 
     protected $fillable = [
+        'uuid',
+        'company_id',
         'name',
+        'type',
         'email',
         'phone',
         'photo',
@@ -37,11 +40,13 @@ class Technician extends Model
         return $this->morphTo();
     }
 
-
     public static function validationRules()
     {
         return [
+            'uuid'          => 'nullable',
+            'company_id'    => 'required',
             'name'          => 'required|string|max:255',
+            'type'          => 'required|string|max:255',
             'email'         => 'required|string|max:255',
             'phone'         => 'required|string|max:25',
             'photo'         => 'nullable|string',
@@ -55,7 +60,10 @@ class Technician extends Model
             'meta_data'     => 'nullable',
         ];
     }
-
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'company_id');
+    }
 
     // public function updater()
     // {

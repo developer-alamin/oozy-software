@@ -14,9 +14,10 @@ return new class extends Migration
         Schema::create('groups', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
-            $table->bigInteger('group_id')->default(0);
+            $table->bigInteger('technician_id')->default(0);
             $table->string('name')->nullable();
             $table->string('description')->nullable();
+            $table->enum('status', ['Active', 'Inactive', 'Pending'])->default('Inactive');
             $table->morphs('creator');
             $table->morphs('updater');
             $table->timestamp("created_at")->useCurrent();

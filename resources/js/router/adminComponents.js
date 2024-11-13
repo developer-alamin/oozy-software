@@ -10,6 +10,15 @@ export { default as UserCreate } from "../Pages/Admin/User/UserCreate.vue";
 export { default as AllCompanyIndex } from "../Pages/Admin/Company/Index.vue";
 export { default as CompanyCreate } from "../Pages/Admin/Company/Create.vue";
 
+// Mechine components
+export { default as MechineIndex } from "../Pages/Admin/Mechine/Index.vue";
+export { default as MechineCreate } from "../Pages/Admin/Mechine/Create.vue";
+export { default as MechineEdit } from "../Pages/Admin/Mechine/Edit.vue";
+export { default as MechineTrash } from "../Pages/Admin/Mechine/Trash.vue";
+export { default as MechineTransfer } from "../Pages/Admin/Mechine/Transfer.vue";
+export { default as MechineTransferList } from "../Pages/Admin/Mechine/TransferList.vue";
+export { default as MechineHistoryList } from "../Pages/Admin/Mechine/History.vue";
+
 // Factory components
 export { default as FactoryIndex } from "../Pages/Admin/Factory/Index.vue";
 export { default as FactoryCreate } from "../Pages/Admin/Factory/Create.vue";
@@ -20,6 +29,7 @@ export { default as FactoryTrash } from "../Pages/Admin/Factory/Trash.vue";
 export { default as SupplierIndex } from "../Pages/Admin/Supplier/Index.vue";
 export { default as SupplierEdit } from "../Pages/Admin/Supplier/Edit.vue";
 export { default as SupplierCreate } from "../Pages/Components/Admin/Supplier/SupplierCreateFrom.vue";
+export { default as SupplierTrash } from "../Pages/Admin/Supplier/Trash.vue";
 
 // Model components
 export { default as ModelIndex } from "../Pages/Admin/Model/Index.vue";
@@ -39,6 +49,18 @@ export { default as BrandTrash } from "../Pages/Admin/Brand/Trash.vue";
 export { default as BrandCreate } from "../Pages/Admin/Brand/Create.vue";
 export { default as BrandEdit } from "../Pages/Admin/Brand/Edit.vue";
 
+// Parse  components
+export { default as ParseIndex } from "../Pages/Admin/Parse/Index.vue";
+export { default as ParseCreate } from "../Pages/Admin/Parse/Create.vue";
+export { default as ParseEdit } from "../Pages/Admin/Parse/Edit.vue";
+export { default as ParseTrash } from "../Pages/Admin/Parse/Trash.vue";
+
+// Parse Unit components
+export { default as ParseUnitIndex } from "../Pages/Admin/ParseUnit/Index.vue";
+export { default as ParseUnitCreate } from "../Pages/Admin/ParseUnit/Create.vue";
+export { default as ParseUnitEdit } from "../Pages/Admin/ParseUnit/Edit.vue";
+export { default as ParseUnitTrash } from "../Pages/Admin/ParseUnit/Trash.vue";
+
 // Unit components
 export { default as UnitIndex } from "../Pages/Admin/Unit/Index.vue";
 export { default as UnitCreate } from "../Pages/Admin/Unit/Create.vue";
@@ -50,6 +72,11 @@ export { default as TechnicianIndex } from "../Pages/Technician/Index.vue";
 export { default as TechnicianCreate } from "../Pages/Technician/Create.vue";
 export { default as TechnicianEdit } from "../Pages/Technician/Edit.vue";
 export { default as TechnicianTrash } from "../Pages/Technician/Trash.vue";
+// Operator components
+export { default as OperatorIndex } from "../Pages/Admin/Operator/Index.vue";
+export { default as OperatorCreate } from "../Pages/Admin/Operator/Create.vue";
+export { default as OperatorEdit } from "../Pages/Admin/Operator/Edit.vue";
+export { default as OperatorTrash } from "../Pages/Admin/Operator/Trash.vue";
 
 // Line components
 export { default as LineIndex } from "../Pages/Admin/Line/Index.vue";
@@ -70,4 +97,20 @@ export { default as RentCreate } from "../Pages/Admin/Rents/Create.vue";
 export { default as RentEdit } from "../Pages/Admin/Rents/Edit.vue";
 export { default as RentsTrash } from "../Pages/Admin/Rents/Trash.vue";
 
+//Floor Components
+export { default as FloorIndex } from "../Pages/Admin/Floor/Index.vue";
+export { default as FloorCreate } from "../Pages/Admin/Floor/Create.vue";
+export { default as FloorEdit } from "../Pages/Admin/Floor/Edit.vue";
+export { default as FloorTrash } from "../Pages/Admin/Floor/Trash.vue";
 
+//Mechine Type Components
+export { default as MechineTypeIndex } from "../Pages/Admin/Mechine/Type/Index.vue";
+export { default as MechineTypeCreate } from "../Pages/Admin/Mechine/Type/Create.vue";
+export { default as MechineTypeEdit } from "../Pages/Admin/Mechine/Type/Edit.vue";
+export { default as MechineTypeTrash } from "../Pages/Admin/Mechine/Type/Trash.vue";
+
+//Mechine Source Components
+export { default as MechineSourceIndex } from "../Pages/Admin/Mechine/Source/Index.vue";
+export { default as MechineSourceCreate } from "../Pages/Admin/Mechine/Source/Create.vue";
+export { default as MechineSourceEdit } from "../Pages/Admin/Mechine/Source/Edit.vue";
+export { default as MechineSourceTrash } from "../Pages/Admin/Mechine/Source/Trash.vue";

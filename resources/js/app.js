@@ -3,6 +3,7 @@ import { createApp } from "vue";
 import App from "./App.vue";
 import { createPinia } from "pinia";
 import router from "./router/router.js";
+import { VDateInput } from "vuetify/labs/VDateInput";
 // import router from "./router";
 import axios from "./axiosInstance"; // Import your Axios instance
 // import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap CSS
@@ -38,6 +39,9 @@ const vuetify = createVuetify({
                 },
             },
         },
+    },
+    components: {
+        VDateInput, // Register VDateInput component
     },
 });
 

@@ -16,6 +16,26 @@
                     </template>
                 </v-text-field>
 
+                <v-select
+                    v-model="brand.type"
+                    :rules="[rules.required]"
+                    :items="statusTypeItems"
+                    label="Brand Type"
+                    density="comfortable"
+                    clearable
+                >
+                    <template v-slot:label>
+                        Brand Type <span style="color: red">*</span>
+                    </template>
+                </v-select>
+                <v-select
+                    v-model="brand.status"
+                    :items="statusItems"
+                    label="Brand Status"
+                    clearable
+                    :error-messages="errors.status ? errors.status : ''"
+                ></v-select>
+
                 <!-- Description Field -->
                 <v-textarea
                     v-model="brand.description"
@@ -32,13 +52,6 @@
                     label="Status"
                     :error-messages="errors.status ? errors.status : ''"
                 /> -->
-                <v-select
-                    v-model="brand.status"
-                    :items="statusItems"
-                    label="Brand Status"
-                    clearable
-                    :error-messages="errors.status ? errors.status : ''"
-                ></v-select>
 
                 <!-- Action Buttons -->
 
@@ -80,8 +93,10 @@ export default {
             valid: false,
             loading: false,
             statusItems: ["Active", "Inactive"],
+            statusTypeItems: ["Mechine", "Parse"],
             brand: {
                 name: "",
+                type: false,
                 description: "",
                 status: false, // Default to false (inactive)
             },
@@ -108,6 +123,8 @@ export default {
                 this.brand = response.data.brand; // Populate form with the existing brand data
                 this.brand.status =
                     this.brand.status === "Active" ? "Active" : "Inactive";
+                this.brand.type =
+                    this.brand.type === "Mechine" ? "Mechine" : "Parse";
             } catch (error) {
                 this.serverError = "Error fetching brand data.";
             }

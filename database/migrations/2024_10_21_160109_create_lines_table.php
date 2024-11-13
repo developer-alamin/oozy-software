@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('lines', function (Blueprint $table) {
             $table->id();
             // No auto-increment here
-            $table->uuid('uuid')->unique();
+            $table->string('uuid')->unique();
             //$table->bigInteger('line_id')->default(0)->unique();
             $table->morphs('creator');
             $table->morphs('updater');

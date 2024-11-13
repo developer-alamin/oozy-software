@@ -1,5 +1,5 @@
 <template>
-	 <v-card outlined class="mx-auto my-5" max-width="">
+    <v-card outlined class="mx-auto my-5" max-width="">
         <v-card-title>Create Line</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="submit">
@@ -7,33 +7,24 @@
                 <v-text-field
                     v-model="line.name"
                     :rules="[rules.required]"
-                    label="Name"
+                    label="Name Number"
                     outlined
                     :error-messages="errors.name ? errors.name : ''"
                 >
                     <template v-slot:label>
-                        Name <span style="color: red">*</span>
+                        Line Number <span style="color: red">*</span>
                     </template>
                 </v-text-field>
 
-                <v-text-field
-			      v-model="line.number"
-			      label="numbrt"
-                  :rules="[rules.required]"
-                  outlined
-                  :error-messages="errors.number ? errors.number : ''"
-			    >
-                     
-                </v-text-field>
-
                 <!-- Description Field -->
-                <v-textarea
-                    v-model="line.description"
-                    label="Description"
-                />
-
-               
-             
+                <v-textarea v-model="line.description" label="Description" />
+                <v-select
+                    v-model="line.status"
+                    :items="statusItems"
+                    label="Line Status"
+                    @change="updateStatus"
+                    clearable
+                ></v-select>
 
                 <!-- Action Buttons -->
                 <v-row class="mt-4">
@@ -72,10 +63,11 @@ export default {
         return {
             valid: false,
             loading: false, // Controls loading state of the button
+            statusItems: ["Active", "Inactive"],
             line: {
                 name: "",
-                number:'',
                 description: "",
+                status: "Active",
             },
             errors: {}, // Stores validation errors
             serverError: null, // Stores server-side error messages
@@ -124,7 +116,8 @@ export default {
         resetForm() {
             this.line = {
                 name: "",
-                number:'',
+                number: "",
+                status: "Active",
                 description: "",
             };
             this.errors = {}; // Reset errors on form reset

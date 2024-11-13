@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\HelperController;
 use Illuminate\Http\Request;
 use App\Models\Admin;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\User;
 use App\Models\Group;
+use App\Models\Technician;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
@@ -56,7 +58,7 @@ class GroupController extends Controller
         // Apply sorting
         $groupsQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $groups = $groupsQuery->with('creator:id,name')->paginate($itemsPerPage);
+        $groups = $groupsQuery->with(['creator:id,name','technicians:id,name,type'])->paginate($itemsPerPage);
         // Return the response as JSON
         return response()->json([
             'items' => $groups->items(), // Current page items
@@ -77,10 +79,7 @@ class GroupController extends Controller
      */
     public function store(Request $request)
     {
-
-
         $validatedData = $request->validate(Group::validationRules());
-
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
              $creator = Auth::guard('admin')->user();
@@ -90,21 +89,22 @@ class GroupController extends Controller
              } else {
                  // Regular admin authorization check can be implemented here if needed
              }
-
          } elseif (Auth::guard('user')->check()) {
              $creator = Auth::guard('user')->user();
              // If you want users to have specific restrictions, implement checks here
          } else {
              return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
          }
-         // Create the technician and associate it with the creator
-         $group = new Group($validatedData);
-         $group->creator()->associate($creator);  // Assign creator polymorphically
-         $group->updater()->associate($creator);  // Associate the updater
-         $group->save(); // Save the technician to the database
-         // Return a success response
-         return response()->json(['success' => true, 'message' => 'Group created successfully.'], 201);
+        // Create the technician and associate it with the creator
+        $group       = new Group($validatedData);
+        $group->uuid = HelperController::generateUuid();
+        $group->creator()->associate($creator);  // Assign creator polymorphically
+        $group->updater()->associate($creator);  // Associate the updater
+        $group->save(); // Save the technician to the database
+        // Return a success response
+        return response()->json(['success' => true, 'message' => 'Group created successfully.'], 201);
     }
+
 
     /**
      * Display the specified resource.
@@ -117,8 +117,9 @@ class GroupController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Group $group)
+    public function edit($uuid)
     {
+        $group = Group::where('uuid', $uuid)->firstOrFail();
         if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('admin')->user();
             $creatorType = Admin::class;
@@ -150,13 +151,11 @@ class GroupController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Group $group)
+    public function update(Request $request, $uuid)
     {
-
-
+        $group = Group::where('uuid', $uuid)->firstOrFail();
         // Validate the incoming request data
-          $validatedData = $request->validate(Group::validationRules());
-
+        $validatedData = $request->validate(Group::validationRules());
          // Determine the authenticated user (either from 'admin' or 'user' guard)
          if (Auth::guard('admin')->check()) {
              $currentUser = Auth::guard('admin')->user();
@@ -171,7 +170,6 @@ class GroupController extends Controller
                      return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to update this group.'], 403);
                  }
              }
-
          } elseif (Auth::guard('user')->check()) {
              $currentUser = Auth::guard('user')->user();
              $creatorType = User::class;
@@ -187,9 +185,8 @@ class GroupController extends Controller
          $group->fill($validatedData);
          $group->updater()->associate($currentUser); // Associate the updater
          $group->save();
-
          // Return a success response
-         return response()->json(['success' => true, 'message' => 'Group updated successfully.', 'group' => $group], 200);
+        return response()->json(['success' => true, 'message' => 'Group updated successfully.', 'group' => $group], 200);
     }
 
     /**
@@ -233,8 +230,8 @@ class GroupController extends Controller
                 'success' => false,
                 'message' => 'Error deleting Group: ' . $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }  
-        
+        }
+
     }
     public function groupsTrashedCount()
     {
@@ -344,7 +341,7 @@ class GroupController extends Controller
      {
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
-                
+
             $currentUser = Auth::guard('admin')->user();
             $creatorType = Admin::class;
 
@@ -371,7 +368,7 @@ class GroupController extends Controller
             } else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
-        
+
         try {
             // Delete the supplier
             $group->forceDelete();
@@ -385,5 +382,21 @@ class GroupController extends Controller
                 'message' => 'Error deleting Group: ' . $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-     }
+    }
+
+    public function getTechnician(Request $request)
+    {
+        $search      = $request->input('search', '');
+        $limit       = $request->input('limit', '');
+        $technicians = Technician::query()
+            ->when($search, function ($query, $search) {
+                return $query->where('name', 'like', "%$search%");
+            })
+            // ->take($limit)
+            ->get();
+        return response()->json($technicians);
+    }
+
+
+
 }

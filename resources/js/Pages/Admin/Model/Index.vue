@@ -88,7 +88,7 @@
                 <v-icon @click="editModel(item.uuid)" class="mr-2"
                     >mdi-pencil</v-icon
                 >
-                <v-icon @click="showConfirmDialog(item.uuid)" color="red"
+                <v-icon @click="showConfirmDialog(item.id)" color="red"
                     >mdi-delete</v-icon
                 >
             </template>
@@ -122,7 +122,7 @@ export default {
             itemsPerPage: 15,
             headers: [
                 { title: "Model Name", key: "name", sortable: true },
-                { title: "Model Number", key: "model_number", sortable: true },
+                { title: "Model Type", key: "type", sortable: false },
                 { title: "Description", key: "description", sortable: false },
                 {
                     title: "Status",
@@ -176,8 +176,8 @@ export default {
         editModel(uuid) {
             this.$router.push({ name: "ModelEdit", params: { uuid } });
         },
-        showConfirmDialog(uuid) {
-            this.selectedModelId = uuid;
+        showConfirmDialog(id) {
+            this.selectedModelId = id;
             this.dialog = true;
         },
         async confirmDelete() {

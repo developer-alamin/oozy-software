@@ -5,22 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Support\Str;
 
 
 class Brand extends Model
 {
-    use HasFactory,SoftDeletes,HasUuids;
-
-    public $incrementing = false; // Disable auto-incrementing for UUIDs
-    protected $keyType = 'string'; // Set key type to string for UUIDs
-    // Define the primary key for this model
-    protected $primaryKey = 'uuid'; // Assuming you want the uuid as the primary key
-
+    use HasFactory,SoftDeletes;
+    protected $primaryKey = 'id'; // Assuming you want the uuid as the primary key
     protected $fillable = [
         'uuid',
         'name',
+        'type',
         'description',
         'status',
         'meta_data',
@@ -45,6 +40,7 @@ class Brand extends Model
     {
         return [
             'name'         => 'required|string|max:255',
+            'type'         => 'required|in:Mechine,Parse',
             'description'  => 'nullable|string',
             'status'       => 'nullable|in:Active,Inactive',
             'meta_data'    => 'nullable',

@@ -5,14 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
-
 
 class Group extends Model
 {
-   use HasFactory,SoftDeletes,HasUuids;
+
+    use HasFactory,SoftDeletes;
+
     protected $table = 'groups';
-    protected $primaryKey = 'uuid'; // Assuming you want the uuid as the primary key
+    protected $primaryKey = 'id';
 
     protected $fillable = [
         'uuid',
@@ -20,15 +20,19 @@ class Group extends Model
         'creator_id',
         'updater_type',
         'updater_id',
+        'technician_id',
         'name',
-        'description'
+        'description',
+        'status'
     ];
-    
+
     public static function validationRules()
     {
         return [
-            'name'         => 'required|string|max:255',
-            'description'  => 'nullable|string',
+            'technician_id' => 'required',
+            'name'          => 'required|string|max:255',
+            'status'        => 'nullable|string',
+            'description'   => 'nullable|string',
         ];
     }
     // Polymorphic relationships
@@ -40,6 +44,10 @@ class Group extends Model
     public function updater()
     {
         return $this->morphTo();
+    }
+    public function technicians()
+    {
+        return $this->belongsTo(Technician::class,'technician_id');
     }
     public static function restoreGroup($id)
     {
@@ -56,4 +64,7 @@ class Group extends Model
 
         return true;
     }
+
+
+
 }

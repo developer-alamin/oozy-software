@@ -5,26 +5,26 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
+
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Unit extends Model
 {
-    use HasFactory,SoftDeletes,HasUuids;
-    
-    public $incrementing = false; // Disable auto-incrementing for UUIDs
-    protected $keyType = 'string'; // Set key type to string for UUIDs
-    // Define the primary key for this model
-    protected $primaryKey = 'uuid';
+    use HasFactory,SoftDeletes;
+    protected $primaryKey = 'id';
+
+
     protected $fillable = [
+        'uuid',
         'name',
-        'description', 
+        'description',
         'status',
         'meta_data',
         'creator_id',
         'creator_type',
         'updater_id',
         'updater_type',
-        
+
     ];
     public static function validationRules()
     {
@@ -37,7 +37,7 @@ class Unit extends Model
             'creator_type' => 'nullable',
             'updater_id'   => 'nullable',
             'updater_type' => 'nullable',
-            
+
         ];
     }
     public function creator()
@@ -49,4 +49,15 @@ class Unit extends Model
     {
         return $this->morphTo();
     }
+    public function floors(): BelongsToMany
+    {
+        return $this->belongsToMany(Floor::class);
+    }
+
+    public function lines()
+    {
+        return $this->belongsToMany(Line::class, 'line_unit', 'unit_id', 'line_id')
+                    ->withPivot('unit_id', 'line_id');
+    }
+
 }

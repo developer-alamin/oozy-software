@@ -51,6 +51,17 @@ class Admin extends Authenticatable
     {
         return $this->morphMany(Technician::class, 'updater');
     }
+     // Operators created by this user
+     public function createdOperators(): MorphMany
+     {
+         return $this->morphMany(Operator::class, 'creator');
+     }
+
+     // Operators updated by this user
+     public function updatedOperators(): MorphMany
+     {
+         return $this->morphMany(Operator::class, 'updater');
+     }
     // Brands created by this user
     public function createdBrands(): MorphMany
     {
@@ -87,17 +98,27 @@ class Admin extends Authenticatable
     {
         return $this->morphMany(Category::class, 'updater');
     }
-     // Units created by this user
-     public function createdUnits(): MorphMany
-     {
-         return $this->morphMany(Unit::class, 'creator');
-     }
- 
-     // Units updated by this user
-     public function updatedUnits(): MorphMany
-     {
-         return $this->morphMany(Unit::class, 'updater');
-     }
+    // Units created by this user
+    public function createdUnits(): MorphMany
+    {
+        return $this->morphMany(Unit::class, 'creator');
+    }
+
+    // Units updated by this user
+    public function updatedUnits(): MorphMany
+    {
+        return $this->morphMany(Unit::class, 'updater');
+    }
+    // Parse Units created by this user
+    public function createdParseUnits(): MorphMany
+    {
+        return $this->morphMany(Unit::class, 'creator');
+    }
+    // Parse Units updated by this user
+    public function updatedParseUnits(): MorphMany
+    {
+        return $this->morphMany(Unit::class, 'updater');
+    }
     // Lines created by this user
     public function createdLines(): MorphMany
     {
@@ -110,16 +131,68 @@ class Admin extends Authenticatable
         return $this->morphMany(Line::class, 'updater');
     }
 
-     // Lines created by this user
-     public function createdGroups(): MorphMany
-     {
-         return $this->morphMany(Line::class, 'creator');
-     }
+    // groups created by this user
+    public function createdGroups(): MorphMany
+    {
+        return $this->morphMany(Group::class, 'creator');
+    }
 
-     // Lines updated by this user
-     public function updatedGroups(): MorphMany
-     {
-         return $this->morphMany(Line::class, 'updater');
-     }
+    // groups updated by this user
+    public function updatedGroups(): MorphMany
+    {
+        return $this->morphMany(Group::class, 'updater');
+    }
+    // factorys created by this user
+    public function createdFactorys(): MorphMany
+    {
+        return $this->morphMany(Factory::class, 'creator');
+    }
 
+    // factorys updated by this user
+    public function updatedFactorys(): MorphMany
+    {
+        return $this->morphMany(Factory::class, 'updater');
+    }
+
+     // mechine assing created by this user
+     public function createdMechineAssings(): MorphMany
+     {
+         return $this->morphMany(MechineAssing::class, 'creator');
+     }
+     //  mechine assing updated by this user
+     public function updatedMechineAssings(): MorphMany
+     {
+         return $this->morphMany(MechineAssing::class, 'updater');
+     }
+    //Parse created by this user
+    public function createdParses(): MorphMany
+    {
+        return $this->morphMany(Parse::class, 'creator');
+    }
+    //  mechine assing updated by this user
+    public function updatedParses(): MorphMany
+    {
+        return $this->morphMany(Parse::class, 'updater');
+    }
+    public function createdParseInStocks(): MorphMany
+    {
+        return $this->morphMany(ParseStockIn::class, 'creator');
+    }
+    //  mechine assing updated by this user
+    public function updatedParseInStocks(): MorphMany
+    {
+        return $this->morphMany(ParseStockIn::class, 'updater');
+    }
+
+
+      // mechine Stock created by this user
+      public function createdMechineStocks(): MorphMany
+      {
+          return $this->morphMany(MechineStock::class, 'creator');
+      }
+      //  mechine Stock updated by this user
+      public function updatedMechineStocks(): MorphMany
+      {
+          return $this->morphMany(MechineStock::class, 'updater');
+      }
 }

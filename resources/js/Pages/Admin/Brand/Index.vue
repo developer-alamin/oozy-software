@@ -88,13 +88,13 @@
                 <v-icon @click="editBrand(item.uuid)" class="mr-2"
                     >mdi-pencil</v-icon
                 >
-                <v-icon @click="showConfirmDialog(item.uuid)" color="red"
+                <v-icon @click="showConfirmDialog(item.id)" color="red"
                     >mdi-delete</v-icon
                 >
             </template>
         </v-data-table-server>
 
-         <ConfirmDialog
+        <ConfirmDialog
             :dialogName="dialogName"
             v-model:modelValue="dialog"
             :onConfirm="confirmDelete"
@@ -110,7 +110,6 @@
 <script>
 import { toast } from "vue3-toastify";
 import ConfirmDialog from "../../Components/ConfirmDialog.vue";
-import bus from "./eventBus";
 
 export default {
     components: {
@@ -118,11 +117,12 @@ export default {
     },
     data() {
         return {
-            dialogName:"Are you sure you want to delete this Brand ?",
+            dialogName: "Are you sure you want to delete this Brand ?",
             search: "",
             itemsPerPage: 15,
             headers: [
                 { title: "Brand Name", key: "name", sortable: true },
+                { title: "Brand Type", key: "type", sortable: false },
                 { title: "Description", key: "description", sortable: false },
                 {
                     title: "Status",
@@ -174,8 +174,8 @@ export default {
         editBrand(uuid) {
             this.$router.push({ name: "BrandEdit", params: { uuid } });
         },
-        showConfirmDialog(uuid) {
-            this.selectedBrandId = uuid;
+        showConfirmDialog(id) {
+            this.selectedBrandId = id;
             this.dialog = true;
         },
         async confirmDelete() {

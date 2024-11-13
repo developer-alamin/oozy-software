@@ -8,6 +8,7 @@
                     v-model="model.name"
                     :rules="[rules.required]"
                     label="Name"
+                    density="comfortable"
                     outlined
                     :error-messages="errors.name ? errors.name : ''"
                 >
@@ -16,33 +17,36 @@
                     </template>
                 </v-text-field>
 
-                <!-- Model Number Field -->
-                <v-text-field
-                    v-model="model.model_number"
-                    label="Model Number"
+                <v-select
+                    v-model="model.type"
                     :rules="[rules.required]"
-                    :error-messages="
-                        errors.model_number ? errors.model_number : ''
-                    "
-                    required
-                />
+                    :items="statusModelItems"
+                    label="Model Type"
+                    density="comfortable"
+                    clearable
+                >
+                    <template v-slot:label>
+                        Model Type <span style="color: red">*</span>
+                    </template>
+                </v-select>
+                <!-- Featured Checkbox -->
+                <v-select
+                    v-model="model.status"
+                    density="comfortable"
+                    :items="statusItems"
+                    label="Model Status"
+                    clearable
+                ></v-select>
 
                 <!-- Description Field -->
                 <v-textarea
                     v-model="model.description"
+                    density="comfortable"
                     label="Description"
                     :error-messages="
                         errors.description ? errors.description : ''
                     "
                 />
-
-                <!-- Featured Checkbox -->
-                <v-select
-                    v-model="model.status"
-                    :items="statusItems"
-                    label="Model Status"
-                    clearable
-                ></v-select>
 
                 <!-- Action Buttons -->
                 <v-row class="mt-4">
@@ -86,9 +90,11 @@ export default {
             valid: false,
             loading: false, // Controls loading state of the button
             statusItems: ["Active", "Inactive"],
+            statusModelItems: ["Mechine", "Parse"],
             model: {
                 name: "",
                 model_number: "",
+                type: "Mechine",
                 description: "",
                 status: "Active", // New property for checkbox
             },
@@ -145,6 +151,7 @@ export default {
             this.model = {
                 name: "",
                 model_number: "",
+                type: "",
                 description: "",
                 status: "", // Reset checkbox on form reset
             };

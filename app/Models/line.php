@@ -5,14 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
+
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
 
 class Line extends Model
 {
-    use HasFactory,SoftDeletes,HasUuids;
+
+    use HasFactory,SoftDeletes;
 
     protected $table = 'lines';
-    protected $primaryKey = 'uuid'; // Assuming you want the uuid as the primary key
+    // protected $primaryKey = 'id';
+
 
     protected $fillable = [
         'uuid',
@@ -21,15 +25,15 @@ class Line extends Model
         'updater_type',
         'updater_id',
         'name',
-        'number',
-        'description', 
+        'status',
+        'description',
     ];
 
     public static function validationRules()
     {
         return [
             'name'         => 'required|string|max:255',
-            'number'       => 'required|string',
+            'status'       => 'nullable|string',
             'description'  => 'nullable|string',
         ];
     }
@@ -43,6 +47,9 @@ class Line extends Model
     {
         return $this->morphTo();
     }
-
-
+    public function lines()
+    {
+        return $this->belongsToMany(Line::class, 'line_unit', 'unit_id', 'line_id')
+                    ->withPivot('unit_id', 'line_id');
+    }
 }

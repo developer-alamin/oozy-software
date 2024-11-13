@@ -1,7 +1,21 @@
 <template>
     <v-container>
         <v-card>
-            <v-card-title>Edit Supplier</v-card-title>
+            <v-card-title>
+                <v-row>
+                    <v-col cols="12" md="6"> Edit Supplier </v-col>
+                    <v-col cols="12" md="6">
+                        <v-img
+                            :width="50"
+                            aspect-ratio="16/9"
+                            cover
+                            :src="newImg"
+                            style="margin-left: auto"
+                            v-if="newImg"
+                        ></v-img>
+                    </v-col>
+                </v-row>
+            </v-card-title>
 
             <v-card-text>
                 <v-form
@@ -9,6 +23,19 @@
                     v-model="valid"
                     @submit.prevent="updateSupplier"
                 >
+                    <v-select
+                        v-model="supplier.type"
+                        :rules="[rules.required]"
+                        :items="statusTypeItems"
+                        label="Supplier Type"
+                        density="comfortable"
+                        clearable
+                    >
+                        <template v-slot:label>
+                            Supplier Type <span style="color: red">*</span>
+                        </template>
+                    </v-select>
+
                     <v-text-field
                         label="Name"
                         v-model="supplier.name"
@@ -47,6 +74,14 @@
                         label="Description"
                         v-model="supplier.description"
                     ></v-textarea>
+                    <v-file-input
+                        accept="image/png, image/jpeg, image/bmp"
+                        label="Photo"
+                        placeholder="Pick an avatar"
+                        prepend-icon="mdi-camera"
+                        @change="onFilePicked($event)"
+                    >
+                    </v-file-input>
 
                     <v-alert v-if="serverError" type="error" class="mt-4">
                         {{ serverError }}
@@ -91,16 +126,21 @@
 
 <script>
 export default {
-    props: ["id"], // Capture the :id from the route
+    props: ["uuid"], // Capture the :id from the route
     data() {
         return {
+            newImg: "",
+            statusTypeItems: ["Mechine", "Parse"],
             supplier: {
+                type: false,
                 name: "",
                 email: "",
                 phone: "",
+                oldImg: "",
                 contact_person: "",
                 address: "",
                 description: "",
+                imageFile: "",
             },
             valid: false,
             loading: false,
@@ -113,14 +153,31 @@ export default {
             },
         };
     },
-    created() {
-        this.loadSupplier();
-    },
+
     methods: {
+        async onFilePicked(e) {
+            const files = e.target.files;
+            if (files[0] !== undefined) {
+                const fr = new FileReader();
+                fr.readAsDataURL(files[0]);
+                fr.addEventListener("load", () => {
+                    this.newImg = fr.result;
+                    this.supplier.imageFile = files[0];
+                });
+            }
+        },
         async loadSupplier() {
             try {
-                const response = await this.$axios.get(`/suppliers/${this.id}`);
+                const response = await this.$axios.get(
+                    `/suppliers/${this.uuid}/edit`
+                );
                 this.supplier = response.data.supplier;
+                // console.log(response.data.supplier);
+
+                this.newImg = this.supplier.photo ? this.supplier.photo : "";
+                this.supplier.oldImg = this.supplier.photo;
+                this.supplier.type =
+                    this.supplier.type === "Mechine" ? "Mechine" : "Parse";
             } catch (error) {
                 console.error("Failed to load supplier:", error);
             }
@@ -129,15 +186,21 @@ export default {
             this.errors = {}; // Reset errors before submission
             this.serverError = null; // Reset server error
             this.loading = true;
+            const formData = new FormData();
+            Object.entries(this.supplier).forEach(([key, value]) => {
+                formData.append(key, value);
+                formData.append("_method", "PUT");
+            });
 
             // Perform client-side validation
             if (this.$refs.form.validate()) {
                 setTimeout(async () => {
                     try {
-                        await this.$axios.put(
-                            `/suppliers/${this.id}`,
-                            this.supplier
+                        const response = await this.$axios.post(
+                            `/suppliers/${this.uuid}`,
+                            formData
                         );
+                        console.log(response.data);
                         this.$router.push({ name: "SupplierIndex" }); // Redirect after update
                     } catch (error) {
                         if (error.response && error.response.status === 422) {
@@ -155,6 +218,9 @@ export default {
                 }, 1000);
             }
         },
+    },
+    created() {
+        this.loadSupplier();
     },
 };
 </script>

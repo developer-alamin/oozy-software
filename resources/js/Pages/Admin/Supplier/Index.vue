@@ -1,21 +1,5 @@
-<!-- <template>
-    <v-container>
-        <supplier-index ref="SupplierIndex" />
-    </v-container>
-</template>
-
-<script>
-import SupplierIndex from "../../Components/Admin/Supplier/SupplierIndex.vue";
-
-export default {
-    components: {
-        SupplierIndex,
-    },
-};
-</script> -->
-
 <template>
-    <v-card outlined class="mx-auto my-5" max-width="900">
+    <v-card outlined class="mx-auto my-5">
         <v-card-title class="pt-5">
             <v-row>
                 <v-col cols="6"><span>Supplier List</span></v-col>
@@ -34,9 +18,43 @@ export default {
                         single-line
                         clearable
                     ></v-text-field>
-                    <v-btn @click="createSupplier" color="primary"
-                        >Add Supplier</v-btn
+
+                    <v-btn
+                        @click="createSupplier"
+                        color="primary"
+                        icon
+                        style="width: 40px; height: 40px"
                     >
+                        <v-tooltip location="top" activator="parent">
+                            <template v-slot:activator="{ props }">
+                                <v-icon v-bind="props" style="font-size: 20px"
+                                    >mdi-plus</v-icon
+                                >
+                            </template>
+                            <span>Add a new Supplier</span>
+                        </v-tooltip>
+                    </v-btn>
+                    <v-badge :content="trashedCount" color="red" overlap>
+                        <v-btn
+                            @click="viewTrash"
+                            color="red"
+                            icon
+                            class="ml-2"
+                            style="width: 40px; height: 40px"
+                        >
+                            <v-tooltip location="top" activator="parent">
+                                <template v-slot:activator="{ props }">
+                                    <v-icon
+                                        v-bind="props"
+                                        style="font-size: 20px"
+                                    >
+                                        mdi-trash-can-outline
+                                    </v-icon>
+                                </template>
+                                <span>View Trashed Rents</span>
+                            </v-tooltip>
+                        </v-btn>
+                    </v-badge>
                 </v-col>
             </v-row>
         </v-card-title>
@@ -50,22 +68,45 @@ export default {
             class="elevation-1"
             @update:options="updateOptions"
         >
+            <template v-slot:item.creator_name="{ item }">
+                <span>{{ item.creator ? item.creator : "Unknown" }}</span>
+            </template>
+            <template v-slot:item.photo="{ item }">
+                <img class="rentsImg" :src="item.photo" alt="" />
+            </template>
+
             <template v-slot:item.actions="{ item }">
-                <v-icon @click="editSupplier(item.id)" class="mr-2"
+                <v-icon @click="editSupplier(item.uuid)" class="mr-2"
                     >mdi-pencil</v-icon
                 >
-                <v-icon @click="deleteSupplier(item.id)" color="red"
+                <v-icon @click="showConfirmDialog(item.id)" color="red"
                     >mdi-delete</v-icon
                 >
             </template>
         </v-data-table>
+        <ConfirmDialog
+            :dialogName="dialogName"
+            v-model:modelValue="dialog"
+            :onConfirm="confirmDelete"
+            :onCancel="
+                () => {
+                    dialog = false;
+                }
+            "
+        />
     </v-card>
 </template>
 
 <script>
+import ConfirmDialog from "../../Components/ConfirmDialog.vue";
 export default {
+    components: {
+        ConfirmDialog,
+    },
     data() {
         return {
+            dialogName: "Are you sure you want to delete this suppliers ?",
+            dialog: false,
             suppliers: [],
             search: "",
             itemsPerPage: 15,
@@ -76,7 +117,9 @@ export default {
             loading: false,
             sortBy: "name", // Default sorting column
             sortDesc: false, // Default sort direction
+            trashedCount: 0,
             headers: [
+                { title: "Type", key: "type", sortable: false },
                 {
                     title: "Name",
                     value: "name",
@@ -101,12 +144,15 @@ export default {
                     sortable: true, // Enable sorting
                     align: "start",
                 },
+                { title: "Creator", key: "creator.name", sortable: false },
+                { title: "Photo", key: "photo", sortable: false },
                 { title: "Actions", value: "actions", sortable: false },
             ],
         };
     },
     created() {
         this.fetchSuppliers();
+        this.fetchTrashedSupplierCount();
     },
     methods: {
         async fetchSuppliers() {
@@ -121,6 +167,7 @@ export default {
                         sortDesc: this.sortDesc, // Include sort direction
                     },
                 });
+                this.fetchTrashedSupplierCount();
                 this.suppliers = response.data.suppliers;
                 this.loading = false; // Stop loading
             } catch (error) {
@@ -133,26 +180,50 @@ export default {
             this.itemsPerPage = options.itemsPerPage;
             this.pagination.page = 1;
             this.fetchSuppliers(); // Refetch suppliers with updated options
+            this.fetchTrashedSupplierCount();
+        },
+        viewTrash() {
+            this.$router.push({ name: "SupplierTrash" });
         },
         createSupplier() {
             this.$router.push({ name: "SupplierCreate" });
         },
-        editSupplier(id) {
-            this.$router.push({ name: "SupplierEdit", params: { id } });
+        editSupplier(uuid) {
+            this.$router.push({ name: "SupplierEdit", params: { uuid } });
         },
-        async deleteSupplier(id) {
-            const confirmDelete = confirm(
-                "Are you sure you want to delete this supplier?"
-            );
-            if (confirmDelete) {
-                try {
-                    await this.$axios.delete(`/suppliers/${id}`);
-                    this.fetchSuppliers(); // Refresh the supplier list
-                } catch (error) {
-                    console.error("Error deleting supplier:", error);
-                }
+        async showConfirmDialog(id) {
+            this.selectedSupplierId = id;
+            this.dialog = true;
+        },
+        async confirmDelete() {
+            this.dialog = false; // Close the dialog
+            try {
+                const response = await this.$axios.delete(
+                    `/suppliers/${this.selectedSupplierId}`
+                );
+                this.fetchSuppliers({
+                    page: 1,
+                    itemsPerPage: this.itemsPerPage,
+                    sortBy: [],
+                });
+                this.fetchTrashedSupplierCount();
+                toast.success("suppliers deleted successfully!");
+            } catch (error) {
+                console.error("Error deleting Rent:", error);
+                toast.error("Failed to delete Rent.");
             }
         },
+        async fetchTrashedSupplierCount() {
+            try {
+                const response = await this.$axios.get(
+                    "/supplier/trashed-count"
+                );
+                this.trashedCount = response.data.trashedCount;
+            } catch (error) {
+                console.error("Error fetching trashed supplier count:", error);
+            }
+        },
+
         // Method to handle sorting
         sortSuppliers(column) {
             if (this.sortBy === column) {
@@ -162,6 +233,7 @@ export default {
                 this.sortDesc = false; // Reset to ascending
             }
             this.fetchSuppliers(); // Refetch units with the updated sort options
+            this.fetchTrashedSupplierCount();
         },
     },
 };

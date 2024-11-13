@@ -82,7 +82,7 @@
             </template>
 
             <template v-slot:item.actions="{ item }">
-                <v-icon @click="editTechnician(item.id)" class="mr-2"
+                <v-icon @click="editTechnician(item.uuid)" class="mr-2"
                     >mdi-pencil</v-icon
                 >
                 <v-icon @click="showConfirmDialog(item.id)" color="red"
@@ -91,7 +91,7 @@
             </template>
         </v-data-table-server>
 
-       <ConfirmDialog
+        <ConfirmDialog
             :dialogName="dialogName"
             v-model:modelValue="dialog"
             :onConfirm="confirmDelete"
@@ -114,19 +114,22 @@ export default {
     },
     data() {
         return {
-            dialogName:"Are you sure you want to delete this Technician ?",
+            dialogName: "Are you sure you want to delete this Technician ?",
             search: "",
             itemsPerPage: 15,
             headers: [
+                { title: "Company Name", key: "user.name", sortable: false },
                 { title: "Name", key: "name", sortable: true },
                 { title: "Email", key: "email", sortable: true },
                 { title: "Phone", key: "phone", sortable: true },
+                { title: "Type", key: "type", sortable: true },
                 {
                     title: "Status",
                     key: "status",
                     value: "status",
                     sortable: true,
                 },
+                { title: "Creator", key: "creator.name", sortable: false },
                 { title: "Actions", key: "actions", sortable: false },
             ],
             serverItems: [],
@@ -180,8 +183,8 @@ export default {
         viewTrash() {
             this.$router.push({ name: "TechnicianTrash" });
         },
-        editTechnician(id) {
-            this.$router.push({ name: "TechnicianEdit", params: { id } });
+        editTechnician(uuid) {
+            this.$router.push({ name: "TechnicianEdit", params: { uuid } });
         },
         showConfirmDialog(id) {
             this.selectedTechnicianId = id;

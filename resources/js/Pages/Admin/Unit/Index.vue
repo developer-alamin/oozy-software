@@ -88,7 +88,7 @@
                 <v-icon @click="editUnit(item.uuid)" class="mr-2"
                     >mdi-pencil</v-icon
                 >
-                <v-icon @click="showConfirmDialog(item.uuid)" color="red"
+                <v-icon @click="showConfirmDialog(item.id)" color="red"
                     >mdi-delete</v-icon
                 >
             </template>
@@ -173,8 +173,8 @@ export default {
         editUnit(uuid) {
             this.$router.push({ name: "UnitEdit", params: { uuid } });
         },
-        showConfirmDialog(uuid) {
-            this.selectedUnitId = uuid;
+        showConfirmDialog(id) {
+            this.selectedUnitId = id;
             this.dialog = true;
         },
         async confirmDelete() {

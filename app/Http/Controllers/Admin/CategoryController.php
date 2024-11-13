@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\HelperController;
 use App\Models\Admin;
 use App\Models\Category;
 use App\Models\User;
@@ -13,127 +14,6 @@ use Illuminate\Support\Facades\Auth;
 
 class CategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    // public function index(Request $request)
-    // {
-    //     // Validate incoming request parameters
-
-    //     $request->validate([
-    //         'search'       => 'nullable|string|max:255',
-    //         'itemsPerPage' => 'nullable|integer|min:1|max:100',
-    //         'page'         => 'nullable|integer|min:1',
-    //     ]);
-
-    //     $query = Category::query();
-
-    //     // Search functionality
-    //     if ($request->filled('search')) {
-    //         $query->where('name', 'like', '%' . $request->search . '%')
-    //             ->orWhere('description', 'like', '%' . $request->search . '%');
-    //     }
-
-    //     // Sorting
-    //     if ($request->filled('sortBy')) {
-    //         $query->orderBy($request->sortBy, $request->sortDesc ? 'desc' : 'asc');
-    //     }
-
-    //     // Pagination
-    //     $itemsPerPage = $request->input('itemsPerPage', 5); // Default items per page
-    //     $categories   = $query->paginate($itemsPerPage);
-
-    //     return response()->json([
-    //         'categories' => $categories->items(),
-    //         'total'      => $categories->total(), // Total count for pagination
-    //     ]);
-    // }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    // public function create()
-    // {
-    //     //
-    // }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    // public function store(Request $request)
-    // {
-    //     $validatedData = $request->validate(Category::validationRules());
-
-    //     Category::create($validatedData);
-    //     return response()->json(['success' => true,'message' => 'Category created successfully.'], 201);
-    // }
-
-
-    /**
-     * Display the specified resource.
-     */
-    // public function show(Category $category)
-    // {
-    //     //
-    // }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    // public function edit(Category $category)
-    // {
-    //     return response()->json([
-    //         'success' => true,
-    //         'category' => $category
-    //     ], Response::HTTP_OK);
-    // }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    // public function update(Request $request, Category $category)
-    // {
-    //     $validatedData = $request->validate(Category::validationRules());
-
-    //     // Update the product model with the validated data
-    //     $category->update($validatedData);
-
-    //     // Return a success response
-    //     return response()->json([
-    //         'success' => true,
-    //         'message' => 'Category updated successfully.',
-    //         // 'category' => $category
-    //     ]);
-    // }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    // public function destroy(Category $category)
-    // {
-    //     try {
-    //         // Delete the supplier
-    //         $category->delete();
-    //         return response()->json([
-    //             'success' => true,
-    //             'message' => 'Category deleted successfully.'
-    //         ], Response::HTTP_OK);
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Error deleting Category: ' . $e->getMessage()
-    //         ], Response::HTTP_INTERNAL_SERVER_ERROR);
-    //     }
-    // }
-
-
-
-
-
-
-
-
-
 
 
     public function index(Request $request)
@@ -211,7 +91,8 @@ class CategoryController extends Controller
              return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
          }
          // Create the technician and associate it with the creator
-         $category = new Category($validatedData);
+         $category       = new Category($validatedData);
+         $category->uuid = HelperController::generateUuid();
          $category->creator()->associate($creator);  // Assign creator polymorphically
          $category->updater()->associate($creator);  // Associate the updater
          $category->save(); // Save the technician to the database
@@ -231,8 +112,9 @@ class CategoryController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Category $category)
+    public function edit($uuid)
     {
+        $category = Category::where('uuid', $uuid)->firstOrFail();
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('admin')->user();
@@ -265,12 +147,11 @@ class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Category $category)
+    public function update(Request $request,$uuid)
     {
-
+        $category = Category::where('uuid', $uuid)->firstOrFail();
          // Validate the incoming request data
          $validatedData = $request->validate(Category::validationRules());
-
          // Determine the authenticated user (either from 'admin' or 'user' guard)
          if (Auth::guard('admin')->check()) {
              $currentUser = Auth::guard('admin')->user();

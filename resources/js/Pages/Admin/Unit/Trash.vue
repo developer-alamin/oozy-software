@@ -44,10 +44,10 @@
             </template>
 
             <template v-slot:item.actions="{ item }">
-                <v-icon @click="showRestoreDialog(item.uuid)" color="green"
+                <v-icon @click="showRestoreDialog(item.id)" color="green"
                     >mdi-restore</v-icon
                 >
-                <v-icon @click="showConfirmDialog(item.uuid)" color="red"
+                <v-icon @click="showConfirmDialog(item.id)" color="red"
                     >mdi-delete</v-icon
                 >
             </template>
@@ -128,12 +128,12 @@ export default {
                 this.loading = false;
             }
         },
-        showRestoreDialog(uuid) {
-            this.selectedUnitId = uuid;
+        showRestoreDialog(id) {
+            this.selectedUnitId = id;
             this.restoreDialog = true; // Open restore dialog
         },
-        showConfirmDialog(uuid) {
-            this.selectedUnitId = uuid;
+        showConfirmDialog(id) {
+            this.selectedUnitId = id;
             this.deleteDialog = true; // Open delete dialog
         },
         async confirmRestore() {
@@ -168,8 +168,8 @@ export default {
                 toast.error("Failed to delete unit.");
             }
         },
-        editUnit(uuid) {
-            this.$router.push({ name: "UnitEdit", params: { uuid } });
+        editUnit(id) {
+            this.$router.push({ name: "UnitEdit", params: { id } });
         },
     },
     created() {

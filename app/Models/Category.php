@@ -5,16 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class Category extends Model
 {
-    use HasFactory,SoftDeletes,HasUuids;
+    use HasFactory,SoftDeletes;
 
-    public $incrementing = false; // Disable auto-incrementing for UUIDs
-    protected $keyType = 'string'; // Set key type to string for UUIDs
-    // Define the primary key for this model
-    protected $primaryKey = 'uuid';
+    protected $primaryKey = 'id';
 
     protected $fillable = [
         'name',

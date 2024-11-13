@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\HelperController;
 use Illuminate\Http\Request;
 use App\Models\Line;
 use App\Models\Admin;
@@ -93,14 +94,12 @@ class LineController extends Controller
          } else {
              return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
          }
-
-
-
-         $line = new Line($validatedData);
+         $line       = new Line($validatedData);
+         $line->uuid = HelperController::generateUuid();
          $line->creator()->associate($creator);  // Assign creator polymorphically
          $line->updater()->associate($creator);  // Associate the updater
          $line->save(); // Save the technician to the database
-        return response()->json(['success' => true,'message' => 'Line created successfully.'], 200);   
+        return response()->json(['success' => true,'message' => 'Line created successfully.'], 200);
     }
 
     /**
@@ -114,13 +113,10 @@ class LineController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Line $line)
+    public function edit($uuid)
     {
-        //  return response()->json([
-        //     'success' => true,
-        //     'line' => $line
-        // ], Response::HTTP_OK);
 
+        $line = Line::where('uuid', $uuid)->firstOrFail();
          if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('admin')->user();
             $creatorType = Admin::class;
@@ -129,7 +125,7 @@ class LineController extends Controller
                 // Super admins can edit any line
                 return response()->json([
                     'success' => true,
-                    'brand' => $line
+                    'line'    => $line
                 ], Response::HTTP_OK);
             }
         } elseif (Auth::guard('user')->check()) {
@@ -152,58 +148,43 @@ class LineController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Line $line)
+    public function update(Request $request, $uuid)
     {
+        // Retrieve the Line model by uuid
+        $line = Line::where('uuid', $uuid)->firstOrFail();
         // Validate the incoming request data
-         $validatedData = $request->validate(Line::validationRules());
-
+        $validatedData = $request->validate(Line::validationRules());
          // Determine the authenticated user (either from 'admin' or 'user' guard)
-         if (Auth::guard('admin')->check()) {
-             $currentUser = Auth::guard('admin')->user();
-             $creatorType = Admin::class;
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
 
-             // Check if the admin is a superadmin
-             if ($currentUser->role === 'superadmin') {
-                 // Superadmin can update without additional checks
-             } else {
-                 // Regular admin authorization check
-                 if ($line->creator_type !== $creatorType || $line->creator_id !== $currentUser->id) {
-                     return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to update this line.'], 403);
-                 }
-             }
+            // Check if the admin is a superadmin
+            if ($currentUser->role === 'superadmin') {
+                // Superadmin can update without additional checks
+            } else {
+                // Regular admin authorization check
+                if ($line->creator_type !== $creatorType || $line->creator_id !== $currentUser->id) {
+                    return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to update this line.'], 403);
+                }
+            }
 
-         } elseif (Auth::guard('user')->check()) {
-             $currentUser = Auth::guard('user')->user();
-             $creatorType = User::class;
-
-             // Regular user authorization check
-             if ($line->creator_type !== $creatorType || $line->creator_id !== $currentUser->id) {
-                 return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to update this line.'], 403);
-             }
-         } else {
-             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
-         }
-         // Update the line's details
-         $line->fill($validatedData);
-         $line->updater()->associate($currentUser); // Associate the updater
-         $line->save();
-
-         // Return a success response
-         return response()->json(['success' => true, 'message' => 'Line updated successfully.', 'line' => $line], 200);
-
-
-
-       
-        //  $validatedData = $request->validate(Line::validationRules());
-
-        //  // Update the product model with the validated data
-        //  $line->update($validatedData);
-
-        // // Return a success response
-        //  return response()->json([
-        //    'success' => true,
-        //     'message' => 'Line updated successfully.',
-        //  ]);
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+            // Regular user authorization check
+            if ($line->creator_type !== $creatorType || $line->creator_id !== $currentUser->id) {
+                return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to update this line.'], 403);
+            }
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+        // Update the line's details
+        $line->fill($validatedData);
+        $line->updater()->associate($currentUser); // Associate the updater
+        $line->save();
+        // Return a success response
+        return response()->json(['success' => true, 'message' => 'Line updated successfully.', 'line' => $line], 200);
     }
 
     /**
@@ -253,12 +234,12 @@ class LineController extends Controller
     {
          // Get the count of soft-deleted brands
         $trashedCount = Line::onlyTrashed()->count();
-      
+
         return response()->json([
             'trashedCount' => $trashedCount
         ], Response::HTTP_OK);
     }
-      public function lineTrashed(Request $request)
+    public function lineTrashed(Request $request)
     {
 
         // Determine the authenticated user (either from 'admin' or 'user' guard)
@@ -369,53 +350,53 @@ class LineController extends Controller
     }
 
     public function LineForceDelete($id)
-     {
+    {
 
 
-        // Determine the authenticated user (either from 'admin' or 'user' guard)
-        if (Auth::guard('admin')->check()) {
-                
-            $currentUser = Auth::guard('admin')->user();
-            $creatorType = Admin::class;
+    // Determine the authenticated user (either from 'admin' or 'user' guard)
+    if (Auth::guard('admin')->check()) {
 
-            // Superadmin check: Allow access to all trashed technicians
-            if ($currentUser->role === 'superadmin') {
-                $line = Line::onlyTrashed()->findOrFail($id);
-            } else {
-                // Regular admin authorization check
-                $line = Line::onlyTrashed()
-                    ->where('creator_id', $currentUser->id)
-                    ->where('creator_type', $creatorType)
-                    ->findOrFail($id);
-            }
+        $currentUser = Auth::guard('admin')->user();
+        $creatorType = Admin::class;
 
-            } elseif (Auth::guard('user')->check()) {
-                $currentUser = Auth::guard('user')->user();
-                $creatorType = User::class;
-
-                // Regular user authorization check
-                $line = line::onlyTrashed()
-                    ->where('creator_id', $currentUser->id)
-                    ->where('creator_type', $creatorType)
-                    ->findOrFail($id);
-            } else {
-            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        // Superadmin check: Allow access to all trashed technicians
+        if ($currentUser->role === 'superadmin') {
+            $line = Line::onlyTrashed()->findOrFail($id);
+        } else {
+            // Regular admin authorization check
+            $line = Line::onlyTrashed()
+                ->where('creator_id', $currentUser->id)
+                ->where('creator_type', $creatorType)
+                ->findOrFail($id);
         }
-        
-        try {
-            // Delete the supplier
-            $line->forceDelete();
-            return response()->json([
-                'success' => true,
-                'message' => 'Line permanently deleted successfully.'
-            ], Response::HTTP_OK);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error deleting Brand: ' . $e->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
- 
-         return response()->json(['message' => 'Line permanently deleted']);
-     }
+
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+
+            // Regular user authorization check
+            $line = line::onlyTrashed()
+                ->where('creator_id', $currentUser->id)
+                ->where('creator_type', $creatorType)
+                ->findOrFail($id);
+        } else {
+        return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+    }
+
+    try {
+        // Delete the supplier
+        $line->forceDelete();
+        return response()->json([
+            'success' => true,
+            'message' => 'Line permanently deleted successfully.'
+        ], Response::HTTP_OK);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error deleting Brand: ' . $e->getMessage()
+        ], Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
+
+        return response()->json(['message' => 'Line permanently deleted']);
+    }
 }

@@ -33,7 +33,6 @@
                         </v-tooltip>
                     </v-btn>
                 </v-col>
-
             </v-row>
         </v-card-title>
 
@@ -48,12 +47,21 @@
             loading-text="Loading... Please wait"
             @update:options="loadItems"
         >
-
+            <template v-slot:item.status="{ item }">
+                <v-chip
+                    :color="item.status === 'Active' ? 'green' : 'red'"
+                    class="text-uppercase"
+                    size="small"
+                    label
+                >
+                    {{ item.status === "Active" ? "Active" : "Inactive" }}
+                </v-chip>
+            </template>
             <template v-slot:item.actions="{ item }">
-                <v-icon @click="showRestoreDialog(item.uuid)" color="green"
+                <v-icon @click="showRestoreDialog(item.id)" color="green"
                     >mdi-restore</v-icon
                 >
-                <v-icon @click="showConfirmDialog(item.uuid)" color="red"
+                <v-icon @click="showConfirmDialog(item.id)" color="red"
                     >mdi-delete</v-icon
                 >
             </template>
@@ -89,15 +97,15 @@ export default {
     },
     data() {
         return {
-            restroreDialogName:"Are you sure you want to restore this Line?",
-            dialogName:"Are you sure you want to delete this Line ?",
+            restroreDialogName: "Are you sure you want to restore this Line?",
+            dialogName: "Are you sure you want to delete this Line ?",
             search: "",
             itemsPerPage: 15,
             headers: [
-                { title: "Line Name", key: "name", sortable: true },
-                { title: "Line Number", key: "number", sortable: true },
+                { title: "Line Number", key: "name", sortable: true },
                 { title: "Description", key: "description", sortable: false },
-                
+                { title: "status", key: "status", sortable: false },
+
                 { title: "Actions", key: "actions", sortable: false },
             ],
             serverItems: [],
@@ -131,20 +139,18 @@ export default {
                 this.loading = false;
             }
         },
-        showRestoreDialog(uuid) {
-            this.selectedLineId = uuid;
+        showRestoreDialog(id) {
+            this.selectedLineId = id;
             this.restoreDialog = true; // Open restore dialog
         },
-        showConfirmDialog(uuid) {
-            this.selectedLineId = uuid;
+        showConfirmDialog(id) {
+            this.selectedLineId = id;
             this.deleteDialog = true; // Open delete dialog
         },
         async confirmRestore() {
             this.restoreDialog = false; // Close the restore dialog
             try {
-                await this.$axios.post(
-                    `/lines/${this.selectedLineId}/restore`
-                );
+                await this.$axios.post(`/lines/${this.selectedLineId}/restore`);
                 this.loadItems({
                     page: 1,
                     itemsPerPage: this.itemsPerPage,
@@ -174,9 +180,9 @@ export default {
                 toast.error("Failed to delete brand.");
             }
         },
-        async LineIndex (){
+        async LineIndex() {
             this.$router.push({ name: "LineIndex" });
-        }
+        },
     },
     created() {
         this.loadItems({
