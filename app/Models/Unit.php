@@ -15,6 +15,7 @@ class Unit extends Model
 
 
     protected $fillable = [
+        'uuid',
         'name',
         'description',
         'status',

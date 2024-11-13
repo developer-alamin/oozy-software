@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\HelperController;
 use App\Models\Unit;
 use App\Models\Admin;
 use App\Models\User;
@@ -90,6 +91,7 @@ class UnitController extends Controller
          }
          // Create the technician and associate it with the creator
          $unit = new Unit($validatedData);
+         $unit->uuid = HelperController::generateUuid();
          $unit->creator()->associate($creator);  // Assign creator polymorphically
          $unit->updater()->associate($creator);  // Associate the updater
          $unit->save(); // Save the technician to the database
@@ -109,8 +111,9 @@ class UnitController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Unit $unit)
+    public function edit($uuid)
     {
+        $unit = Unit::where('uuid', $uuid)->firstOrFail();
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('admin')->user();
@@ -136,16 +139,16 @@ class UnitController extends Controller
         // Return the unit data if authorized
         return response()->json([
             'success' => true,
-            'unit'   => $unit
+            'unit'    => $unit
         ], Response::HTTP_OK);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Unit $unit)
+    public function update(Request $request, $uuid)
     {
-
+        $unit = Unit::where('uuid', $uuid)->firstOrFail();
          // Validate the incoming request data
          $validatedData = $request->validate(Unit::validationRules());
 
