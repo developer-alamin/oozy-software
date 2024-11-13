@@ -142,13 +142,13 @@ const routes = [
                 component: adminComponents.MechineCreate,
                 meta: { title: "Mechine Create" },
             },
-            // {
-            //     path: "factory/:uuid/edit", // Dynamic route for Factory Edit
-            //     name: "FactoryEdit",
-            //     component: adminComponents.FactoryEdit,
-            //     meta: { title: "Edit Factory" },
-            //     props: true, // Enables passing route params as props
-            // },
+            {
+                path: "mechine/:uuid/edit", // Dynamic route for Factory Edit
+                name: "MechineEdit",
+                component: adminComponents.MechineEdit,
+                meta: { title: "Edit Mechine" },
+                props: true, // Enables passing route params as props
+            },
             {
                 path: "mechine/:uuid/transfer", // Dynamic route for mechine transfer
                 name: "MechineTransfer",

@@ -13,6 +13,7 @@ export { default as CompanyCreate } from "../Pages/Admin/Company/Create.vue";
 // Mechine components
 export { default as MechineIndex } from "../Pages/Admin/Mechine/Index.vue";
 export { default as MechineCreate } from "../Pages/Admin/Mechine/Create.vue";
+export { default as MechineEdit } from "../Pages/Admin/Mechine/Edit.vue";
 export { default as MechineTrash } from "../Pages/Admin/Mechine/Trash.vue";
 export { default as MechineTransfer } from "../Pages/Admin/Mechine/Transfer.vue";
 export { default as MechineTransferList } from "../Pages/Admin/Mechine/TransferList.vue";

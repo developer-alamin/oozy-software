@@ -264,9 +264,35 @@ class MechineAssingController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(MechineAssing $mechineAssing)
+    public function edit($uuid)
     {
-        //
+        $mechineAssing = MechineAssing::where('uuid', $uuid)->firstOrFail();
+         if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
+            // Check if the admin is a super admin
+            if ($currentUser->role === 'superadmin') {
+                // Super admins can edit any mechineAssing
+                return response()->json([
+                    'success' => true,
+                    'mechineAssing'    => $mechineAssing
+                ], Response::HTTP_OK);
+            }
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+        // Check if the mechineAssing belongs to the current user or admin
+        if ($mechineAssing->creator_type !== $creatorType || $mechineAssing->creator_id !== $currentUser->id) {
+            return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to edit this mechineAssing.'], 403);
+        }
+        // Return the mechineAssing data if authorized
+        return response()->json([
+            'success'       => true,
+            'mechineAssing' => $mechineAssing
+        ], Response::HTTP_OK);
     }
     public function mechineTransfer($uuid){
 
