@@ -297,7 +297,7 @@
                             :disabled="!valid || loading"
                             :loading="loading"
                         >
-                            Edit Mechine
+                            Upate Mechine
                         </v-btn>
                     </v-col>
                 </v-row>
@@ -503,7 +503,7 @@ export default {
             setTimeout(async () => {
                 try {
                     const response = await this.$axios.post(
-                        `mechine/transfer/${mechineId}`,
+                        `/mechine-assing`,
                         this.mechine_assing
                     );
                     // console.log(response.data);

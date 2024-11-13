@@ -20,6 +20,8 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class MechineAssingController extends Controller
 {
@@ -230,6 +232,13 @@ class MechineAssingController extends Controller
         $mechineAssing->creator()->associate($creator);
         $mechineAssing->updater()->associate($creator);
 
+        // Generate and save QR code
+        // $qrCodeData = $mechineAssing->mechine_code;
+        // $qrCodeImage = QrCode::format('png')->size(200)->generate($qrCodeData);
+        // $qrCodePath = 'qrcodes/' . uniqid() . '_qrcode.png';
+        // Storage::disk('public')->put($qrCodePath, $qrCodeImage);
+        // $mechineAssing->qr_code_path = $qrCodePath;
+
         // Save the MechineAssing record
         $mechineAssing->save();
 
@@ -394,8 +403,69 @@ class MechineAssingController extends Controller
      */
     public function update(Request $request, MechineAssing $mechineAssing)
     {
-        //
+        // Determine the updater based on authentication guard
+        if (Auth::guard('admin')->check()) {
+            $updater = Auth::guard('admin')->user();
+        } elseif (Auth::guard('user')->check()) {
+            $updater = Auth::guard('user')->user();
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        // Validate the incoming request data
+        $validatedData = $request->validate([
+            'company_id'              => 'required|integer',
+            'factory_id'              => 'required|integer',
+            'brand_id'                => 'required|integer',
+            'model_id'                => 'required|integer',
+            'mechine_type_id'         => 'required|integer',
+            'mechine_source_id'       => 'required|integer',
+            'supplier_id'             => 'nullable|integer',
+            'rent_id'                 => 'nullable|integer',
+            'rent_date'               => 'nullable|date',
+            'name'                    => 'required|string|max:255',
+            'mechine_code'            => 'required|string|max:255',
+            'serial_number'           => 'nullable|string|max:255',
+            'preventive_service_days' => 'nullable|integer',
+            'purchace_price'          => 'nullable|numeric',
+            'purchase_date'           => 'nullable|date',
+            'status'                  => 'nullable|string',
+            'note'                    => 'nullable|string',
+            'mechine_status'          => 'nullable|string',
+        ]);
+
+        // Process dates to handle timezone issues and format them properly
+        if (isset($validatedData['purchase_date'])) {
+            $validatedData['purchase_date'] = Carbon::parse(
+                preg_replace('/\s*\(.*\)$/', '', $validatedData['purchase_date'])
+            )->format('Y-m-d');
+        }
+
+        if (isset($validatedData['rent_date'])) {
+            $validatedData['rent_date'] = Carbon::parse(
+                preg_replace('/\s*\(.*\)$/', '', $validatedData['rent_date'])
+            )->format('Y-m-d');
+        }
+
+        // Update the MechineAssing instance with validated data
+        $mechineAssing->fill($validatedData);
+
+        // Associate the updater polymorphically
+        $mechineAssing->updater()->associate($updater);
+
+        // Save the updated MechineAssing record and check for success
+        if ($mechineAssing->save()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Mechine Assing updated successfully.',
+                'mechine_assing' => $mechineAssing
+            ], 200);
+        }
+
+        // Return an error response if save fails
+        return response()->json(['success' => false, 'message' => 'Failed to update Mechine Assing.'], 500);
     }
+
 
     /**
      * Remove the specified resource from storage.
