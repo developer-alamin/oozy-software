@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('service_parses', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger('service_id');
+            $table->bigInteger('parse_id');
+            $table->decimal('use_qty')->default(0);
+            $table->morphs('creator');
+            $table->morphs('updater');
             $table->timestamps();
         });
     }

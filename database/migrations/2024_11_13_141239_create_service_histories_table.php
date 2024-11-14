@@ -13,6 +13,20 @@ return new class extends Migration
     {
         Schema::create('service_histories', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid')->unique();
+            $table->morphs('creator');
+            $table->morphs('updater');
+            $table->bigInteger('service_id');
+            $table->bigInteger('operator_id');
+            $table->text('operator_mechine_problem_note');
+            $table->time('operator_call_time');
+            $table->bigInteger('technician_id');
+            $table->text('technician_note')->nullable();
+            $table->time('technician_arrive_time');
+            $table->time('technician_working_time');
+            $table->enum('technician_status', ['Pending', 'Running','Success','Failed'])->default('Pending');
+            $table->text('meta_data')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

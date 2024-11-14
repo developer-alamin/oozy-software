@@ -29,6 +29,8 @@ export { default as FactoryTrash } from "../Pages/Admin/Factory/Trash.vue";
 export { default as ServiceIndex } from "../Pages/Admin/Service/Index.vue";
 export { default as ServiceEdit } from "../Pages/Admin/Service/Edit.vue";
 export { default as ServiceCreate } from "../Pages/Admin/Service/Create.vue";
+export { default as ServiceHistoryCreate } from "../Pages/Admin/Service/CreateServiceHistory.vue";
+
 export { default as ServiceTrash } from "../Pages/Admin/Service/Trash.vue";
 
 // Supplier components

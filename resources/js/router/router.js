@@ -176,6 +176,12 @@ const routes = [
                 meta: { title: "Survice Create" },
             },
             {
+                path: "survice/history/create/:id", // New route for Contact
+                name: "ServiceHistoryCreate",
+                component: adminComponents.ServiceHistoryCreate,
+                meta: { title: "Survice History Create" },
+            },
+            {
                 path: "survice/:uuid/edit", // Dynamic route for Survice Edit
                 name: "ServiceEdit",
                 component: adminComponents.ServiceEdit,
