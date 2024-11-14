@@ -209,6 +209,43 @@
             <li class="nav-item">
                 <a
                     class="nav-link collapsed"
+                    data-bs-target="#tables-nav-Service"
+                    data-bs-toggle="collapse"
+                    href="#"
+                >
+                    <i class="bi bi-layout-text-window-reverse"></i
+                    ><span>Service</span
+                    ><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul
+                    id="tables-nav-Service"
+                    class="nav-content collapse"
+                    data-bs-parent="#sidebar-nav"
+                >
+                    <li>
+                        <router-link
+                            :to="{ name: 'ServiceCreate' }"
+                            active-class="active"
+                        >
+                            <i class="bi bi-circle"></i
+                            ><span>Create Service</span>
+                        </router-link>
+                    </li>
+
+                    <li>
+                        <router-link
+                            :to="{ name: 'ServiceIndex' }"
+                            active-class="active"
+                        >
+                            <i class="bi bi-circle"></i><span>All Service</span>
+                        </router-link>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="nav-item">
+                <a
+                    class="nav-link collapsed"
                     data-bs-target="#tables-nav"
                     data-bs-toggle="collapse"
                     href="#"

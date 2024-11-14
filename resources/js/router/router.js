@@ -162,6 +162,33 @@ const routes = [
                 component: adminComponents.MechineTrash,
                 meta: { title: "Mechine Trash" },
             },
+            // service
+            {
+                path: "survice/index", // New route for Contact
+                name: "ServiceIndex",
+                component: adminComponents.ServiceIndex,
+                meta: { title: "Survice Index" },
+            },
+            {
+                path: "survice/create", // New route for Contact
+                name: "ServiceCreate",
+                component: adminComponents.ServiceCreate,
+                meta: { title: "Survice Create" },
+            },
+            {
+                path: "survice/:uuid/edit", // Dynamic route for Survice Edit
+                name: "ServiceEdit",
+                component: adminComponents.ServiceEdit,
+                meta: { title: "Edit Survice" },
+                props: true, // Enables passing route params as props
+            },
+            {
+                path: "survice/trash", // Dynamic route for Survice Edit
+                name: "ServiceTrash",
+                component: adminComponents.ServiceTrash,
+                meta: { title: "Trash Survice" },
+                props: true, // Enables passing route params as props
+            },
 
             {
                 path: "supplier/index", // New route for Contact

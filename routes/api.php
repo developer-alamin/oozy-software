@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\ParseUnitController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\Admin\ProductModelController;
+use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\OperatorController;
 use App\Models\MechineAssing;
@@ -80,6 +81,12 @@ Route::get('/mechine/assing/{uuid}/edit', [MechineAssingController::class,'edit'
 Route::resource('mechine-assing',MechineAssingController::class);
 
 
+// --------------------------------------------Mechine Service route statr here-------------------------------------------------------------------
+Route::get('/get_mechines', [ServiceController::class, 'getMechins']);
+Route::get('/get_operators', [ServiceController::class, 'getOperators']);
+Route::get('/get_technicians', [ServiceController::class, 'getTechnicians']);
+Route::get('/get_parses', [ServiceController::class, 'getParses']);
+Route::resource('services',ServiceController::class);
 // -------------------------------------------- mechine typeroute statr here-------------------------------------------------------------------
 
 Route::prefix("/mechine")->group(function(){
