@@ -16,11 +16,14 @@ return new class extends Migration
             $table->uuid('uuid')->unique();
             $table->string('company_id');
             $table->string('name'); // Name of the factory
-            $table->string('factory_code');
+            $table->string('factory_code')->nullable();
+            $table->string('factory_owner')->nullable();
+            $table->string('factory_size')->nullable();
+            $table->string('factory_capacity')->nullable();
             $table->string('email')->nullable(); // Name of the factory manager
             $table->string('phone')->nullable(); // Contact number for the factory
             $table->string('location')->nullable();
-            $table->integer('description')->default(0); // Total number of machines
+            $table->text('note')->nullable(); // Total number of machines
             $table->text('meta_data')->nullable();
             $table->morphs('creator'); // Polymorphic relationship for creator
             $table->morphs('updater'); // Polymorphic relationship for updater

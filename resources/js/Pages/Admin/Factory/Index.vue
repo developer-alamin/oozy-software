@@ -54,6 +54,27 @@
                             <span>Add a new Factory</span>
                         </v-tooltip>
                     </v-btn>
+                    <v-badge :content="trashedCount" color="red" overlap>
+                        <v-btn
+                            @click="viewTrash"
+                            color="red"
+                            icon
+                            class="ml-2"
+                            style="width: 40px; height: 40px"
+                        >
+                            <v-tooltip location="top" activator="parent">
+                                <template v-slot:activator="{ props }">
+                                    <v-icon
+                                        v-bind="props"
+                                        style="font-size: 20px"
+                                    >
+                                        mdi-trash-can-outline
+                                    </v-icon>
+                                </template>
+                                <span>View trashed brands</span>
+                            </v-tooltip>
+                        </v-btn>
+                    </v-badge>
                 </v-col>
             </v-row>
         </v-card-title>
@@ -81,12 +102,22 @@
                 <!-- <v-icon @click="editFactory(item.uuid)" class="mr-2"
                     >mdi-pencil</v-icon
                 > -->
-                <v-icon @click="showConfirmDialog(item.uuid)" color="red"
+                <v-icon @click="showConfirmDialog(item.id)" color="red"
                     >mdi-delete</v-icon
                 >
             </template>
         </v-data-table-server>
 
+        <ConfirmDialog
+            :dialogName="dialogName"
+            v-model:modelValue="dialog"
+            :onConfirm="confirmDelete"
+            :onCancel="
+                () => {
+                    dialog = false;
+                }
+            "
+        />
         <FactoryFloorsModal
             :visible="showModal"
             :factory="selectedFactory"
@@ -119,6 +150,7 @@ export default {
             ],
             serverItems: [],
             loading: true,
+            trashedCount: 0,
             totalItems: 0,
             showModal: false,
             selectedFactory: {},
@@ -140,8 +172,7 @@ export default {
                         factory_code: this.factoryCode,
                     },
                 });
-                console.log(response.data.items);
-
+                // console.log(response.data.items);
                 this.serverItems = response.data.items || [];
                 this.totalItems = response.data.total || 0;
             } catch (error) {
@@ -168,9 +199,34 @@ export default {
         editFactory(uuid) {
             this.$router.push({ name: "FactoryEdit", params: { uuid } });
         },
-        showConfirmDialog(uuid) {
-            this.selectedFactoryId = uuid;
+        showConfirmDialog(id) {
+            this.selectedFactoryId = id;
             this.dialog = true;
+        },
+        async confirmDelete() {
+            this.dialog = false; // Close the dialog
+            try {
+                await this.$axios.delete(`/brand/${this.selectedFactoryId}`);
+                this.loadItems({
+                    page: 1,
+                    itemsPerPage: this.itemsPerPage,
+                    sortBy: [],
+                });
+                toast.success("Brand deleted successfully!");
+            } catch (error) {
+                console.error("Error deleting brand:", error);
+                toast.error("Failed to delete brand.");
+            }
+        },
+        async fetchTrashedFactoriesCount() {
+            try {
+                const response = await this.$axios.get(
+                    "/factory/trashed-count"
+                );
+                this.trashedCount = response.data.trashedCount;
+            } catch (error) {
+                console.error("Error fetching trashed factories count:", error);
+            }
         },
     },
     created() {

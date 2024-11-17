@@ -12,7 +12,19 @@ class Factory extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['uuid','company_id', 'name', 'factory_code', 'email', 'phone', 'location', 'status'];
+    protected $fillable = [
+        'uuid',
+        'company_id',
+        'name',
+        'factory_code',
+        'factory_owner',
+        'factory_size',
+        'factory_capacity',
+        'email',
+        'phone',
+        'location',
+        'status'
+    ];
 
     public function floors(): BelongsToMany
     {

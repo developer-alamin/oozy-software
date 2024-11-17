@@ -3,130 +3,153 @@
         <v-card-title>Create factory</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="submit">
-                <v-autocomplete
-                    v-model="factory.company_id"
-                    :items="companys"
-                    item-value="id"
-                    item-title="name"
-                    outlined
-                    clearable
-                    chips
-                    density="comfortable"
-                    :rules="[rules.required]"
-                    :error-messages="errors.company_id ? errors.company_id : ''"
-                    @update:search="fetchCompanys"
-                >
-                    <template v-slot:label>
-                        Select Company <span style="color: red">*</span>
-                    </template>
-                </v-autocomplete>
-                <v-text-field
-                    v-model="factory.name"
-                    :rules="[rules.required]"
-                    label="Factory Name"
-                    outlined
-                    density="comfortable"
-                    :error-messages="errors.name ? errors.name : ''"
-                >
-                    <template v-slot:label>
-                        Factory Name <span style="color: red">*</span>
-                    </template>
-                </v-text-field>
-                <v-autocomplete
-                    v-model="factory.floor_ids"
-                    :items="floors"
-                    item-value="id"
-                    item-title="name"
-                    label="Select Floor"
-                    outlined
-                    multiple
-                    clearable
-                    chips
-                    density="comfortable"
-                    :rules="[rules.required]"
-                    :error-messages="errors.floor_ids ? errors.floor_ids : ''"
-                    @update:search="fetchFloors"
-                >
-                    <template v-slot:label>
-                        Select Floor <span style="color: red">*</span>
-                    </template>
-                </v-autocomplete>
-                <v-autocomplete
-                    v-model="factory.unit_ids"
-                    :items="units"
-                    item-value="id"
-                    item-title="name"
-                    label="Select Unit"
-                    outlined
-                    multiple
-                    clearable
-                    chips
-                    density="comfortable"
-                    :rules="[rules.required]"
-                    :error-messages="errors.unit_ids ? errors.unit_ids : ''"
-                    @update:search="fetchUnit"
-                >
-                    <template v-slot:label>
-                        Select Unit <span style="color: red">*</span>
-                    </template>
-                </v-autocomplete>
-
-                <v-autocomplete
-                    v-model="factory.line_ids"
-                    :items="lines"
-                    item-value="id"
-                    item-title="name"
-                    label="Select Line"
-                    density="comfortable"
-                    multiple
-                    clearable
-                    chips
-                    :rules="[rules.required]"
-                    :error-messages="errors.line_ids ? errors.line_ids : ''"
-                    @update:search="fetchLines"
-                >
-                    <template v-slot:label>
-                        Select Line <span style="color: red">*</span>
-                    </template>
-                </v-autocomplete>
-
+                <v-row>
+                    <v-col cols="6">
+                        <v-autocomplete
+                            v-model="factory.company_id"
+                            :items="companys"
+                            item-value="id"
+                            item-title="name"
+                            outlined
+                            clearable
+                            chips
+                            density="comfortable"
+                            :rules="[rules.required]"
+                            :error-messages="
+                                errors.company_id ? errors.company_id : ''
+                            "
+                            @update:search="fetchCompanys"
+                        >
+                            <template v-slot:label>
+                                Select Company <span style="color: red">*</span>
+                            </template>
+                        </v-autocomplete>
+                    </v-col>
+                    <v-col cols="6">
+                        <v-text-field
+                            v-model="factory.name"
+                            :rules="[rules.required]"
+                            label="Factory Name"
+                            outlined
+                            density="comfortable"
+                            :error-messages="errors.name ? errors.name : ''"
+                        >
+                            <template v-slot:label>
+                                Factory Name <span style="color: red">*</span>
+                            </template>
+                        </v-text-field>
+                    </v-col>
+                </v-row>
                 <!-- Name Field -->
-                <v-text-field
-                    v-model="factory.email"
-                    :rules="[rules.required, rules.email]"
-                    label="Email"
-                    outlined
-                    density="comfortable"
-                    :error-messages="errors.email ? errors.email : ''"
-                >
-                    <template v-slot:label>
-                        Email <span style="color: red">*</span>
-                    </template>
-                </v-text-field>
+                <v-row>
+                    <v-col cols="6">
+                        <v-text-field
+                            v-model="factory.email"
+                            label="Email"
+                            outlined
+                            density="comfortable"
+                            :error-messages="errors.email ? errors.email : ''"
+                        >
+                            <!-- <template v-slot:label>
+                                Email <span style="color: red">*</span>
+                            </template> -->
+                        </v-text-field></v-col
+                    >
+                    <v-col cols="6">
+                        <v-text-field
+                            v-model="factory.phone"
+                            label="Phone"
+                            outlined
+                            density="comfortable"
+                            :error-messages="errors.phone ? errors.phone : ''"
+                        >
+                            <template v-slot:label> Phone </template>
+                        </v-text-field>
+                    </v-col>
+                </v-row>
 
-                <v-text-field
-                    v-model="factory.phone"
-                    :rules="[rules.phone]"
-                    label="Phone"
-                    outlined
-                    density="comfortable"
-                    :error-messages="errors.phone ? errors.phone : ''"
-                >
-                    <template v-slot:label> Phone </template>
-                </v-text-field>
-
-                <v-text-field
-                    v-model="factory.factory_code"
-                    :rules="[rules.factory_code]"
-                    label="Factory Code"
-                    outlined
-                    density="comfortable"
-                    :error-messages="
-                        errors.factory_code ? errors.factory_code : ''
-                    "
-                >
-                    <template v-slot:label> Factory Code </template>
-                </v-text-field>
+                <v-row>
+                    <v-col cols="4">
+                        <v-text-field
+                            v-model="factory.factory_owner"
+                            :rules="[rules.factory_owner]"
+                            label="Factory Woner"
+                            outlined
+                            density="comfortable"
+                            :error-messages="
+                                errors.factory_owner ? errors.factory_owner : ''
+                            "
+                        >
+                            <template v-slot:label>
+                                Factory Woner Name</template
+                            >
+                        </v-text-field>
+                    </v-col>
+                    <v-col cols="4">
+                        <v-text-field
+                            v-model="factory.factory_size"
+                            :rules="[rules.factory_size]"
+                            label="Factory Code"
+                            outlined
+                            density="comfortable"
+                            :error-messages="
+                                errors.factory_size ? errors.factory_size : ''
+                            "
+                        >
+                            <template v-slot:label> Factory Size </template>
+                        </v-text-field>
+                    </v-col>
+                    <v-col cols="4">
+                        <v-text-field
+                            v-model="factory.factory_capacity"
+                            :rules="[rules.factory_capacity]"
+                            label="Factory Code"
+                            outlined
+                            density="comfortable"
+                            :error-messages="
+                                errors.factory_capacity
+                                    ? errors.factory_capacity
+                                    : ''
+                            "
+                        >
+                            <template v-slot:label> Factory Capacity </template>
+                        </v-text-field>
+                    </v-col>
+                    <!-- <v-col cols="4">
+                        <v-select
+                            v-model="factory.status"
+                            :items="statusItems"
+                            label="Factory Status"
+                            clearable
+                            density="comfortable"
+                        ></v-select>
+                    </v-col> -->
+                </v-row>
+                <v-row>
+                    <v-col cols="6">
+                        <v-text-field
+                            v-model="factory.factory_code"
+                            :rules="[rules.factory_code]"
+                            label="Factory Code"
+                            outlined
+                            density="comfortable"
+                            :error-messages="
+                                errors.factory_code ? errors.factory_code : ''
+                            "
+                        >
+                            <template v-slot:label> Factory Code </template>
+                        </v-text-field>
+                    </v-col>
+                    <v-col cols="6">
+                        <v-select
+                            v-model="factory.status"
+                            :items="statusItems"
+                            label="Factory Status"
+                            clearable
+                            density="comfortable"
+                        ></v-select>
+                    </v-col>
+                </v-row>
 
                 <v-textarea
                     v-model="factory.location"
@@ -134,19 +157,16 @@
                     density="comfortable"
                     :error-messages="errors.location ? errors.location : ''"
                 />
-                <v-select
-                    v-model="factory.status"
-                    :items="statusItems"
-                    label="Factory Status"
-                    clearable
+                <v-textarea
+                    v-model="factory.note"
+                    label="Note"
                     density="comfortable"
-                ></v-select>
+                    :error-messages="errors.note ? errors.note : ''"
+                />
 
                 <!-- Action Buttons -->
                 <v-row class="mt-4">
                     <!-- Submit Button -->
-
-                    <!-- Reset Button -->
                     <v-col cols="12" class="text-right">
                         <v-btn
                             type="button"
@@ -188,33 +208,25 @@ export default {
 
             factory: {
                 company_id: null,
-                floor_ids: null,
-                unit_ids: null,
-                line_ids: null,
                 name: "",
                 email: "",
                 phone: "",
                 location: "",
+                note: "",
                 factory_code: "",
+                factory_owner: "",
+                factory_size: "",
+                factory_capacity: "",
                 status: "Active", // New property for checkbox
             },
             errors: {}, // Stores validation errors
             serverError: null, // Stores server-side error messages
             limit: 5,
             companys: [], // Array to store Company data
-            floors: [], // Array to store Floor data
-            units: [], // Array to store Unit data
-            lines: [], // Array to store Line data
             selectedCompany: null, // Bound to selected Company in v-autocomplete
 
             rules: {
                 required: (value) => !!value || "Required.",
-                email: (value) =>
-                    /.+@.+\..+/.test(value) || "E-mail must be valid.",
-                confirm_password: (value) =>
-                    value === this.company.password || "Passwords must match.", // Confirms password matches
-                phone: (value) =>
-                    /^\d{11}$/.test(value) || "Phone number must be valid.",
             },
             visible: false,
             confirm_visible: false,
@@ -226,7 +238,6 @@ export default {
             this.errors = {};
             this.serverError = null;
             this.loading = true; // Start loading when submit is clicked
-
             // const formData = new FormData();
             // Object.entries(this.factory).forEach(([key, value]) => {
             //     formData.append(key, value);
@@ -279,6 +290,7 @@ export default {
                 phone: "",
                 factory_code: "",
                 location: "",
+                note: "",
                 status: "Active", // New property for checkbox
             };
             this.errors = {}; // Reset errors on form reset
@@ -299,48 +311,6 @@ export default {
                 this.companys = response.data;
             } catch (error) {
                 console.error("Error fetching companys:", error);
-            }
-        },
-        async fetchFloors(search) {
-            try {
-                const response = await this.$axios.get(`/get_floors`, {
-                    params: {
-                        search: search,
-                        limit: this.limit,
-                    },
-                });
-                console.log(response.data);
-                this.floors = response.data;
-            } catch (error) {
-                console.error("Error fetching floors:", error);
-            }
-        },
-        async fetchUnit(search) {
-            try {
-                const response = await this.$axios.get(`/get_units`, {
-                    params: {
-                        search: search,
-                        limit: this.limit,
-                    },
-                });
-                console.log(response.data);
-                this.units = response.data;
-            } catch (error) {
-                console.error("Error fetching units:", error);
-            }
-        },
-        async fetchLines(search) {
-            try {
-                const response = await this.$axios.get(`/get_lines`, {
-                    params: {
-                        search: search,
-                        limit: this.limit,
-                    },
-                });
-                console.log(response.data);
-                this.lines = response.data;
-            } catch (error) {
-                console.error("Error fetching lines:", error);
             }
         },
     },
