@@ -86,6 +86,7 @@ Route::get('/get_mechines', [ServiceController::class, 'getMechins']);
 Route::get('/get_operators', [ServiceController::class, 'getOperators']);
 Route::get('/get_technicians', [ServiceController::class, 'getTechnicians']);
 Route::get('/get_parses', [ServiceController::class, 'getParses']);
+Route::post('/service/history', [ServiceController::class, 'storeHistory']);
 Route::resource('services',ServiceController::class);
 // -------------------------------------------- mechine typeroute statr here-------------------------------------------------------------------
 

@@ -7,7 +7,10 @@ use App\Http\Controllers\HelperController;
 use App\Models\MechineAssing;
 use App\Models\Operator;
 use App\Models\Parse;
+use App\Models\ParseStockIn;
 use App\Models\Service;
+use App\Models\ServiceHistory;
+use App\Models\ServiceParse;
 use App\Models\Technician;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -130,59 +133,67 @@ class ServiceController extends Controller
         ], 200);
     }
 
-    public function storedd(Request $request)
+    public function storeHistory(Request $request)
     {
+
+        // dd($request->all());
         // Step 1: Validate the incoming request data
         $validatedData = $request->validate([
-            'machine_id' => 'required|exists:machines,id',
-            'date_time' => 'required|date',
-            'status' => 'required|in:pending,in_progress,completed,cancelled',
-
             // Service History details
-            'operator_id' => 'nullable|exists:users,id',
-            'operator_note' => 'nullable|string',
-            'operator_call_time' => 'nullable|date',
-            'technician_id' => 'nullable|exists:users,id',
-            'technician_note' => 'nullable|string',
-            'technician_arrive_time' => 'nullable|date',
-            'technician_working_time' => 'nullable|integer',
-            'history_status' => 'required|in:initiated,under_review,resolved,escalated',
-
+            'service_id'                    => 'required',
+            'operator_id'                   => 'required',
+            'operator_mechine_problem_note' => 'nullable|string',
+            'operator_cell_time'            => 'nullable',
+            'technician_id'                 => 'required',
+            'technician_note'               => 'nullable|string',
+            'technician_arrive_time'        => 'nullable',
+            'technician_working_time'       => 'nullable',
+            'technician_status'             => 'nullable',
+            // 'history_status' => 'required|in:initiated,under_review,resolved,escalated',
             // Service Parse (Parts) details
-            'parses' => 'required|array', // Array of parts
+            'parses'            => 'required|array', // Array of parts
             'parses.*.parse_id' => 'required|exists:parses,id',
             'parses.*.use_qty' => 'required|integer|min:1',
         ]);
-
+        if (Auth::guard('admin')->check()) {
+            $creator = Auth::guard('admin')->user();
+        } elseif (Auth::guard('user')->check()) {
+            $creator = Auth::guard('user')->user();
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
         // Step 2: Start a database transaction to ensure atomicity of all operations
         DB::beginTransaction();
 
         try {
-            // Step 3: Create the Service record
-            $service = Service::create([
-                'machine_id' => $validatedData['machine_id'],
-                'date_time' => $validatedData['date_time'],
-                'status' => $validatedData['status'],
-            ]);
+           
+
+            $serviceHistory             = new ServiceHistory($validatedData);
+            // Associate the creator and updater polymorphically
+            $serviceHistory->uuid       = HelperController::generateUuid();
+            $serviceHistory->service_id = $request->service_id;
+            $serviceHistory->creator()->associate($creator);
+            $serviceHistory->updater()->associate($creator);
+            $serviceHistory->save();
 
             // Step 4: Create the Service History record
-            $serviceHistory = ServiceHistory::create([
-                'service_id' => $service->id,
-                'operator_id' => $validatedData['operator_id'],
-                'operator_note' => $validatedData['operator_note'],
-                'operator_call_time' => $validatedData['operator_call_time'],
-                'technician_id' => $validatedData['technician_id'],
-                'technician_note' => $validatedData['technician_note'],
-                'technician_arrive_time' => $validatedData['technician_arrive_time'],
-                'technician_working_time' => $validatedData['technician_working_time'],
-                'status' => $validatedData['history_status'],
-            ]);
+            // $serviceHistory = ServiceHistory::create([
+            //     'service_id'                    => $request->service_id,
+            //     'operator_id'                   => $validatedData['operator_id'],
+            //     'operator_mechine_problem_note' => $validatedData['operator_note'],
+            //     'operator_call_time'            => $validatedData['operator_call_time'],
+            //     'technician_id'                 => $validatedData['technician_id'],
+            //     'technician_note'               => $validatedData['technician_note'],
+            //     'technician_arrive_time'        => $validatedData['technician_arrive_time'],
+            //     'technician_working_time'       => $validatedData['technician_working_time'],
+            //     'technician_status'             => $validatedData['technician_status'],
+            // ]);
 
             // Step 5: Loop through each part (parse) and create a ServiceParse record while deducting stock
             foreach ($validatedData['parses'] as $parseData) {
+                // dd($parseData);
                 // Find the parse stock record in the ParseInStock table
-                $parseStock = ParseInStock::where('parse_id', $parseData['parse_id'])->first();
-
+                $parseStock = ParseStockIn::where('parse_id', $parseData['parse_id'])->first();
                 // Check if there is enough quantity in stock
                 if (!$parseStock || $parseStock->quantity_in < $parseData['use_qty']) {
                     throw new \Exception("Not enough stock for part ID {$parseData['parse_id']} in ParseInStock");
@@ -193,18 +204,32 @@ class ServiceController extends Controller
                 $parseStock->save();
 
                 // Step 6: Create the ServiceParse record for the used part
-                ServiceParse::create([
-                    'service_id' => $service->id,
-                    'parse_id' => $parseData['parse_id'],
-                    'use_qty' => $parseData['use_qty'],
+                // ServiceParse::create([
+                //     'service_id' => $request->service_id,
+                //     'parse_id'   => $parseData['parse_id'],
+                //     'use_qty'    => $parseData['use_qty'],
+                // ]);
+
+                $serviceParse = new ServiceParse([
+                    'service_id' => $request->service_id,
+                    'parse_id'   => $parseData['parse_id'],
+                    'use_qty'    => $parseData['use_qty'],  // Adjust status as needed
                 ]);
+        
+                $serviceParse->creator()->associate($creator);
+                $serviceParse->updater()->associate($creator);
+                $serviceParse->save();
+        
             }
 
             // Step 7: Commit the transaction if everything is successful
             DB::commit();
-
+            return response()->json([
+                'success' => true,
+                'message' => 'Service created successfully.',
+            ], 200);
             // Step 8: Return a success response with a message
-            return response()->json(['message' => 'Service and related records created successfully with stock deducted from ParseInStock!'], 201);
+            // return response()->json(['message' => 'Service and related records created successfully with stock deducted from ParseInStock!'], 201);
 
         } catch (\Exception $e) {
             // Step 9: If any error occurs, roll back the transaction to maintain data integrity

@@ -54,7 +54,6 @@
                             </v-tooltip>
                         </v-btn>
                     </v-badge>
-                    
                 </v-col>
             </v-row>
         </v-card-title>
@@ -121,7 +120,7 @@ export default {
                 { title: "Address", key: "address", sortable: true },
                 // { title: "Description", key: "description", sortable: false },
                 { title: "Creator", key: "creator.name", sortable: false },
-                { title: "Photo", key: "photo", sortable: false },
+                // { title: "Photo", key: "photo", sortable: false },
 
                 { title: "Actions", key: "actions", sortable: false },
             ],

@@ -68,7 +68,7 @@
     "src": "resources/assets/vendor/remixicon/remixicon.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-Cdbl-y8U.css",
+    "file": "assets/app-gAKxX7WX.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
@@ -77,12 +77,12 @@
     "src": "resources/img/login_page_img.png"
   },
   "resources/js/app.js": {
-    "file": "assets/app-BPaSeY6c.js",
+    "file": "assets/app-bUJgHocT.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "css": [
-      "assets/app-DyNT_aX2.css"
+      "assets/app-dbPUmnRk.css"
     ],
     "assets": [
       "assets/login_page_img-CfsmQqeV.png",

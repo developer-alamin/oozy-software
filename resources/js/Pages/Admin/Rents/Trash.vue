@@ -85,7 +85,7 @@ export default {
                 { title: "Phone", key: "phone", sortable: true },
                 { title: "Address", key: "address", sortable: true },
                 { title: "Description", key: "description", sortable: false },
-                { title: "Photo", key: "photo", sortable: false },
+                // { title: "Photo", key: "photo", sortable: false },
 
                 { title: "Actions", key: "actions", sortable: false },
             ],

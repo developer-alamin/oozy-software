@@ -1,9 +1,9 @@
 <template>
     <v-card outlined class="mx-auto my-5" max-width="">
-        <v-card-title>Create Service</v-card-title>
+        <v-card-title>Create Service History</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="submit">
-                <v-row>
+                <!-- <v-row>
                     <v-col cols="6">
                         <v-autocomplete
                             v-model="mechine_assing.company_id"
@@ -88,7 +88,8 @@
                             density="comfortable"
                         ></v-select>
                     </v-col>
-                </v-row>
+                </v-row> -->
+
                 <v-row>
                     <v-col cols="6">
                         <v-autocomplete
@@ -228,17 +229,17 @@
                     </v-col>
                     <v-col>
                         <v-text-field
-                            v-model="mechine_assing.quantity"
+                            v-model="mechine_assing.use_qty"
                             :rules="[rules.required]"
-                            label="Quantity"
+                            label="use qty"
                             density="comfortable"
                             outlined
                             :error-messages="
-                                errors.quantity ? errors.quantity : ''
+                                errors.use_qty ? errors.use_qty : ''
                             "
                         >
                             <template v-slot:label>
-                                Quantity <span style="color: red">*</span>
+                                use_qty <span style="color: red">*</span>
                             </template>
                         </v-text-field>
                     </v-col>
@@ -274,13 +275,13 @@
                         </v-col>
                         <v-col cols="4">
                             <v-text-field
-                                v-model="parse.quantity"
+                                v-model="parse.use_qty"
                                 :rules="[rules.required]"
-                                label="Quantity"
+                                label="Use Quantity"
                                 density="comfortable"
                                 outlined
                                 :error-messages="
-                                    errors[`parses.${index}.quantity`] || ''
+                                    errors[`parses.${index}.use_qty`] || ''
                                 "
                             ></v-text-field>
                         </v-col>
@@ -378,7 +379,7 @@ export default {
                 status: "Pending", // New property for checkbox
                 service_type_status: "Preventive",
                 technician_status: "Pending",
-                parses: [{ parse_id: null, quantity: 1 }],
+                parses: [{ parse_id: null, use_qty: 1 }],
             },
             errors: {}, // Stores validation errors
             serverError: null, // Stores server-side error messages
@@ -422,8 +423,8 @@ export default {
                             parse.parse_id
                         );
                         formData.append(
-                            `parses[${index}][quantity]`,
-                            parse.quantity
+                            `parses[${index}][use_qty]`,
+                            parse.use_qty
                         );
                     });
                 } else {
@@ -433,7 +434,7 @@ export default {
             setTimeout(async () => {
                 try {
                     const response = await this.$axios.post(
-                        "/mechine-assing",
+                        "/service/history",
                         formData
                     );
                     if (response.data.success) {
@@ -455,7 +456,7 @@ export default {
         },
 
         addParse() {
-            this.mechine_assing.parses.push({ parse_id: null, quantity: 1 });
+            this.mechine_assing.parses.push({ parse_id: null, use_qty: 1 });
         },
         removeParse(index) {
             this.mechine_assing.parses.splice(index, 1);
@@ -466,7 +467,7 @@ export default {
                 name: "",
                 email: "",
                 phone: "",
-                parses: [{ parse_id: null, quantity: 1 }],
+                parses: [{ parse_id: null, use_qty: 1 }],
                 factory_code: "",
                 location: "",
                 status: "Preventive", // New property for checkbox

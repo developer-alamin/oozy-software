@@ -120,7 +120,7 @@ class RentController extends Controller
         $rent->name = $name;
         $rent->email = $request->email;
         $rent->phone = $request->phone;
-        $rent->photo = $uploadImg;
+        // $rent->photo = $uploadImg;
         $rent->address = $request->address;
         $rent->description = $request->description;
 

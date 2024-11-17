@@ -1,29 +1,25 @@
 <template>
     <v-card outlined class="mx-auto my-5" max-width="">
-         <v-card-title>
+        <v-card-title>
             <v-row>
+                <v-col cols="12" md="6"> Create Rent </v-col>
                 <v-col cols="12" md="6">
-                     Create Rent
-                </v-col>
-                 <v-col cols="12" md="6">
                     <v-img
-                      :width="50"
-                      aspect-ratio="16/9"
-                      cover
-                      :src="imageUrl" 
-                      style="margin-left:auto"
-                      v-if="imageUrl"
-                      ></v-img>
+                        :width="50"
+                        aspect-ratio="16/9"
+                        cover
+                        :src="imageUrl"
+                        style="margin-left: auto"
+                        v-if="imageUrl"
+                    ></v-img>
                 </v-col>
             </v-row>
-        
         </v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="submit">
-
                 <v-container>
                     <v-row>
-                        <v-col cols="12" md="6">
+                        <!-- <v-col cols="12" md="6">
                             <v-file-input
                                 accept="image/png, image/jpeg, image/bmp"
                                 label="Photo"
@@ -32,7 +28,7 @@
                                 @change="onFilePicked($event)"
                             >    
                         </v-file-input>
-                        </v-col>
+                        </v-col> -->
                         <v-col cols="12" md="6">
                             <!-- Name Field -->
                             <v-text-field
@@ -45,32 +41,25 @@
                                 <template v-slot:label>
                                     Name <span style="color: red">*</span>
                                 </template>
-                             </v-text-field>
+                            </v-text-field>
                         </v-col>
                         <v-col cols="12" md="6">
-                            <v-text-field
-                                v-model="rent.email"
-                                label="E-mail"
-                              >  
-                              </v-text-field>
-                        </v-col> 
-                         <v-col cols="12" md="6">
-                            <v-text-field
-                                v-model="rent.phone"
-                                label="Phone"
-                              >  
-                              </v-text-field>
-                        </v-col> 
+                            <v-text-field v-model="rent.email" label="E-mail">
+                            </v-text-field>
+                        </v-col>
+                        <v-col cols="12" md="6">
+                            <v-text-field v-model="rent.phone" label="Phone">
+                            </v-text-field>
+                        </v-col>
                         <v-col cols="12">
                             <v-text-field
                                 v-model="rent.address"
                                 label="Address"
-                              >  
-                              </v-text-field>
-                        </v-col>  
+                            >
+                            </v-text-field>
+                        </v-col>
                     </v-row>
                 </v-container>
-                
 
                 <!-- Description Field -->
                 <v-textarea
@@ -120,16 +109,16 @@ import { toast } from "vue3-toastify";
 export default {
     data() {
         return {
-            imageUrl: '',
+            imageUrl: "",
             valid: false,
             loading: false, // Controls loading state of the button
             rent: {
                 name: "",
                 description: "",
-                imageFile:'',
-                email:'',
-                phone:'',
-                address:""
+                imageFile: "",
+                email: "",
+                phone: "",
+                address: "",
             },
             errors: {}, // Stores validation errors
             serverError: null, // Stores server-side error messages
@@ -139,16 +128,16 @@ export default {
         };
     },
     methods: {
-        async onFilePicked(e){
-           const files = e.target.files;
-           if(files[0] !== undefined){
-              const fr = new FileReader();
-              fr.readAsDataURL(files[0]);
-               fr.addEventListener('load', () => {
-                  this.imageUrl = fr.result;
-                  this.rent.imageFile = files[0]
-                })
-           }
+        async onFilePicked(e) {
+            const files = e.target.files;
+            if (files[0] !== undefined) {
+                const fr = new FileReader();
+                fr.readAsDataURL(files[0]);
+                fr.addEventListener("load", () => {
+                    this.imageUrl = fr.result;
+                    this.rent.imageFile = files[0];
+                });
+            }
         },
         async submit() {
             // Reset errors and loading state before submission
@@ -167,7 +156,7 @@ export default {
                 try {
                     // Assuming the actual API call here
                     const response = await this.$axios.post("/rent", formData);
-                    console.log(response.data)
+                    console.log(response.data);
                     if (response.data.success) {
                         this.resetForm();
                         toast.success("Rent Created successfully!");

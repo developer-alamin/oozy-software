@@ -198,37 +198,48 @@ class MechineAssingController extends Controller
             'mechine_type_id'         => 'required|integer',
             'mechine_source_id'       => 'required|integer',
             'supplier_id'             => 'nullable',
-            'rent_id'                 => 'nullable|integer',
+            'rent_id'                 => 'nullable',
             'rent_date'               => 'nullable',
             'name'                    => 'required|string|max:255',
             'mechine_code'            => 'required|string|max:255',
             'serial_number'           => 'nullable|string|max:255',
             'preventive_service_days' => 'nullable',
-            'purchace_price'          => 'nullable|numeric',
+            'purchace_price'          => 'nullable',
             'purchase_date'           => 'nullable',
             'status'                  => 'nullable',  // Example: assumes "status" has specific values
             'note'                    => 'nullable|string',
             'mechine_status'          => 'nullable',
         ]);
-
+        // dd($request->all());
         // Process dates to handle timezone issues and format them properly
-        if (isset($validatedData['purchase_date'])) {
+        // Process dates to handle timezone issues and format them properly
+        if (!empty($request->purchase_date) && $request->purchase_date !== 'null') {
+            // Remove extra characters like "(timezone)" if any and parse the date
             $validatedData['purchase_date'] = Carbon::parse(
-                preg_replace('/\s*\(.*\)$/', '', $validatedData['purchase_date'])
+                preg_replace('/\s*\(.*\)$/', '', $request->purchase_date)
             )->format('Y-m-d');
+        } else {
+            $validatedData['purchase_date'] = null; // Set to null if no valid date is provided
         }
-
-        if (isset($validatedData['rent_date'])) {
+        
+        if (!empty($request->rent_date) && $request->rent_date !== 'null') {
+            // Remove extra characters like "(timezone)" if any and parse the date
             $validatedData['rent_date'] = Carbon::parse(
-                preg_replace('/\s*\(.*\)$/', '', $validatedData['rent_date'])
+                preg_replace('/\s*\(.*\)$/', '', $request->rent_date)
             )->format('Y-m-d');
+        } else {
+            $validatedData['rent_date'] = null; // Set to null if no valid date is provided
         }
 
-        // Create the new MechineAssing instance with validated data
+            // Create the new MechineAssing instance with validated data
         $mechineAssing       = new MechineAssing($validatedData);
         // Associate the creator and updater polymorphically
         $mechineAssing->uuid = HelperController::generateUuid();
         $mechineAssing->mechine_status = "Assing";
+        $mechineAssing->rent_id = ($request->rent_id && $request->rent_id !== 'null') ? $request->rent_id : 0;
+
+        // Similarly handle supplier_id
+        $mechineAssing->supplier_id = ($request->supplier_id && $request->supplier_id !== 'null') ? $request->supplier_id : 0;
         $mechineAssing->creator()->associate($creator);
         $mechineAssing->updater()->associate($creator);
 
@@ -350,16 +361,22 @@ class MechineAssingController extends Controller
 
         // validataion
         $validatedData = $request->validated();
-        if (isset($validatedData['purchase_date'])) {
+        if (!empty($request->purchase_date) && $request->purchase_date !== 'null') {
+            // Remove extra characters like "(timezone)" if any and parse the date
             $validatedData['purchase_date'] = Carbon::parse(
-                preg_replace('/\s*\(.*\)$/', '', $validatedData['purchase_date'])
+                preg_replace('/\s*\(.*\)$/', '', $request->purchase_date)
             )->format('Y-m-d');
+        } else {
+            $validatedData['purchase_date'] = null; // Set to null if no valid date is provided
         }
-
-        if (isset($validatedData['rent_date'])) {
+        
+        if (!empty($request->rent_date) && $request->rent_date !== 'null') {
+            // Remove extra characters like "(timezone)" if any and parse the date
             $validatedData['rent_date'] = Carbon::parse(
-                preg_replace('/\s*\(.*\)$/', '', $validatedData['rent_date'])
+                preg_replace('/\s*\(.*\)$/', '', $request->rent_date)
             )->format('Y-m-d');
+        } else {
+            $validatedData['rent_date'] = null; // Set to null if no valid date is provided
         }
          // Update the original machine status to "history"
 
@@ -372,8 +389,8 @@ class MechineAssingController extends Controller
         $mechineTransfer->model_id                  = $request->model_id;
         $mechineTransfer->mechine_type_id           = $request->mechine_type_id;
         $mechineTransfer->mechine_source_id         = $request->mechine_source_id;
-        $mechineTransfer->supplier_id               = $request->supplier_id;
-        $mechineTransfer->rent_id                   = $request->rent_id;
+        $mechineTransfer->supplier_id               = ($request->supplier_id && $request->supplier_id !== 'null') ? $request->supplier_id : 0;
+        $mechineTransfer->rent_id                   = ($request->rent_id && $request->rent_id !== 'null') ? $request->rent_id : 0;
         $mechineTransfer->rent_date                 = $request->rent_date;
         $mechineTransfer->name                      = $request->name;
         $mechineTransfer->mechine_code              = $request->mechine_code;
@@ -420,13 +437,13 @@ class MechineAssingController extends Controller
             'model_id'                => 'required|integer',
             'mechine_type_id'         => 'required|integer',
             'mechine_source_id'       => 'required|integer',
-            'supplier_id'             => 'nullable|integer',
-            'rent_id'                 => 'nullable|integer',
+            'supplier_id'             => 'nullable',
+            'rent_id'                 => 'nullable',
             'rent_date'               => 'nullable|date',
             'name'                    => 'required|string|max:255',
             'mechine_code'            => 'required|string|max:255',
             'serial_number'           => 'nullable|string|max:255',
-            'preventive_service_days' => 'nullable|integer',
+            'preventive_service_days' => 'nullable',
             'purchace_price'          => 'nullable|numeric',
             'purchase_date'           => 'nullable|date',
             'status'                  => 'nullable|string',
@@ -435,20 +452,27 @@ class MechineAssingController extends Controller
         ]);
 
         // Process dates to handle timezone issues and format them properly
-        if (isset($validatedData['purchase_date'])) {
+        if (!empty($request->purchase_date) && $request->purchase_date !== 'null') {
+            // Remove extra characters like "(timezone)" if any and parse the date
             $validatedData['purchase_date'] = Carbon::parse(
-                preg_replace('/\s*\(.*\)$/', '', $validatedData['purchase_date'])
+                preg_replace('/\s*\(.*\)$/', '', $request->purchase_date)
             )->format('Y-m-d');
+        } else {
+            $validatedData['purchase_date'] = null; // Set to null if no valid date is provided
         }
-
-        if (isset($validatedData['rent_date'])) {
+        
+        if (!empty($request->rent_date) && $request->rent_date !== 'null') {
+            // Remove extra characters like "(timezone)" if any and parse the date
             $validatedData['rent_date'] = Carbon::parse(
-                preg_replace('/\s*\(.*\)$/', '', $validatedData['rent_date'])
+                preg_replace('/\s*\(.*\)$/', '', $request->rent_date)
             )->format('Y-m-d');
+        } else {
+            $validatedData['rent_date'] = null; // Set to null if no valid date is provided
         }
-
         // Update the MechineAssing instance with validated data
         $mechineAssing->fill($validatedData);
+        $mechineAssing->supplier_id               = ($request->supplier_id && $request->supplier_id !== 'null') ? $request->supplier_id : 0;
+        $mechineAssing->rent_id                   = ($request->rent_id && $request->rent_id !== 'null') ? $request->rent_id : 0;
 
         // Associate the updater polymorphically
         $mechineAssing->updater()->associate($updater);
