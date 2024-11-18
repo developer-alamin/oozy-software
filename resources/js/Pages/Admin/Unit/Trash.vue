@@ -87,6 +87,7 @@ export default {
             search: "",
             itemsPerPage: 15,
             headers: [
+                { title: "Floor", key: "floors.name", sortable: false },
                 { title: "Unit Name", key: "name", sortable: true },
                 { title: "Description", key: "description", sortable: false },
                 {
@@ -95,6 +96,7 @@ export default {
                     value: "status",
                     sortable: true,
                 },
+                { title: "Creator", key: "creator.name", sortable: false },
                 { title: "Actions", key: "actions", sortable: false },
             ],
             serverItems: [],

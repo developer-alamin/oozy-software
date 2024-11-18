@@ -15,6 +15,7 @@ class Unit extends Model
 
 
     protected $fillable = [
+        'floor_id',
         'uuid',
         'name',
         'description',
@@ -29,6 +30,7 @@ class Unit extends Model
     public static function validationRules()
     {
         return [
+            'floor_id'     => 'required',
             'name'         => 'required|string|max:255',
             'description'  => 'nullable|string',
             'status'       => 'nullable|in:Active,Inactive',
@@ -40,6 +42,10 @@ class Unit extends Model
 
         ];
     }
+    public function floors()
+    {
+        return $this->belongsTo(Floor::class,'floor_id');
+    }
     public function creator()
     {
         return $this->morphTo();
@@ -49,10 +55,7 @@ class Unit extends Model
     {
         return $this->morphTo();
     }
-    public function floors(): BelongsToMany
-    {
-        return $this->belongsToMany(Floor::class);
-    }
+
 
     public function lines()
     {

@@ -174,9 +174,9 @@ export default {
             );
             if (selectedFloor) {
                 this.selectedFactoryName =
-                    selectedFloor.factory?.name || "No Factory Name";
+                    selectedFloor.factories?.name || "No Factory Name";
                 this.selectedUserName =
-                    selectedFloor.factory?.user?.name || "No User Name";
+                    selectedFloor.factories?.user?.name || "No User Name";
             } else {
                 this.selectedFactoryName = null;
                 this.selectedUserName = null;

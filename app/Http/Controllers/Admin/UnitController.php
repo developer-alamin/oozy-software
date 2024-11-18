@@ -51,7 +51,7 @@ class UnitController extends Controller
         // Apply sorting
         $unitsQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $units = $unitsQuery->with('creator:id,name')->paginate($itemsPerPage);
+        $units = $unitsQuery->with('creator:id,name','floors:id,name')->paginate($itemsPerPage);
         // Return the response as JSON
         return response()->json([
             'items' => $units->items(), // Current page items
@@ -278,7 +278,7 @@ class UnitController extends Controller
         $unitsQuery->orderBy($sortBy, $sortOrder);
 
         // Paginate results
-        $units = $unitsQuery->paginate($itemsPerPage);
+        $units = $unitsQuery->with('creator:id,name','floors:id,name')->paginate($itemsPerPage);
 
         // Return the response as JSON
         return response()->json([
