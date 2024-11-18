@@ -122,7 +122,8 @@ export default {
             search: "",
             itemsPerPage: 15,
             headers: [
-                { title: "Floor Number", key: "name", sortable: true },
+                { title: "Factory", key: "factories.name", sortable: false },
+                { title: "Floor", key: "name", sortable: true },
                 { title: "Description", key: "description", sortable: false },
                 {
                     title: "Status",
@@ -156,6 +157,8 @@ export default {
                         search: this.search,
                     },
                 });
+                console.log(response.data.items);
+
                 this.serverItems = response.data.items || [];
                 this.totalItems = response.data.total || 0;
                 this.fetchTrashedFloorsCount();

@@ -3,6 +3,32 @@
         <v-card-title>Create unit</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="submit">
+                <v-autocomplete
+                    v-model="unit.floor_id"
+                    :items="floors"
+                    item-value="id"
+                    item-title="name"
+                    outlined
+                    clearable
+                    density="comfortable"
+                    :rules="[rules.required]"
+                    :error-messages="errors.floor_id ? errors.floor_id : ''"
+                    @update:search="fetchFloors"
+                >
+                    <template v-slot:label>
+                        Select Floor <span style="color: red">*</span>
+                    </template>
+                </v-autocomplete>
+                <!-- Display factory name -->
+                <div v-if="selectedFactoryName" style="margin-top: 10px">
+                    <strong>Factory Name:</strong> {{ selectedFactoryName }}
+                </div>
+
+                <!-- Display user name -->
+                <div v-if="selectedUserName" style="margin-top: 10px">
+                    <strong>User Name:</strong> {{ selectedUserName }}
+                </div>
+
                 <!-- Name Field -->
                 <v-text-field
                     v-model="unit.name"
@@ -73,7 +99,11 @@ export default {
             valid: false,
             loading: false, // Controls loading state of the button
             statusItems: ["Active", "Inactive"],
+            selectedFactoryName: null, // Displayed factory name
+            selectedUserName: null, // Displayed user name
+            floors: [],
             unit: {
+                floor_id: null,
                 name: "",
                 description: "",
                 status: "Active", // New property for checkbox
@@ -124,6 +154,34 @@ export default {
                 }
             }, 1000); // Simulates a 3-second loading duration
         },
+        async fetchFloors(search) {
+            try {
+                const response = await this.$axios.get(`/get_floors`, {
+                    params: {
+                        search: search,
+                        limit: this.limit,
+                    },
+                });
+                console.log(response.data);
+                this.floors = response.data;
+            } catch (error) {
+                console.error("Error fetching floors:", error);
+            }
+        },
+        updateSelectedFloorDetails(floorId) {
+            const selectedFloor = this.floors.find(
+                (floor) => floor.id === floorId
+            );
+            if (selectedFloor) {
+                this.selectedFactoryName =
+                    selectedFloor.factory?.name || "No Factory Name";
+                this.selectedUserName =
+                    selectedFloor.factory?.user?.name || "No User Name";
+            } else {
+                this.selectedFactoryName = null;
+                this.selectedUserName = null;
+            }
+        },
         resetForm() {
             this.unit = {
                 name: "",
@@ -134,6 +192,12 @@ export default {
             if (this.$refs.form) {
                 this.$refs.form.reset(); // Reset the form via its ref if necessary
             }
+        },
+    },
+    watch: {
+        // Watch for changes to unit.floor_id
+        "unit.floor_id": function (newFloorId) {
+            this.updateSelectedFloorDetails(newFloorId);
         },
     },
 };

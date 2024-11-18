@@ -50,6 +50,8 @@ class User extends Authenticatable
     }
 
 
+
+
     public function createdTechnicians(): MorphMany
     {
         return $this->morphMany(Technician::class, 'creator');

@@ -24,13 +24,18 @@ class Factory extends Model
         'email',
         'phone',
         'location',
-        'status'
+        'status',
+        'note',
     ];
 
-  
+
     public function user()
     {
         return $this->belongsTo(User::class, 'company_id');
+    }
+    public function floors()
+    {
+        return $this->hasMany(Floor::class);
     }
     public function creator()
     {

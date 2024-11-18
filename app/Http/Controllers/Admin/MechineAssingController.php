@@ -221,7 +221,7 @@ class MechineAssingController extends Controller
         } else {
             $validatedData['purchase_date'] = null; // Set to null if no valid date is provided
         }
-        
+
         if (!empty($request->rent_date) && $request->rent_date !== 'null') {
             // Remove extra characters like "(timezone)" if any and parse the date
             $validatedData['rent_date'] = Carbon::parse(
@@ -369,7 +369,7 @@ class MechineAssingController extends Controller
         } else {
             $validatedData['purchase_date'] = null; // Set to null if no valid date is provided
         }
-        
+
         if (!empty($request->rent_date) && $request->rent_date !== 'null') {
             // Remove extra characters like "(timezone)" if any and parse the date
             $validatedData['rent_date'] = Carbon::parse(
@@ -460,7 +460,7 @@ class MechineAssingController extends Controller
         } else {
             $validatedData['purchase_date'] = null; // Set to null if no valid date is provided
         }
-        
+
         if (!empty($request->rent_date) && $request->rent_date !== 'null') {
             // Remove extra characters like "(timezone)" if any and parse the date
             $validatedData['rent_date'] = Carbon::parse(

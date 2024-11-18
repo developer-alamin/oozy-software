@@ -53,7 +53,7 @@ class FloorController extends Controller
         // Apply sorting
         $floorsQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $floors = $floorsQuery->with('creator:id,name')->paginate($itemsPerPage);
+        $floors = $floorsQuery->with('creator:id,name','factories:id,name')->paginate($itemsPerPage);
         // Return the response as JSON
         return response()->json([
             'items' => $floors->items(), // Current page items
@@ -288,7 +288,7 @@ class FloorController extends Controller
         $floorsQuery->orderBy($sortBy, $sortOrder);
 
         // Paginate results
-        $floors = $floorsQuery->paginate($itemsPerPage);
+        $floors = $floorsQuery->with('creator:id,name','factories:id,name')->paginate($itemsPerPage);
 
         // Return the response as JSON
         return response()->json([

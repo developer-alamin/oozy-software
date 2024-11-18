@@ -88,6 +88,7 @@ export default {
             search: "",
             itemsPerPage: 15,
             headers: [
+                { title: "Factory", key: "factories.name", sortable: false },
                 { title: "Number", key: "name", sortable: true },
                 { title: "Description", key: "description", sortable: false },
                 {

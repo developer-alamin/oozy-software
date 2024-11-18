@@ -3,6 +3,26 @@
         <v-card-title>Create Floor</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="submit">
+                <v-autocomplete
+                    v-model="floor.factory_id"
+                    :items="factories"
+                    item-value="id"
+                    item-title="name"
+                    outlined
+                    clearable
+                    density="comfortable"
+                    :rules="[rules.required]"
+                    :error-messages="errors.factory_id ? errors.factory_id : ''"
+                    @update:search="fetchFactories"
+                >
+                    <template v-slot:label>
+                        Select Factory <span style="color: red">*</span>
+                    </template>
+                </v-autocomplete>
+                <!-- Display the selected user's name -->
+                <div v-if="selectedUserName" style="margin-top: 2px">
+                    <strong>Company Name:</strong> {{ selectedUserName }}
+                </div>
                 <!-- Name Field -->
                 <v-text-field
                     v-model="floor.name"
@@ -12,7 +32,7 @@
                     :error-messages="errors.name ? errors.name : ''"
                 >
                     <template v-slot:label>
-                        Floor Number <span style="color: red">*</span>
+                        Floor <span style="color: red">*</span>
                     </template>
                 </v-text-field>
 
@@ -36,7 +56,6 @@
                     v-model="floor.status"
                     :items="statusItems"
                     label="Floor Status"
-                    @change="updateStatus"
                     clearable
                 ></v-select>
 
@@ -84,12 +103,16 @@ export default {
             loading: false, // Controls loading state of the button
             statusItems: ["Active", "Inactive"],
             floor: {
+                factory_id: "",
                 name: "",
                 description: "",
                 status: "Active", // New property for checkbox
             },
             errors: {}, // Stores validation errors
             serverError: null, // Stores server-side error messages
+            factories: [],
+            companyName: null,
+            selectedUserName: "",
             rules: {
                 required: (value) => !!value || "Required.",
             },
@@ -145,6 +168,42 @@ export default {
             if (this.$refs.form) {
                 this.$refs.form.reset(); // Reset the form via its ref if necessary
             }
+        },
+
+        async fetchFactories(search) {
+            try {
+                const response = await this.$axios.get(`/get_factories`, {
+                    params: {
+                        search: search,
+                        limit: this.limit,
+                    },
+                });
+                // console.log(response.data);
+                this.factories = response.data;
+                const userNames = this.factories.map(
+                    (factory) => factory.user?.name || "No User Name"
+                );
+                console.log("User Names:", userNames);
+
+                // this.companyName = response.data.user.name;
+            } catch (error) {
+                console.error("Error fetching factories:", error);
+            }
+        },
+
+        updateSelectedFactory(factoryId) {
+            const selectedFactory = this.factories.find(
+                (factory) => factory.id === factoryId
+            );
+            // Update the selected user's name or set default value
+            this.selectedUserName =
+                selectedFactory?.user?.name || "No Company Name";
+        },
+    },
+    watch: {
+        // Watch for changes in the selected factory and update the user name
+        "floor.factory_id": function (newFactoryId) {
+            this.updateSelectedFactory(newFactoryId); // Update user name when factory changes
         },
     },
 };

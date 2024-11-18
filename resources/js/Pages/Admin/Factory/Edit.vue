@@ -2,7 +2,7 @@
     <v-card outlined class="mx-auto my-5" max-width="">
         <v-card-title>Edit Factory</v-card-title>
         <v-card-text>
-            <v-form ref="form" v-model="valid" @submit.prevent="submit">
+            <v-form ref="form" v-model="valid" @submit.prevent="update">
                 <v-row>
                     <v-col cols="6">
                         <v-autocomplete
@@ -252,39 +252,72 @@ export default {
                 this.factory = response.data.factory;
             }
         },
-        async submit() {
-            this.errors = {};
+
+        async update() {
+            this.errors = {}; // Reset errors before submission
             this.serverError = null;
             this.loading = true;
+            const factoryId = this.$route.params.uuid; // Assuming brand ID is in route params
+            setTimeout(async () => {
+                try {
+                    const response = await this.$axios.put(
+                        `/factory/${factoryId}`,
+                        this.factory
+                    );
 
-            const formData = new FormData();
-            Object.entries(this.factory).forEach(([key, value]) => {
-                if (Array.isArray(value)) {
-                    value.forEach((val) => formData.append(`${key}[]`, val));
-                } else {
-                    formData.append(key, value);
+                    if (response.data.success) {
+                        toast.success("Factory update successfully!");
+                        this.$router.push({ name: "FactoryIndex" }); // Redirect to Factory list page
+                    }
+                } catch (error) {
+                    if (error.response && error.response.status === 422) {
+                        toast.error("Failed to update Factory.");
+                        this.errors = error.response.data.errors || {};
+                    } else {
+                        toast.error(
+                            "Error updating Factory. Please try again."
+                        );
+                        this.serverError = "Error updating Factory.";
+                    }
+                } finally {
+                    // Stop loading after the request (or simulated time) is done
+                    this.loading = false;
                 }
-            });
-
-            try {
-                const response = await this.$axios.put(
-                    `/factory/${this.factory.id}`,
-                    formData
-                );
-                if (response.data.success) {
-                    toast.success("Factory updated successfully!");
-                    this.resetForm();
-                }
-            } catch (error) {
-                if (error.response && error.response.status === 422) {
-                    this.errors = error.response.data.errors;
-                } else {
-                    this.serverError = "An unexpected error occurred.";
-                }
-            } finally {
-                this.loading = false;
-            }
+            }, 1000);
         },
+        // async submit() {
+        //     this.errors = {};
+        //     this.serverError = null;
+        //     this.loading = true;
+
+        //     const formData = new FormData();
+        //     Object.entries(this.factory).forEach(([key, value]) => {
+        //         if (Array.isArray(value)) {
+        //             value.forEach((val) => formData.append(`${key}[]`, val));
+        //         } else {
+        //             formData.append(key, value);
+        //         }
+        //     });
+
+        //     try {
+        //         const response = await this.$axios.put(
+        //             `/factory/${this.factory.id}`,
+        //             formData
+        //         );
+        //         if (response.data.success) {
+        //             toast.success("Factory updated successfully!");
+        //             this.resetForm();
+        //         }
+        //     } catch (error) {
+        //         if (error.response && error.response.status === 422) {
+        //             this.errors = error.response.data.errors;
+        //         } else {
+        //             this.serverError = "An unexpected error occurred.";
+        //         }
+        //     } finally {
+        //         this.loading = false;
+        //     }
+        // },
         resetForm() {
             this.factory = {
                 company_id: null,

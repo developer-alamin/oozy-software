@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('factories', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
-            $table->string('company_id');
+            $table->bigInteger('company_id');
             $table->string('name'); // Name of the factory
             $table->string('factory_code')->nullable();
             $table->string('factory_owner')->nullable();

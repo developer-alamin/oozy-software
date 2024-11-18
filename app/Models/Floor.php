@@ -21,11 +21,13 @@ class Floor extends Model
         'creator_id',
         'updater_type',
         'updater_id',
+        'factory_id',
     ];
 
     public static function validationRules()
     {
         return [
+            'factory_id'   => 'required',
             'name'         => 'required|max:255',
             'description'  => 'nullable',
             'status'       => 'nullable',
@@ -43,14 +45,14 @@ class Floor extends Model
     {
         return $this->morphTo();
     }
-    public function factories(): BelongsToMany
-    {
-        return $this->belongsToMany(Factory::class);
-    }
 
-    public function units(): BelongsToMany
+    public function factories()
     {
-        return $this->belongsToMany(Unit::class);
+        return $this->belongsTo(Factory::class, 'factory_id');
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'company_id');
     }
 
 }

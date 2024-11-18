@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\FactoryStoreRequest;
+use App\Http\Requests\FactoryUpdateRequest;
 use App\Models\Admin;
 use App\Models\Factory;
 use App\Models\Floor;
@@ -123,7 +124,7 @@ class FactoryController extends Controller
             $factory->updater()->associate($creator);
             $factory->save();
 
-            $factory->floors()->sync($request->floor_ids);
+            // $factory->floors()->sync($request->floor_ids);
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Factory created successfully.','factory' => $factory],200);
         } catch (\Exception $e) {
@@ -177,25 +178,25 @@ class FactoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request,$uuid)
+    public function update(FactoryUpdateRequest $request, $uuid)
     {
         if (Auth::guard('admin')->check()) {
             $creator = Auth::guard('admin')->user();
-            // Additional checks can be implemented here for admin roles if needed
         } elseif (Auth::guard('user')->check()) {
             $creator = Auth::guard('user')->user();
-            // User-specific checks can be added here if needed
         } else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
+
         try {
             DB::beginTransaction();
+
             $validated = $request->validated();
-            $technician = Factory::where('uuid', $uuid)->firstOrFail();
-            // $factory         = Factory::create($factoryData);
-            $factory = new Factory([
-                'uuid'             => HelperController::generateUuid(),
-                'company_id'       => $validated['company_id'], // Convert array to JSON
+            $factory = Factory::where('uuid', $uuid)->firstOrFail();
+
+            // Update factory attributes
+            $factory->fill([
+                'company_id'       => $validated['company_id'],
                 'name'             => $validated['name'],
                 'factory_code'     => $validated['factory_code'],
                 'factory_owner'    => $validated['factory_owner'],
@@ -207,19 +208,29 @@ class FactoryController extends Controller
                 'note'             => $validated['note'],
                 'status'           => $validated['status'],
             ]);
-            // Associate creator and updater with the factory
-            $factory->creator()->associate($creator);
+
+            // Update the updater relationship
             $factory->updater()->associate($creator);
             $factory->save();
 
-            $factory->floors()->sync($request->floor_ids);
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'Factory created successfully.','factory' => $factory],200);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Factory updated successfully.',
+                'factory' => $factory,
+            ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => 'Failed to create factory', 'error' => $e->getMessage()], 500);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update factory',
+                'error'   => $e->getMessage(),
+            ], 500);
         }
     }
+
 
     /**
      * Remove the specified resource from storage.

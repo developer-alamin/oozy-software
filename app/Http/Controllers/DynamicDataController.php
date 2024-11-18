@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Factory;
+use App\Models\Floor;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -19,4 +21,31 @@ class DynamicDataController extends Controller
         // Return the users as JSON
         return response()->json($users);
     }
+    public function getFactories(Request $request){
+
+        // Get search term and limit from the request, with defaults
+        $search = $request->query('search', '');
+        $limit  = $request->query('limit', 5); // Default limit of 10
+        // Query to search for factories by name with a limit
+        $factories = Factory::with('user:id,name')->where('name', 'like', '%' . $search . '%')
+                     ->limit($limit)
+                     ->get();
+        // Return the factories as JSON
+        return response()->json($factories);
+    }
+
+    public function getFloors(Request $request){
+
+        // Get search term and limit from the request, with defaults
+        $search = $request->query('search', '');
+        $limit  = $request->query('limit', 5); // Default limit of 10
+        // Query to search for factories by name with a limit
+        $factories = Floor::with(['factories.user'])->where('name', 'like', '%' . $search . '%')
+                     ->limit($limit)
+                     ->get();
+        // Return the factories as JSON
+        return response()->json($factories);
+    }
+
+
 }

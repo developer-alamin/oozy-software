@@ -60,7 +60,7 @@ Route::controller(FloorController::class)
 });
 Route::resource('floor', FloorController::class);
 
-// --------------------------------------------Mechine route statr here-------------------------------------------------------------------
+// --------------------------------------------Machine route statr here-------------------------------------------------------------------
 
 Route::get('/get_factories', [MechineAssingController::class, 'getFactories']);
 Route::get('/get_brands', [MechineAssingController::class, 'getBrands']);
@@ -262,7 +262,7 @@ Route::resource('operator', OperatorController::class);
 Route::resource('company', CompanyController::class);
 
 // --------------------------------------------Factory route statr here-------------------------------------------------------------------
-Route::get('/get_companies', [DynamicDataController::class, 'getCompanies']);
+
 Route::get('/factory/trashed', [FactoryController::class, 'trashed']);
 Route::post('/factory/{id}/restore', [FactoryController::class, 'restore']);
 Route::delete('/factory/{id}/force-delete', [FactoryController::class, 'forceDelete']);
@@ -272,6 +272,9 @@ Route::put('/factory/{uuid}', [FactoryController::class, 'update'])->name('facto
 Route::resource('factory', FactoryController::class);
 
 // Group Rents Controller End form here
+Route::get('/get_floors', [DynamicDataController::class, 'getFloors']);
+Route::get('/get_factories', [DynamicDataController::class, 'getFactories']);
+Route::get('/get_companies', [DynamicDataController::class, 'getCompanies']);
 
 // Admin Auth Routes
 Route::prefix('admin')->group(function () {
