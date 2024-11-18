@@ -71,7 +71,7 @@
                                         mdi-trash-can-outline
                                     </v-icon>
                                 </template>
-                                <span>View trashed brands</span>
+                                <span>View trashed factorys</span>
                             </v-tooltip>
                         </v-btn>
                     </v-badge>
@@ -99,15 +99,21 @@
                 </span>
             </template>
             <template v-slot:item.actions="{ item }">
-                <!-- <v-icon @click="editFactory(item.uuid)" class="mr-2"
+                <v-icon @click="editFactory(item.uuid)" class="mr-2"
                     >mdi-pencil</v-icon
-                > -->
+                >
                 <v-icon @click="showConfirmDialog(item.id)" color="red"
                     >mdi-delete</v-icon
                 >
             </template>
         </v-data-table-server>
 
+        <FactoryFloorsModal
+            :visible="showModal"
+            :factory="selectedFactory"
+            @update:visible="showModal = $event"
+            @close="showModal = false"
+        />
         <ConfirmDialog
             :dialogName="dialogName"
             v-model:modelValue="dialog"
@@ -118,24 +124,21 @@
                 }
             "
         />
-        <FactoryFloorsModal
-            :visible="showModal"
-            :factory="selectedFactory"
-            @update:visible="showModal = $event"
-            @close="showModal = false"
-        />
     </v-card>
 </template>
 
 <script>
 import FactoryFloorsModal from "../../Components/FactoryFloorsModal.vue";
+import ConfirmDialog from "../../Components/ConfirmDialog.vue";
 
 export default {
     components: {
         FactoryFloorsModal,
+        ConfirmDialog,
     },
     data() {
         return {
+            dialogName: "Are you sure you want to delete this Factory ?",
             search: "",
             factoryCode: "",
             itemsPerPage: 15,
@@ -154,6 +157,7 @@ export default {
             totalItems: 0,
             showModal: false,
             selectedFactory: {},
+            dialog: false,
         };
     },
     methods: {
@@ -175,6 +179,7 @@ export default {
                 // console.log(response.data.items);
                 this.serverItems = response.data.items || [];
                 this.totalItems = response.data.total || 0;
+                this.fetchTrashedFactoriesCount();
             } catch (error) {
                 console.error("Error loading items:", error);
             } finally {
@@ -203,19 +208,22 @@ export default {
             this.selectedFactoryId = id;
             this.dialog = true;
         },
+        viewTrash() {
+            this.$router.push({ name: "FactoryTrash" });
+        },
         async confirmDelete() {
             this.dialog = false; // Close the dialog
             try {
-                await this.$axios.delete(`/brand/${this.selectedFactoryId}`);
+                await this.$axios.delete(`/factory/${this.selectedFactoryId}`);
                 this.loadItems({
                     page: 1,
                     itemsPerPage: this.itemsPerPage,
                     sortBy: [],
                 });
-                toast.success("Brand deleted successfully!");
+                toast.success("Factory deleted successfully!");
             } catch (error) {
-                console.error("Error deleting brand:", error);
-                toast.error("Failed to delete brand.");
+                console.error("Error deleting factory:", error);
+                toast.error("Failed to delete factory.");
             }
         },
         async fetchTrashedFactoriesCount() {
@@ -223,6 +231,8 @@ export default {
                 const response = await this.$axios.get(
                     "/factory/trashed-count"
                 );
+                console.log(response.data);
+
                 this.trashedCount = response.data.trashedCount;
             } catch (error) {
                 console.error("Error fetching trashed factories count:", error);
@@ -235,6 +245,7 @@ export default {
             itemsPerPage: this.itemsPerPage,
             sortBy: [],
         });
+        this.fetchTrashedFactoriesCount();
     },
 };
 </script>

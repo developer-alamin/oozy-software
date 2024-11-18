@@ -69,7 +69,7 @@ class FactoryController extends Controller
         $factoriesQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
         $factories = $factoriesQuery
-        ->with(['floors.units.lines', 'creator:id,name','user:id,name']) // Eager load relationships and creator's name
+        ->with(['creator:id,name','user:id,name']) // Eager load relationships and creator's name
         ->paginate($itemsPerPage, ['*'], 'page', $page);
         // Return the response as JSON
         return response()->json([
@@ -144,19 +144,81 @@ class FactoryController extends Controller
      */
     public function edit($uuid)
     {
-        $factory = Factory::where('uuid', $uuid)->with(['floors.units.lines', 'creator', 'user'])->firstOrFail();
-        if (!$factory) {
-            return response()->json(['success' => false, 'message' => 'Factory not found.'], 404);
-        }
 
-        return response()->json(['success' => true, 'factory' => $factory], 200);
+        $factory = Factory::where('uuid', $uuid)->firstOrFail();
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
+            // Check if the admin is a super admin
+            if ($currentUser->role === 'superadmin') {
+                // Super admins can edit any factory
+                return response()->json([
+                    'success' => true,
+                    'factory' => $factory
+                ], Response::HTTP_OK);
+            }
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+        // Check if the factory belongs to the current user or admin
+        if ($factory->creator_type !== $creatorType || $factory->creator_id !== $currentUser->id) {
+            return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to edit this factory.'], 403);
+        }
+        // Return the factory data if authorized
+        return response()->json([
+            'success' => true,
+            'factory' => $factory
+        ], Response::HTTP_OK);
     }
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Factory $factory)
+    public function update(Request $request,$uuid)
     {
-        //
+        if (Auth::guard('admin')->check()) {
+            $creator = Auth::guard('admin')->user();
+            // Additional checks can be implemented here for admin roles if needed
+        } elseif (Auth::guard('user')->check()) {
+            $creator = Auth::guard('user')->user();
+            // User-specific checks can be added here if needed
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+        try {
+            DB::beginTransaction();
+            $validated = $request->validated();
+            $technician = Factory::where('uuid', $uuid)->firstOrFail();
+            // $factory         = Factory::create($factoryData);
+            $factory = new Factory([
+                'uuid'             => HelperController::generateUuid(),
+                'company_id'       => $validated['company_id'], // Convert array to JSON
+                'name'             => $validated['name'],
+                'factory_code'     => $validated['factory_code'],
+                'factory_owner'    => $validated['factory_owner'],
+                'factory_size'     => $validated['factory_size'],
+                'factory_capacity' => $validated['factory_capacity'],
+                'email'            => $validated['email'],
+                'phone'            => $validated['phone'],
+                'location'         => $validated['location'],
+                'note'             => $validated['note'],
+                'status'           => $validated['status'],
+            ]);
+            // Associate creator and updater with the factory
+            $factory->creator()->associate($creator);
+            $factory->updater()->associate($creator);
+            $factory->save();
+
+            $factory->floors()->sync($request->floor_ids);
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Factory created successfully.','factory' => $factory],200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Failed to create factory', 'error' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -164,7 +226,43 @@ class FactoryController extends Controller
      */
     public function destroy(Factory $factory)
     {
-        //
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            // Check if the admin is a superadmin
+            if ($currentUser->role === 'superadmin') {
+                // Superadmin can delete any factory without additional checks
+            } else {
+                $creatorType = Admin::class;
+                // Regular admin authorization check
+                if ($factory->creator_type !== $creatorType || $factory->creator_id !== $currentUser->id) {
+                    return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to delete this factory.'], 403);
+                }
+            }
+
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+            // Regular user authorization check
+            if ($factory->creator_type !== $creatorType || $factory->creator_id !== $currentUser->id) {
+                return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to delete this factory.'], 403);
+            }
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        try {
+            // Delete the supplier
+            $factory->delete();
+            return response()->json([
+                'success' => true,
+                'message' => 'factory deleted successfully.'
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting factory: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     public function trashedFactoriesCount()

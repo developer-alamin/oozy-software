@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class DynamicDataController extends Controller
 {
-    public function getCompanys(Request $request){
+    public function getCompanies(Request $request){
 
         // Get search term and limit from the request, with defaults
         $search = $request->query('search', '');

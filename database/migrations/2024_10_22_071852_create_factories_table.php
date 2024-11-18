@@ -28,6 +28,7 @@ return new class extends Migration
             $table->morphs('creator'); // Polymorphic relationship for creator
             $table->morphs('updater'); // Polymorphic relationship for updater
             $table->enum('status', ['Active', 'Inactive'])->default('Inactive');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

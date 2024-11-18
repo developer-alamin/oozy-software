@@ -262,12 +262,12 @@ Route::resource('operator', OperatorController::class);
 Route::resource('company', CompanyController::class);
 
 // --------------------------------------------Factory route statr here-------------------------------------------------------------------
-Route::get('/get_companys', [DynamicDataController::class, 'getCompanys']);
+Route::get('/get_companies', [DynamicDataController::class, 'getCompanies']);
 Route::get('/factory/trashed', [FactoryController::class, 'trashed']);
 Route::post('/factory/{id}/restore', [FactoryController::class, 'restore']);
 Route::delete('/factory/{id}/force-delete', [FactoryController::class, 'forceDelete']);
 Route::get('/factory/trashed-count', [FactoryController::class, 'trashedFactoriesCount']);
-Route::get('/factory/edit/{uuid}', [FactoryController::class, 'edit'])->name('factory.edit');
+Route::get('/factory/{uuid}/edit', [FactoryController::class, 'edit'])->name('factory.edit');
 Route::put('/factory/{uuid}', [FactoryController::class, 'update'])->name('factory.update');
 Route::resource('factory', FactoryController::class);
 

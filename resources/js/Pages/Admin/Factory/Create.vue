@@ -7,7 +7,7 @@
                     <v-col cols="6">
                         <v-autocomplete
                             v-model="factory.company_id"
-                            :items="companys"
+                            :items="companies"
                             item-value="id"
                             item-title="name"
                             outlined
@@ -18,7 +18,7 @@
                             :error-messages="
                                 errors.company_id ? errors.company_id : ''
                             "
-                            @update:search="fetchCompanys"
+                            @update:search="fetchCompanies"
                         >
                             <template v-slot:label>
                                 Select Company <span style="color: red">*</span>
@@ -222,7 +222,7 @@ export default {
             errors: {}, // Stores validation errors
             serverError: null, // Stores server-side error messages
             limit: 5,
-            companys: [], // Array to store Company data
+            companies: [], // Array to store Company data
             selectedCompany: null, // Bound to selected Company in v-autocomplete
 
             rules: {
@@ -299,18 +299,18 @@ export default {
             }
         },
 
-        async fetchCompanys(search) {
+        async fetchCompanies(search) {
             try {
-                const response = await this.$axios.get(`/get_companys`, {
+                const response = await this.$axios.get(`/get_companies`, {
                     params: {
                         search: search,
                         limit: this.limit,
                     },
                 });
-                console.log(response.data);
-                this.companys = response.data;
+                // console.log(response.data);
+                this.companies = response.data;
             } catch (error) {
-                console.error("Error fetching companys:", error);
+                console.error("Error fetching companies:", error);
             }
         },
     },

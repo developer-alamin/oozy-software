@@ -1,6 +1,6 @@
 <template>
     <v-card outlined class="mx-auto my-5" max-width="">
-        <v-card-title>Edit Mechine</v-card-title>
+        <v-card-title>Edit Machine</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="submit">
                 <v-text-field
@@ -12,7 +12,7 @@
                     :error-messages="errors.name ? errors.name : ''"
                 >
                     <template v-slot:label>
-                        Mechine Name <span style="color: red">*</span>
+                        Machine Name <span style="color: red">*</span>
                     </template>
                 </v-text-field>
                 <v-row>
@@ -596,7 +596,7 @@ export default {
 
         async fetchCompanys(search) {
             try {
-                const response = await this.$axios.get(`/get_companys`, {
+                const response = await this.$axios.get(`/get_companies`, {
                     params: {
                         search: search,
                         limit: this.limit,

@@ -43,6 +43,7 @@ class FactoryStoreRequest extends FormRequest
             'factory_owner'    => 'nullable|string',
             'factory_size'     => 'nullable|string',
             'factory_capacity' => 'nullable|string',
+            'note'             => 'nullable|string',
             'status'           => 'required|in:Active,Inactive',
         ];
     }
