@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\HelperController;
+use App\Http\Requests\FloorRequest;
 use Illuminate\Http\Request;
 use App\Models\Admin;
 use App\Models\Floor;
@@ -72,9 +73,9 @@ class FloorController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(FloorRequest $request)
     {
-        $validatedData = $request->validate(Floor::validationRules());
+        $validatedData = $request->validated();
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
              $creator = Auth::guard('admin')->user();
@@ -148,11 +149,11 @@ class FloorController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request,$uuid)
+    public function update(FloorRequest $request,$uuid)
     {
         $floor = Floor::where('uuid', $uuid)->firstOrFail();
          // Validate the incoming request data
-         $validatedData = $request->validate(Floor::validationRules());
+         $validatedData = $request->validated();
 
          // Determine the authenticated user (either from 'admin' or 'user' guard)
          if (Auth::guard('admin')->check()) {

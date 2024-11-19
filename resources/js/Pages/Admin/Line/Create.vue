@@ -156,7 +156,7 @@ export default {
                         limit: this.limit,
                     },
                 });
-                console.log(response.data);
+                // console.log(response.data);
                 this.units = response.data;
             } catch (error) {
                 console.error("Error fetching units:", error);

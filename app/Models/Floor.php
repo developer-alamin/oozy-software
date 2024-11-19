@@ -24,17 +24,6 @@ class Floor extends Model
         'factory_id',
     ];
 
-    public static function validationRules()
-    {
-        return [
-            'factory_id'   => 'required',
-            'name'         => 'required|max:255',
-            'description'  => 'nullable',
-            'status'       => 'nullable',
-
-        ];
-    }
-
     // Polymorphic relationships
     public function creator()
     {

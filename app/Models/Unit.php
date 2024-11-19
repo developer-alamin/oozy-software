@@ -27,21 +27,7 @@ class Unit extends Model
         'updater_type',
 
     ];
-    public static function validationRules()
-    {
-        return [
-            'floor_id'     => 'required',
-            'name'         => 'required|string|max:255',
-            'description'  => 'nullable|string',
-            'status'       => 'nullable|in:Active,Inactive',
-            'meta_data'    => 'nullable',
-            'creator_id'   => 'nullable',
-            'creator_type' => 'nullable',
-            'updater_id'   => 'nullable',
-            'updater_type' => 'nullable',
 
-        ];
-    }
     public function floors()
     {
         return $this->belongsTo(Floor::class,'floor_id');

@@ -131,9 +131,9 @@ export default {
                 }
                 // console.log(response.data);
                 if (response.data.success) {
-                    this.factory = response.data.factory;
+                    this.floor = response.data.floor;
                 }
-                this.floor = response.data.floor; // Populate form with the existing floor data
+                // this.floor = response.data.floor; // Populate form with the existing floor data
                 this.floor.status =
                     this.floor.status === "Active" ? "Active" : "Inactive";
             } catch (error) {
@@ -176,6 +176,7 @@ export default {
             this.errors = {};
             this.$refs.form.resetValidation();
         },
+
         async fetchFactories(search) {
             try {
                 const response = await this.$axios.get(`/get_factories`, {

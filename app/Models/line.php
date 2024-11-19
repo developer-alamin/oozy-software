@@ -30,15 +30,6 @@ class Line extends Model
         'description',
     ];
 
-    public static function validationRules()
-    {
-        return [
-            'unit_id'      => 'required',
-            'name'         => 'required|string|max:255',
-            'status'       => 'nullable|string',
-            'description'  => 'nullable|string',
-        ];
-    }
     public function units()
     {
         return $this->belongsTo(Unit::class,'unit_id');

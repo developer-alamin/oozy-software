@@ -26,7 +26,7 @@
 
                 <!-- Display user name -->
                 <div v-if="selectedUserName" style="margin-top: 10px">
-                    <strong>User Name:</strong> {{ selectedUserName }}
+                    <strong>Company Name:</strong> {{ selectedUserName }}
                 </div>
 
                 <!-- Name Field -->
@@ -176,7 +176,7 @@ export default {
                 this.selectedFactoryName =
                     selectedFloor.factories?.name || "No Factory Name";
                 this.selectedUserName =
-                    selectedFloor.factories?.user?.name || "No User Name";
+                    selectedFloor.factories?.user?.name || "No Company Name";
             } else {
                 this.selectedFactoryName = null;
                 this.selectedUserName = null;

@@ -452,7 +452,7 @@ const routes = [
                 meta: { title: "Line Create" },
             },
             {
-                path: "line/edit/:uuid", // New route for line edit
+                path: "line/:uuid/edit", // New route for line edit
                 name: "LineEdit",
                 component: adminComponents.LineEdit,
                 meta: { title: "Line Edit" },
