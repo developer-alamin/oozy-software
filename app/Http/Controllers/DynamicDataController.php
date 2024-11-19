@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Factory;
 use App\Models\Floor;
+use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -46,6 +47,19 @@ class DynamicDataController extends Controller
         // Return the factories as JSON
         return response()->json($factories);
     }
+    public function getUnits(Request $request){
+
+        // Get search term and limit from the request, with defaults
+        $search = $request->query('search', '');
+        $limit  = $request->query('limit', 5); // Default limit of 10
+        // Query to search for factories by name with a limit
+        $factories = Unit::with(['floors.factories.user'])->where('name', 'like', '%' . $search . '%')
+                     ->limit($limit)
+                     ->get();
+        // Return the factories as JSON
+        return response()->json($factories);
+    }
+    
 
 
 }

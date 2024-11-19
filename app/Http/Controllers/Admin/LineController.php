@@ -54,7 +54,7 @@ class LineController extends Controller
         // Apply sorting
         $linesQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $lines = $linesQuery->with('creator:id,name')->paginate($itemsPerPage);
+        $lines = $linesQuery->with('creator:id,name','units:id,name')->paginate($itemsPerPage);
         // Return the response as JSON
         return response()->json([
             'items' => $lines->items(), // Current page items

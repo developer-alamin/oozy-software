@@ -272,6 +272,7 @@ Route::put('/factory/{uuid}', [FactoryController::class, 'update'])->name('facto
 Route::resource('factory', FactoryController::class);
 
 // Group Rents Controller End form here
+Route::get('/get_units', [DynamicDataController::class, 'getUnits']);
 Route::get('/get_floors', [DynamicDataController::class, 'getFloors']);
 Route::get('/get_factories', [DynamicDataController::class, 'getFactories']);
 Route::get('/get_companies', [DynamicDataController::class, 'getCompanies']);

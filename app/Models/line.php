@@ -24,6 +24,7 @@ class Line extends Model
         'creator_id',
         'updater_type',
         'updater_id',
+        'unit_id',
         'name',
         'status',
         'description',
@@ -32,10 +33,15 @@ class Line extends Model
     public static function validationRules()
     {
         return [
+            'unit_id'      => 'required',
             'name'         => 'required|string|max:255',
             'status'       => 'nullable|string',
             'description'  => 'nullable|string',
         ];
+    }
+    public function units()
+    {
+        return $this->belongsTo(Unit::class,'unit_id');
     }
     // Polymorphic relationships
     public function creator()

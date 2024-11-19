@@ -443,19 +443,19 @@ const routes = [
                 path: "line/index", // New route for line index
                 name: "LineIndex",
                 component: adminComponents.LineIndex,
-                meta: { title: "line Index" },
+                meta: { title: "Line Index" },
             },
             {
                 path: "line/create", // New route for line create
                 name: "LineCreate",
                 component: adminComponents.LineCreate,
-                meta: { title: "line Create" },
+                meta: { title: "Line Create" },
             },
             {
                 path: "line/edit/:uuid", // New route for line edit
                 name: "LineEdit",
                 component: adminComponents.LineEdit,
-                meta: { title: "line Edit" },
+                meta: { title: "Line Edit" },
                 props: true,
             },
             {

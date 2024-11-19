@@ -79,6 +79,11 @@
                     {{ item.status === "Active" ? "Active" : "Inactive" }}
                 </v-chip>
             </template>
+            <template v-slot:item.description="{ item }">
+                <span>{{
+                    item.description != null || item.description || ""
+                }}</span>
+            </template>
 
             <template v-slot:item.creator_name="{ item }">
                 <span>{{ item.creator ? item.creator.name : "Unknown" }}</span>
