@@ -18,7 +18,7 @@
                     data-bs-toggle="collapse"
                     href="#"
                 >
-                    <i class="bi bi-menu-button-wide"></i><span>Mechines</span
+                    <i class="bi bi-menu-button-wide"></i><span>Machines</span
                     ><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
                 <ul
@@ -30,25 +30,25 @@
                     <li>
                         <router-link :to="{ name: 'MechineCreate' }">
                             <i class="bi bi-circle"></i
-                            ><span>Mechine Assing</span>
+                            ><span>Machine Assing</span>
                         </router-link>
                     </li>
                     <li>
                         <router-link :to="{ name: 'MechineIndex' }">
                             <i class="bi bi-circle"></i
-                            ><span> Mechine Assing List </span>
+                            ><span> Machine Assing List </span>
                         </router-link>
                     </li>
                     <li>
                         <router-link :to="{ name: 'MechineTransferList' }">
                             <i class="bi bi-circle"></i
-                            ><span> Mechine Transfer List </span>
+                            ><span> Machine Transfer List </span>
                         </router-link>
                     </li>
                     <li>
                         <router-link :to="{ name: 'MechineHistoryList' }">
                             <i class="bi bi-circle"></i
-                            ><span> Mechine History List </span>
+                            ><span> Machine History List </span>
                         </router-link>
                     </li>
 

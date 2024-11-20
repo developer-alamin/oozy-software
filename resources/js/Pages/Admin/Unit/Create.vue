@@ -197,6 +197,7 @@ export default {
     watch: {
         // Watch for changes to unit.floor_id
         "unit.floor_id": function (newFloorId) {
+            console.log(newFloorId);
             this.updateSelectedFloorDetails(newFloorId);
         },
     },

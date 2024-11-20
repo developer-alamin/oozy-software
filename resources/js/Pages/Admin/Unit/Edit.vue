@@ -14,6 +14,7 @@
                     :rules="[rules.required]"
                     :error-messages="errors.floor_id ? errors.floor_id : ''"
                     @update:search="fetchFloors"
+                    @update:menu="updateSelectedFloorDetails()"
                 >
                     <template v-slot:label>
                         Select Floor <span style="color: red">*</span>
@@ -121,6 +122,7 @@ export default {
         });
         this.fetchUnit();
     },
+
     methods: {
         async fetchUnit() {
             // Fetch the unit data to populate the form
@@ -140,6 +142,7 @@ export default {
 
                 this.unit.status =
                     this.unit.status === "Active" ? "Active" : "Inactive";
+                this.updateSelectedFloorDetails(response.data.unit.floor_id);
             } catch (error) {
                 console.log(error);
                 this.serverError = "Error fetching unit data." + error;
@@ -191,8 +194,11 @@ export default {
         },
         updateSelectedFloorDetails(floorId) {
             const selectedFloor = this.floors.find(
-                (floor) => floor.id === floorId
+                (floor) => floor.id == floorId
             );
+            console.log(floorId);
+            console.log(selectedFloor);
+
             if (selectedFloor) {
                 this.selectedFactoryName =
                     selectedFloor.factories?.name || "No Factory Name";
@@ -209,11 +215,11 @@ export default {
             this.$refs.form.resetValidation();
         },
     },
-    watch: {
-        // Watch for changes to unit.floor_id
-        "unit.floor_id": function (newFloorId) {
-            this.updateSelectedFloorDetails(newFloorId);
-        },
-    },
+    // watch: {
+    //     // Watch for changes to unit.floor_id
+    //     "unit.floor_id": function (newFloorId) {
+    //         this.updateSelectedFloorDetails(newFloorId);
+    //     },
+    // },
 };
 </script>

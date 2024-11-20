@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\HelperController;
 use App\Http\Requests\LineRequest;
+use App\Http\Requests\LineUpdateRequest;
 use Illuminate\Http\Request;
 use App\Models\Line;
 use App\Models\Admin;
@@ -150,7 +151,7 @@ class LineController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(LineRequest $request, $uuid)
+    public function update(LineUpdateRequest $request, $uuid)
     {
         // Retrieve the Line model by uuid
         $line = Line::where('uuid', $uuid)->firstOrFail();

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\HelperController;
 use App\Http\Requests\FloorRequest;
+use App\Http\Requests\FloorUpdateRequest;
 use Illuminate\Http\Request;
 use App\Models\Admin;
 use App\Models\Floor;
@@ -149,7 +150,7 @@ class FloorController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(FloorRequest $request,$uuid)
+    public function update(FloorUpdateRequest $request,$uuid)
     {
         $floor = Floor::where('uuid', $uuid)->firstOrFail();
          // Validate the incoming request data
