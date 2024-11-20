@@ -7,7 +7,7 @@
                     v-model="floor.factory_id"
                     :items="factories"
                     item-value="id"
-                    item-title="name"
+                    :item-title="formatFactory"
                     outlined
                     clearable
                     chips
@@ -140,6 +140,12 @@ export default {
                 this.serverError = "Error fetching floor data.";
             }
         },
+        // Format factory name with user name
+        formatFactory(factory) {
+            if (factory) {
+                return `${factory.name} -- ${factory.user?.name || "No User"}`;
+            }
+        },
         async update() {
             this.errors = {}; // Reset errors before submission
             this.serverError = null;
@@ -192,19 +198,19 @@ export default {
                 console.error("Error fetching factories:", error);
             }
         },
-        updateSelectedFactory(factoryId) {
-            const selectedFactory = this.factories.find(
-                (factory) => factory.id === factoryId
-            );
-            this.selectedUserName =
-                selectedFactory?.user?.name || "No Company Name";
-        },
+        // updateSelectedFactory(factoryId) {
+        //     const selectedFactory = this.factories.find(
+        //         (factory) => factory.id === factoryId
+        //     );
+        //     this.selectedUserName =
+        //         selectedFactory?.user?.name || "No Company Name";
+        // },
     },
-    watch: {
-        // Watch for changes in the selected factory and update the user name
-        "floor.factory_id": function (newFactoryId) {
-            this.updateSelectedFactory(newFactoryId); // Update user name when factory changes
-        },
-    },
+    // watch: {
+    //     // Watch for changes in the selected factory and update the user name
+    //     "floor.factory_id": function (newFactoryId) {
+    //         this.updateSelectedFactory(newFactoryId); // Update user name when factory changes
+    //     },
+    // },
 };
 </script>

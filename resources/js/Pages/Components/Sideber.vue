@@ -54,17 +54,6 @@
 
                     <li>
                         <router-link
-                            :to="{ name: 'UnitIndex' }"
-                            active-class="active"
-                            :class="{ active: isUnitRoute }"
-                        >
-                            <i class="bi bi-circle"></i
-                            ><span>Mechine Unit</span>
-                        </router-link>
-                    </li>
-
-                    <li>
-                        <router-link
                             :to="{ name: 'MechineTypeIndex' }"
                             active-class="active"
                             :class="{ active: MechineTypeIndex }"
@@ -92,39 +81,58 @@
                     data-bs-target="#forms-nav-company"
                     data-bs-toggle="collapse"
                     href="#"
-                    :class="{ show: isCompanyRouteShow }"
+                    :class="{ show: isOrganizationRouteShow }"
                 >
-                    <i class="bi bi-journal-text"></i><span>Company</span
+                    <i class="bi bi-journal-text"></i><span>Organization</span
                     ><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
                 <ul
                     id="forms-nav-company"
                     class="nav-content collapse"
                     data-bs-parent="#sidebar-nav"
-                    :class="{ show: isCompanyRouteShow }"
+                    :class="{ show: isOrganizationRouteShow }"
                 >
-                    <li>
-                        <router-link
-                            :to="{ name: 'CompanyCreate' }"
-                            active-class="active"
-                            :class="{ active: isCompanyCreateActive }"
-                        >
-                            <i class="bi bi-circle"></i><span>Add Company</span>
-                        </router-link>
-                    </li>
                     <li>
                         <router-link
                             :to="{ name: 'AllCompanyIndex' }"
                             active-class="active"
-                            :class="{ active: isCompanyIndexActive }"
+                            :class="{ active: isCompanyRoute }"
                         >
-                            <i class="bi bi-circle"></i><span>All Company</span>
+                            <i class="bi bi-circle"></i><span>Company</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'FactoryIndex' }"
+                            active-class="active"
+                            :class="{ active: isFactoryRoute }"
+                        >
+                            <i class="bi bi-circle"></i><span>Factory</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'FloorIndex' }"
+                            active-class="active"
+                            :class="{ active: isFloorRoute }"
+                        >
+                            <i class="bi bi-circle"></i><span>Floor</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'UnitIndex' }"
+                            active-class="active"
+                            :class="{ active: isUnitRoute }"
+                        >
+                            <i class="bi bi-circle"></i
+                            ><span>Mechine Unit</span>
                         </router-link>
                     </li>
                 </ul>
             </li>
 
-            <li class="nav-item">
+            <!-- <li class="nav-item">
                 <a
                     class="nav-link collapsed"
                     data-bs-target="#forms-nav"
@@ -150,19 +158,8 @@
                             ><span>Create Factory</span>
                         </router-link>
                     </li>
-
-                    <li>
-                        <router-link
-                            :to="{ name: 'FactoryIndex' }"
-                            active-class="active"
-                            :class="{ active: isFactoryIndexActive }"
-                        >
-                            <i class="bi bi-circle"></i
-                            ><span>All Factories</span>
-                        </router-link>
-                    </li>
                 </ul>
-            </li>
+            </li> -->
             <!-- End Forms Nav -->
 
             <!-- parse -->
@@ -575,15 +572,6 @@
                             <i class="bi bi-circle"></i><span>Group</span>
                         </router-link>
                     </li>
-                    <li>
-                        <router-link
-                            :to="{ name: 'FloorIndex' }"
-                            active-class="active"
-                            :class="{ active: isFloorRoute }"
-                        >
-                            <i class="bi bi-circle"></i><span>Floor</span>
-                        </router-link>
-                    </li>
                 </ul>
             </li>
             <!-- End Settings Nav -->
@@ -602,10 +590,6 @@ const route = useRoute();
 // Check if the current route is part of the Mechine-related routes
 const isMechineRoute = computed(() => {
     return [
-        "UnitIndex",
-        "UnitCreate",
-        "UnitEdit",
-        "UnitTrash",
         "MechineTypeIndex",
         "MechineTypeCreate",
         "MechineTypeEdit",
@@ -652,14 +636,7 @@ const isGroupRoute = computed(() =>
         route.name
     )
 );
-const isFloorRoute = computed(() =>
-    ["FloorIndex", "FloorCreate", "FloorEdit", "FloorTrash"].includes(
-        route.name
-    )
-);
-const isUnitRoute = computed(() =>
-    ["UnitIndex", "UnitCreate", "UnitEdit", "UnitTrash"].includes(route.name)
-);
+
 const isParseUnitRoute = computed(() =>
     [
         "ParseUnitIndex",
@@ -669,27 +646,48 @@ const isParseUnitRoute = computed(() =>
     ].includes(route.name)
 );
 // Company
-const isCompanyRouteShow = computed(() => {
+const isOrganizationRouteShow = computed(() => {
     return [
         "AllCompanyIndex",
         "CompanyCreate",
         "CompanyEdit",
         "CompanyTrash",
-    ].includes(route.name);
-});
-const isCompanyCreateActive = computed(() => route.name === "CompanyCreate");
-const isCompanyIndexActive = computed(() => route.name === "AllCompanyIndex");
-// Company
-const isFactoryRouteShow = computed(() => {
-    return [
         "FactoryIndex",
         "FactoryCreate",
         "FactoryEdit",
         "FactoryTrash",
+        "FloorIndex",
+        "FloorCreate",
+        "FloorEdit",
+        "FloorTrash",
+        "UnitIndex",
+        "UnitCreate",
+        "UnitEdit",
+        "UnitTrash",
     ].includes(route.name);
 });
-const isFactoryCreateActive = computed(() => route.name === "FactoryCreate");
-const isFactoryIndexActive = computed(() => route.name === "FactoryIndex");
+
+const isCompanyRoute = computed(() =>
+    [
+        "AllCompanyIndex",
+        "CompanyCreate",
+        "CompanyEdit",
+        "CompanyTrash",
+    ].includes(route.name)
+);
+const isFactoryRoute = computed(() =>
+    ["FactoryIndex", "FactoryCreate", "FactoryEdit", "FactoryTrash"].includes(
+        route.name
+    )
+);
+const isFloorRoute = computed(() =>
+    ["FloorIndex", "FloorCreate", "FloorEdit", "FloorTrash"].includes(
+        route.name
+    )
+);
+const isUnitRoute = computed(() =>
+    ["UnitIndex", "UnitCreate", "UnitEdit", "UnitTrash"].includes(route.name)
+);
 //technician
 const isTechnicianRouteShow = computed(() => {
     return [
@@ -763,9 +761,6 @@ const isSettingRouteShow = computed(() => {
         "GroupIndex",
         "GroupEdit",
         "GroupTrash",
-        "FloorIndex",
-        "FloorEdit",
-        "FloorTrash",
         "ParseUnitIndex",
         "ParseUnitCreate",
         "ParseUnitEdit",
