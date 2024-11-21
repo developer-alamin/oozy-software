@@ -203,6 +203,8 @@ Route::get('/units/trashed', [UnitController::class, 'trashed']);
 Route::post('/units/{id}/restore', [UnitController::class, 'restore']);
 Route::delete('/units/{id}/force-delete', [UnitController::class, 'forceDelete']);
 Route::get('/units/trashed-count', [UnitController::class, 'trashedUnitsCount']);
+Route::get('/units/{uuid}/edit', [UnitController::class, 'edit']);
+Route::put('/units/{uuid}', [UnitController::class, 'update']);
 Route::resource('units', UnitController::class);
 
 /// --------------------------------------------Parse route statr here-------------------------------------------------------------------

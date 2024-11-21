@@ -7,27 +7,28 @@
                     v-model="unit.floor_id"
                     :items="floors"
                     item-value="id"
-                    :item-title="formatFloor"
+                    item-title="name"
                     outlined
                     clearable
                     density="comfortable"
                     :rules="[rules.required]"
                     :error-messages="errors.floor_id ? errors.floor_id : ''"
                     @update:search="fetchFloors"
+                    @update:menu="updateSelectedFloorDetails()"
                 >
                     <template v-slot:label>
                         Select Floor <span style="color: red">*</span>
                     </template>
                 </v-autocomplete>
                 <!-- Display factory name -->
-                <!-- <div v-if="selectedFactoryName" style="margin-top: 10px">
+                <div v-if="selectedFactoryName" style="margin-top: 10px">
                     <strong>Factory Name:</strong> {{ selectedFactoryName }}
-                </div> -->
+                </div>
 
                 <!-- Display user name -->
-                <!-- <div v-if="selectedUserName" style="margin-top: 10px">
+                <div v-if="selectedUserName" style="margin-top: 10px">
                     <strong>Company Name:</strong> {{ selectedUserName }}
-                </div> -->
+                </div>
 
                 <!-- Name Field -->
                 <v-text-field
@@ -141,17 +142,10 @@ export default {
 
                 this.unit.status =
                     this.unit.status === "Active" ? "Active" : "Inactive";
-                // this.updateSelectedFloorDetails(response.data.unit.floor_id);
+                this.updateSelectedFloorDetails(response.data.unit.floor_id);
             } catch (error) {
                 console.log(error);
                 this.serverError = "Error fetching unit data." + error;
-            }
-        },
-        formatFloor(floor) {
-            if (floor) {
-                return `${floor.name} -- ${floor.factories?.name}-- ${
-                    floor.factories?.user?.name || "No User"
-                }`;
             }
         },
         async submit() {
@@ -198,23 +192,23 @@ export default {
                 console.error("Error fetching floors:", error);
             }
         },
-        // updateSelectedFloorDetails(floorId) {
-        //     const selectedFloor = this.floors.find(
-        //         (floor) => floor.id == floorId
-        //     );
-        //     console.log(floorId);
-        //     console.log(selectedFloor);
+        updateSelectedFloorDetails(floorId) {
+            const selectedFloor = this.floors.find(
+                (floor) => floor.id == floorId
+            );
+            console.log(floorId);
+            console.log(selectedFloor);
 
-        //     if (selectedFloor) {
-        //         this.selectedFactoryName =
-        //             selectedFloor.factories?.name || "No Factory Name";
-        //         this.selectedUserName =
-        //             selectedFloor.factories?.user?.name || "No Company Name";
-        //     } else {
-        //         this.selectedFactoryName = null;
-        //         this.selectedUserName = null;
-        //     }
-        // },
+            if (selectedFloor) {
+                this.selectedFactoryName =
+                    selectedFloor.factories?.name || "No Factory Name";
+                this.selectedUserName =
+                    selectedFloor.factories?.user?.name || "No Company Name";
+            } else {
+                this.selectedFactoryName = null;
+                this.selectedUserName = null;
+            }
+        },
         resetForm() {
             this.fetchUnit(); // Reset the form with existing unit data
             this.errors = {};

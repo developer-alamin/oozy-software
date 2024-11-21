@@ -20,9 +20,9 @@
                     </template>
                 </v-autocomplete>
                 <!-- Display the selected user's name -->
-                <div v-if="selectedUserName" style="margin-top: 2px">
+                <!-- <div v-if="selectedUserName" style="margin-top: 2px">
                     <strong>Company Name:</strong> {{ selectedUserName }}
-                </div>
+                </div> -->
                 <!-- Name Field -->
                 <v-text-field
                     v-model="floor.name"

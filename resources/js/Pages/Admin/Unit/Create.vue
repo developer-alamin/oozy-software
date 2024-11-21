@@ -7,7 +7,7 @@
                     v-model="unit.floor_id"
                     :items="floors"
                     item-value="id"
-                    item-title="name"
+                    :item-title="formatFloor"
                     outlined
                     clearable
                     density="comfortable"
@@ -20,14 +20,14 @@
                     </template>
                 </v-autocomplete>
                 <!-- Display factory name -->
-                <div v-if="selectedFactoryName" style="margin-top: 10px">
+                <!-- <div v-if="selectedFactoryName" style="margin-top: 10px">
                     <strong>Factory Name:</strong> {{ selectedFactoryName }}
                 </div>
 
                 <!-- Display user name -->
-                <div v-if="selectedUserName" style="margin-top: 10px">
+                <!-- <div v-if="selectedUserName" style="margin-top: 10px">
                     <strong>Company Name:</strong> {{ selectedUserName }}
-                </div>
+                </div>  -->
 
                 <!-- Name Field -->
                 <v-text-field
@@ -162,26 +162,33 @@ export default {
                         limit: this.limit,
                     },
                 });
-                console.log(response.data);
+
                 this.floors = response.data;
             } catch (error) {
                 console.error("Error fetching floors:", error);
             }
         },
-        updateSelectedFloorDetails(floorId) {
-            const selectedFloor = this.floors.find(
-                (floor) => floor.id === floorId
-            );
-            if (selectedFloor) {
-                this.selectedFactoryName =
-                    selectedFloor.factories?.name || "No Factory Name";
-                this.selectedUserName =
-                    selectedFloor.factories?.user?.name || "No Company Name";
-            } else {
-                this.selectedFactoryName = null;
-                this.selectedUserName = null;
+        formatFloor(floor) {
+            if (floor) {
+                return `${floor.name} -- ${floor.factories?.name}-- ${
+                    floor.factories?.user?.name || "No User"
+                }`;
             }
         },
+        // updateSelectedFloorDetails(floorId) {
+        //     const selectedFloor = this.floors.find(
+        //         (floor) => floor.id === floorId
+        //     );
+        //     if (selectedFloor) {
+        //         this.selectedFactoryName =
+        //             selectedFloor.factories?.name || "No Factory Name";
+        //         this.selectedUserName =
+        //             selectedFloor.factories?.user?.name || "No Company Name";
+        //     } else {
+        //         this.selectedFactoryName = null;
+        //         this.selectedUserName = null;
+        //     }
+        // },
         resetForm() {
             this.unit = {
                 name: "",
@@ -194,12 +201,12 @@ export default {
             }
         },
     },
-    watch: {
-        // Watch for changes to unit.floor_id
-        "unit.floor_id": function (newFloorId) {
-            console.log(newFloorId);
-            this.updateSelectedFloorDetails(newFloorId);
-        },
-    },
+    // watch: {
+    //     // Watch for changes to unit.floor_id
+    //     "unit.floor_id": function (newFloorId) {
+    //         console.log(newFloorId);
+    //         this.updateSelectedFloorDetails(newFloorId);
+    //     },
+    // },
 };
 </script>

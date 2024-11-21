@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\HelperController;
 use App\Http\Requests\UnitRequest;
+use App\Http\Requests\UnitUpdateRequest;
 use App\Models\Unit;
 use App\Models\Admin;
 use App\Models\User;
@@ -147,8 +148,9 @@ class UnitController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UnitRequest $request, $uuid)
+    public function update(UnitUpdateRequest $request, $uuid)
     {
+        // dd($request->all());
         $unit = Unit::where('uuid', $uuid)->firstOrFail();
          // Validate the incoming request data
          $validatedData = $request->validated();
