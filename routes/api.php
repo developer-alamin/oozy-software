@@ -63,7 +63,7 @@ Route::resource('floor', FloorController::class);
 // --------------------------------------------Machine route statr here-------------------------------------------------------------------
 
 Route::get('/get_factories', [MechineAssingController::class, 'getFactories']);
-Route::get('/get_brands', [MechineAssingController::class, 'getBrands']);
+// Route::get('/get_brands', [MechineAssingController::class, 'getBrands']);
 Route::get('/get_models', [MechineAssingController::class, 'getModels']);
 Route::get('/get_types', [MechineAssingController::class, 'getTypes']);
 Route::get('/get_sources', [MechineAssingController::class, 'getSources']);
@@ -278,6 +278,7 @@ Route::get('/get_units', [DynamicDataController::class, 'getUnits']);
 Route::get('/get_floors', [DynamicDataController::class, 'getFloors']);
 Route::get('/get_factories', [DynamicDataController::class, 'getFactories']);
 Route::get('/get_companies', [DynamicDataController::class, 'getCompanies']);
+Route::get('/get_brands', [DynamicDataController::class, 'getBrands']);
 
 // Admin Auth Routes
 Route::prefix('admin')->group(function () {

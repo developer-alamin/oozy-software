@@ -121,8 +121,9 @@ export default {
             search: "",
             itemsPerPage: 15,
             headers: [
+                { title: "Brand Name", key: "brand.name", sortable: true },
                 { title: "Model Name", key: "name", sortable: true },
-                { title: "Model Type", key: "type", sortable: false },
+                // { title: "Model Type", key: "type", sortable: false },
                 { title: "Description", key: "description", sortable: false },
                 {
                     title: "Status",

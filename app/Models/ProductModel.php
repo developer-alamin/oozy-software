@@ -14,6 +14,7 @@ class ProductModel extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
+        'brand_id',
         'name',
         'description',
         'status',
@@ -28,11 +29,15 @@ class ProductModel extends Model
     public static function validationRules()
     {
         return [
+            'brand_id'     => 'required',
             'name'         => 'required|string|max:255',
-            'type'         => 'required|string|max:255|',
+            'type'         => 'nullable|string|max:255|',
             'description'  => 'nullable|string',
             'status'       => 'nullable',
         ];
+    }
+    public function brand(){
+        return $this->belongsTo(Brand::class,'brand_id');
     }
     public function creator()
     {

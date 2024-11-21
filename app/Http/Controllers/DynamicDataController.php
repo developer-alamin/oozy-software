@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Brand;
 use App\Models\Factory;
 use App\Models\Floor;
 use App\Models\Unit;
@@ -59,7 +60,18 @@ class DynamicDataController extends Controller
         // Return the factories as JSON
         return response()->json($factories);
     }
-    
+    public function getBrands(Request $request){
+
+        // Get search term and limit from the request, with defaults
+        $search = $request->query('search', '');
+        $limit  = $request->query('limit', 5); // Default limit of 10
+        // Query to search for brands by name with a limit
+        $brands  = Brand::where('name', 'like', '%' . $search . '%')
+                     ->limit($limit)
+                     ->get();
+        // Return the brands as JSON
+        return response()->json($brands);
+    }
 
 
 }

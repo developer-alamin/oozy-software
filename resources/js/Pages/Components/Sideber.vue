@@ -29,14 +29,13 @@
                 >
                     <li>
                         <router-link :to="{ name: 'MechineCreate' }">
-                            <i class="bi bi-circle"></i
-                            ><span>Machine Assing</span>
+                            <i class="bi bi-circle"></i><span>Machine Add</span>
                         </router-link>
                     </li>
                     <li>
                         <router-link :to="{ name: 'MechineIndex' }">
                             <i class="bi bi-circle"></i
-                            ><span> Machine Assing List </span>
+                            ><span> Machine All </span>
                         </router-link>
                     </li>
                     <li>
@@ -699,10 +698,10 @@ const isSupplierRoute = computed(() =>
 );
 const MechineTypeRoute = computed(() =>
     [
-        "MechineTypeIndexIndex",
-        "MechineTypeIndexCreate",
-        "MechineTypeIndexEdit",
-        "MechineTypeIndexTrash",
+        "MechineTypeIndex",
+        "MechineTypeCreate",
+        "MechineTypeEdit",
+        "MechineTypeTrash",
     ].includes(route.name)
 );
 const isMechineSourceRoute = computed(() =>

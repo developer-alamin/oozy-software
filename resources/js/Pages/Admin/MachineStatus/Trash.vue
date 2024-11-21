@@ -2,7 +2,7 @@
     <v-card>
         <v-card-title class="pt-5">
             <v-row>
-                <v-col cols="6"><span>Rents Trash List</span></v-col>
+                <v-col cols="6"><span>Parse Unit Trash List</span></v-col>
                 <v-col cols="6" class="d-flex justify-end">
                     <v-text-field
                         v-model="search"
@@ -32,8 +32,15 @@
             loading-text="Loading... Please wait"
             @update:options="loadItems"
         >
-            <template v-slot:item.photo="{ item }">
-                <img class="rentsImg" :src="item.photo" alt="" />
+            <template v-slot:item.status="{ item }">
+                <v-chip
+                    :color="item.status === 'Active' ? 'green' : 'red'"
+                    class="text-uppercase"
+                    size="small"
+                    label
+                >
+                    {{ item.status === "Active" ? "Active" : "Inactive" }}
+                </v-chip>
             </template>
 
             <template v-slot:item.actions="{ item }">
@@ -48,7 +55,7 @@
 
         <!-- Restore Confirmation Dialog -->
         <RestoreConfirmDialog
-            :restoreDialogName="restoreDialogName"
+            :restroreDialogName="restroreDialogName"
             v-model:modelValue="restoreDialog"
             :onConfirm="confirmRestore"
             :onCancel="() => (restoreDialog = false)"
@@ -75,22 +82,20 @@ export default {
     },
     data() {
         return {
-            restoreDialogName: "Are you sure you want to restore this Rents?",
-            dialogName: "Are you sure you want to delete this Rents ?",
+            restroreDialogName:
+                "Are you sure you want to restore this Parse Unit ?",
+            dialogName: "Are you sure you want to delete this Parse Unit ?",
             search: "",
             itemsPerPage: 15,
             headers: [
-                { title: "Name", key: "name", sortable: true },
-                { title: "Email", key: "email", sortable: true },
-                { title: "Phone", key: "phone", sortable: true },
+                { title: "Parse Unit Name", key: "name", sortable: true },
+                { title: "Description", key: "description", sortable: false },
                 {
-                    title: "Contact Person",
-                    value: "contact_person",
-                    sortable: true, // Enable sorting
-                    align: "start",
+                    title: "Status",
+                    key: "status",
+                    value: "status",
+                    sortable: true,
                 },
-                { title: "Photo", key: "photo", sortable: false },
-
                 { title: "Actions", key: "actions", sortable: false },
             ],
             serverItems: [],
@@ -98,7 +103,7 @@ export default {
             totalItems: 0,
             restoreDialog: false, // Separate state for restore dialog
             deleteDialog: false, // Separate state for delete dialog
-            selectedBrandId: null,
+            selectedUnitId: null,
         };
     },
     methods: {
@@ -107,7 +112,7 @@ export default {
             const sortOrder = sortBy.length ? sortBy[0].order : "desc";
             const sortKey = sortBy.length ? sortBy[0].key : "created_at";
             try {
-                const response = await this.$axios.get("/supplier/trashed", {
+                const response = await this.$axios.get("/parse/unit/trashed", {
                     params: {
                         page,
                         itemsPerPage,
@@ -125,46 +130,45 @@ export default {
             }
         },
         showRestoreDialog(id) {
-            this.selectedSupplierId = id;
+            this.selectedUnitId = id;
             this.restoreDialog = true; // Open restore dialog
         },
         showConfirmDialog(id) {
-            this.selectedSupplierId = id;
+            this.selectedUnitId = id;
             this.deleteDialog = true; // Open delete dialog
         },
         async confirmRestore() {
             this.restoreDialog = false; // Close the restore dialog
             try {
                 await this.$axios.post(
-                    `/supplier/${this.selectedSupplierId}/restore`
+                    `/parse/unit/${this.selectedUnitId}/restore`
                 );
                 this.loadItems({
                     page: 1,
                     itemsPerPage: this.itemsPerPage,
                     sortBy: [],
                 });
-                toast.success("Supplier restored successfully!");
+                toast.success("Parse Unit restored successfully!");
             } catch (error) {
-                console.error("Error restoring Supplier:", error);
-                toast.error("Failed to restore Supplier.");
+                console.error("Error restoring parse unit:", error);
+                toast.error("Failed to restore parse unit.");
             }
         },
         async confirmDelete() {
             this.deleteDialog = false; // Close the delete dialog
             try {
-                const response = await this.$axios.delete(
-                    `/supplier/${this.selectedSupplierId}/force-delete`
+                await this.$axios.delete(
+                    `/parse/unit/${this.selectedUnitId}/force-delete`
                 );
                 this.loadItems({
                     page: 1,
                     itemsPerPage: this.itemsPerPage,
                     sortBy: [],
                 });
-
-                toast.success("Supplier deleted successfully!");
+                toast.success("Parse Unit deleted successfully!");
             } catch (error) {
-                console.error("Error deleting Supplier:", error);
-                toast.error("Failed to delete Supplier.");
+                console.error("Error deleting parse unit:", error);
+                toast.error("Failed to delete parse unit.");
             }
         },
     },

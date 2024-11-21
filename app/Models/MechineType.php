@@ -17,6 +17,8 @@ class MechineType extends Model
         'uuid',
         'name',
         'day',
+        'partial_maintenance_day',
+        'full_maintenance_day',
         'description',
         'status',
         'creator_type',
@@ -30,10 +32,12 @@ class MechineType extends Model
     public static function validationRules()
     {
         return [
-            'name'         => 'required|max:255',
-            'day'          => 'nullable',
-            'description'  => 'nullable',
-            'status'       => 'nullable|in:Active,Inactive',
+            'name'                     => 'required|max:255',
+            'day'                      => 'nullable',
+            'partial_maintenance_day'  => 'nullable',
+            'full_maintenance_day'     => 'nullable',
+            'description'              => 'nullable',
+            'status'                   => 'nullable|in:Active,Inactive',
         ];
     }
 

@@ -1,53 +1,36 @@
 <template>
     <v-card outlined class="mx-auto my-5" max-width="900">
-        <v-card-title>Edit Mechine Type</v-card-title>
+        <v-card-title>Edit Machine Status</v-card-title>
         <v-card-text>
-            <v-form ref="form" v-model="valid" @submit.prevent="update">
+            <v-form ref="form" v-model="valid" @submit.prevent="submit">
                 <!-- Name Field -->
-                <v-col cols="12" md="12">
-                    <v-text-field
-                        v-model="type.name"
-                        :rules="[rules.required]"
-                        label="Name"
-                        outlined
-                        :error-messages="errors.name ? errors.name : ''"
-                    >
-                        <template v-slot:label>
-                            Name <span style="color: red">*</span>
-                        </template>
-                    </v-text-field>
-                </v-col>
-                <v-row>
-                    <v-col cols="12" md="6">
-                        <v-text-field
-                            v-model="type.partial_maintenance_day"
-                            label="Partial Maintenance Days"
-                        ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" md="6">
-                        <v-text-field
-                            v-model="type.full_maintenance_day"
-                            label="Full Maintenance Days"
-                        ></v-text-field>
-                    </v-col>
-                </v-row>
+                <v-text-field
+                    v-model="machine_status.name"
+                    :rules="[rules.required]"
+                    label="Name"
+                    outlined
+                    :error-messages="errors.name ? errors.name : ''"
+                >
+                    <template v-slot:label>
+                        Name <span style="color: red">*</span>
+                    </template>
+                </v-text-field>
 
                 <!-- Description Field -->
                 <v-textarea
-                    v-model="type.description"
+                    v-model="machine_status.description"
                     label="Description"
                     outlined
                     :error-messages="
                         errors.description ? errors.description : ''
                     "
                 />
-
+                <!-- Status Field (Checkbox) -->
                 <v-select
-                    v-model="type.status"
+                    v-model="machine_status.status"
                     :items="statusItems"
-                    label="Type Status"
+                    label="Status"
                     clearable
-                    :error-messages="errors.status ? errors.status : ''"
                 ></v-select>
 
                 <!-- Action Buttons -->
@@ -68,7 +51,7 @@
                             :disabled="!valid || loading"
                             :loading="loading"
                         >
-                            Update type
+                            Machine Status Update
                         </v-btn>
                     </v-col>
                 </v-row>
@@ -90,12 +73,10 @@ export default {
             valid: false,
             loading: false,
             statusItems: ["Active", "Inactive"],
-            type: {
+            machine_status: {
                 name: "",
-                partial_maintenance_day: "",
-                full_maintenance_day: "",
                 description: "",
-                status: false, // Default to false (inactive)
+                status: "", // Default to false (inactive)
             },
             errors: {},
             serverError: null,
@@ -105,46 +86,52 @@ export default {
         };
     },
     created() {
-        this.fetchtype();
+        this.fetchMachineStatus();
     },
     methods: {
-        async fetchtype() {
-            // Fetch the type data to populate the form
-            const typesId = this.$route.params.uuid; // Assuming the type ID is passed in the route params
+        async fetchMachineStatus() {
+            // Fetch the unit data to populate the form
+            const machineStatusId = this.$route.params.uuid; // Assuming the unit ID is passed in the route params
             try {
                 const response = await this.$axios.get(
-                    `/mechine/type/${typesId}/edit`
+                    `/parse-unit/${machineStatusId}/edit`
                 );
-                this.type = response.data.mechinetype; // Populate form with the existing type data
-                this.type.status =
-                    this.type.status === "Active" ? "Active" : "Inactive";
+                this.machine_status = response.data.unit; // Populate form with the existing unit data
+                // console.log(this.unit);
+
+                this.machine_status.status =
+                    this.machine_status.status === "Active"
+                        ? "Active"
+                        : "Inactive";
             } catch (error) {
-                this.serverError = "Error fetching type data.";
+                console.log(error);
+                this.serverError =
+                    "Error fetching machine status data." + error;
             }
         },
-        async update() {
+        async submit() {
             this.errors = {}; // Reset errors before submission
             this.serverError = null;
             this.loading = true;
-            const typeId = this.$route.params.uuid; // Assuming type ID is in route params
+            const machineStatusId = this.$route.params.uuid; // Assuming unit ID is in route params
             setTimeout(async () => {
                 try {
                     const response = await this.$axios.put(
-                        `mechine/type/${typeId}`,
-                        this.type
+                        `/parse-unit/${machineStatusId}`,
+                        this.machine_status
                     );
-                    console.log(response.data);
+
                     if (response.data.success) {
-                        toast.success("type update successfully!");
-                        this.$router.push({ name: "MechineTypeIndex" }); // Redirect to type list page
+                        toast.success("Machine Status updated successfully!");
+                        this.$router.push({ name: "MachineStatusIndex" }); // Redirect to unit list page
                     }
                 } catch (error) {
                     if (error.response && error.response.status === 422) {
-                        toast.error("Failed to update type.");
+                        toast.error("Failed to update machine status.");
                         this.errors = error.response.data.errors || {};
                     } else {
-                        toast.error("Error updating type. Please try again.");
-                        this.serverError = "Error updating type.";
+                        toast.error("Error updating  machine status.");
+                        this.serverError = "Error updating machine status.";
                     }
                 } finally {
                     // Stop loading after the request (or simulated time) is done
@@ -153,7 +140,7 @@ export default {
             }, 1000);
         },
         resetForm() {
-            this.fetchtype(); // Reset the form with existing type data
+            this.fetchMachineStatus(); // Reset the form with existing unit data
             this.errors = {};
             this.$refs.form.resetValidation();
         },

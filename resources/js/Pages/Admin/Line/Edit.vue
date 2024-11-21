@@ -7,7 +7,7 @@
                     v-model="line.unit_id"
                     :items="units"
                     item-value="id"
-                    item-title="name"
+                    :item-title="formatUnit"
                     outlined
                     clearable
                     density="comfortable"
@@ -21,18 +21,18 @@
                 </v-autocomplete>
 
                 <!-- Display factory name -->
-                <div v-if="selectedFloorName" style="margin-top: 10px">
+                <!-- <div v-if="selectedFloorName" style="margin-top: 10px">
                     <strong>Floor Name:</strong> {{ selectedFloorName }}
-                </div>
+                </div> -->
                 <!-- Display factory name -->
-                <div v-if="selectedFactoryName" style="margin-top: 10px">
+                <!-- <div v-if="selectedFactoryName" style="margin-top: 10px">
                     <strong>Factory Name:</strong> {{ selectedFactoryName }}
-                </div>
+                </div> -->
 
                 <!-- Display user name -->
-                <div v-if="selectedUserName" style="margin-top: 10px">
+                <!-- <div v-if="selectedUserName" style="margin-top: 10px">
                     <strong>Company Name:</strong> {{ selectedUserName }}
-                </div>
+                </div> -->
 
                 <!-- Name Field -->
                 <v-text-field v-model="line.name" label="Line Number">
@@ -141,6 +141,13 @@ export default {
                 this.serverError = "Error fetching Line data.";
             }
         },
+        formatUnit(line) {
+            if (line) {
+                return `${line.name} -- ${line.floors?.name || "No Floor"} -- ${
+                    line.floors?.factories?.name || "No Factory"
+                } -- ${line.floors?.factories?.user?.name || "No Company"}`;
+            }
+        },
         async update() {
             this.errors = {}; // Reset errors before submission
             this.serverError = null;
@@ -188,28 +195,28 @@ export default {
                 console.error("Error fetching units:", error);
             }
         },
-        updateSelectedUnitDetails(unitId) {
-            const selectedUnit = this.units.find((unit) => unit.id === unitId);
-            if (selectedUnit) {
-                this.selectedFloorName =
-                    selectedUnit.floors?.name || "No Floor Name";
-                this.selectedFactoryName =
-                    selectedUnit.floors?.factories?.name || "No Factory Name";
-                this.selectedUserName =
-                    selectedUnit.floors?.factories?.user?.name ||
-                    "No Company Name";
-            } else {
-                this.selectedFloorName = null;
-                this.selectedFactoryName = null;
-                this.selectedUserName = null;
-            }
-        },
+        // updateSelectedUnitDetails(unitId) {
+        //     const selectedUnit = this.units.find((unit) => unit.id === unitId);
+        //     if (selectedUnit) {
+        //         this.selectedFloorName =
+        //             selectedUnit.floors?.name || "No Floor Name";
+        //         this.selectedFactoryName =
+        //             selectedUnit.floors?.factories?.name || "No Factory Name";
+        //         this.selectedUserName =
+        //             selectedUnit.floors?.factories?.user?.name ||
+        //             "No Company Name";
+        //     } else {
+        //         this.selectedFloorName = null;
+        //         this.selectedFactoryName = null;
+        //         this.selectedUserName = null;
+        //     }
+        // },
     },
-    watch: {
-        // Watch for changes to unit.floor_id
-        "line.unit_id": function (newUnitId) {
-            this.updateSelectedUnitDetails(newUnitId);
-        },
-    },
+    // watch: {
+    //     // Watch for changes to unit.floor_id
+    //     "line.unit_id": function (newUnitId) {
+    //         this.updateSelectedUnitDetails(newUnitId);
+    //     },
+    // },
 };
 </script>
