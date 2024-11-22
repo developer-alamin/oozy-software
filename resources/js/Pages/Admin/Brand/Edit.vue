@@ -118,7 +118,7 @@ export default {
                 const response = await this.$axios.get(
                     `/brand/${brandId}/edit`
                 );
-                console.log(response.data);
+                // console.log(response.data);
 
                 this.brand = response.data.brand; // Populate form with the existing brand data
                 this.brand.status =

@@ -34,6 +34,14 @@
                     :error-messages="errors.status ? errors.status : ''"
                 ></v-select>
 
+                <v-checkbox
+                    v-model="source.rate_applicable"
+                    label="Rate Applicable"
+                    :error-messages="
+                        errors.rate_applicable ? errors.rate_applicable : ''
+                    "
+                />
+
                 <!-- Action Buttons -->
 
                 <v-row class="mt-4">
@@ -78,6 +86,7 @@ export default {
                 name: "",
                 description: "",
                 status: false, // Default to false (inactive)
+                rate_applicable: false,
             },
             errors: {},
             serverError: null,
@@ -100,6 +109,9 @@ export default {
                 this.source = response.data.source; // Populate form with the existing source data
                 this.source.status =
                     this.source.status === "Active" ? "Active" : "Inactive";
+                this.source.rate_applicable =
+                    this.source.rate_applicable == "true" ||
+                    this.source.rate_applicable == true;
             } catch (error) {
                 this.serverError = "Error fetching source data.";
             }
