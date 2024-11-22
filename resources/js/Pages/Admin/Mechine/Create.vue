@@ -242,7 +242,7 @@
                             :error-messages="
                                 errors.rent_date ? errors.rent_date : ''
                             "
-                            :model-value="machine.rent_date || currentDate"
+                            :model-value="machine.rent_date"
                         />
                     </v-col>
                 </v-row>
@@ -344,13 +344,30 @@
                     density="comfortable"
                     :error-messages="errors.note ? errors.note : ''"
                 />
-                <v-select
+                <!-- <v-select
                     v-model="machine.status"
                     :items="statusItems"
                     label="Machine Status"
                     clearable
                     density="comfortable"
-                ></v-select>
+                ></v-select> -->
+
+                <v-autocomplete
+                    v-model="machine.status"
+                    :items="machine_statuses"
+                    item-value="id"
+                    item-title="name"
+                    label="Select Machine Status"
+                    density="comfortable"
+                    clearable
+                    :error-messages="errors.status ? errors.status : ''"
+                    @update:search="fetchMachineStatus"
+                >
+                    <template v-slot:label>
+                        Select Machine Status
+                        <span style="color: red">*</span>
+                    </template>
+                </v-autocomplete>
 
                 <!-- Action Buttons -->
                 <v-row class="mt-4">
@@ -411,7 +428,7 @@ export default {
             ],
 
             machine: {
-                rent_date: null,
+                rent_date: new Date(),
                 purchase_date: null,
                 purchace_price: 0,
                 name: "",
@@ -430,7 +447,7 @@ export default {
                 phone: "",
                 note: "",
                 factory_code: "",
-                status: "Preventive", // New property for checkbox
+                status: null, // New property for checkbox
             },
             isRateApplicable: false,
             errors: {}, // Stores validation errors
@@ -444,8 +461,9 @@ export default {
             sources: [], // Array to store sources data
             suppliers: [], // Array to store suppliers data
             rents: [], // Array to store rents data
+            machine_statuses: [],
             selectedCompany: null, // Bound to selected Company in v-autocomplete
-            currentDate: new Date().toISOString().split("T")[0],
+            currentDate: new Date(),
 
             rules: {
                 required: (value) => !!value || "Required.",
@@ -467,6 +485,11 @@ export default {
                 return date >= new Date();
             };
         },
+    },
+    created() {
+        this.fetchMachineStatus().then(() => {
+            this.setDefaultStatus();
+        });
     },
     methods: {
         async submit() {
@@ -524,12 +547,12 @@ export default {
                 (source) => source.id === id
             );
             this.isRateApplicable = selectedSource?.rate_applicable || false;
-            console.log(this.isRateApplicable);
+            // console.log(this.isRateApplicable);
 
-            if (!this.isRateApplicable) {
-                this.machine.rent_id = null;
-                this.machine.rent_date = null;
-            }
+            // if (!this.isRateApplicable) {
+            //     this.machine.rent_id = null;
+            //     this.machine.rent_date = null;
+            // }
         },
         resetForm() {
             this.machine = {
@@ -549,7 +572,7 @@ export default {
 
         async fetchCompanys(search) {
             try {
-                const response = await this.$axios.get(`/get_companys`, {
+                const response = await this.$axios.get(`/get_companies`, {
                     params: {
                         search: search,
                         limit: this.limit,
@@ -642,6 +665,34 @@ export default {
                 this.sources = response.data;
             } catch (error) {
                 console.error("Error fetching sources:", error);
+            }
+        },
+
+        async fetchMachineStatus(search) {
+            try {
+                const response = await this.$axios.get(
+                    `/get_machine_statuses`,
+                    {
+                        params: {
+                            search: search,
+                            limit: this.limit,
+                        },
+                    }
+                );
+                // console.log(response.data);
+                this.machine_statuses = response.data;
+            } catch (error) {
+                console.error("Error fetching machine status:", error);
+            }
+        },
+        setDefaultStatus() {
+            const idleStatus = this.machine_statuses.find(
+                (status) => status.name == "Idle"
+            );
+            console.log(idleStatus);
+
+            if (idleStatus) {
+                this.machine.status = idleStatus.id;
             }
         },
         async fetchSuppliers(search) {

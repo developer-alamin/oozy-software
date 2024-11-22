@@ -80,7 +80,7 @@ Route::delete('/mechine/assing/{id}/forceDelete', [MechineAssingController::clas
 Route::get('/mechine/transfer/list', [MechineAssingController::class,'mechineTransferList'])->name('mechine.transfer.list');
 Route::get('/mechine/history/list', [MechineAssingController::class,'mechineHistoryList'])->name('mechine.assing.trashed');
 Route::get('/mechine/assing/{uuid}/edit', [MechineAssingController::class,'edit'])->name('mechine.assing.trashed');
-Route::resource('mechine-assing',MechineAssingController::class);
+Route::resource('machine-assing',MechineAssingController::class);
 
 
 // --------------------------------------------Mechine Service route statr here-------------------------------------------------------------------
@@ -289,6 +289,8 @@ Route::get('/get_floors', [DynamicDataController::class, 'getFloors']);
 Route::get('/get_factories', [DynamicDataController::class, 'getFactories']);
 Route::get('/get_companies', [DynamicDataController::class, 'getCompanies']);
 Route::get('/get_brands', [DynamicDataController::class, 'getBrands']);
+Route::get('/get_machine_statuses', [DynamicDataController::class, 'getMachineStatus']);
+
 
 // Admin Auth Routes
 Route::prefix('admin')->group(function () {

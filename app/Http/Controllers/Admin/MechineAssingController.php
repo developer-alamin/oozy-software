@@ -180,6 +180,8 @@ class MechineAssingController extends Controller
 
     public function store(Request $request)
     {
+
+        dd($request->all());
         // Check which authentication guard is in use and set the creator
         if (Auth::guard('admin')->check()) {
             $creator = Auth::guard('admin')->user();
