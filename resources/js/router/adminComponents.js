@@ -122,3 +122,8 @@ export { default as MechineSourceIndex } from "../Pages/Admin/Mechine/Source/Ind
 export { default as MechineSourceCreate } from "../Pages/Admin/Mechine/Source/Create.vue";
 export { default as MechineSourceEdit } from "../Pages/Admin/Mechine/Source/Edit.vue";
 export { default as MechineSourceTrash } from "../Pages/Admin/Mechine/Source/Trash.vue";
+//Mechine status Components
+export { default as MachineStatusIndex } from "../Pages/Admin/Mechine/MachineStatus/Index.vue";
+export { default as MachineStatusCreate } from "../Pages/Admin/Mechine/MachineStatus/Create.vue";
+export { default as MachineStatusEdit } from "../Pages/Admin/Mechine/MachineStatus/Edit.vue";
+export { default as MachineStatusTrash } from "../Pages/Admin/Mechine/MachineStatus/Trash.vue";

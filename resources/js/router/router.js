@@ -606,6 +606,34 @@ const routes = [
                 meta: { title: "Mechine Source Trash" },
                 props: true,
             },
+            {
+                path: "machine/status/index", // New route for mechine source index
+                name: "MachineStatusIndex",
+                component: adminComponents.MachineStatusIndex,
+                meta: { title: "Machine Status Index" },
+                props: true,
+            },
+            {
+                path: "machine/status/create", // New route for mechine Source index
+                name: "MachineStatusCreate",
+                component: adminComponents.MachineStatusCreate,
+                meta: { title: "Machine Status Create" },
+                props: true,
+            },
+            {
+                path: "machine/status/edit/:uuid", // New route for mechine Source index
+                name: "MachineStatusEdit",
+                component: adminComponents.MachineStatusEdit,
+                meta: { title: "Machine Status Edit" },
+                props: true,
+            },
+            {
+                path: "mechine/status/trash", // New route for Source trash
+                name: "MachineStatusTrash",
+                component: adminComponents.MachineStatusTrash,
+                meta: { title: "Machine Status Trash" },
+                props: true,
+            },
         ],
     },
     // {

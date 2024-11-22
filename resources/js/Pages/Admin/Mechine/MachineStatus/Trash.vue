@@ -2,7 +2,7 @@
     <v-card>
         <v-card-title class="pt-5">
             <v-row>
-                <v-col cols="6"><span>Parse Unit Trash List</span></v-col>
+                <v-col cols="6"><span>Machine Status Trash List</span></v-col>
                 <v-col cols="6" class="d-flex justify-end">
                     <v-text-field
                         v-model="search"
@@ -72,8 +72,8 @@
 
 <script>
 import { toast } from "vue3-toastify";
-import RestoreConfirmDialog from "../../Components/RestoreConfirmDialog.vue";
-import ConfirmDialog from "../../Components/ConfirmDialog.vue";
+import RestoreConfirmDialog from "../../../Components/RestoreConfirmDialog.vue";
+import ConfirmDialog from "../../../Components/ConfirmDialog.vue";
 
 export default {
     components: {
@@ -83,12 +83,12 @@ export default {
     data() {
         return {
             restroreDialogName:
-                "Are you sure you want to restore this Parse Unit ?",
-            dialogName: "Are you sure you want to delete this Parse Unit ?",
+                "Are you sure you want to restore this Machine Status ?",
+            dialogName: "Are you sure you want to delete this Machine Status ?",
             search: "",
             itemsPerPage: 15,
             headers: [
-                { title: "Parse Unit Name", key: "name", sortable: true },
+                { title: "Machine Status Name", key: "name", sortable: true },
                 { title: "Description", key: "description", sortable: false },
                 {
                     title: "Status",
@@ -112,15 +112,18 @@ export default {
             const sortOrder = sortBy.length ? sortBy[0].order : "desc";
             const sortKey = sortBy.length ? sortBy[0].key : "created_at";
             try {
-                const response = await this.$axios.get("/parse/unit/trashed", {
-                    params: {
-                        page,
-                        itemsPerPage,
-                        sortBy: sortKey,
-                        sortOrder,
-                        search: this.search,
-                    },
-                });
+                const response = await this.$axios.get(
+                    "/machine/status/trashed",
+                    {
+                        params: {
+                            page,
+                            itemsPerPage,
+                            sortBy: sortKey,
+                            sortOrder,
+                            search: this.search,
+                        },
+                    }
+                );
                 this.serverItems = response.data.items || [];
                 this.totalItems = response.data.total || 0;
             } catch (error) {
@@ -141,34 +144,34 @@ export default {
             this.restoreDialog = false; // Close the restore dialog
             try {
                 await this.$axios.post(
-                    `/parse/unit/${this.selectedUnitId}/restore`
+                    `/machine/status/${this.selectedUnitId}/restore`
                 );
                 this.loadItems({
                     page: 1,
                     itemsPerPage: this.itemsPerPage,
                     sortBy: [],
                 });
-                toast.success("Parse Unit restored successfully!");
+                toast.success("Machine Status restored successfully!");
             } catch (error) {
-                console.error("Error restoring parse unit:", error);
-                toast.error("Failed to restore parse unit.");
+                console.error("Error restoring Machine Status:", error);
+                toast.error("Failed to restore Machine Status.");
             }
         },
         async confirmDelete() {
             this.deleteDialog = false; // Close the delete dialog
             try {
                 await this.$axios.delete(
-                    `/parse/unit/${this.selectedUnitId}/force-delete`
+                    `/machine/status/${this.selectedUnitId}/force-delete`
                 );
                 this.loadItems({
                     page: 1,
                     itemsPerPage: this.itemsPerPage,
                     sortBy: [],
                 });
-                toast.success("Parse Unit deleted successfully!");
+                toast.success("Machine Status deleted successfully!");
             } catch (error) {
-                console.error("Error deleting parse unit:", error);
-                toast.error("Failed to delete parse unit.");
+                console.error("Error deleting Machine Status:", error);
+                toast.error("Failed to delete Machine Status.");
             }
         },
     },

@@ -109,7 +109,7 @@
 
 <script>
 import { toast } from "vue3-toastify";
-import ConfirmDialog from "../../Components/ConfirmDialog.vue";
+import ConfirmDialog from "../../../Components/ConfirmDialog.vue";
 
 export default {
     components: {
@@ -146,7 +146,7 @@ export default {
             const sortOrder = sortBy.length ? sortBy[0].order : "desc";
             const sortKey = sortBy.length ? sortBy[0].key : "created_at";
             try {
-                const response = await this.$axios.get("/parse-unit", {
+                const response = await this.$axios.get("/machine-status", {
                     params: {
                         page,
                         itemsPerPage,
@@ -181,7 +181,7 @@ export default {
             this.dialog = false; // Close the dialog
             try {
                 await this.$axios.delete(
-                    `/parse-unit/${this.selectedMachineStatusId}`
+                    `/machine-status/${this.selectedMachineStatusId}`
                 );
                 this.loadItems({
                     page: 1,
@@ -197,7 +197,7 @@ export default {
         async fetchTrashedMachineStatusCount() {
             try {
                 const response = await this.$axios.get(
-                    "/parse/unit/trashed-count"
+                    "/machine/status/trashed-count"
                 );
                 this.trashedCount = response.data.trashedCount;
             } catch (error) {

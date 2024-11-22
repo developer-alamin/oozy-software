@@ -27,6 +27,7 @@ use App\Http\Controllers\Admin\ProductModelController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\DynamicDataController;
+use App\Http\Controllers\MachineStatusController;
 use App\Http\Controllers\OperatorController;
 use App\Models\MechineAssing;
 
@@ -273,6 +274,15 @@ Route::get('/factory/{uuid}/edit', [FactoryController::class, 'edit'])->name('fa
 Route::put('/factory/{uuid}', [FactoryController::class, 'update'])->name('factory.update');
 Route::resource('factory', FactoryController::class);
 
+// --------------------------------------------Machine route statr here-------------------------------------------------------------------
+
+Route::get('/machine/status/trashed', [MachineStatusController::class, 'trashed']);
+Route::post('/machine/status/{id}/restore', [MachineStatusController::class, 'restore']);
+Route::delete('/machine/status/{id}/force-delete', [MachineStatusController::class, 'forceDelete']);
+Route::get('/machine/status/trashed-count', [MachineStatusController::class, 'trashedMachineStatusCount']);
+Route::get('/machine/status/{uuid}/edit', [MachineStatusController::class, 'edit'])->name('machine.status.edit');
+Route::put('/machine/status/{uuid}', [MachineStatusController::class, 'update'])->name('machine.status.update');
+Route::resource('machine-status', MachineStatusController::class);
 // Group Rents Controller End form here
 Route::get('/get_units', [DynamicDataController::class, 'getUnits']);
 Route::get('/get_floors', [DynamicDataController::class, 'getFloors']);
@@ -299,7 +309,6 @@ Route::get('/auth/user', [AuthController::class, 'fetchGobalUserAuthInfo']);
 Route::get('/user/role/auth', [AuthController::class, 'fetchUserAuthRoleInfo']);
 // User Auth Routes
 Route::prefix('user')->group(function () {
-
     Route::post('/register', [UserAuthController::class, 'register']);
     Route::post('/login', [UserAuthController::class, 'login']);
     Route::post('/logout', [UserAuthController::class, 'logout'])->middleware('auth:user');

@@ -463,6 +463,16 @@
                             <i class="bi bi-circle"></i><span>Supplier</span>
                         </router-link>
                     </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'MachineStatusIndex' }"
+                            active-class="active"
+                            :class="{ active: isMachineStatusRoute }"
+                        >
+                            <i class="bi bi-circle"></i
+                            ><span>Machine Status</span>
+                        </router-link>
+                    </li>
                 </ul>
             </li>
             <!-- <li class="nav-item">
@@ -696,6 +706,7 @@ const isSupplierRoute = computed(() =>
         "SupplierTrash",
     ].includes(route.name)
 );
+
 const MechineTypeRoute = computed(() =>
     [
         "MechineTypeIndex",
@@ -710,6 +721,15 @@ const isMechineSourceRoute = computed(() =>
         "MechineSourceCreate",
         "MechineSourceEdit",
         "MechineSourceTrash",
+    ].includes(route.name)
+);
+
+const isMachineStatusRoute = computed(() =>
+    [
+        "MachineStatusIndex",
+        "MachineStatusCreate",
+        "MachineStatusEdit",
+        "MachineStatusTrash",
     ].includes(route.name)
 );
 

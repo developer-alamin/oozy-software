@@ -1,6 +1,6 @@
 <template>
-    <v-card outlined class="mx-auto my-5" max-width="900">
-        <v-card-title>Edit Machine Status</v-card-title>
+    <v-card outlined class="mx-auto my-5" max-width="">
+        <v-card-title>Create machine status</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="submit">
                 <!-- Name Field -->
@@ -20,12 +20,12 @@
                 <v-textarea
                     v-model="machine_status.description"
                     label="Description"
-                    outlined
                     :error-messages="
                         errors.description ? errors.description : ''
                     "
                 />
-                <!-- Status Field (Checkbox) -->
+
+                <!-- Featured Checkbox -->
                 <v-select
                     v-model="machine_status.status"
                     :items="statusItems"
@@ -34,115 +34,109 @@
                 ></v-select>
 
                 <!-- Action Buttons -->
-
                 <v-row class="mt-4">
+                    <!-- Submit Button -->
                     <v-col cols="12" class="text-right">
                         <v-btn
                             type="button"
                             color="secondary"
-                            class="mr-3"
                             @click="resetForm"
+                            class="mr-3"
                         >
                             Reset Form
                         </v-btn>
+
                         <v-btn
                             type="submit"
                             color="primary"
                             :disabled="!valid || loading"
                             :loading="loading"
                         >
-                            Machine Status Update
+                            Create Machine Status
                         </v-btn>
                     </v-col>
                 </v-row>
             </v-form>
         </v-card-text>
-
-        <!-- Server Error Message -->
-        <v-alert v-if="serverError" type="error" class="my-4">
-            {{ serverError }}
-        </v-alert>
     </v-card>
-</template>
 
+    <!-- Server Error Message -->
+    <v-alert v-if="serverError" type="error" class="my-4">
+        {{ serverError }}
+    </v-alert>
+</template>
 <script>
 import { toast } from "vue3-toastify";
 export default {
     data() {
         return {
             valid: false,
-            loading: false,
+            loading: false, // Controls loading state of the button
             statusItems: ["Active", "Inactive"],
             machine_status: {
                 name: "",
                 description: "",
-                status: "", // Default to false (inactive)
+                status: "Active", // New property for checkbox
             },
-            errors: {},
-            serverError: null,
+            errors: {}, // Stores validation errors
+            serverError: null, // Stores server-side error messages
             rules: {
                 required: (value) => !!value || "Required.",
             },
         };
     },
-    created() {
-        this.fetchMachineStatus();
-    },
     methods: {
-        async fetchMachineStatus() {
-            // Fetch the unit data to populate the form
-            const machineStatusId = this.$route.params.uuid; // Assuming the unit ID is passed in the route params
-            try {
-                const response = await this.$axios.get(
-                    `/parse-unit/${machineStatusId}/edit`
-                );
-                this.machine_status = response.data.unit; // Populate form with the existing unit data
-                // console.log(this.unit);
-
-                this.machine_status.status =
-                    this.machine_status.status === "Active"
-                        ? "Active"
-                        : "Inactive";
-            } catch (error) {
-                console.log(error);
-                this.serverError =
-                    "Error fetching machine status data." + error;
-            }
-        },
         async submit() {
-            this.errors = {}; // Reset errors before submission
+            // Reset errors and loading state before submission
+            this.errors = {};
             this.serverError = null;
-            this.loading = true;
-            const machineStatusId = this.$route.params.uuid; // Assuming unit ID is in route params
+            this.loading = true; // Start loading when submit is clicked
+
+            const formData = new FormData();
+            Object.entries(this.machine_status).forEach(([key, value]) => {
+                formData.append(key, value);
+            });
+
+            // Simulate a 3-second loading time (e.g., for an API call)
             setTimeout(async () => {
                 try {
-                    const response = await this.$axios.put(
-                        `/parse-unit/${machineStatusId}`,
-                        this.machine_status
+                    // Assuming the actual API call here
+                    const response = await this.$axios.post(
+                        "/machine-status",
+                        formData
                     );
 
                     if (response.data.success) {
-                        toast.success("Machine Status updated successfully!");
-                        this.$router.push({ name: "MachineStatusIndex" }); // Redirect to unit list page
+                        toast.success("Machine Status create successfully!");
+                        this.resetForm();
                     }
                 } catch (error) {
                     if (error.response && error.response.status === 422) {
-                        toast.error("Failed to update machine status.");
+                        toast.error("Failed to create Machine Status.");
+                        // Handle validation errors from the server
                         this.errors = error.response.data.errors || {};
                     } else {
-                        toast.error("Error updating  machine status.");
-                        this.serverError = "Error updating machine status.";
+                        toast.error("An error occurred. Please try again.");
+                        // Handle other server errors
+                        this.serverError =
+                            "An error occurred. Please try again.";
                     }
                 } finally {
                     // Stop loading after the request (or simulated time) is done
                     this.loading = false;
                 }
-            }, 1000);
+            }, 1000); // Simulates a 3-second loading duration
         },
         resetForm() {
-            this.fetchMachineStatus(); // Reset the form with existing unit data
-            this.errors = {};
-            this.$refs.form.resetValidation();
+            this.machine_status = {
+                name: "",
+                description: "",
+                status: false, // Reset checkbox on form reset
+            };
+            this.errors = {}; // Reset errors on form reset
+            if (this.$refs.form) {
+                this.$refs.form.reset(); // Reset the form via its ref if necessary
+            }
         },
     },
 };
