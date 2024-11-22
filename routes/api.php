@@ -65,11 +65,14 @@ Route::resource('floor', FloorController::class);
 
 Route::get('/get_factories', [MechineAssingController::class, 'getFactories']);
 // Route::get('/get_brands', [MechineAssingController::class, 'getBrands']);
-Route::get('/get_models', [MechineAssingController::class, 'getModels']);
+
 Route::get('/get_types', [MechineAssingController::class, 'getTypes']);
 Route::get('/get_sources', [MechineAssingController::class, 'getSources']);
 Route::get('/get_suppliers', [MechineAssingController::class, 'getSuppliers']);
 Route::get('/get_rents', [MechineAssingController::class, 'getRents']);
+Route::get('/generate-machine-code', [MechineAssingController::class, 'generateMachineCode']);
+
+
 
 Route::get('/mechine/{uuid}/transfer', [MechineAssingController::class, 'mechineTransfer'])->name('mechine.transfer');
 Route::post('/mechine/transfer/{uuid}', [MechineAssingController::class, 'mechineTransferStore'])->name('mechine.transfer.store');
@@ -289,6 +292,7 @@ Route::get('/get_floors', [DynamicDataController::class, 'getFloors']);
 Route::get('/get_factories', [DynamicDataController::class, 'getFactories']);
 Route::get('/get_companies', [DynamicDataController::class, 'getCompanies']);
 Route::get('/get_brands', [DynamicDataController::class, 'getBrands']);
+Route::get('/get_models', [DynamicDataController::class, 'getModels']);
 Route::get('/get_machine_statuses', [DynamicDataController::class, 'getMachineStatus']);
 
 

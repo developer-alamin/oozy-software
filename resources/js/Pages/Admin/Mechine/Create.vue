@@ -3,18 +3,36 @@
         <v-card-title>Create machine</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="submit">
-                <v-text-field
-                    v-model="machine.name"
-                    :rules="[rules.required]"
-                    label="Machine Name"
-                    outlined
-                    density="comfortable"
-                    :error-messages="errors.name ? errors.name : ''"
-                >
-                    <template v-slot:label>
-                        Machine Name <span style="color: red">*</span>
-                    </template>
-                </v-text-field>
+                <v-row>
+                    <v-col cols="6">
+                        <v-text-field
+                            v-model="machine.machine_code"
+                            :rules="[rules.required]"
+                            label="Machine Code"
+                            outlined
+                            density="comfortable"
+                            :error-messages="
+                                errors.machine_code ? errors.machine_code : ''
+                            "
+                        >
+                        </v-text-field>
+                    </v-col>
+                    <v-col cols="6">
+                        <v-text-field
+                            v-model="machine.name"
+                            :rules="[rules.required]"
+                            label="Machine Name"
+                            outlined
+                            density="comfortable"
+                            :error-messages="errors.name ? errors.name : ''"
+                        >
+                            <template v-slot:label>
+                                Machine Name <span style="color: red">*</span>
+                            </template>
+                        </v-text-field></v-col
+                    >
+                </v-row>
+
                 <v-row>
                     <v-col cols="6">
                         <v-autocomplete
@@ -58,6 +76,7 @@
                         </v-autocomplete>
                     </v-col>
                 </v-row>
+
                 <v-row>
                     <v-col cols="6">
                         <v-autocomplete
@@ -73,6 +92,55 @@
                             :error-messages="
                                 errors.brand_id ? errors.brand_id : ''
                             "
+                            @update:search="fetchBrands"
+                            @update:model-value="onBrandChange"
+                        >
+                            <template v-slot:label>
+                                Select Machine Brand
+                                <span style="color: red">*</span>
+                            </template>
+                        </v-autocomplete>
+                    </v-col>
+                    <v-col cols="6">
+                        <!-- Model Selection -->
+                        <v-autocomplete
+                            v-model="machine.model_id"
+                            :items="models"
+                            item-value="id"
+                            item-title="name"
+                            label="Select Machine Model"
+                            density="comfortable"
+                            clearable
+                            :rules="[rules.required]"
+                            :error-messages="
+                                errors.model_id ? errors.model_id : ''
+                            "
+                            @update:search="fetchModels"
+                            :disabled="!machine.brand_id"
+                        >
+                            <template v-slot:label>
+                                Select Machine Model
+                                <span style="color: red">*</span>
+                            </template>
+                        </v-autocomplete>
+                    </v-col>
+                </v-row>
+                <!-- <v-row>
+                    <v-col cols="6">
+                        <v-autocomplete
+                            v-model="machine.brand_id"
+                            :items="brands"
+                            item-value="id"
+                            item-title="name"
+                            label="Select Machine Brand"
+                            outlined
+                            clearable
+                            density="comfortable"
+                            :rules="[rules.required]"
+                            :error-messages="
+                                errors.brand_id ? errors.brand_id : ''
+                            "
+                            @update:model-value="updateBrandId"
                             @update:search="fetchBrands"
                         >
                             <template v-slot:label>
@@ -94,6 +162,7 @@
                             :error-messages="
                                 errors.model_id ? errors.model_id : ''
                             "
+                            @update:model-value="updateModelId"
                             @update:search="fetchModels"
                         >
                             <template v-slot:label>
@@ -102,7 +171,7 @@
                             </template>
                         </v-autocomplete>
                     </v-col>
-                </v-row>
+                </v-row> -->
 
                 <v-row>
                     <v-col cols="4">
@@ -171,19 +240,7 @@
                 </v-row>
 
                 <v-row>
-                    <v-col cols="6">
-                        <v-text-field
-                            v-model="machine.machine_code"
-                            label="Machine Code"
-                            outlined
-                            density="comfortable"
-                            :error-messages="
-                                errors.machine_code ? errors.machine_code : ''
-                            "
-                        >
-                        </v-text-field>
-                    </v-col>
-                    <v-col cols="6">
+                    <v-col cols="12">
                         <v-autocomplete
                             v-model="machine.machine_source_id"
                             :items="sources"
@@ -490,6 +547,8 @@ export default {
         this.fetchMachineStatus().then(() => {
             this.setDefaultStatus();
         });
+        // this.fetchBrands();
+        this.generateMachineCode();
     },
     methods: {
         async submit() {
@@ -542,6 +601,7 @@ export default {
                 }
             }, 1000); // Simulates a 3-second loading duration
         },
+
         checkRateApplicable(id) {
             const selectedSource = this.sources.find(
                 (source) => source.id === id
@@ -598,34 +658,110 @@ export default {
                 console.error("Error fetching factories:", error);
             }
         },
+
+        // Fetch brands based on search term
         async fetchBrands(search) {
             try {
-                const response = await this.$axios.get(`/get_brands`, {
-                    params: {
-                        search: search,
-                        limit: this.limit,
-                    },
+                const response = await this.$axios.get("/get_brands", {
+                    params: { search },
                 });
-                // console.log(response.data);
                 this.brands = response.data;
             } catch (error) {
                 console.error("Error fetching brands:", error);
             }
         },
-        async fetchModels(search) {
+
+        // Handle brand change, fetch models based on selected brand
+        async onBrandChange() {
+            this.machine.model_id = null;
+            if (!this.machine.brand_id) {
+                this.models = []; // Clear models if no brand is selected
+                return;
+            }
+
             try {
-                const response = await this.$axios.get(`/get_models`, {
-                    params: {
-                        search: search,
-                        limit: this.limit,
-                    },
+                const response = await this.$axios.get("/get_models", {
+                    params: { brand_id: this.machine.brand_id },
                 });
-                // console.log(response.data);
                 this.models = response.data;
             } catch (error) {
                 console.error("Error fetching models:", error);
             }
         },
+
+        // Fetch models based on search term (for model autocomplete)
+        async fetchModels(search) {
+            try {
+                const response = await this.$axios.get("/get_models", {
+                    params: { search, brand_id: this.machine.brand_id },
+                });
+                this.models = response.data;
+            } catch (error) {
+                console.error("Error fetching models:", error);
+            }
+        },
+        async generateMachineCode() {
+            try {
+                const response = await this.$axios.get(
+                    "/generate-machine-code"
+                );
+                console.log(response.data);
+
+                this.machine.machine_code = response.data.machine_code;
+            } catch (error) {
+                console.error("Error fetching machine code:", error);
+            }
+        },
+
+        // async fetchBrands(search) {
+        //     try {
+        //         const response = await this.$axios.get(`/get_brands`, {
+        //             params: {
+        //                 search: search,
+        //                 limit: this.limit,
+        //             },
+        //         });
+        //         // console.log(response.data);
+        //         this.brands = response.data;
+        //     } catch (error) {
+        //         console.error("Error fetching brands:", error);
+        //     }
+        // },
+        // async fetchModels(search = "") {
+        //     if (!this.machine.brand_id) {
+        //         // Clear the models if no brand is selected
+        //         this.models = [];
+        //         return;
+        //     }
+
+        //     try {
+        //         const response = await this.$axios.get("/get_models", {
+        //             params: {
+        //                 brand_id: this.machine.brand_id, // Pass the selected brand_id
+        //                 search, // Optional search term for filtering models
+        //             },
+        //         });
+        //         this.models = response.data;
+        //     } catch (error) {
+        //         console.error("Error fetching models:", error);
+        //     }
+        // },
+
+        // // Update machine.brand_id when a brand is selected
+        // updateBrandId(value) {
+        //     this.machine.brand_id = value;
+        //     if (!value) {
+        //         this.machine.model_id = null; // Clear model when no brand is selected
+        //     }
+        //     // Fetch models based on the new brand selection
+        //     this.fetchModels();
+        // },
+
+        // // Update machine.model_id when a model is selected
+        // updateModelId(value) {
+        //     this.machine.model_id = value;
+        // },
+
         async fetchTypes(search) {
             try {
                 const response = await this.$axios.get(`/get_types`, {

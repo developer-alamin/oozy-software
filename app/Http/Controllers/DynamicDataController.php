@@ -6,6 +6,7 @@ use App\Models\Brand;
 use App\Models\Factory;
 use App\Models\Floor;
 use App\Models\MachineStatus;
+use App\Models\ProductModel;
 use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -72,6 +73,40 @@ class DynamicDataController extends Controller
                      ->get();
         // Return the brands as JSON
         return response()->json($brands);
+    }
+
+    // public function getModels(Request $request){
+
+    //     // Get search term and limit from the request, with defaults
+    //     $search = $request->query('search', '');
+    //     $limit  = $request->query('limit', 5); // Default limit of 10
+    //     // Query to search for models by name with a limit
+    //     $models  = ProductModel::where('name', 'like', '%' . $search . '%')
+    //                  ->limit($limit)
+    //                  ->get();
+    //     // Return the models as JSON
+    //     return response()->json($models);
+    // }
+
+    public function getModels(Request $request)
+    {
+        // Get search term, limit, and brand_id from the request
+        $search = $request->query('search', '');
+        $limit  = $request->query('limit', 5); // Default limit of 5
+        $brandId = $request->query('brand_id');
+
+        if (!$brandId) {
+            return response()->json([], 400); // Return empty if no brand_id is provided
+        }
+
+        // Query to search for models by brand_id and name with a limit
+        $models  = ProductModel::where('brand_id', $brandId)
+                     ->where('name', 'like', '%' . $search . '%')
+                     ->limit($limit)
+                     ->get();
+
+        // Return the models as JSON
+        return response()->json($models);
     }
     public function getMachineStatus(Request $request){
 

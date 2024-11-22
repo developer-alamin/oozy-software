@@ -9,6 +9,7 @@ use App\Models\Admin;
 use App\Models\MechineAssing;
 use App\Models\Brand;
 use App\Models\Factory;
+use App\Models\GeneralSetting;
 use App\Models\MechineStock;
 use App\Models\MechineType;
 use App\Models\ProductModel;
@@ -708,17 +709,20 @@ class MechineAssingController extends Controller
         return response()->json($factories);
     }
 
-    public function getModels(Request $request){
+    public function generateMachineCode()
+    {
+        // Fetch the prefix from the settings table
+        $prefix = GeneralSetting::where('key', 'machine_code_prefix')->value('value') ?? 'OZ-'; // Default to 'MC-' if not found
 
-        // Get search term and limit from the request, with defaults
-        $search = $request->query('search', '');
-        $limit  = $request->query('limit', 5); // Default limit of 10
-        // Query to search for models by name with a limit
-        $models  = ProductModel::where('name', 'like', '%' . $search . '%')
-                     ->limit($limit)
-                     ->get();
-        // Return the models as JSON
-        return response()->json($models);
+        // Get the highest machine_code and increment by 1, or start from 1 if none exists
+        $lastMachine = MechineAssing::orderBy('mechine_code', 'desc')->first();
+        $nextCode = $lastMachine ? ((int)$lastMachine->mechine_code + 1) : 1;
+
+        // Format the code with the prefix and six-digit padding
+        $machineCode = $prefix . str_pad($nextCode, 8, '0', STR_PAD_LEFT);
+
+        // Return the generated code as JSON
+        return response()->json(['machine_code' => $machineCode]);
     }
     public function getTypes(Request $request){
 

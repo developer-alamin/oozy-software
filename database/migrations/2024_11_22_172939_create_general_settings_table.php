@@ -11,8 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('sources', function (Blueprint $table) {
-            $table->string('rate_applicable')->default(false);
+        Schema::create('general_settings', function (Blueprint $table) {
+            $table->id();
+            $table->string('key')->unique();
+            $table->text('value')->nullable();
+            $table->morphs('creator');
+            $table->morphs('updater');
+            $table->timestamps();
         });
     }
 
@@ -21,8 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('sources', function (Blueprint $table) {
-            $table->dropColumn('rate_applicable');
-        });
+        Schema::dropIfExists('general_settings');
     }
 };
