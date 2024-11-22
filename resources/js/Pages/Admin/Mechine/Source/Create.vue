@@ -1,6 +1,6 @@
 <template>
     <v-card outlined class="mx-auto my-5" max-width="">
-        <v-card-title>Create Mechine Source</v-card-title>
+        <v-card-title>Create Machine Source</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="submit">
                 <!-- Name Field -->
@@ -34,6 +34,13 @@
                     @change="updateStatus"
                     clearable
                 ></v-select>
+                <v-checkbox
+                    v-model="source.rate_applicable"
+                    label="Rate Applicable"
+                    :error-messages="
+                        errors.rate_applicable ? errors.rate_applicable : ''
+                    "
+                />
 
                 <!-- Action Buttons -->
                 <v-row class="mt-4">
@@ -82,6 +89,7 @@ export default {
                 name: "",
                 description: "",
                 status: "Active", // New property for checkbox
+                rate_applicable: false,
             },
             errors: {}, // Stores validation errors
             serverError: null, // Stores server-side error messages
@@ -106,8 +114,11 @@ export default {
             setTimeout(async () => {
                 try {
                     // Assuming the actual API call here
-                    const response = await this.$axios.post("mechine/source", formData);
-                    console.log(response.data)
+                    const response = await this.$axios.post(
+                        "mechine/source",
+                        formData
+                    );
+                    console.log(response.data);
                     if (response.data.success) {
                         toast.success("source create successfully!");
                         this.resetForm();
