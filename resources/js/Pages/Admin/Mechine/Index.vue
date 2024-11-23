@@ -2,7 +2,7 @@
     <v-card>
         <v-card-title class="pt-5">
             <v-row>
-                <v-col cols="4"><span>Mechine Assing List</span></v-col>
+                <v-col cols="4"><span>Machine All List</span></v-col>
                 <v-col cols="8" class="d-flex justify-end">
                     <v-text-field
                         v-model="search"
@@ -29,7 +29,7 @@
                                     >mdi-plus</v-icon
                                 >
                             </template>
-                            <span>Add New a Mechine</span>
+                            <span>Add New a Machine</span>
                         </v-tooltip>
                     </v-btn>
 
@@ -50,7 +50,7 @@
                                         mdi-trash-can-outline
                                     </v-icon>
                                 </template>
-                                <span>View trashed Mechines</span>
+                                <span>View trashed Machines</span>
                             </v-tooltip>
                         </v-btn>
                     </v-badge>
@@ -121,16 +121,22 @@ export default {
     },
     data() {
         return {
-            dialogName: "Are you sure you want to delete this Mechine ?",
+            dialogName: "Are you sure you want to delete this Machine ?",
 
             search: "",
             itemsPerPage: 10,
             headers: [
-                { title: "Company Name", key: "user.name", sortable: false },
-                { title: "Factory Name", key: "factory.name", sortable: false },
-                { title: "Mechine Name", key: "name", sortable: true },
-                { title: "Mechine Code", key: "mechine_code", sortable: false },
-                { title: "Status", key: "status", sortable: true },
+                // { title: "Company Name", key: "user.name", sortable: false },
+                { title: "Factory", key: "factory.name", sortable: false },
+                { title: "Machine Name", key: "name", sortable: true },
+                { title: "Machine Code", key: "machine_code", sortable: false },
+                { title: "Model", key: "product_model.name", sortable: false },
+                { title: "Type", key: "mechine_type.name", sortable: false },
+                {
+                    title: "Status",
+                    key: "machine_status.name",
+                    sortable: true,
+                },
                 { title: "Creator", key: "creator.name", sortable: false },
                 { title: "Actions", key: "actions", sortable: false },
             ],
@@ -148,7 +154,7 @@ export default {
             const sortOrder = sortBy.length ? sortBy[0].order : "desc";
             const sortKey = sortBy.length ? sortBy[0].key : "created_at";
             try {
-                const response = await this.$axios.get("/mechine-assing", {
+                const response = await this.$axios.get("/machine-assing", {
                     params: {
                         page,
                         itemsPerPage,
@@ -157,6 +163,8 @@ export default {
                         search: this.search,
                     },
                 });
+                console.log(response.data.items);
+
                 this.serverItems = response.data.items || [];
                 this.totalItems = response.data.total || 0;
                 this.fetchTrashedMechinesCount();

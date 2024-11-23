@@ -39,9 +39,9 @@
                         </router-link>
                     </li>
                     <li>
-                        <router-link :to="{ name: 'MechineTransferList' }">
+                        <router-link :to="{ name: 'MachineMovement' }">
                             <i class="bi bi-circle"></i
-                            ><span> Machine Transfer List </span>
+                            ><span> Machine Movement </span>
                         </router-link>
                     </li>
                     <li>

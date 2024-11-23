@@ -18,6 +18,7 @@ export { default as MechineTrash } from "../Pages/Admin/Mechine/Trash.vue";
 export { default as MechineTransfer } from "../Pages/Admin/Mechine/Transfer.vue";
 export { default as MechineTransferList } from "../Pages/Admin/Mechine/TransferList.vue";
 export { default as MechineHistoryList } from "../Pages/Admin/Mechine/History.vue";
+export { default as MachineMovement } from "../Pages/Admin/Mechine/movement.vue";
 
 // Factory components
 export { default as FactoryIndex } from "../Pages/Admin/Factory/Index.vue";

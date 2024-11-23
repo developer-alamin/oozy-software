@@ -284,7 +284,7 @@
                             "
                             @update:search="fetchRents"
                         >
-                            
+
                         </v-autocomplete> -->
                     <v-col cols="3">
                         <v-date-input
@@ -748,6 +748,7 @@ export default {
                     params: { search, limit: 5 },
                 });
                 this.models = response.data;
+                console.log(response.data);
             } catch (error) {
                 console.error("Error fetching models:", error);
             } finally {
@@ -860,10 +861,10 @@ export default {
             const idleStatus = this.machine_statuses.find(
                 (status) => status.name == "Idle"
             );
-            console.log(idleStatus);
+            // console.log(idleStatus);
 
             if (idleStatus) {
-                this.machine.status = idleStatus.id;
+                this.machine.machine_status_id = idleStatus.id;
             }
         },
         async fetchSuppliers(search) {

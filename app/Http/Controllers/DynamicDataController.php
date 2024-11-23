@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Brand;
 use App\Models\Factory;
 use App\Models\Floor;
+use App\Models\Line;
 use App\Models\MachineStatus;
+use App\Models\MechineAssing;
 use App\Models\ProductModel;
 use App\Models\Unit;
 use App\Models\User;
@@ -75,7 +77,7 @@ class DynamicDataController extends Controller
     //     return response()->json($brands);
     // }
 
-    
+
 
     // public function getModels(Request $request)
     // {
@@ -154,6 +156,19 @@ class DynamicDataController extends Controller
         // Return the machineStatus as JSON
         return response()->json($machineStatus);
     }
+    public function getLinesByMachine(Request $request)
+    {
+        $machineId = $request->query('machine_id');
+        if (!$machineId) {
+            return response()->json(['error' => 'Machine ID is required'], 400);
+        }
 
+        // Fetch lines associated with the factory of the selected machine
+        $lines = Line::whereHas('units.floors.factories', function ($query) use ($machineId) {
+            $query->where('id', MechineAssing::find($machineId)->factory_id);
+        })->get(['id', 'name']);
+
+        return response()->json($lines);
+    }
 
 }

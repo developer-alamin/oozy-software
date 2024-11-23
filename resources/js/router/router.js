@@ -162,6 +162,13 @@ const routes = [
                 component: adminComponents.MechineTrash,
                 meta: { title: "Mechine Trash" },
             },
+            {
+                path: "machine/movement", // New route for Contact
+                name: "MachineMovement",
+                component: adminComponents.MachineMovement,
+                meta: { title: "Machine Movement" },
+            },
+
             // service
             {
                 path: "survice/index", // New route for Contact
