@@ -62,51 +62,85 @@ class DynamicDataController extends Controller
         // Return the factories as JSON
         return response()->json($factories);
     }
-    public function getBrands(Request $request){
-
-        // Get search term and limit from the request, with defaults
-        $search = $request->query('search', '');
-        $limit  = $request->query('limit', 5); // Default limit of 10
-        // Query to search for brands by name with a limit
-        $brands  = Brand::where('name', 'like', '%' . $search . '%')
-                     ->limit($limit)
-                     ->get();
-        // Return the brands as JSON
-        return response()->json($brands);
-    }
-
-    // public function getModels(Request $request){
+    // public function getBrands(Request $request){
 
     //     // Get search term and limit from the request, with defaults
     //     $search = $request->query('search', '');
     //     $limit  = $request->query('limit', 5); // Default limit of 10
-    //     // Query to search for models by name with a limit
-    //     $models  = ProductModel::where('name', 'like', '%' . $search . '%')
+    //     // Query to search for brands by name with a limit
+    //     $brands  = Brand::where('name', 'like', '%' . $search . '%')
     //                  ->limit($limit)
     //                  ->get();
+    //     // Return the brands as JSON
+    //     return response()->json($brands);
+    // }
+
+    
+
+    // public function getModels(Request $request)
+    // {
+    //     // Get search term, limit, and brand_id from the request
+    //     $search = $request->query('search', '');
+    //     $limit  = $request->query('limit', 5); // Default limit of 5
+    //     $brandId = $request->query('brand_id');
+
+    //     if (!$brandId) {
+    //         return response()->json([], 400); // Return empty if no brand_id is provided
+    //     }
+
+    //     // Query to search for models by brand_id and name with a limit
+    //     $models  = ProductModel::where('brand_id', $brandId)
+    //                  ->where('name', 'like', '%' . $search . '%')
+    //                  ->limit($limit)
+    //                  ->get();
+
     //     // Return the models as JSON
     //     return response()->json($models);
     // }
 
     public function getModels(Request $request)
     {
-        // Get search term, limit, and brand_id from the request
         $search = $request->query('search', '');
-        $limit  = $request->query('limit', 5); // Default limit of 5
-        $brandId = $request->query('brand_id');
+        $limit = $request->query('limit', 5);
 
-        if (!$brandId) {
-            return response()->json([], 400); // Return empty if no brand_id is provided
+        $models = ProductModel::where('name', 'like', '%' . $search . '%')
+            ->limit($limit)
+            ->get();
+
+        return response()->json($models);
+    }
+
+    /**
+     * Fetch brands based on the selected model.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getBrands(Request $request)
+    {
+        $modelId = $request->query('model_id');
+        $search = $request->query('search', '');
+        $limit = $request->query('limit', 5);
+
+        if (!$modelId) {
+            return response()->json([]);
         }
 
-        // Query to search for models by brand_id and name with a limit
-        $models  = ProductModel::where('brand_id', $brandId)
-                     ->where('name', 'like', '%' . $search . '%')
-                     ->limit($limit)
-                     ->get();
+        $model = ProductModel::find($modelId);
 
-        // Return the models as JSON
-        return response()->json($models);
+        if (!$model) {
+            return response()->json([]);
+        }
+
+        $query = Brand::where('id', $model->brand_id);
+
+        if ($search) {
+            $query->where('name', 'like', '%' . $search . '%');
+        }
+
+        $brands = $query->limit($limit)->get();
+
+        return response()->json($brands);
     }
     public function getMachineStatus(Request $request){
 

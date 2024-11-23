@@ -12,24 +12,27 @@ class MechineAssing extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'company_id',
         'factory_id',
         'brand_id',
         'model_id',
-        'mechine_type_id',
-        'mechine_source_id',
+        'machine_type_id',
+        'machine_source_id',
         'supplier_id',
         'rent_id',
         'rent_date',
+        'rent_name',
+        'rent_note',
+        'rent_amount_type',
         'name',
-        'mechine_code',
+        'machine_code',
         'serial_number',
-        'preventive_service_days',
-        'purchace_price',
+        'partial_maintenance_day',
+        'full_maintenance_day',
+        'purchase_price',
         'purchase_date',
         'status',
         'note',
-        'mechine_status'
+        'machine_status_id'
     ];
 
     // Optionally, cast some fields to specific types (e.g., dates)
