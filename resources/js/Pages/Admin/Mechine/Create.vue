@@ -249,7 +249,6 @@
                             label="Select Machine Source"
                             density="comfortable"
                             clearable
-                            :rules="[rules.required]"
                             :error-messages="
                                 errors.machine_source_id
                                     ? errors.machine_source_id
@@ -258,10 +257,10 @@
                             @update:model-value="checkRateApplicable"
                             @update:search="fetchSources"
                         >
-                            <template v-slot:label>
+                            <!-- <template v-slot:label>
                                 Select Machine Source
                                 <span style="color: red">*</span>
-                            </template>
+                            </template> -->
                         </v-autocomplete>
                     </v-col>
                 </v-row>

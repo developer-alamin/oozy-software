@@ -19,16 +19,29 @@
                 </v-col>
                 <v-row>
                     <v-col cols="12" md="6">
-                        <v-text-field
-                            v-model="type.partial_maintenance_day"
-                            label="Partial Maintenance Days"
-                        ></v-text-field>
+                        <v-tooltip location="top" activator="parent">
+                            <template v-slot:activator="{ props }">
+                                <v-text-field
+                                    v-model="type.partial_maintenance_day"
+                                    label="Partial Maintenance Days"
+                                ></v-text-field>
+                            </template>
+                            <span
+                                >Enter the partial maintenance days here
+                                ??</span
+                            >
+                        </v-tooltip>
                     </v-col>
                     <v-col cols="12" md="6">
-                        <v-text-field
-                            v-model="type.full_maintenance_day"
-                            label="Full Maintenance Days"
-                        ></v-text-field>
+                        <v-tooltip location="top" activator="parent">
+                            <template v-slot:activator="{ props }">
+                                <v-text-field
+                                    v-model="type.full_maintenance_day"
+                                    label="Full Maintenance Days"
+                                ></v-text-field>
+                            </template>
+                            <span>Enter the full maintenance days here ??</span>
+                        </v-tooltip>
                     </v-col>
                 </v-row>
 

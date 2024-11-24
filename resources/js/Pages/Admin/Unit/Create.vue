@@ -102,8 +102,10 @@ export default {
             selectedFactoryName: null, // Displayed factory name
             selectedUserName: null, // Displayed user name
             floors: [],
+            limit: 5,
             unit: {
                 floor_id: null,
+                selected_floor: null,
                 name: "",
                 description: "",
                 status: "Active", // New property for checkbox
@@ -132,6 +134,7 @@ export default {
                 try {
                     // Assuming the actual API call here
                     const response = await this.$axios.post("/units", formData);
+                    console.log(response.data);
 
                     if (response.data.success) {
                         toast.success("Unit create successfully!");
@@ -164,16 +167,30 @@ export default {
                 });
 
                 this.floors = response.data;
+                console.log(response.data);
             } catch (error) {
                 console.error("Error fetching floors:", error);
             }
         },
+        // updateFloorId(selectedFloor) {
+        //     this.unit.floor_id = selectedFloor ? selectedFloor.id : null;
+        // },
+        // formatFloor(floor) {
+        //     if (floor) {
+        //         return `${floor.factories?.name} -- ${
+        //             floor.factories?.user?.name || "No User"
+        //         }`;
+        //     }
+        // },
         formatFloor(floor) {
             if (floor) {
-                return `${floor.name} -- ${floor.factories?.name}-- ${
-                    floor.factories?.user?.name || "No User"
-                }`;
+                const factoryName = floor.factories?.name || "No Factory Name";
+                const userName = floor.factories?.user?.name || "No User";
+                return `${
+                    floor.name || "No Floor Name"
+                } -- ${factoryName} -- ${userName}`;
             }
+            return "No Floor Data";
         },
         // updateSelectedFloorDetails(floorId) {
         //     const selectedFloor = this.floors.find(

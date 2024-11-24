@@ -83,18 +83,18 @@
                 <span>{{ item.creator ? item.creator.name : "Unknown" }}</span>
             </template>
             <template v-slot:item.actions="{ item }">
-                <v-icon
+                <!-- <v-icon
                     @click="transferMachine(item.uuid)"
                     color="blue"
                     class="mr-2"
                     >mdi-transfer</v-icon
-                >
-                <v-icon @click="editMechine(item.uuid)" class="mr-2"
+                > -->
+                <!-- <v-icon @click="editMechine(item.uuid)" class="mr-2"
                     >mdi-pencil</v-icon
-                >
-                <v-icon @click="showConfirmDialog(item.id)" color="red"
+                > -->
+                <!-- <v-icon @click="showConfirmDialog(item.id)" color="red"
                     >mdi-delete</v-icon
-                >
+                > -->
             </template>
         </v-data-table-server>
 
@@ -156,7 +156,7 @@ export default {
                 // { title: "Machine Code", key: "machine_code", sortable: false },
                 // { title: "Status", key: "status", sortable: true },
                 // { title: "Creator", key: "creator.name", sortable: false },
-                { title: "Actions", key: "actions", sortable: false },
+                // { title: "Actions", key: "actions", sortable: false },
             ],
             serverItems: [],
             loading: true,

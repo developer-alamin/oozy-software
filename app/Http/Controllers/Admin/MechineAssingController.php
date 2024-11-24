@@ -199,7 +199,7 @@ class MechineAssingController extends Controller
             'brand_id'                => 'required|integer',
             'model_id'                => 'required|integer',
             'machine_type_id'         => 'required|integer',
-            'machine_source_id'       => 'required|integer',
+            'machine_source_id'       => 'nullable',
             'supplier_id'             => 'nullable',
             'rent_date'               => 'nullable',
             'rent_name'               => 'nullable|string|max:255',
@@ -236,14 +236,13 @@ class MechineAssingController extends Controller
         }
 
         // Create the new MachineAssing instance with validated data
-        $mechineAssing                 = new MechineAssing($validatedData);
+        $mechineAssing                    = new MechineAssing($validatedData);
+        $mechineAssing->machine_source_id = ($request->machine_source_id && $request->machine_source_id !== 'null') ? $request->machine_source_id : 0;
         // Associate the creator and updater polymorphically
-        $mechineAssing->uuid           = HelperController::generateUuid();
-        $mechineAssing->status         = "Assign";
-
-
+        $mechineAssing->uuid              = HelperController::generateUuid();
+        $mechineAssing->status            = "Assign";
         // Similarly handle supplier_id
-        $mechineAssing->supplier_id = ($request->supplier_id && $request->supplier_id !== 'null') ? $request->supplier_id : 0;
+        $mechineAssing->supplier_id       = ($request->supplier_id && $request->supplier_id !== 'null') ? $request->supplier_id : 0;
         $mechineAssing->creator()->associate($creator);
         $mechineAssing->updater()->associate($creator);
 
@@ -497,8 +496,9 @@ class MechineAssingController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(MechineAssing $mechineAssing)
+    public function destroy(MechineAssing $machineAssing)
     {
+
         if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('admin')->user();
             // Check if the admin is a superadmin
@@ -507,7 +507,7 @@ class MechineAssingController extends Controller
             } else {
                 $creatorType = Admin::class;
                 // Regular admin authorization check
-                if ($mechineAssing->creator_type !== $creatorType || $mechineAssing->creator_id !== $currentUser->id) {
+                if ($machineAssing->creator_type !== $creatorType || $machineAssing->creator_id !== $currentUser->id) {
                     return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to delete this brand.'], 403);
                 }
             }
@@ -516,7 +516,7 @@ class MechineAssingController extends Controller
             $currentUser = Auth::guard('user')->user();
             $creatorType = User::class;
             // Regular user authorization check
-            if ($mechineAssing->creator_type !== $creatorType || $mechineAssing->creator_id !== $currentUser->id) {
+            if ($machineAssing->creator_type !== $creatorType || $machineAssing->creator_id !== $currentUser->id) {
                 return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to delete this brand.'], 403);
             }
         } else {
@@ -524,8 +524,10 @@ class MechineAssingController extends Controller
         }
 
         try {
+            // Delete related movements
+            $machineAssing->movements()->delete();
             // Delete the supplier
-            $mechineAssing->delete();
+            $machineAssing->delete();
             return response()->json([
                 'success' => true,
                 'message' => 'mechine assign deleted successfully.'
@@ -589,7 +591,7 @@ class MechineAssingController extends Controller
         // Apply sorting
         $mechinsQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $mechins = $mechinsQuery->with('creator:id,name','user:id,name','factory:id,name')->paginate($itemsPerPage);
+        $mechins = $mechinsQuery->where('status','Assign')->with('creator:id,name','factory:id,name','machineStatus:id,name','productModel:id,name','mechineType:id,name')->paginate($itemsPerPage);
 
         // Return the response as JSON
         return response()->json([

@@ -13,7 +13,7 @@
             <li class="nav-item">
                 <a
                     class="nav-link collapsed"
-                    :class="{ show: isMechineRoute }"
+                    :class="{ show: isMechineRouteShow }"
                     data-bs-target="#components-nav"
                     data-bs-toggle="collapse"
                     href="#"
@@ -24,37 +24,57 @@
                 <ul
                     id="components-nav"
                     class="nav-content collapse"
-                    :class="{ show: isMechineRoute }"
+                    :class="{ show: isMechineRouteShow }"
                     data-bs-parent="#sidebar-nav"
                 >
                     <li>
-                        <router-link :to="{ name: 'MechineCreate' }">
+                        <router-link
+                            :to="{ name: 'MechineCreate' }"
+                            active-class="active"
+                            :class="{ active: isMachineCreateRoute }"
+                        >
                             <i class="bi bi-circle"></i><span>Machine Add</span>
                         </router-link>
                     </li>
                     <li>
-                        <router-link :to="{ name: 'MechineIndex' }">
+                        <router-link
+                            :to="{ name: 'MechineIndex' }"
+                            active-class="active"
+                            :class="{ active: isMachineRoute }"
+                        >
                             <i class="bi bi-circle"></i
                             ><span> Machine All </span>
                         </router-link>
                     </li>
                     <li>
-                        <router-link :to="{ name: 'MachineMovement' }">
+                        <router-link
+                            :to="{ name: 'MachineMovement' }"
+                            active-class="active"
+                            :class="{ active: isMachineMovementRoute }"
+                        >
                             <i class="bi bi-circle"></i
                             ><span> Machine Movement </span>
                         </router-link>
                     </li>
                     <li>
-                        <router-link :to="{ name: 'MachineLocation' }">
+                        <router-link
+                            :to="{ name: 'MachineLocation' }"
+                            active-class="active"
+                            :class="{ active: isMachineLocationRoute }"
+                        >
                             <i class="bi bi-circle"></i
-                            ><span> Machine Location List </span>
+                            ><span> Machine Movement Location List </span>
                         </router-link>
                     </li>
 
                     <li>
-                        <router-link :to="{ name: 'MechineHistoryList' }">
+                        <router-link
+                            :to="{ name: 'MechineHistoryList' }"
+                            active-class="active"
+                            :class="{ active: isMechineHistoryListRoute }"
+                        >
                             <i class="bi bi-circle"></i
-                            ><span> Machine History List </span>
+                            ><span> Machine Movement History List </span>
                         </router-link>
                     </li>
                 </ul>
@@ -591,9 +611,32 @@ import { useRoute } from "vue-router";
 const route = useRoute();
 
 // Check if the current route is part of the Mechine-related routes
-const isMechineRoute = computed(() => {
-    return [].includes(route.name);
+const isMechineRouteShow = computed(() => {
+    return [
+        "MechineIndex",
+        "MechineCreate",
+        "MechineTrash",
+        "MachineMovement",
+        "MachineLocation",
+        "MechineHistoryList",
+    ].includes(route.name);
 });
+
+const isMachineRoute = computed(() =>
+    ["MechineIndex", "MechineEdit", "MechineTrash"].includes(route.name)
+);
+const isMachineCreateRoute = computed(() =>
+    ["MechineCreate"].includes(route.name)
+);
+const isMachineMovementRoute = computed(() =>
+    ["MachineMovement"].includes(route.name)
+);
+const isMachineLocationRoute = computed(() =>
+    ["MachineLocation"].includes(route.name)
+);
+const isMechineHistoryListRoute = computed(() =>
+    ["MechineHistoryList"].includes(route.name)
+);
 
 // organization
 const isOrganizationRouteShow = computed(() => {

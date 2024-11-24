@@ -17,7 +17,7 @@
                         single-line
                         clearable
                     ></v-text-field>
-                    <!-- <v-btn
+                    <v-btn
                         @click="createMechine"
                         color="primary"
                         icon
@@ -29,9 +29,9 @@
                                     >mdi-plus</v-icon
                                 >
                             </template>
-                            <span>Add New a Mechine</span>
+                            <span>Add New a Machine Movement </span>
                         </v-tooltip>
-                    </v-btn> -->
+                    </v-btn>
 
                     <v-badge :content="trashedCount" color="red" overlap>
                         <v-btn
@@ -83,18 +83,18 @@
                 <span>{{ item.creator ? item.creator.name : "Unknown" }}</span>
             </template>
             <template v-slot:item.actions="{ item }">
-                <v-icon
+                <!-- <v-icon
                     @click="transferMachine(item.uuid)"
                     color="blue"
                     class="mr-2"
                     >mdi-transfer</v-icon
-                >
-                <v-icon @click="editMechine(item.uuid)" class="mr-2"
+                > -->
+                <!-- <v-icon @click="editMechine(item.uuid)" class="mr-2"
                     >mdi-pencil</v-icon
-                >
-                <v-icon @click="showConfirmDialog(item.id)" color="red"
+                > -->
+                <!-- <v-icon @click="showConfirmDialog(item.id)" color="red"
                     >mdi-delete</v-icon
-                >
+                > -->
             </template>
         </v-data-table-server>
 
@@ -121,7 +121,7 @@ export default {
     },
     data() {
         return {
-            dialogName: "Are you sure you want to delete this Mechine ?",
+            dialogName: "Are you sure you want to delete this Machine ?",
 
             search: "",
             itemsPerPage: 10,
@@ -156,7 +156,7 @@ export default {
                 // { title: "Machine Code", key: "machine_code", sortable: false },
                 // { title: "Status", key: "status", sortable: true },
                 // { title: "Creator", key: "creator.name", sortable: false },
-                { title: "Actions", key: "actions", sortable: false },
+                // { title: "Actions", key: "actions", sortable: false },
             ],
             serverItems: [],
             loading: true,
@@ -193,7 +193,7 @@ export default {
             }
         },
         createMechine() {
-            this.$router.push({ name: "MechineCreate" });
+            this.$router.push({ name: "MachineMovement" });
         },
         viewTrash() {
             this.$router.push({ name: "MechineTrash" });

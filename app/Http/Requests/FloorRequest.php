@@ -24,7 +24,7 @@ class FloorRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'factory_id'   => 'required',
+            'factory_id'   => 'required|integer',
             'name'         => [
                 'required',
                 'string',
