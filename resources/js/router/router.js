@@ -168,6 +168,12 @@ const routes = [
                 component: adminComponents.MachineMovement,
                 meta: { title: "Machine Movement" },
             },
+            {
+                path: "machine/location", // New route for Contact
+                name: "MachineLocation",
+                component: adminComponents.MachineLocation,
+                meta: { title: "Machine Location" },
+            },
 
             // service
             {

@@ -221,4 +221,13 @@ class User extends Authenticatable
     {
         return $this->morphMany(Service::class, 'updater');
     }
+    public function createdMovement(): MorphMany
+    {
+        return $this->morphMany(Movement::class, 'creator');
+    }
+    //  movement 
+    public function updatedMovement(): MorphMany
+    {
+        return $this->morphMany(Movement::class, 'updater');
+    }
 }

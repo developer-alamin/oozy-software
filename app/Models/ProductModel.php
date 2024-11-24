@@ -12,6 +12,7 @@ class ProductModel extends Model
     use HasFactory,SoftDeletes;
 
     protected $primaryKey = 'id';
+  
 
     protected $fillable = [
         'brand_id',

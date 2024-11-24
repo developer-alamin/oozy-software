@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Auth\UserAuthController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\MachineMovementController;
 use App\Http\Controllers\Admin\MechineAssingController;
 use App\Http\Controllers\Admin\ParseController;
 use App\Http\Controllers\Admin\ParseUnitController;
@@ -84,6 +85,8 @@ Route::get('/mechine/transfer/list', [MechineAssingController::class,'mechineTra
 Route::get('/mechine/history/list', [MechineAssingController::class,'mechineHistoryList'])->name('mechine.assing.trashed');
 Route::get('/mechine/assing/{uuid}/edit', [MechineAssingController::class,'edit'])->name('mechine.assing.trashed');
 Route::resource('machine-assing',MechineAssingController::class);
+Route::get('/machine-movement-history',[MachineMovementController::class,'historyIndex'])->name('mechine.movement.history');
+Route::resource('machine-movement',MachineMovementController::class);
 
 
 // --------------------------------------------Mechine Service route statr here-------------------------------------------------------------------
@@ -291,6 +294,7 @@ Route::get('/get_units', [DynamicDataController::class, 'getUnits']);
 Route::get('/get_floors', [DynamicDataController::class, 'getFloors']);
 Route::get('/get_factories', [DynamicDataController::class, 'getFactories']);
 Route::get('/get_companies', [DynamicDataController::class, 'getCompanies']);
+Route::get('/get_brand_alls', [DynamicDataController::class, 'getBrandAll']);
 Route::get('/get_brands', [DynamicDataController::class, 'getBrands']);
 Route::get('/get_models', [DynamicDataController::class, 'getModels']);
 Route::get('/get_machine_statuses', [DynamicDataController::class, 'getMachineStatus']);

@@ -218,13 +218,23 @@ class Admin extends Authenticatable
      }
 
       // mechine Stock created by this user
-      public function createdServiceParses(): MorphMany
-      {
-          return $this->morphMany(ServiceParse::class, 'creator');
-      }
-      //  mechine Stock updated by this user
-      public function updatedServiceParses(): MorphMany
-      {
-          return $this->morphMany(ServiceParse::class, 'updater');
-      }
+    public function createdServiceParses(): MorphMany
+    {
+        return $this->morphMany(ServiceParse::class, 'creator');
+    }
+    //  mechine Stock updated by this user
+    public function updatedServiceParses(): MorphMany
+    {
+        return $this->morphMany(ServiceParse::class, 'updater');
+    }
+
+    public function createdMovement(): MorphMany
+    {
+        return $this->morphMany(Movement::class, 'creator');
+    }
+    //  movement 
+    public function updatedMovement(): MorphMany
+    {
+        return $this->morphMany(Movement::class, 'updater');
+    }
 }

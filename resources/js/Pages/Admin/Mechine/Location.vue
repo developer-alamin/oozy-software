@@ -2,7 +2,7 @@
     <v-card>
         <v-card-title class="pt-5">
             <v-row>
-                <v-col cols="4"><span>Machine History </span></v-col>
+                <v-col cols="4"><span>Machine Location </span></v-col>
                 <v-col cols="8" class="d-flex justify-end">
                     <v-text-field
                         v-model="search"
@@ -172,18 +172,15 @@ export default {
             const sortOrder = sortBy.length ? sortBy[0].order : "desc";
             const sortKey = sortBy.length ? sortBy[0].key : "created_at";
             try {
-                const response = await this.$axios.get(
-                    "/machine-movement-history",
-                    {
-                        params: {
-                            page,
-                            itemsPerPage,
-                            sortBy: sortKey,
-                            sortOrder,
-                            search: this.search,
-                        },
-                    }
-                );
+                const response = await this.$axios.get("/machine-movement", {
+                    params: {
+                        page,
+                        itemsPerPage,
+                        sortBy: sortKey,
+                        sortOrder,
+                        search: this.search,
+                    },
+                });
                 // console.log(response.data.items);
 
                 this.serverItems = response.data.items || [];

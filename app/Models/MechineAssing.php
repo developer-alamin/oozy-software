@@ -10,7 +10,11 @@ class MechineAssing extends Model
 {
     use HasFactory,SoftDeletes;
     protected $primaryKey = 'id';
-
+    
+    protected $casts = [
+        'model_id'=> 'integer'
+    ];
+    
     protected $fillable = [
         'name',
         'factory_id',

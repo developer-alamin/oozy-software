@@ -175,38 +175,7 @@
                         </v-autocomplete>
                     </v-col>
                 </v-row>
-                <v-row>
-                    <v-col cols="6">
-                        <v-autocomplete
-                            v-model="machine.rent_id"
-                            :items="rents"
-                            item-value="id"
-                            item-title="name"
-                            label="Select Rent"
-                            density="comfortable"
-                            clearable
-                            :error-messages="
-                                errors.rent_id ? errors.rent_id : ''
-                            "
-                            @update:search="fetchRents"
-                        >
-                            <!-- <template v-slot:label>
-                        Select Rent
-                        <span style="color: red">*</span>
-                    </template> -->
-                        </v-autocomplete>
-                    </v-col>
-                    <v-col cols="6">
-                        <v-date-input
-                            v-model="machine.rent_date"
-                            label="Rent Date"
-                            density="comfortable"
-                            :error-messages="
-                                errors.rent_date ? errors.rent_date : ''
-                            "
-                        />
-                    </v-col>
-                </v-row>
+
                 <v-row>
                     <v-col cols="4">
                         <v-autocomplete
@@ -381,15 +350,10 @@ export default {
         },
     },
     created() {
-        this.fetchCompanys().then(() => {
-            this.fetchMechine();
-        });
-
         this.fetchFactories().then(() => {
             this.fetchMechine();
         });
-
-        this.fetchBrands().then(() => {
+        this.fetchModels().then(() => {
             this.fetchMechine();
         });
         this.fetchTypes().then(() => {
@@ -401,9 +365,6 @@ export default {
         this.fetchSuppliers().then(() => {
             this.fetchMechine();
         });
-        this.fetchRents().then(() => {
-            this.fetchMechine();
-        });
     },
     methods: {
         async fetchMechine() {
@@ -413,18 +374,11 @@ export default {
                     `/mechine/assing/${mecineAssingId}/edit`
                 );
                 this.machine = response.data.mechineAssing;
-                console.log(response.data.mechineAssing);
 
                 // Ensure models and brands are loaded before assigning
                 await this.fetchBrands();
                 await this.fetchModels();
                 // Match brand_id with the brands list
-                const selectedBrand = this.brands.find(
-                    (brand) => brand.id === this.machine.brand_id
-                );
-                if (selectedBrand) {
-                    this.machine.brand_id = selectedBrand.id;
-                }
 
                 this.machine.status = this.statusItems.includes(
                     this.machine.status
@@ -433,20 +387,21 @@ export default {
                     : "";
 
                 // Set the selected company based on the company_id
-                const selectedCompany = this.companys.find(
-                    (c) => c.id === this.machine.company_id
+                const selectedModel = this.models.find(
+                    (c) => c.id === this.machine.model_id
                 );
-                if (selectedCompany) {
-                    this.machine.company_id = selectedCompany.id; // Set the company_id for v-autocomplete
+
+                if (selectedModel) {
+                    this.machine.model_id = selectedModel.id; // Set the company_id for v-autocomplete
                 }
-                // factories
-                const selectedFactory = this.factories.find(
-                    (c) => c.id === this.machine.factory_id
+                // models
+                const selectedFactory = this.models.find(
+                    (c) => c.id === this.machine.model_id
                 );
                 if (selectedFactory) {
                     this.machine.factory_id = selectedFactory.id; // Set the company_id for v-autocomplete
                 }
-
+                console.log(selectedFactory);
                 // Type
                 const selectedType = this.factories.find(
                     (c) => c.id === this.machine.mechine_type_id
@@ -514,56 +469,6 @@ export default {
             }, 1000);
         },
 
-        async submitOnd() {
-            // Reset errors and loading state before submission
-            this.errors = {};
-            this.serverError = null;
-            this.loading = true; // Start loading when submit is clicked
-
-            const formData = new FormData();
-            Object.entries(this.machine).forEach(([key, value]) => {
-                formData.append(key, value);
-            });
-            // const formData = new FormData();
-            // Object.entries(this.factory).forEach(([key, value]) => {
-            //     if (Array.isArray(value)) {
-            //         value.forEach((val) => formData.append(`${key}[]`, val));
-            //     } else {
-            //         formData.append(key, value);
-            //     }
-            // });
-            // Simulate a 3-second loading time (e.g., for an API call)
-            setTimeout(async () => {
-                try {
-                    // Assuming the actual API call here
-                    const response = await this.$axios.post(
-                        "/mechine-assing",
-                        formData
-                    );
-                    console.log(response.data);
-
-                    if (response.data.success) {
-                        toast.success("machine assign create successfully!");
-                        // localStorage.setItem("token", response.data.token);
-                        this.resetForm();
-                    }
-                } catch (error) {
-                    if (error.response && error.response.status === 422) {
-                        toast.error("Failed to create mechine assing.");
-                        // Handle validation errors from the server
-                        this.errors = error.response.data.errors || {};
-                    } else {
-                        toast.error("Failed to create machine assign.");
-                        // Handle other server errors
-                        this.serverError =
-                            "An error occurred. Please try again.";
-                    }
-                } finally {
-                    // Stop loading after the request (or simulated time) is done
-                    this.loading = false;
-                }
-            }, 1000); // Simulates a 3-second loading duration
-        },
         resetForm() {
             this.machine = {
                 company_id: "",
@@ -580,20 +485,6 @@ export default {
             }
         },
 
-        async fetchCompanys(search) {
-            try {
-                const response = await this.$axios.get(`/get_companies`, {
-                    params: {
-                        search: search,
-                        limit: this.limit,
-                    },
-                });
-                // console.log(response.data);
-                this.companys = response.data;
-            } catch (error) {
-                console.error("Error fetching companys:", error);
-            }
-        },
         async fetchFactories(search) {
             try {
                 const response = await this.$axios.get(`/get_factories`, {
@@ -666,7 +557,7 @@ export default {
             const selectedType = this.types.find(
                 (type) => type.id === this.machine.mechine_type_id
             );
-            console.log("Selected Type:", selectedType); // Debugging log
+            // console.log("Selected Type:", selectedType); // Debugging log
 
             this.machine.preventive_service_days = selectedType
                 ? selectedType.day
@@ -698,20 +589,6 @@ export default {
                 this.suppliers = response.data;
             } catch (error) {
                 console.error("Error fetching suppliers:", error);
-            }
-        },
-        async fetchRents(search) {
-            try {
-                const response = await this.$axios.get(`/get_rents`, {
-                    params: {
-                        search: search,
-                        limit: this.limit,
-                    },
-                });
-                // console.log(response.data);
-                this.rents = response.data;
-            } catch (error) {
-                console.error("Error fetching rents:", error);
             }
         },
     },

@@ -9,7 +9,7 @@ class MechineType extends Model
 {
     use HasFactory,SoftDeletes;
 
-    public $incrementing = false; // Disable auto-incrementing for UUIDs
+    // public $incrementing = false; // Disable auto-incrementing for UUIDs
     //protected $table = "mechine_types";
     protected $primaryKey = 'id';
 

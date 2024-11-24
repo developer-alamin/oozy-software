@@ -45,6 +45,13 @@
                         </router-link>
                     </li>
                     <li>
+                        <router-link :to="{ name: 'MachineLocation' }">
+                            <i class="bi bi-circle"></i
+                            ><span> Machine Location List </span>
+                        </router-link>
+                    </li>
+
+                    <li>
                         <router-link :to="{ name: 'MechineHistoryList' }">
                             <i class="bi bi-circle"></i
                             ><span> Machine History List </span>

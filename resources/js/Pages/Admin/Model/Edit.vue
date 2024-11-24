@@ -188,7 +188,7 @@ export default {
         },
         async fetchBrands(search) {
             try {
-                const response = await this.$axios.get(`/get_brands`, {
+                const response = await this.$axios.get(`/get_brand_alls`, {
                     params: {
                         search: search,
                         limit: this.limit,

@@ -23,7 +23,7 @@ return new class extends Migration
             $table->morphs('updater');
             $table->timestamps();
             $table->softDeletes();
-            $table->timestamps();
+         
         });
     }
 
