@@ -6,7 +6,7 @@
                 <span class="headline">Restore Confirmation</span>
             </v-card-title>
             <v-card-text>
-                <p>{{ restroreDialogName }}</p>
+                <p>{{ restoreDialogName }}</p>
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
@@ -20,8 +20,8 @@
 <script>
 export default {
     props: {
-        restroreDialogName:{
-            type:String
+        restoreDialogName: {
+            type: String,
         },
         modelValue: {
             type: Boolean,
@@ -36,9 +36,7 @@ export default {
             required: true,
         },
     },
-    setup(props){
-
-    },
+    setup(props) {},
     computed: {
         localVisible: {
             get() {

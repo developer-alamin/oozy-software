@@ -2,7 +2,7 @@
     <v-card>
         <v-card-title class="pt-5">
             <v-row>
-                <v-col cols="4"><span>Mechine Assing List</span></v-col>
+                <v-col cols="4"><span>Machine All List</span></v-col>
                 <v-col cols="8" class="d-flex justify-end">
                     <v-text-field
                         v-model="search"
@@ -18,6 +18,23 @@
                         clearable
                     ></v-text-field>
                     <v-btn
+                        @click="createMachineMovement"
+                        color="success"
+                        class="mr-2"
+                        icon
+                        style="width: 40px; height: 40px"
+                    >
+                        <v-tooltip location="top" activator="parent">
+                            <template v-slot:activator="{ props }">
+                                <v-icon v-bind="props" style="font-size: 20px">
+                                    mdi-swap-horizontal
+                                </v-icon>
+                            </template>
+                            <span>Add Machine Movement</span>
+                        </v-tooltip>
+                    </v-btn>
+
+                    <v-btn
                         @click="createMechine"
                         color="primary"
                         icon
@@ -29,7 +46,7 @@
                                     >mdi-plus</v-icon
                                 >
                             </template>
-                            <span>Add New a Mechine</span>
+                            <span>Add New a Machine</span>
                         </v-tooltip>
                     </v-btn>
 
@@ -50,7 +67,7 @@
                                         mdi-trash-can-outline
                                     </v-icon>
                                 </template>
-                                <span>View trashed Mechines</span>
+                                <span>View trashed Machines</span>
                             </v-tooltip>
                         </v-btn>
                     </v-badge>
@@ -83,15 +100,15 @@
                 <span>{{ item.creator ? item.creator.name : "Unknown" }}</span>
             </template>
             <template v-slot:item.actions="{ item }">
-                <v-icon
+                <!-- <v-icon
                     @click="transferMachine(item.uuid)"
                     color="blue"
                     class="mr-2"
                     >mdi-transfer</v-icon
-                >
-                <v-icon @click="editMechine(item.uuid)" class="mr-2"
+                > -->
+                <!-- <v-icon @click="editMechine(item.uuid)" class="mr-2"
                     >mdi-pencil</v-icon
-                >
+                > -->
                 <v-icon @click="showConfirmDialog(item.id)" color="red"
                     >mdi-delete</v-icon
                 >
@@ -121,16 +138,22 @@ export default {
     },
     data() {
         return {
-            dialogName: "Are you sure you want to delete this Mechine ?",
+            dialogName: "Are you sure you want to delete this Machine ?",
 
             search: "",
             itemsPerPage: 10,
             headers: [
-                { title: "Company Name", key: "user.name", sortable: false },
-                { title: "Factory Name", key: "factory.name", sortable: false },
-                { title: "Mechine Name", key: "name", sortable: true },
-                { title: "Mechine Code", key: "mechine_code", sortable: false },
-                { title: "Status", key: "status", sortable: true },
+                // { title: "Company Name", key: "user.name", sortable: false },
+                { title: "Factory", key: "factory.name", sortable: false },
+                { title: "Machine Name", key: "name", sortable: true },
+                { title: "Machine Code", key: "machine_code", sortable: false },
+                { title: "Model", key: "product_model.name", sortable: false },
+                { title: "Type", key: "mechine_type.name", sortable: false },
+                {
+                    title: "Status",
+                    key: "machine_status.name",
+                    sortable: true,
+                },
                 { title: "Creator", key: "creator.name", sortable: false },
                 { title: "Actions", key: "actions", sortable: false },
             ],
@@ -148,7 +171,7 @@ export default {
             const sortOrder = sortBy.length ? sortBy[0].order : "desc";
             const sortKey = sortBy.length ? sortBy[0].key : "created_at";
             try {
-                const response = await this.$axios.get("/mechine-assing", {
+                const response = await this.$axios.get("/machine-assing", {
                     params: {
                         page,
                         itemsPerPage,
@@ -157,6 +180,8 @@ export default {
                         search: this.search,
                     },
                 });
+                console.log(response.data.items);
+
                 this.serverItems = response.data.items || [];
                 this.totalItems = response.data.total || 0;
                 this.fetchTrashedMechinesCount();
@@ -169,6 +194,10 @@ export default {
         createMechine() {
             this.$router.push({ name: "MechineCreate" });
         },
+        createMachineMovement() {
+            this.$router.push({ name: "MachineMovement" });
+        },
+
         viewTrash() {
             this.$router.push({ name: "MechineTrash" });
         },
@@ -186,18 +215,18 @@ export default {
             this.dialog = false; // Close the dialog
             try {
                 const response = await this.$axios.delete(
-                    `/mechine-assing/${this.selectedMechineId}`
+                    `/machine-assing/${this.selectedMechineId}`
                 );
                 this.loadItems({
                     page: 1,
                     itemsPerPage: this.itemsPerPage,
                     sortBy: [],
                 });
-                console.log(response.data);
-                toast.success("Mechine deleted successfully!");
+                // console.log(response.data);
+                toast.success("Machine deleted successfully!");
             } catch (error) {
-                console.error("Error deleting Mechine:", error);
-                toast.error("Failed to delete Mechine.");
+                console.error("Error deleting Machine:", error);
+                toast.error("Failed to delete Machine.");
             }
         },
         async fetchTrashedMechinesCount() {
@@ -209,7 +238,7 @@ export default {
                     ? response.data.trashedCount
                     : 0;
             } catch (error) {
-                console.error("Error fetching trashed Mechine count:", error);
+                console.error("Error fetching trashed Machine count:", error);
             }
         },
 

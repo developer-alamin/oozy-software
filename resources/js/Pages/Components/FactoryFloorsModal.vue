@@ -84,7 +84,7 @@ export default {
             </v-card-title>
             <v-divider></v-divider>
             <v-card-text>
-                <v-row dense>
+                <!-- <v-row dense>
                     <v-col
                         v-for="floor in factory.floors"
                         :key="floor.id"
@@ -96,7 +96,7 @@ export default {
                                     ><v-icon icon="md:home"></v-icon> Floor
                                     No:</strong
                                 >
-                                <!-- <v-icon class="mr-2">mdi-home-floor</v-icon> -->
+                                <v-icon class="mr-2">mdi-home-floor</v-icon>
                                 {{ floor.name }}
                             </v-card-title>
                             <v-card-subtitle class="floor-subtitle">
@@ -157,7 +157,7 @@ export default {
                 </v-row>
                 <div v-if="factory.floors.length === 0" class="no-floors">
                     No floors available for this factory.
-                </div>
+                </div> -->
             </v-card-text>
         </v-card>
     </v-dialog>

@@ -121,6 +121,7 @@ export default {
             search: "",
             itemsPerPage: 15,
             headers: [
+                { title: "Floor", key: "floors.name", sortable: false },
                 { title: "Unit Name", key: "name", sortable: true },
                 { title: "Description", key: "description", sortable: false },
                 {

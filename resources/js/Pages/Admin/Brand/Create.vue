@@ -16,7 +16,7 @@
                         Name <span style="color: red">*</span>
                     </template>
                 </v-text-field>
-                <v-select
+                <!-- <v-select
                     v-model="brand.type"
                     :rules="[rules.required]"
                     :items="statusTypeItems"
@@ -27,7 +27,7 @@
                     <template v-slot:label>
                         Brand Type <span style="color: red">*</span>
                     </template>
-                </v-select>
+                </v-select> -->
                 <v-select
                     v-model="brand.status"
                     :items="statusItems"

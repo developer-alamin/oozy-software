@@ -123,8 +123,18 @@ export default {
             itemsPerPage: 15,
             headers: [
                 { title: "Name", key: "name", sortable: true },
+
+                {
+                    title: "Partial Maintenance Day",
+                    key: "partial_maintenance_day",
+                    sortable: false,
+                },
+                {
+                    title: "Full Maintenance Day",
+                    key: "full_maintenance_day",
+                    sortable: false,
+                },
                 { title: "Description", key: "description", sortable: false },
-                { title: "Day", key: "day", sortable: false },
                 {
                     title: "Status",
                     key: "status",

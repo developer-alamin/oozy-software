@@ -103,7 +103,7 @@ export default {
                 const response = await this.$axios.get(
                     `/category/${categoryId}/edit`
                 );
-                console.log(response.data);
+                // console.log(response.data);
 
                 this.category = response.data.category; // Populate form with the existing category data
                 // this.category.status =

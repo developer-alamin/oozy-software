@@ -120,6 +120,7 @@ export default {
             search: "",
             itemsPerPage: 10,
             headers: [
+                { title: "Unit", key: "units.name", sortable: false },
                 { title: "Number", key: "name", sortable: true },
                 { title: "Description", key: "description", sortable: false },
                 { title: "status", key: "status", sortable: false },

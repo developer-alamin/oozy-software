@@ -119,7 +119,7 @@ export default {
             sortDesc: false, // Default sort direction
             trashedCount: 0,
             headers: [
-                { title: "Type", key: "type", sortable: false },
+                // { title: "Type", key: "type", sortable: false },
                 {
                     title: "Name",
                     value: "name",

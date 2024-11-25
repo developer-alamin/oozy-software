@@ -50,7 +50,7 @@ class ProductModelController extends Controller
         // Apply sorting
         $modelsQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $models = $modelsQuery->with('creator:id,name')->paginate($itemsPerPage);
+        $models = $modelsQuery->with('creator:id,name','brand:id,name')->paginate($itemsPerPage);
         // Return the response as JSON
         return response()->json([
             'items' => $models->items(), // Current page items
@@ -71,6 +71,7 @@ class ProductModelController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->all());
         $validatedData = $request->validate(ProductModel::validationRules());
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
@@ -91,6 +92,7 @@ class ProductModelController extends Controller
          // Create the technician and associate it with the creator
          $model       = new ProductModel($validatedData);
          $model->uuid = HelperController::generateUuid();
+         $model->type = "Parse";
          $model->creator()->associate($creator);  // Assign creator polymorphically
          $model->updater()->associate($creator);  // Associate the updater
          $model->save(); // Save the technician to the database
@@ -277,7 +279,7 @@ class ProductModelController extends Controller
         $modelsQuery->orderBy($sortBy, $sortOrder);
 
         // Paginate results
-        $models = $modelsQuery->paginate($itemsPerPage);
+        $models = $modelsQuery->with('creator:id,name','brand:id,name')->paginate($itemsPerPage);
 
         // Return the response as JSON
         return response()->json([

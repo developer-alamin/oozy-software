@@ -3,6 +3,32 @@
         <v-card-title>Edit Unit</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="submit">
+                <v-autocomplete
+                    v-model="unit.floor_id"
+                    :items="floors"
+                    item-value="id"
+                    :item-title="formatFloor"
+                    outlined
+                    clearable
+                    density="comfortable"
+                    :rules="[rules.required]"
+                    :error-messages="errors.floor_id ? errors.floor_id : ''"
+                    @update:search="fetchFloors"
+                >
+                    <template v-slot:label>
+                        Select Floor <span style="color: red">*</span>
+                    </template>
+                </v-autocomplete>
+                <!-- Display factory name -->
+                <!-- <div v-if="selectedFactoryName" style="margin-top: 10px">
+                    <strong>Factory Name:</strong> {{ selectedFactoryName }}
+                </div> -->
+
+                <!-- Display user name -->
+                <!-- <div v-if="selectedUserName" style="margin-top: 10px">
+                    <strong>Company Name:</strong> {{ selectedUserName }}
+                </div> -->
+
                 <!-- Name Field -->
                 <v-text-field
                     v-model="unit.name"
@@ -73,7 +99,11 @@ export default {
             valid: false,
             loading: false,
             statusItems: ["Active", "Inactive"],
+            selectedFactoryName: null, // Displayed factory name
+            selectedUserName: null, // Displayed user name
+            floors: [],
             unit: {
+                floor_id: null,
                 name: "",
                 description: "",
                 status: "", // Default to false (inactive)
@@ -86,8 +116,12 @@ export default {
         };
     },
     created() {
+        this.fetchFloors().then(() => {
+            this.fetchUnit();
+        });
         this.fetchUnit();
     },
+
     methods: {
         async fetchUnit() {
             // Fetch the unit data to populate the form
@@ -97,11 +131,27 @@ export default {
                 this.unit = response.data.unit; // Populate form with the existing unit data
                 // console.log(this.unit);
 
+                // console.log(response.data);
+                const selectedUnit = this.floors.find(
+                    (c) => c.id === this.unit.floor_id
+                );
+                if (selectedUnit) {
+                    this.unit.floor_id = selectedUnit.id;
+                }
+
                 this.unit.status =
                     this.unit.status === "Active" ? "Active" : "Inactive";
+                // this.updateSelectedFloorDetails(response.data.unit.floor_id);
             } catch (error) {
                 console.log(error);
                 this.serverError = "Error fetching unit data." + error;
+            }
+        },
+        formatFloor(floor) {
+            if (floor) {
+                return `${floor.name} -- ${floor.factories?.name}-- ${
+                    floor.factories?.user?.name || "No User"
+                }`;
             }
         },
         async submit() {
@@ -134,11 +184,48 @@ export default {
                 }
             }, 1000);
         },
+        async fetchFloors(search) {
+            try {
+                const response = await this.$axios.get(`/get_floors`, {
+                    params: {
+                        search: search,
+                        limit: this.limit,
+                    },
+                });
+                // console.log(response.data);
+                this.floors = response.data;
+            } catch (error) {
+                console.error("Error fetching floors:", error);
+            }
+        },
+        // updateSelectedFloorDetails(floorId) {
+        //     const selectedFloor = this.floors.find(
+        //         (floor) => floor.id == floorId
+        //     );
+        //     console.log(floorId);
+        //     console.log(selectedFloor);
+
+        //     if (selectedFloor) {
+        //         this.selectedFactoryName =
+        //             selectedFloor.factories?.name || "No Factory Name";
+        //         this.selectedUserName =
+        //             selectedFloor.factories?.user?.name || "No Company Name";
+        //     } else {
+        //         this.selectedFactoryName = null;
+        //         this.selectedUserName = null;
+        //     }
+        // },
         resetForm() {
             this.fetchUnit(); // Reset the form with existing unit data
             this.errors = {};
             this.$refs.form.resetValidation();
         },
     },
+    // watch: {
+    //     // Watch for changes to unit.floor_id
+    //     "unit.floor_id": function (newFloorId) {
+    //         this.updateSelectedFloorDetails(newFloorId);
+    //     },
+    // },
 };
 </script>

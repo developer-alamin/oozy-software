@@ -55,7 +55,7 @@
 
         <!-- Restore Confirmation Dialog -->
         <RestoreConfirmDialog
-            :restroreDialogName="restroreDialogName"
+            :restoreDialogName="restoreDialogName"
             v-model:modelValue="restoreDialog"
             :onConfirm="confirmRestore"
             :onCancel="() => (restoreDialog = false)"
@@ -82,12 +82,13 @@ export default {
     },
     data() {
         return {
-            restroreDialogName:
+            restoreDialogName:
                 "Are you sure you want to restore this Machine Model?",
             dialogName: "Are you sure you want to delete this Mechine Model ?",
             search: "",
             itemsPerPage: 15,
             headers: [
+                { title: "Brand Name", key: "brand.name", sortable: true },
                 { title: "Model Name", key: "name", sortable: true },
                 { title: "Model Number", key: "model_number", sortable: true },
                 { title: "Description", key: "description", sortable: false },
@@ -97,6 +98,7 @@ export default {
                     value: "status",
                     sortable: true,
                 },
+                { title: "Creator", key: "creator.name", sortable: false },
                 { title: "Actions", key: "actions", sortable: false },
             ],
             serverItems: [],

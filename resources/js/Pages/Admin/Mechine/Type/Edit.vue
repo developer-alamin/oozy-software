@@ -4,26 +4,44 @@
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="update">
                 <!-- Name Field -->
+                <v-col cols="12" md="12">
+                    <v-text-field
+                        v-model="type.name"
+                        :rules="[rules.required]"
+                        label="Name"
+                        outlined
+                        :error-messages="errors.name ? errors.name : ''"
+                    >
+                        <template v-slot:label>
+                            Name <span style="color: red">*</span>
+                        </template>
+                    </v-text-field>
+                </v-col>
                 <v-row>
                     <v-col cols="12" md="6">
-                        <v-text-field
-                            v-model="type.name"
-                            :rules="[rules.required]"
-                            label="Name"
-                            outlined
-                            :error-messages="errors.name ? errors.name : ''"
-                        >
-                            <template v-slot:label>
-                                Name <span style="color: red">*</span>
+                        <v-tooltip location="top" activator="parent">
+                            <template v-slot:activator="{ props }">
+                                <v-text-field
+                                    v-model="type.partial_maintenance_day"
+                                    label="Partial Maintenance Days"
+                                ></v-text-field>
                             </template>
-                        </v-text-field>
+                            <span
+                                >Enter the partial maintenance days here
+                                ??</span
+                            >
+                        </v-tooltip>
                     </v-col>
                     <v-col cols="12" md="6">
-                        <v-text-field
-                            v-model="type.day"
-                            :rules="day"
-                            label="Days"
-                        ></v-text-field>
+                        <v-tooltip location="top" activator="parent">
+                            <template v-slot:activator="{ props }">
+                                <v-text-field
+                                    v-model="type.full_maintenance_day"
+                                    label="Full Maintenance Days"
+                                ></v-text-field>
+                            </template>
+                            <span>Enter the full maintenance days here ??</span>
+                        </v-tooltip>
                     </v-col>
                 </v-row>
 
@@ -87,7 +105,8 @@ export default {
             statusItems: ["Active", "Inactive"],
             type: {
                 name: "",
-                day: "",
+                partial_maintenance_day: "",
+                full_maintenance_day: "",
                 description: "",
                 status: false, // Default to false (inactive)
             },

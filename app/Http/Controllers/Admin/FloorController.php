@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\HelperController;
+use App\Http\Requests\FloorRequest;
+use App\Http\Requests\FloorUpdateRequest;
 use Illuminate\Http\Request;
 use App\Models\Admin;
 use App\Models\Floor;
@@ -53,7 +55,7 @@ class FloorController extends Controller
         // Apply sorting
         $floorsQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $floors = $floorsQuery->with('creator:id,name')->paginate($itemsPerPage);
+        $floors = $floorsQuery->with('creator:id,name','factories:id,name')->paginate($itemsPerPage);
         // Return the response as JSON
         return response()->json([
             'items' => $floors->items(), // Current page items
@@ -72,9 +74,9 @@ class FloorController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(FloorRequest $request)
     {
-        $validatedData = $request->validate(Floor::validationRules());
+        $validatedData = $request->validated();
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
              $creator = Auth::guard('admin')->user();
@@ -148,11 +150,11 @@ class FloorController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request,$uuid)
+    public function update(FloorUpdateRequest $request,$uuid)
     {
         $floor = Floor::where('uuid', $uuid)->firstOrFail();
          // Validate the incoming request data
-         $validatedData = $request->validate(Floor::validationRules());
+         $validatedData = $request->validated();
 
          // Determine the authenticated user (either from 'admin' or 'user' guard)
          if (Auth::guard('admin')->check()) {
@@ -288,7 +290,7 @@ class FloorController extends Controller
         $floorsQuery->orderBy($sortBy, $sortOrder);
 
         // Paginate results
-        $floors = $floorsQuery->paginate($itemsPerPage);
+        $floors = $floorsQuery->with('creator:id,name','factories:id,name')->paginate($itemsPerPage);
 
         // Return the response as JSON
         return response()->json([

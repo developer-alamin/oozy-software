@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\HelperController;
+use App\Http\Requests\LineRequest;
+use App\Http\Requests\LineUpdateRequest;
 use Illuminate\Http\Request;
 use App\Models\Line;
 use App\Models\Admin;
@@ -54,7 +56,7 @@ class LineController extends Controller
         // Apply sorting
         $linesQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $lines = $linesQuery->with('creator:id,name')->paginate($itemsPerPage);
+        $lines = $linesQuery->with('creator:id,name','units:id,name')->paginate($itemsPerPage);
         // Return the response as JSON
         return response()->json([
             'items' => $lines->items(), // Current page items
@@ -73,17 +75,18 @@ class LineController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(LineRequest $request)
     {
 
 
-        $validatedData = $request->validate(Line::validationRules());
+        $validatedData = $request->validated();
+        // dd( $validatedData);
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
              $creator = Auth::guard('admin')->user();
-             // Check if the admin is a superadmin
+             // Check if the admin is a super admin
              if ($creator->role === 'superadmin') {
-                 // Superadmin can create technician without additional checks
+                 // Super admin can create technician without additional checks
              } else {
                  // Regular admin authorization check can be implemented here if needed
              }
@@ -148,12 +151,12 @@ class LineController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $uuid)
+    public function update(LineUpdateRequest $request, $uuid)
     {
         // Retrieve the Line model by uuid
         $line = Line::where('uuid', $uuid)->firstOrFail();
         // Validate the incoming request data
-        $validatedData = $request->validate(Line::validationRules());
+        $validatedData = $request->validated();
          // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('admin')->user();
@@ -287,7 +290,7 @@ class LineController extends Controller
         $linesQuery->orderBy($sortBy, $sortOrder);
 
         // Paginate results
-        $lines = $linesQuery->paginate($itemsPerPage);
+        $lines = $linesQuery->with('creator:id,name','units:id,name')->paginate($itemsPerPage);
 
         // Return the response as JSON
         return response()->json([

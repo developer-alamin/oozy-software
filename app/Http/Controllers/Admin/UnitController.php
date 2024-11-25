@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\HelperController;
+use App\Http\Requests\UnitRequest;
+use App\Http\Requests\UnitUpdateRequest;
 use App\Models\Unit;
 use App\Models\Admin;
 use App\Models\User;
@@ -51,7 +53,7 @@ class UnitController extends Controller
         // Apply sorting
         $unitsQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $units = $unitsQuery->with('creator:id,name')->paginate($itemsPerPage);
+        $units = $unitsQuery->with('creator:id,name','floors:id,name')->paginate($itemsPerPage);
         // Return the response as JSON
         return response()->json([
             'items' => $units->items(), // Current page items
@@ -70,9 +72,9 @@ class UnitController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(UnitRequest $request)
     {
-        $validatedData = $request->validate(Unit::validationRules());
+        $validatedData = $request->validated();
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
              $creator = Auth::guard('admin')->user();
@@ -146,11 +148,12 @@ class UnitController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $uuid)
+    public function update(UnitUpdateRequest $request, $uuid)
     {
+        // dd($request->all());
         $unit = Unit::where('uuid', $uuid)->firstOrFail();
          // Validate the incoming request data
-         $validatedData = $request->validate(Unit::validationRules());
+         $validatedData = $request->validated();
 
          // Determine the authenticated user (either from 'admin' or 'user' guard)
          if (Auth::guard('admin')->check()) {
@@ -278,7 +281,7 @@ class UnitController extends Controller
         $unitsQuery->orderBy($sortBy, $sortOrder);
 
         // Paginate results
-        $units = $unitsQuery->paginate($itemsPerPage);
+        $units = $unitsQuery->with('creator:id,name','floors:id,name')->paginate($itemsPerPage);
 
         // Return the response as JSON
         return response()->json([

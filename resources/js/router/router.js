@@ -162,6 +162,52 @@ const routes = [
                 component: adminComponents.MechineTrash,
                 meta: { title: "Mechine Trash" },
             },
+            {
+                path: "machine/movement", // New route for Contact
+                name: "MachineMovement",
+                component: adminComponents.MachineMovement,
+                meta: { title: "Machine Movement" },
+            },
+            {
+                path: "machine/location", // New route for Contact
+                name: "MachineLocation",
+                component: adminComponents.MachineLocation,
+                meta: { title: "Machine Location" },
+            },
+
+            // service
+            {
+                path: "survice/index", // New route for Contact
+                name: "ServiceIndex",
+                component: adminComponents.ServiceIndex,
+                meta: { title: "Survice Index" },
+            },
+            {
+                path: "survice/create", // New route for Contact
+                name: "ServiceCreate",
+                component: adminComponents.ServiceCreate,
+                meta: { title: "Survice Create" },
+            },
+            {
+                path: "survice/history/create/:id", // New route for Contact
+                name: "ServiceHistoryCreate",
+                component: adminComponents.ServiceHistoryCreate,
+                meta: { title: "Survice History Create" },
+            },
+            {
+                path: "survice/:uuid/edit", // Dynamic route for Survice Edit
+                name: "ServiceEdit",
+                component: adminComponents.ServiceEdit,
+                meta: { title: "Edit Survice" },
+                props: true, // Enables passing route params as props
+            },
+            {
+                path: "survice/trash", // Dynamic route for Survice Edit
+                name: "ServiceTrash",
+                component: adminComponents.ServiceTrash,
+                meta: { title: "Trash Survice" },
+                props: true, // Enables passing route params as props
+            },
 
             {
                 path: "supplier/index", // New route for Contact
@@ -410,19 +456,19 @@ const routes = [
                 path: "line/index", // New route for line index
                 name: "LineIndex",
                 component: adminComponents.LineIndex,
-                meta: { title: "line Index" },
+                meta: { title: "Line Index" },
             },
             {
                 path: "line/create", // New route for line create
                 name: "LineCreate",
                 component: adminComponents.LineCreate,
-                meta: { title: "line Create" },
+                meta: { title: "Line Create" },
             },
             {
-                path: "line/edit/:uuid", // New route for line edit
+                path: "line/:uuid/edit", // New route for line edit
                 name: "LineEdit",
                 component: adminComponents.LineEdit,
-                meta: { title: "line Edit" },
+                meta: { title: "Line Edit" },
                 props: true,
             },
             {
@@ -571,6 +617,34 @@ const routes = [
                 name: "MechineSourceTrash",
                 component: adminComponents.MechineSourceTrash,
                 meta: { title: "Mechine Source Trash" },
+                props: true,
+            },
+            {
+                path: "machine/status/index", // New route for mechine source index
+                name: "MachineStatusIndex",
+                component: adminComponents.MachineStatusIndex,
+                meta: { title: "Machine Status Index" },
+                props: true,
+            },
+            {
+                path: "machine/status/create", // New route for mechine Source index
+                name: "MachineStatusCreate",
+                component: adminComponents.MachineStatusCreate,
+                meta: { title: "Machine Status Create" },
+                props: true,
+            },
+            {
+                path: "machine/status/edit/:uuid", // New route for mechine Source index
+                name: "MachineStatusEdit",
+                component: adminComponents.MachineStatusEdit,
+                meta: { title: "Machine Status Edit" },
+                props: true,
+            },
+            {
+                path: "mechine/status/trash", // New route for Source trash
+                name: "MachineStatusTrash",
+                component: adminComponents.MachineStatusTrash,
+                meta: { title: "Machine Status Trash" },
                 props: true,
             },
         ],

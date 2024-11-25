@@ -69,7 +69,7 @@
 
         <!-- Restore Confirmation Dialog -->
         <RestoreConfirmDialog
-            :restroreDialogName="restroreDialogName"
+            :restoreDialogName="restoreDialogName"
             v-model:modelValue="restoreDialog"
             :onConfirm="confirmRestore"
             :onCancel="() => (restoreDialog = false)"
@@ -97,15 +97,16 @@ export default {
     },
     data() {
         return {
-            restroreDialogName: "Are you sure you want to restore this Line?",
+            restoreDialogName: "Are you sure you want to restore this Line?",
             dialogName: "Are you sure you want to delete this Line ?",
             search: "",
             itemsPerPage: 15,
             headers: [
+                { title: "Unit", key: "units.name", sortable: false },
                 { title: "Line Number", key: "name", sortable: true },
                 { title: "Description", key: "description", sortable: false },
                 { title: "status", key: "status", sortable: false },
-
+                { title: "Creator", key: "creator.name", sortable: false },
                 { title: "Actions", key: "actions", sortable: false },
             ],
             serverItems: [],

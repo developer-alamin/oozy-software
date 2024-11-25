@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\FactoryStoreRequest;
+use App\Http\Requests\FactoryUpdateRequest;
 use App\Models\Admin;
 use App\Models\Factory;
 use App\Models\Floor;
@@ -13,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB; // Import the DB facade
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Response;
 
 class FactoryController extends Controller
 {
@@ -68,7 +70,7 @@ class FactoryController extends Controller
         $factoriesQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
         $factories = $factoriesQuery
-        ->with(['floors.units.lines', 'creator:id,name','user:id,name']) // Eager load relationships and creator's name
+        ->with(['creator:id,name','user:id,name']) // Eager load relationships and creator's name
         ->paginate($itemsPerPage, ['*'], 'page', $page);
         // Return the response as JSON
         return response()->json([
@@ -87,21 +89,9 @@ class FactoryController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     */
-    public function stored(Request $request)
-    {
-        $factory = $request->all();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'factory updated successfully.',
-            'factory' => $factory
-        ]);
-
-    }
+    */
     public function store(FactoryStoreRequest $request)
     {
-
         if (Auth::guard('admin')->check()) {
             $creator = Auth::guard('admin')->user();
             // Additional checks can be implemented here for admin roles if needed
@@ -111,151 +101,37 @@ class FactoryController extends Controller
         } else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
-
         try {
             DB::beginTransaction();
             $validated = $request->validated();
             // $factory         = Factory::create($factoryData);
             $factory = new Factory([
-                'uuid'         => HelperController::generateUuid(),
-                'company_id'   => $validated['company_id'], // Convert array to JSON
-                'name'         => $validated['name'],
-                'factory_code' => $validated['factory_code'],
-                'email'        => $validated['email'],
-                'phone'        => $validated['phone'],
-                'location'     => $validated['location'],
-                'status'       => $validated['status'],
-
+                'uuid'             => HelperController::generateUuid(),
+                'company_id'       => $validated['company_id'], // Convert array to JSON
+                'name'             => $validated['name'],
+                'factory_code'     => $validated['factory_code'],
+                'factory_owner'    => $validated['factory_owner'],
+                'factory_size'     => $validated['factory_size'],
+                'factory_capacity' => $validated['factory_capacity'],
+                'email'            => $validated['email'],
+                'phone'            => $validated['phone'],
+                'location'         => $validated['location'],
+                'note'             => $validated['note'],
+                'status'           => $validated['status'],
             ]);
             // Associate creator and updater with the factory
             $factory->creator()->associate($creator);
             $factory->updater()->associate($creator);
             $factory->save();
 
-            $factory->floors()->sync($request->floor_ids);
-            // Attach units to each floor
-            foreach ($request->floor_ids as $floorId) {
-                $floor = Floor::find($floorId);
-                // Attach units to the floor
-                $floor->units()->sync( $request->unit_ids);
-                // Attach lines to each unit
-                foreach ( $request->unit_ids as $unitId) {
-                    $unit = Unit::find($unitId);
-                    // Attach lines to the unit
-                    $unit->lines()->sync($request->line_ids);
-                }
-            }
-                DB::commit();
-                return response()->json(['success' => true, 'message' => 'Factory created successfully.','factory' => $factory],200);
-            } catch (\Exception $e) {
-                DB::rollBack();
-                return response()->json(['success' => false, 'message' => 'Failed to create factory', 'error' => $e->getMessage()], 500);
-        }
-    }
-
-    public function storede(Request $request)
-    {
-        // Validate the incoming request data
-        $data = $request->validate([
-            'company_id'   => 'required', // Expect an for JSON storage
-            'name'         => 'required|string|max:255',
-            'factory_code' => 'required|string|max:50|unique:factories,factory_code',
-            'email'        => 'nullable|email',
-            'phone'        => 'nullable|string|max:15',
-            'location'     => 'nullable|string|max:255',
-            'status'       => 'required|string|in:Active,Inactive',
-            'floor_ids'    => 'required',
-            // 'floor_ids.*' => 'exists:floors,id',
-            'unit_ids'     => 'required',
-            // 'unit_ids.*' => 'exists:units,id',
-            'line_ids'     => 'required',
-            // 'line_ids.*' => 'exists:lines,id',
-        ]);
-
-        // Determine the authenticated user (either from 'admin' or 'user' guard)
-        if (Auth::guard('admin')->check()) {
-            $creator = Auth::guard('admin')->user();
-            // Additional checks can be implemented here for admin roles if needed
-        } elseif (Auth::guard('user')->check()) {
-            $creator = Auth::guard('user')->user();
-            // User-specific checks can be added here if needed
-        } else {
-            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
-        }
-
-        try {
-            DB::beginTransaction();
-
-            // Create the factory
-            $factory = new Factory([
-                'company_id'   => json_encode($data['company_id']), // Convert array to JSON
-                'name'         => $data['name'],
-                'factory_code' => $data['factory_code'],
-                'email'        => $data['email'],
-                'phone'        => $data['phone'],
-                'location'     => $data['location'],
-                'status'       => $data['status'],
-            ]);
-            // Associate creator and updater polymorphically
-            $factory->creator()->associate($creator);
-            $factory->updater()->associate($creator);
-            $factory->save(); // Save the factory to the database
-
-            $factoryId = Factory::where('uuid',$factory->uuid)->first()->id;
-            foreach ($data['floor_ids'] as $floorId) {
-                DB::table('factory_floor')->insert([
-                    'factory_id' => $factoryId,
-                    'floor_id'   => $floorId,
-                ]);
-            }
-
-            // Attach units to each floor
-            foreach ($data['floor_ids'] as $floorId) {
-                foreach ($data['unit_ids'] as $unitId) {
-                    DB::table('floor_unit')->insert([ // Assuming you have a pivot table called 'floor_unit'
-                        'floor_id' => $floorId,
-                        'unit_id'  => $unitId,
-                    ]);
-
-                    // Attach lines to each unit
-                    foreach ($data['line_ids'] as $lineId) {
-                        DB::table('unit_line')->insert([ // Assuming you have a pivot table called 'unit_line'
-                            'unit_id' => $unitId,
-                            'line_id' => $lineId,
-                        ]);
-                    }
-                }
-            }
-            // if ($factory) {
-            //     $factoryId = Factory::where('uuid',$factory->uuid)->first();
-            //     $
-            // }
-            // Sync floors with the factory
-            $factory->floors()->sync($data['floor_ids']);
-            // Attach units to each floor
-            foreach ($data['floor_ids'] as $floorId) {
-                $floor = Floor::find($floorId);
-                // Attach units to the floor
-                $floor->units()->sync($data['unit_ids']);
-
-                // Attach lines to each unit
-                foreach ($data['unit_ids'] as $unitId) {
-                    $unit = Unit::find($unitId);
-                    // Attach lines to the unit
-                    $unit->lines()->sync($data['line_ids']);
-                }
-            }
+            // $factory->floors()->sync($request->floor_ids);
             DB::commit();
-            // Return a success response
-            return response()->json(['success' => true, 'message' => 'Factory created successfully.']);
+            return response()->json(['success' => true, 'message' => 'Factory created successfully.','factory' => $factory],200);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => 'Failed to create factory', 'error' => $e->getMessage()], 500);
         }
     }
-
-
-
     /**
      * Display the specified resource.
      */
@@ -269,27 +145,276 @@ class FactoryController extends Controller
      */
     public function edit($uuid)
     {
-        $factory = Factory::where('uuid', $uuid)->with(['floors.units.lines', 'creator', 'user'])->firstOrFail();
-        if (!$factory) {
-            return response()->json(['success' => false, 'message' => 'Factory not found.'], 404);
-        }
 
-        return response()->json(['success' => true, 'factory' => $factory], 200);
+        $factory = Factory::where('uuid', $uuid)->firstOrFail();
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
+            // Check if the admin is a super admin
+            if ($currentUser->role === 'superadmin') {
+                // Super admins can edit any factory
+                return response()->json([
+                    'success' => true,
+                    'factory' => $factory
+                ], Response::HTTP_OK);
+            }
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+        // Check if the factory belongs to the current user or admin
+        if ($factory->creator_type !== $creatorType || $factory->creator_id !== $currentUser->id) {
+            return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to edit this factory.'], 403);
+        }
+        // Return the factory data if authorized
+        return response()->json([
+            'success' => true,
+            'factory' => $factory
+        ], Response::HTTP_OK);
     }
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Factory $factory)
+    public function update(FactoryUpdateRequest $request, $uuid)
     {
-        //
+        if (Auth::guard('admin')->check()) {
+            $creator = Auth::guard('admin')->user();
+        } elseif (Auth::guard('user')->check()) {
+            $creator = Auth::guard('user')->user();
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $validated = $request->validated();
+            $factory = Factory::where('uuid', $uuid)->firstOrFail();
+
+            // Update factory attributes
+            $factory->fill([
+                'company_id'       => $validated['company_id'],
+                'name'             => $validated['name'],
+                'factory_code'     => $validated['factory_code'],
+                'factory_owner'    => $validated['factory_owner'],
+                'factory_size'     => $validated['factory_size'],
+                'factory_capacity' => $validated['factory_capacity'],
+                'email'            => $validated['email'],
+                'phone'            => $validated['phone'],
+                'location'         => $validated['location'],
+                'note'             => $validated['note'],
+                'status'           => $validated['status'],
+            ]);
+
+            // Update the updater relationship
+            $factory->updater()->associate($creator);
+            $factory->save();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Factory updated successfully.',
+                'factory' => $factory,
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update factory',
+                'error'   => $e->getMessage(),
+            ], 500);
+        }
     }
+
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(Factory $factory)
     {
-        //
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            // Check if the admin is a superadmin
+            if ($currentUser->role === 'superadmin') {
+                // Superadmin can delete any factory without additional checks
+            } else {
+                $creatorType = Admin::class;
+                // Regular admin authorization check
+                if ($factory->creator_type !== $creatorType || $factory->creator_id !== $currentUser->id) {
+                    return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to delete this factory.'], 403);
+                }
+            }
+
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+            // Regular user authorization check
+            if ($factory->creator_type !== $creatorType || $factory->creator_id !== $currentUser->id) {
+                return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to delete this factory.'], 403);
+            }
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        try {
+            // Delete the supplier
+            $factory->delete();
+            return response()->json([
+                'success' => true,
+                'message' => 'factory deleted successfully.'
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting factory: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function trashedFactoriesCount()
+    {
+        // Get the count of soft-deleted Factorys
+        $trashedCount = Factory::onlyTrashed()->count();
+        return response()->json([
+            'trashedCount' => $trashedCount
+        ], Response::HTTP_OK);
+    }
+    public function trashed(Request $request)
+    {
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
+
+            // Superadmin check: Allow access to all soft-deleted factorys
+            if ($currentUser->role === 'superadmin') {
+                // Fetch all trashed factorys without additional checks
+                $factorysQuery = Factory::onlyTrashed();
+            } else {
+                // Regular admin authorization check
+                $factorysQuery = Factory::onlyTrashed()
+                    ->where('creator_id', $currentUser->id)
+                    ->where('creator_type', $creatorType); // Only fetch soft-deleted records created by this admin
+            }
+
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+
+            // Regular user authorization check
+            $factorysQuery = Factory::onlyTrashed()
+                ->where('creator_id', $currentUser->id)
+                ->where('creator_type', $creatorType); // Only fetch soft-deleted records created by this user
+
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        // Get parameters from the request
+        $page         = $request->input('page', 1);
+        $itemsPerPage = $request->input('itemsPerPage', 5);
+        $sortBy       = $request->input('sortBy', 'created_at'); // Default sort by created_at
+        $sortOrder    = $request->input('sortOrder', 'desc'); // Default order is descending
+        $search       = $request->input('search', ''); // Search term, default is empty
+
+        // Apply search if the search term is not empty
+        if (!empty($search)) {
+            $factorysQuery->where('name', 'LIKE', '%' . $search . '%'); // Adjust as per your Operator fields
+        }
+
+        // Apply sorting
+        $factorysQuery->orderBy($sortBy, $sortOrder);
+
+        // Paginate results
+        $factorys = $factorysQuery->with('creator:id,name','user:id,name')->paginate($itemsPerPage);
+
+        // Return the response as JSON
+        return response()->json([
+            'items' => $factorys->items(), // Current page items
+            'total' => $factorys->total(), // Total number of trashed records
+        ]);
+    }
+
+    public function forceDelete($id)
+    {
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
+
+            // Superadmin check: Allow access to all trashed factorys
+            if ($currentUser->role === 'superadmin') {
+                $operator = Factory::onlyTrashed()->findOrFail($id);
+            } else {
+                // Regular admin authorization check
+                $operator = Factory::onlyTrashed()
+                    ->where('creator_id', $currentUser->id)
+                    ->where('creator_type', $creatorType)
+                    ->findOrFail($id);
+            }
+
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+
+            // Regular user authorization check
+            $operator = Factory::onlyTrashed()
+                ->where('creator_id', $currentUser->id)
+                ->where('creator_type', $creatorType)
+                ->findOrFail($id);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        // Permanently delete the operator
+        $operator->forceDelete(); // Permanent delete
+
+        return response()->json(['message' => 'Operator permanently deleted'], Response::HTTP_OK);
+    }
+    // Restore a soft-deleted operator
+    public function restore($id)
+    {
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
+
+            // Superadmin check: Allow access to all trashed factorys
+            if ($currentUser->role === 'superadmin') {
+                $restored = Factory::onlyTrashed()->findOrFail($id)->restore();
+            } else {
+                // Regular admin authorization check
+                $restored = Factory::onlyTrashed()
+                    ->where('creator_id', $currentUser->id)
+                    ->where('creator_type', $creatorType)
+                    ->findOrFail($id)
+                    ->restore();
+            }
+
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+
+            // Regular user authorization check
+            $restored = Factory::onlyTrashed()
+                ->where('creator_id', $currentUser->id)
+                ->where('creator_type', $creatorType)
+                ->findOrFail($id)
+                ->restore();
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        if ($restored) {
+            return response()->json(['message' => 'Operator restored successfully'], Response::HTTP_OK);
+        }
+
+        return response()->json(['message' => 'Operator not found or is not trashed'], Response::HTTP_NOT_FOUND);
     }
 
     public function getCompanys(Request $request){
@@ -339,17 +464,5 @@ class FactoryController extends Controller
                      ->get();
         // Return the lines as JSON
         return response()->json($lines);
-    }
-
-    private function generateCustomUuid()
-    {
-        // You can customize the UUID format here
-        // Here is a simple example of generating a random UUID-like string
-        $data = random_bytes(16);
-        // Set the version (4) and variant bits
-        $data[6] = chr(ord($data[6]) & 0x0f | 0x40); // Version 4
-        $data[8] = chr(ord($data[8]) & 0x3f | 0x80); // Variant
-
-        return vsprintf('%s-%s-%s-%s-%s', str_split(bin2hex($data), 4));
     }
 }

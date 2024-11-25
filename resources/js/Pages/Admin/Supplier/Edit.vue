@@ -23,7 +23,7 @@
                     v-model="valid"
                     @submit.prevent="updateSupplier"
                 >
-                    <v-select
+                    <!-- <v-select
                         v-model="supplier.type"
                         :rules="[rules.required]"
                         :items="statusTypeItems"
@@ -34,7 +34,7 @@
                         <template v-slot:label>
                             Supplier Type <span style="color: red">*</span>
                         </template>
-                    </v-select>
+                    </v-select> -->
 
                     <v-text-field
                         label="Name"
