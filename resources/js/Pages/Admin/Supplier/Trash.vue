@@ -48,7 +48,7 @@
 
         <!-- Restore Confirmation Dialog -->
         <RestoreConfirmDialog
-            :restroreDialogName="restroreDialogName"
+            :restoreDialogName="restoreDialogName"
             v-model:modelValue="restoreDialog"
             :onConfirm="confirmRestore"
             :onCancel="() => (restoreDialog = false)"
@@ -75,7 +75,7 @@ export default {
     },
     data() {
         return {
-            restroreDialogName: "Are you sure you want to restore this Rents?",
+            restoreDialogName: "Are you sure you want to restore this Rents?",
             dialogName: "Are you sure you want to delete this Rents ?",
             search: "",
             itemsPerPage: 15,

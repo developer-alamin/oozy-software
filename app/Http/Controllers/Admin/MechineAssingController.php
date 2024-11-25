@@ -9,6 +9,7 @@ use App\Models\Admin;
 use App\Models\MechineAssing;
 use App\Models\Brand;
 use App\Models\Factory;
+use App\Models\GeneralSetting;
 use App\Models\MechineStock;
 use App\Models\MechineType;
 use App\Models\ProductModel;
@@ -20,6 +21,8 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class MechineAssingController extends Controller
 {
@@ -62,7 +65,7 @@ class MechineAssingController extends Controller
         // Apply sorting
         $mechineAssingQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $mechineAssing = $mechineAssingQuery->where('mechine_status','Assing')->with('creator:id,name','user:id,name','factory:id,name')->paginate($itemsPerPage);
+        $mechineAssing = $mechineAssingQuery->where('status','Assign')->with('creator:id,name','factory:id,name','machineStatus:id,name','productModel:id,name','mechineType:id,name')->paginate($itemsPerPage);
         // Return the response as JSON
         return response()->json([
             'items' => $mechineAssing->items(), // Current page items
@@ -178,6 +181,8 @@ class MechineAssingController extends Controller
 
     public function store(Request $request)
     {
+
+        // dd($request->all());
         // Check which authentication guard is in use and set the creator
         if (Auth::guard('admin')->check()) {
             $creator = Auth::guard('admin')->user();
@@ -189,66 +194,84 @@ class MechineAssingController extends Controller
 
         // Validate the incoming request data
         $validatedData = $request->validate([
-            'company_id'              => 'required|integer',
+            'name'                    => 'required|string|max:255',
             'factory_id'              => 'required|integer',
             'brand_id'                => 'required|integer',
             'model_id'                => 'required|integer',
-            'mechine_type_id'         => 'required|integer',
-            'mechine_source_id'       => 'required|integer',
+            'machine_type_id'         => 'required|integer',
+            'machine_source_id'       => 'nullable',
             'supplier_id'             => 'nullable',
-            'rent_id'                 => 'nullable|integer',
             'rent_date'               => 'nullable',
-            'name'                    => 'required|string|max:255',
-            'mechine_code'            => 'required|string|max:255',
-            'serial_number'           => 'nullable|string|max:255',
-            'preventive_service_days' => 'nullable',
-            'purchace_price'          => 'nullable|numeric',
+            'rent_name'               => 'nullable|string|max:255',
+            'rent_note'               => 'nullable|string',
+            'rent_amount_type'        => 'nullable|string',
+            'machine_code'            => 'required|string|max:255',
+            'partial_maintenance_day' => 'nullable',
+            'full_maintenance_day'    => 'nullable',
+            'purchase_price'          => 'nullable',
             'purchase_date'           => 'nullable',
             'status'                  => 'nullable',  // Example: assumes "status" has specific values
             'note'                    => 'nullable|string',
-            'mechine_status'          => 'nullable',
+            'machine_status_id'       => 'required',
+            'qr_code_path'            => 'nullable'
         ]);
-
+        // dd($request->all());
         // Process dates to handle timezone issues and format them properly
-        if (isset($validatedData['purchase_date'])) {
+        if (!empty($request->purchase_date) && $request->purchase_date !== 'null') {
+            // Remove extra characters like "(timezone)" if any and parse the date
             $validatedData['purchase_date'] = Carbon::parse(
-                preg_replace('/\s*\(.*\)$/', '', $validatedData['purchase_date'])
+                preg_replace('/\s*\(.*\)$/', '', $request->purchase_date)
             )->format('Y-m-d');
+        } else {
+            $validatedData['purchase_date'] = null; // Set to null if no valid date is provided
         }
 
-        if (isset($validatedData['rent_date'])) {
+        if (!empty($request->rent_date) && $request->rent_date !== 'null') {
+            // Remove extra characters like "(timezone)" if any and parse the date
             $validatedData['rent_date'] = Carbon::parse(
-                preg_replace('/\s*\(.*\)$/', '', $validatedData['rent_date'])
+                preg_replace('/\s*\(.*\)$/', '', $request->rent_date)
             )->format('Y-m-d');
+        } else {
+            $validatedData['rent_date'] = null; // Set to null if no valid date is provided
         }
 
-        // Create the new MechineAssing instance with validated data
-        $mechineAssing       = new MechineAssing($validatedData);
+        // Create the new MachineAssing instance with validated data
+        $mechineAssing                    = new MechineAssing($validatedData);
+        $mechineAssing->machine_source_id = ($request->machine_source_id && $request->machine_source_id !== 'null') ? $request->machine_source_id : 0;
         // Associate the creator and updater polymorphically
-        $mechineAssing->uuid = HelperController::generateUuid();
-        $mechineAssing->mechine_status = "Assing";
+        $mechineAssing->uuid              = HelperController::generateUuid();
+        $mechineAssing->status            = "Assign";
+        // Similarly handle supplier_id
+        $mechineAssing->supplier_id       = ($request->supplier_id && $request->supplier_id !== 'null') ? $request->supplier_id : 0;
         $mechineAssing->creator()->associate($creator);
         $mechineAssing->updater()->associate($creator);
+
+        // Generate and save QR code
+        // $qrCodeData = $mechineAssing->mechine_code;
+        // $qrCodeImage = QrCode::format('png')->size(200)->generate($qrCodeData);
+        // $qrCodePath = 'qrcodes/' . uniqid() . '_qrcode.png';
+        // Storage::disk('public')->put($qrCodePath, $qrCodeImage);
+        // $mechineAssing->qr_code_path = $qrCodePath;
 
         // Save the MechineAssing record
         $mechineAssing->save();
 
         // Save data to the Stock table
-        $stock = new MechineStock([
-            'mechine_assing_id' => $mechineAssing->id,
-            'quantity'          => 1,
-            'type'              => "mechine",
-            'status'            => 'in_stock',  // Adjust status as needed
-        ]);
+        // $stock = new MechineStock([
+        //     'mechine_assing_id' => $mechineAssing->id,
+        //     'quantity'          => 1,
+        //     'type'              => "mechine",
+        //     'status'            => 'in_stock',  // Adjust status as needed
+        // ]);
 
-        $stock->creator()->associate($creator);
-        $stock->updater()->associate($creator);
-        $stock->save();
+        // $stock->creator()->associate($creator);
+        // $stock->updater()->associate($creator);
+        // $stock->save();
 
         // Return a success response
         return response()->json([
-            'success' => true,
-            'message' => 'MechineAssing created successfully.',
+            'success'        => true,
+            'message'        => 'Machine Assing created successfully.',
             'mechine_assing' => $mechineAssing
         ], 200);
     }
@@ -341,30 +364,35 @@ class MechineAssingController extends Controller
 
         // validataion
         $validatedData = $request->validated();
-        if (isset($validatedData['purchase_date'])) {
+        if (!empty($request->purchase_date) && $request->purchase_date !== 'null') {
+            // Remove extra characters like "(timezone)" if any and parse the date
             $validatedData['purchase_date'] = Carbon::parse(
-                preg_replace('/\s*\(.*\)$/', '', $validatedData['purchase_date'])
+                preg_replace('/\s*\(.*\)$/', '', $request->purchase_date)
             )->format('Y-m-d');
+        } else {
+            $validatedData['purchase_date'] = null; // Set to null if no valid date is provided
         }
 
-        if (isset($validatedData['rent_date'])) {
+        if (!empty($request->rent_date) && $request->rent_date !== 'null') {
+            // Remove extra characters like "(timezone)" if any and parse the date
             $validatedData['rent_date'] = Carbon::parse(
-                preg_replace('/\s*\(.*\)$/', '', $validatedData['rent_date'])
+                preg_replace('/\s*\(.*\)$/', '', $request->rent_date)
             )->format('Y-m-d');
+        } else {
+            $validatedData['rent_date'] = null; // Set to null if no valid date is provided
         }
          // Update the original machine status to "history"
 
 
         $mechineTransfer                            = new MechineAssing();
         $mechineTransfer->uuid                      = HelperController::generateUuid();
-        $mechineTransfer->company_id                = $request->company_id;
         $mechineTransfer->factory_id                = $request->factory_id;
         $mechineTransfer->brand_id                  = $request->brand_id;
         $mechineTransfer->model_id                  = $request->model_id;
         $mechineTransfer->mechine_type_id           = $request->mechine_type_id;
         $mechineTransfer->mechine_source_id         = $request->mechine_source_id;
-        $mechineTransfer->supplier_id               = $request->supplier_id;
-        $mechineTransfer->rent_id                   = $request->rent_id;
+        $mechineTransfer->supplier_id               = ($request->supplier_id && $request->supplier_id !== 'null') ? $request->supplier_id : 0;
+        $mechineTransfer->rent_id                   = ($request->rent_id && $request->rent_id !== 'null') ? $request->rent_id : 0;
         $mechineTransfer->rent_date                 = $request->rent_date;
         $mechineTransfer->name                      = $request->name;
         $mechineTransfer->mechine_code              = $request->mechine_code;
@@ -394,14 +422,83 @@ class MechineAssingController extends Controller
      */
     public function update(Request $request, MechineAssing $mechineAssing)
     {
-        //
+        // Determine the updater based on authentication guard
+        if (Auth::guard('admin')->check()) {
+            $updater = Auth::guard('admin')->user();
+        } elseif (Auth::guard('user')->check()) {
+            $updater = Auth::guard('user')->user();
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        // Validate the incoming request data
+        $validatedData = $request->validate([
+            'company_id'              => 'required|integer',
+            'factory_id'              => 'required|integer',
+            'brand_id'                => 'required|integer',
+            'model_id'                => 'required|integer',
+            'mechine_type_id'         => 'required|integer',
+            'mechine_source_id'       => 'required|integer',
+            'supplier_id'             => 'nullable',
+            'rent_id'                 => 'nullable',
+            'rent_date'               => 'nullable|date',
+            'name'                    => 'required|string|max:255',
+            'mechine_code'            => 'required|string|max:255',
+            'serial_number'           => 'nullable|string|max:255',
+            'preventive_service_days' => 'nullable',
+            'purchace_price'          => 'nullable|numeric',
+            'purchase_date'           => 'nullable|date',
+            'status'                  => 'nullable|string',
+            'note'                    => 'nullable|string',
+            'mechine_status'          => 'nullable|string',
+        ]);
+
+        // Process dates to handle timezone issues and format them properly
+        if (!empty($request->purchase_date) && $request->purchase_date !== 'null') {
+            // Remove extra characters like "(timezone)" if any and parse the date
+            $validatedData['purchase_date'] = Carbon::parse(
+                preg_replace('/\s*\(.*\)$/', '', $request->purchase_date)
+            )->format('Y-m-d');
+        } else {
+            $validatedData['purchase_date'] = null; // Set to null if no valid date is provided
+        }
+
+        if (!empty($request->rent_date) && $request->rent_date !== 'null') {
+            // Remove extra characters like "(timezone)" if any and parse the date
+            $validatedData['rent_date'] = Carbon::parse(
+                preg_replace('/\s*\(.*\)$/', '', $request->rent_date)
+            )->format('Y-m-d');
+        } else {
+            $validatedData['rent_date'] = null; // Set to null if no valid date is provided
+        }
+        // Update the MechineAssing instance with validated data
+        $mechineAssing->fill($validatedData);
+        $mechineAssing->supplier_id               = ($request->supplier_id && $request->supplier_id !== 'null') ? $request->supplier_id : 0;
+        $mechineAssing->rent_id                   = ($request->rent_id && $request->rent_id !== 'null') ? $request->rent_id : 0;
+
+        // Associate the updater polymorphically
+        $mechineAssing->updater()->associate($updater);
+
+        // Save the updated MechineAssing record and check for success
+        if ($mechineAssing->save()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Mechine Assing updated successfully.',
+                'mechine_assing' => $mechineAssing
+            ], 200);
+        }
+
+        // Return an error response if save fails
+        return response()->json(['success' => false, 'message' => 'Failed to update Mechine Assing.'], 500);
     }
+
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(MechineAssing $mechineAssing)
+    public function destroy(MechineAssing $machineAssing)
     {
+
         if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('admin')->user();
             // Check if the admin is a superadmin
@@ -410,7 +507,7 @@ class MechineAssingController extends Controller
             } else {
                 $creatorType = Admin::class;
                 // Regular admin authorization check
-                if ($mechineAssing->creator_type !== $creatorType || $mechineAssing->creator_id !== $currentUser->id) {
+                if ($machineAssing->creator_type !== $creatorType || $machineAssing->creator_id !== $currentUser->id) {
                     return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to delete this brand.'], 403);
                 }
             }
@@ -419,7 +516,7 @@ class MechineAssingController extends Controller
             $currentUser = Auth::guard('user')->user();
             $creatorType = User::class;
             // Regular user authorization check
-            if ($mechineAssing->creator_type !== $creatorType || $mechineAssing->creator_id !== $currentUser->id) {
+            if ($machineAssing->creator_type !== $creatorType || $machineAssing->creator_id !== $currentUser->id) {
                 return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to delete this brand.'], 403);
             }
         } else {
@@ -427,16 +524,18 @@ class MechineAssingController extends Controller
         }
 
         try {
+            // Delete related movements
+            $machineAssing->movements()->delete();
             // Delete the supplier
-            $mechineAssing->delete();
+            $machineAssing->delete();
             return response()->json([
                 'success' => true,
-                'message' => 'mechine assing deleted successfully.'
+                'message' => 'mechine assign deleted successfully.'
             ], Response::HTTP_OK);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error deleting mechine assing: ' . $e->getMessage()
+                'message' => 'Error deleting mechine assign: ' . $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -492,7 +591,7 @@ class MechineAssingController extends Controller
         // Apply sorting
         $mechinsQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $mechins = $mechinsQuery->with('creator:id,name','user:id,name','factory:id,name')->paginate($itemsPerPage);
+        $mechins = $mechinsQuery->where('status','Assign')->with('creator:id,name','factory:id,name','machineStatus:id,name','productModel:id,name','mechineType:id,name')->paginate($itemsPerPage);
 
         // Return the response as JSON
         return response()->json([
@@ -611,29 +710,30 @@ class MechineAssingController extends Controller
         // Return the factories as JSON
         return response()->json($factories);
     }
-    public function getBrands(Request $request){
 
-        // Get search term and limit from the request, with defaults
-        $search = $request->query('search', '');
-        $limit  = $request->query('limit', 5); // Default limit of 10
-        // Query to search for brands by name with a limit
-        $brands  = Brand::where('name', 'like', '%' . $search . '%')
-                     ->limit($limit)
-                     ->get();
-        // Return the brands as JSON
-        return response()->json($brands);
-    }
-    public function getModels(Request $request){
+    public function generateMachineCode()
+    {
+        // Fetch the prefix from the settings table
+        $prefix = GeneralSetting::where('key', 'machine_code_prefix')->value('value') ?? 'OZ-'; // Default to 'OZ-' if not found
 
-        // Get search term and limit from the request, with defaults
-        $search = $request->query('search', '');
-        $limit  = $request->query('limit', 5); // Default limit of 10
-        // Query to search for models by name with a limit
-        $models  = ProductModel::where('name', 'like', '%' . $search . '%')
-                     ->limit($limit)
-                     ->get();
-        // Return the models as JSON
-        return response()->json($models);
+        // Get the last machine assigned with the highest code
+        $lastMachine = MechineAssing::orderBy('machine_code', 'desc')->first();
+
+        // Determine the next numeric part of the machine code
+        if ($lastMachine) {
+            // Remove the prefix and convert the numeric part to an integer
+            $lastCode = intval(str_replace($prefix, '', $lastMachine->machine_code));
+            $nextCode = $lastCode + 1;
+        } else {
+            // If no machine code exists, start from 1
+            $nextCode = 1;
+        }
+
+        // Format the new machine code with the prefix and six-digit padding
+        $machineCode = $prefix . str_pad($nextCode, 8, '0', STR_PAD_LEFT);
+
+        // Return the generated code as JSON
+        return response()->json(['machine_code' => $machineCode]);
     }
     public function getTypes(Request $request){
 

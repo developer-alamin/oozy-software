@@ -3,6 +3,36 @@
         <v-card-title>Create Line</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="submit">
+                <v-autocomplete
+                    v-model="line.unit_id"
+                    :items="units"
+                    item-value="id"
+                    :item-title="formatUnit"
+                    outlined
+                    clearable
+                    density="comfortable"
+                    :rules="[rules.required]"
+                    :error-messages="errors.unit_id ? errors.unit_id : ''"
+                    @update:search="fetchUnits"
+                >
+                    <template v-slot:label>
+                        Select Unit <span style="color: red">*</span>
+                    </template>
+                </v-autocomplete>
+
+                <!-- Display factory name -->
+                <!-- <div v-if="selectedFloorName" style="margin-top: 10px">
+                    <strong>Floor Name:</strong> {{ selectedFloorName }}
+                </div> -->
+                <!-- Display factory name -->
+                <!-- <div v-if="selectedFactoryName" style="margin-top: 10px">
+                    <strong>Factory Name:</strong> {{ selectedFactoryName }}
+                </div> -->
+
+                <!-- Display user name -->
+                <!-- <div v-if="selectedUserName" style="margin-top: 10px">
+                    <strong>Company Name:</strong> {{ selectedUserName }}
+                </div> -->
                 <!-- Name Field -->
                 <v-text-field
                     v-model="line.name"
@@ -12,7 +42,7 @@
                     :error-messages="errors.name ? errors.name : ''"
                 >
                     <template v-slot:label>
-                        Line Number <span style="color: red">*</span>
+                        Line <span style="color: red">*</span>
                     </template>
                 </v-text-field>
 
@@ -64,6 +94,9 @@ export default {
             valid: false,
             loading: false, // Controls loading state of the button
             statusItems: ["Active", "Inactive"],
+            selectedFactoryName: null, // Displayed factory name
+            selectedUserName: null, // Displayed user name
+            selectedFloorName: null,
             line: {
                 name: "",
                 description: "",
@@ -71,6 +104,7 @@ export default {
             },
             errors: {}, // Stores validation errors
             serverError: null, // Stores server-side error messages
+            units: [],
             rules: {
                 required: (value) => !!value || "Required.",
             },
@@ -113,6 +147,46 @@ export default {
                 }
             }, 1000); // Simulates a 3-second loading duration
         },
+
+        async fetchUnits(search) {
+            try {
+                const response = await this.$axios.get(`/get_units`, {
+                    params: {
+                        search: search,
+                        limit: this.limit,
+                    },
+                });
+                // console.log(response.data);
+                this.units = response.data;
+            } catch (error) {
+                console.error("Error fetching units:", error);
+            }
+        },
+        // Format factory name with user name
+        formatUnit(line) {
+            if (line) {
+                return `${line.name} -- ${line.floors?.name || "No Floor"} -- ${
+                    line.floors?.factories?.name || "No Factory"
+                } -- ${line.floors?.factories?.user?.name || "No Company"}`;
+            }
+        },
+        // updateSelectedUnitDetails(unitId) {
+        //     const selectedUnit = this.units.find((unit) => unit.id === unitId);
+        //     if (selectedUnit) {
+        //         this.selectedFloorName =
+        //             selectedUnit.floors?.name || "No Floor Name";
+        //         this.selectedFactoryName =
+        //             selectedUnit.floors?.factories?.name || "No Factory Name";
+        //         this.selectedUserName =
+        //             selectedUnit.floors?.factories?.user?.name ||
+        //             "No Company Name";
+        //     } else {
+        //         this.selectedFloorName = null;
+        //         this.selectedFactoryName = null;
+        //         this.selectedUserName = null;
+        //     }
+        // },
+
         resetForm() {
             this.line = {
                 name: "",
@@ -126,5 +200,11 @@ export default {
             }
         },
     },
+    // watch: {
+    //     // Watch for changes to unit.floor_id
+    //     "line.unit_id": function (newUnitId) {
+    //         this.updateSelectedUnitDetails(newUnitId);
+    //     },
+    // },
 };
 </script>

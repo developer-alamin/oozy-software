@@ -11,25 +11,31 @@ class MechineAssing extends Model
     use HasFactory,SoftDeletes;
     protected $primaryKey = 'id';
 
+    protected $casts = [
+        'model_id'=> 'integer'
+    ];
+
     protected $fillable = [
-        'company_id',
+        'name',
         'factory_id',
         'brand_id',
         'model_id',
-        'mechine_type_id',
-        'mechine_source_id',
+        'machine_type_id',
+        'machine_source_id',
         'supplier_id',
-        'rent_id',
         'rent_date',
-        'name',
-        'mechine_code',
-        'serial_number',
-        'preventive_service_days',
-        'purchace_price',
+        'rent_name',
+        'rent_note',
+        'rent_amount_type',
+        'machine_code',
+        'partial_maintenance_day',
+        'full_maintenance_day',
+        'purchase_price',
         'purchase_date',
-        'status',
         'note',
-        'mechine_status'
+        'status',
+        'machine_status_id',
+        'qr_code_path'
     ];
 
     // Optionally, cast some fields to specific types (e.g., dates)
@@ -41,6 +47,18 @@ class MechineAssing extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'company_id');
+    }
+    public function machineStatus()
+    {
+        return $this->belongsTo(MachineStatus::class, 'machine_status_id');
+    }
+    public function productModel()
+    {
+        return $this->belongsTo(ProductModel::class, 'model_id');
+    }
+    public function mechineType()
+    {
+        return $this->belongsTo(MechineType::class, 'machine_type_id');
     }
     public function factory()
     {
@@ -54,6 +72,11 @@ class MechineAssing extends Model
     public function updater()
     {
         return $this->morphTo();
+    }
+
+    public function movements()
+    {
+        return $this->hasMany(Movement::class, 'machine_id', 'id');
     }
 
 

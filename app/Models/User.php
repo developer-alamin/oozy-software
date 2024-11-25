@@ -50,6 +50,8 @@ class User extends Authenticatable
     }
 
 
+
+
     public function createdTechnicians(): MorphMany
     {
         return $this->morphMany(Technician::class, 'creator');
@@ -207,5 +209,25 @@ class User extends Authenticatable
     public function updatedMechineStocks(): MorphMany
     {
         return $this->morphMany(MechineStock::class, 'updater');
+    }
+
+    // mechine Stock created by this user
+    public function createdServices(): MorphMany
+    {
+        return $this->morphMany(Service::class, 'creator');
+    }
+    //  mechine Stock updated by this user
+    public function updatedServices(): MorphMany
+    {
+        return $this->morphMany(Service::class, 'updater');
+    }
+    public function createdMovement(): MorphMany
+    {
+        return $this->morphMany(Movement::class, 'creator');
+    }
+    //  movement 
+    public function updatedMovement(): MorphMany
+    {
+        return $this->morphMany(Movement::class, 'updater');
     }
 }

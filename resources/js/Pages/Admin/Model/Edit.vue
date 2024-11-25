@@ -3,6 +3,23 @@
         <v-card-title>Edit Model</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="submit">
+                <v-autocomplete
+                    v-model="model.brand_id"
+                    :items="brands"
+                    item-value="id"
+                    item-title="name"
+                    outlined
+                    clearable
+                    chips
+                    density="comfortable"
+                    :rules="[rules.required]"
+                    :error-messages="errors.brand_id ? errors.brand_id : ''"
+                    @update:search="fetchBrands"
+                >
+                    <template v-slot:label>
+                        Select Brand <span style="color: red">*</span>
+                    </template>
+                </v-autocomplete>
                 <!-- Name Field -->
                 <v-text-field
                     v-model="model.name"
@@ -92,12 +109,14 @@ export default {
             statusItems: ["Active", "Inactive"],
             statusTypeItems: ["Mechine", "Parse"],
             model: {
+                brand_id: "",
                 type: "",
                 name: "",
                 model_number: "",
                 description: "",
                 status: "", // Default to false (inactive)
             },
+            brands: [],
             errors: {},
             serverError: null,
             rules: {
@@ -106,6 +125,9 @@ export default {
         };
     },
     created() {
+        this.fetchBrands().then(() => {
+            this.fetchModel();
+        });
         this.fetchModel();
     },
     methods: {
@@ -119,6 +141,12 @@ export default {
                 // console.log(response.data);
 
                 this.model = response.data.model; // Populate form with the existing model data
+                const selectedBrand = this.brands.find(
+                    (c) => c.id === this.model.brand_id
+                );
+                if (selectedBrand) {
+                    this.model.brand_id = selectedBrand.id; // Set the company_id for v-autocomplete
+                }
 
                 this.model.status =
                     this.model.status === "Active" ? "Active" : "Inactive";
@@ -157,6 +185,20 @@ export default {
                     this.loading = false;
                 }
             }, 1000);
+        },
+        async fetchBrands(search) {
+            try {
+                const response = await this.$axios.get(`/get_brand_alls`, {
+                    params: {
+                        search: search,
+                        limit: this.limit,
+                    },
+                });
+                // console.log(response.data);
+                this.brands = response.data;
+            } catch (error) {
+                console.error("Error fetching brands:", error);
+            }
         },
         resetForm() {
             this.fetchModel(); // Reset the form with existing model data

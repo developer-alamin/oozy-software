@@ -79,6 +79,11 @@
                     {{ item.status === "Active" ? "Active" : "Inactive" }}
                 </v-chip>
             </template>
+            <template v-slot:item.description="{ item }">
+                <span>{{
+                    item.description != null || item.description || ""
+                }}</span>
+            </template>
 
             <template v-slot:item.creator_name="{ item }">
                 <span>{{ item.creator ? item.creator.name : "Unknown" }}</span>
@@ -122,7 +127,8 @@ export default {
             search: "",
             itemsPerPage: 15,
             headers: [
-                { title: "Floor Number", key: "name", sortable: true },
+                { title: "Factory", key: "factories.name", sortable: false },
+                { title: "Floor", key: "name", sortable: true },
                 { title: "Description", key: "description", sortable: false },
                 {
                     title: "Status",
@@ -156,6 +162,8 @@ export default {
                         search: this.search,
                     },
                 });
+                console.log(response.data.items);
+
                 this.serverItems = response.data.items || [];
                 this.totalItems = response.data.total || 0;
                 this.fetchTrashedFloorsCount();

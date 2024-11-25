@@ -36,156 +36,172 @@
         </ul>
       </li>
 
-      <li class="nav-item">
-        <a
-          class="nav-link collapsed"
-          :class="{ show: isMachineRoute }"
-          data-bs-target="#components-nav"
-          data-bs-toggle="collapse"
-          href="#"
-        >
-          <i class="bi bi-menu-button-wide"></i><span>Machines</span
-          ><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul
-          id="components-nav"
-          class="nav-content collapse"
-          :class="{ show: isMachineRoute }"
-          data-bs-parent="#sidebar-nav"
-        >
-          <li>
-            <router-link :to="{ name: 'MechineCreate' }">
-              <i class="bi bi-circle"></i>
-              <span>Machine Assign</span>
-            </router-link>
-          </li>
-          <li>
-            <router-link :to="{ name: 'MechineIndex' }">
-              <i class="bi bi-circle"></i>
-              <span> Machine Assign List </span>
-            </router-link>
-          </li>
-          <li>
-            <router-link :to="{ name: 'MechineTransferList' }">
-              <i class="bi bi-circle"></i>
-              <span> Machine Transfer List </span>
-            </router-link>
-          </li>
-          <li>
-            <router-link :to="{ name: 'MechineHistoryList' }">
-              <i class="bi bi-circle"></i><span> Machine History List </span>
-            </router-link>
-          </li>
+            <li class="nav-item">
+                <a
+                    class="nav-link collapsed"
+                    :class="{ show: isMechineRouteShow }"
+                    data-bs-target="#components-nav"
+                    data-bs-toggle="collapse"
+                    href="#"
+                >
+                    <i class="bi bi-menu-button-wide"></i><span>Machines</span
+                    ><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul
+                    id="components-nav"
+                    class="nav-content collapse"
+                    :class="{ show: isMechineRouteShow }"
+                    data-bs-parent="#sidebar-nav"
+                >
+                    <li>
+                        <router-link
+                            :to="{ name: 'MechineCreate' }"
+                            active-class="active"
+                            :class="{ active: isMachineCreateRoute }"
+                        >
+                            <i class="bi bi-circle"></i><span>Machine Add</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'MechineIndex' }"
+                            active-class="active"
+                            :class="{ active: isMachineRoute }"
+                        >
+                            <i class="bi bi-circle"></i
+                            ><span> Machine All </span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'MachineMovement' }"
+                            active-class="active"
+                            :class="{ active: isMachineMovementRoute }"
+                        >
+                            <i class="bi bi-circle"></i
+                            ><span> Machine Movement </span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'MachineLocation' }"
+                            active-class="active"
+                            :class="{ active: isMachineLocationRoute }"
+                        >
+                            <i class="bi bi-circle"></i
+                            ><span> Machine Movement Location List </span>
+                        </router-link>
+                    </li>
 
-          <li>
-            <router-link
-              :to="{ name: 'UnitIndex' }"
-              active-class="active"
-              :class="{ active: isUnitRoute }"
-            >
-              <i class="bi bi-circle"></i><span>Machine Unit</span>
-            </router-link>
-          </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'MechineHistoryList' }"
+                            active-class="active"
+                            :class="{ active: isMechineHistoryListRoute }"
+                        >
+                            <i class="bi bi-circle"></i
+                            ><span> Machine Movement History List </span>
+                        </router-link>
+                    </li>
+                </ul>
+            </li>
+            <!-- End Components Nav -->
+            <li class="nav-item">
+                <a
+                    class="nav-link collapsed"
+                    data-bs-target="#forms-nav-company"
+                    data-bs-toggle="collapse"
+                    href="#"
+                    :class="{ show: isOrganizationRouteShow }"
+                >
+                    <i class="bi bi-journal-text"></i><span>Organization</span
+                    ><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul
+                    id="forms-nav-company"
+                    class="nav-content collapse"
+                    data-bs-parent="#sidebar-nav"
+                    :class="{ show: isOrganizationRouteShow }"
+                >
+                    <li>
+                        <router-link
+                            :to="{ name: 'AllCompanyIndex' }"
+                            active-class="active"
+                            :class="{ active: isCompanyRoute }"
+                        >
+                            <i class="bi bi-circle"></i><span>Company</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'FactoryIndex' }"
+                            active-class="active"
+                            :class="{ active: isFactoryRoute }"
+                        >
+                            <i class="bi bi-circle"></i><span>Factory</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'FloorIndex' }"
+                            active-class="active"
+                            :class="{ active: isFloorRoute }"
+                        >
+                            <i class="bi bi-circle"></i><span>Floor</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'UnitIndex' }"
+                            active-class="active"
+                            :class="{ active: isUnitRoute }"
+                        >
+                            <i class="bi bi-circle"></i
+                            ><span>Mechine Unit</span>
+                        </router-link>
+                    </li>
 
-          <li>
-            <router-link
-              :to="{ name: 'MechineTypeIndex' }"
-              active-class="active"
-              :class="{ active: isMachineRoute.MechineTypeIndex }"
-            >
-              <i class="bi bi-circle"></i><span>Mechine Type</span>
-            </router-link>
-          </li>
-          <li>
-            <router-link
-              :to="{ name: 'MechineSourceIndex' }"
-              active-class="active"
-              :class="{
-                active: isMachineRoute.isMechineSourceIndex,
-              }"
-            >
-              <i class="bi bi-circle"></i><span>Mechine Source</span>
-            </router-link>
-          </li>
-        </ul>
-      </li>
-      <!-- End Components Nav -->
-      <li class="nav-item">
-        <a
-          class="nav-link collapsed"
-          data-bs-target="#forms-nav-company"
-          data-bs-toggle="collapse"
-          href="#"
-          :class="{ show: isCompanyRouteShow }"
-        >
-          <i class="bi bi-journal-text"></i><span>Company</span
-          ><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul
-          id="forms-nav-company"
-          class="nav-content collapse"
-          data-bs-parent="#sidebar-nav"
-          :class="{ show: isCompanyRouteShow }"
-        >
-          <li>
-            <router-link
-              :to="{ name: 'CompanyCreate' }"
-              active-class="active"
-              :class="{ active: isCompanyCreateActive }"
-            >
-              <i class="bi bi-circle"></i><span>Add Company</span>
-            </router-link>
-          </li>
-          <li>
-            <router-link
-              :to="{ name: 'AllCompanyIndex' }"
-              active-class="active"
-              :class="{ active: isCompanyIndexActive }"
-            >
-              <i class="bi bi-circle"></i><span>All Company</span>
-            </router-link>
-          </li>
-        </ul>
-      </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'LineIndex' }"
+                            active-class="active"
+                            :class="{ active: isLineRoute }"
+                        >
+                            <i class="bi bi-circle"></i><span>Line</span>
+                        </router-link>
+                    </li>
+                </ul>
+            </li>
 
-      <li class="nav-item">
-        <a
-          class="nav-link collapsed"
-          data-bs-target="#forms-nav"
-          data-bs-toggle="collapse"
-          :class="{ show: isFactoryRouteShow }"
-        >
-          <i class="bi bi-journal-text"></i><span>Factory</span
-          ><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul
-          id="forms-nav"
-          class="nav-content collapse"
-          data-bs-parent="#sidebar-nav"
-          :class="{ show: isFactoryRouteShow }"
-        >
-          <li>
-            <router-link
-              :to="{ name: 'FactoryCreate' }"
-              active-class="active"
-              :class="{ active: isFactoryCreateActive }"
-            >
-              <i class="bi bi-circle"></i><span>Create Factory</span>
-            </router-link>
-          </li>
-
-          <li>
-            <router-link
-              :to="{ name: 'FactoryIndex' }"
-              active-class="active"
-              :class="{ active: isFactoryIndexActive }"
-            >
-              <i class="bi bi-circle"></i><span>All Factories</span>
-            </router-link>
-          </li>
-        </ul>
-      </li>
-      <!-- End Forms Nav -->
+            <!-- <li class="nav-item">
+                <a
+                    class="nav-link collapsed"
+                    data-bs-target="#forms-nav"
+                    data-bs-toggle="collapse"
+                    :class="{ show: isFactoryRouteShow }"
+                >
+                    <i class="bi bi-journal-text"></i><span>Factory</span
+                    ><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul
+                    id="forms-nav"
+                    class="nav-content collapse"
+                    data-bs-parent="#sidebar-nav"
+                    :class="{ show: isFactoryRouteShow }"
+                >
+                    <li>
+                        <router-link
+                            :to="{ name: 'FactoryCreate' }"
+                            active-class="active"
+                            :class="{ active: isFactoryCreateActive }"
+                        >
+                            <i class="bi bi-circle"></i
+                            ><span>Create Factory</span>
+                        </router-link>
+                    </li>
+                </ul>
+            </li> -->
+            <!-- End Forms Nav -->
 
       <!-- parse -->
 
@@ -230,34 +246,73 @@
         </ul>
       </li>
 
-      <li class="nav-item">
-        <a
-          class="nav-link collapsed"
-          data-bs-target="#tables-nav"
-          data-bs-toggle="collapse"
-          href="#"
-        >
-          <i class="bi bi-layout-text-window-reverse"></i><span>Stock</span
-          ><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul
-          id="tables-nav"
-          class="nav-content collapse"
-          data-bs-parent="#sidebar-nav"
-        >
-          <li>
-            <a href="tables-general.html">
-              <i class="bi bi-circle"></i><span>Stock List </span>
-            </a>
-          </li>
-          <li>
-            <a href="tables-data.html">
-              <i class="bi bi-circle"></i><span>Stock Alert </span>
-            </a>
-          </li>
-        </ul>
-      </li>
-      <!-- End Tables Nav -->
+            <li class="nav-item">
+                <a
+                    class="nav-link collapsed"
+                    data-bs-target="#tables-nav-Service"
+                    data-bs-toggle="collapse"
+                    href="#"
+                >
+                    <i class="bi bi-layout-text-window-reverse"></i
+                    ><span>Service</span
+                    ><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul
+                    id="tables-nav-Service"
+                    class="nav-content collapse"
+                    data-bs-parent="#sidebar-nav"
+                >
+                    <li>
+                        <router-link
+                            :to="{ name: 'ServiceCreate' }"
+                            active-class="active"
+                        >
+                            <i class="bi bi-circle"></i
+                            ><span>Create Service</span>
+                        </router-link>
+                    </li>
+
+                    <!-- <li>
+                        <router-link
+                            :to="{ name: 'ServiceIndex' }"
+                            active-class="active"
+                        >
+                            <i class="bi bi-circle"></i><span>All Service</span>
+                        </router-link>
+                    </li> -->
+                </ul>
+            </li>
+
+            <li class="nav-item">
+                <a
+                    class="nav-link collapsed"
+                    data-bs-target="#tables-nav"
+                    data-bs-toggle="collapse"
+                    href="#"
+                >
+                    <i class="bi bi-layout-text-window-reverse"></i
+                    ><span>Stock</span
+                    ><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul
+                    id="tables-nav"
+                    class="nav-content collapse"
+                    data-bs-parent="#sidebar-nav"
+                >
+                    <li>
+                        <a href="tables-general.html">
+                            <i class="bi bi-circle"></i><span>Stock List </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="tables-data.html">
+                            <i class="bi bi-circle"></i
+                            ><span>Stock Alert </span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <!-- End Tables Nav -->
 
       <li class="nav-item">
         <a
@@ -359,206 +414,215 @@
         </ul>
       </li>
 
-      <li class="nav-item">
-        <a
-          class="nav-link collapsed"
-          data-bs-target="#tables-nav-tt"
-          data-bs-toggle="collapse"
-          href="#"
-          :class="{ show: isTechnicianRouteShow }"
-        >
-          <i class="bi bi-layout-text-window-reverse"></i><span>Technician</span
-          ><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul
-          id="tables-nav-tt"
-          class="nav-content collapse"
-          data-bs-parent="#sidebar-nav"
-          :class="{ show: isTechnicianRouteShow }"
-        >
-          <li>
-            <router-link
-              :to="{ name: 'TechnicianCreate' }"
-              active-class="active"
-              :class="{ active: isTechnicianCreateActive }"
-            >
-              <i class="bi bi-circle"></i><span>Add Technician </span>
-            </router-link>
-          </li>
-          <li>
-            <router-link
-              :to="{ name: 'TechnicianIndex' }"
-              active-class="active"
-              :class="{ active: isTechnicianIndexActive }"
-            >
-              <i class="bi bi-circle"></i><span>All Technicians</span>
-            </router-link>
-          </li>
-        </ul>
-      </li>
-      <li class="nav-item">
-        <a
-          class="nav-link collapsed"
-          data-bs-target="#tables-nav-tt"
-          data-bs-toggle="collapse"
-          href="#"
-          :class="{ show: isOperatorRouteShow }"
-        >
-          <i class="bi bi-layout-text-window-reverse"></i><span>Operator</span
-          ><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul
-          id="tables-nav-tt"
-          class="nav-content collapse"
-          data-bs-parent="#sidebar-nav"
-          :class="{ show: isOperatorRouteShow }"
-        >
-          <li>
-            <router-link
-              :to="{ name: 'OperatorCreate' }"
-              active-class="active"
-              :class="{ active: isOperatorCreateActive }"
-            >
-              <i class="bi bi-circle"></i><span>Add Operator </span>
-            </router-link>
-          </li>
-          <li>
-            <router-link
-              :to="{ name: 'OperatorIndex' }"
-              active-class="active"
-              :class="{ active: isOperatorIndexActive }"
-            >
-              <i class="bi bi-circle"></i><span>All Operators</span>
-            </router-link>
-          </li>
-        </ul>
-      </li>
-      <li class="nav-item">
-        <a
-          class="nav-link collapsed"
-          data-bs-target="#rant-nav"
-          data-bs-toggle="collapse"
-          href="#"
-        >
-          <i class="bi bi-layout-text-window-reverse"></i><span>Rant</span
-          ><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul
-          id="rant-nav"
-          class="nav-content collapse"
-          data-bs-parent="#sidebar-nav"
-        >
-          <li>
-            <router-link
-              :to="{ name: 'RentIndex' }"
-              active-class="active"
-              :class="{ active: isRentRouteShow }"
-            >
-              <i class="bi bi-circle"></i><span>All Rent </span>
-            </router-link>
-          </li>
-          <li>
-            <router-link
-              :to="{ name: 'RentCreate' }"
-              active-class="active"
-              :class="{ active: isRentRouteShow }"
-            >
-              <i class="bi bi-circle"></i><span>Create Rent</span>
-            </router-link>
-          </li>
-        </ul>
-      </li>
+            <li class="nav-item">
+                <a
+                    class="nav-link collapsed"
+                    data-bs-target="#tables-nav-tt"
+                    data-bs-toggle="collapse"
+                    href="#"
+                    :class="{ show: isGroupRouteShow }"
+                >
+                    <i class="bi bi-layout-text-window-reverse"></i
+                    ><span>Groups</span
+                    ><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul
+                    id="tables-nav-tt"
+                    class="nav-content collapse"
+                    data-bs-parent="#sidebar-nav"
+                    :class="{ show: isGroupRouteShow }"
+                >
+                    <li>
+                        <router-link
+                            :to="{ name: 'GroupCreate' }"
+                            active-class="active"
+                            :class="{ active: isGroupCreateActive }"
+                        >
+                            <i class="bi bi-circle"></i><span>Add Group </span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'GroupIndex' }"
+                            active-class="active"
+                            :class="{ active: isGroupIndexActive }"
+                        >
+                            <i class="bi bi-circle"></i><span>All Group</span>
+                        </router-link>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a
+                    class="nav-link collapsed"
+                    data-bs-target="#tables-nav-pp"
+                    data-bs-toggle="collapse"
+                    href="#"
+                    :class="{ show: isMachineManageSettingsRouteShow }"
+                >
+                    <i class="bi bi-layout-text-window-reverse"></i
+                    ><span>Machine Settings</span
+                    ><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul
+                    id="tables-nav-pp"
+                    class="nav-content collapse"
+                    data-bs-parent="#sidebar-nav"
+                    :class="{ show: isMachineManageSettingsRouteShow }"
+                >
+                    <li>
+                        <router-link
+                            :to="{ name: 'MechineTypeIndex' }"
+                            active-class="active"
+                            :class="{ active: MechineTypeRoute }"
+                        >
+                            <i class="bi bi-circle"></i><span>Type</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'MechineSourceIndex' }"
+                            active-class="active"
+                            :class="{ active: isMechineSourceRoute }"
+                        >
+                            <i class="bi bi-circle"></i><span>Source</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'BrandIndex' }"
+                            active-class="active"
+                            :class="{ active: isBrandRoute }"
+                        >
+                            <i class="bi bi-circle"></i><span>Brand</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'ModelIndex' }"
+                            active-class="active"
+                            :class="{ active: isModelRoute }"
+                        >
+                            <i class="bi bi-circle"></i><span>Model</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'SupplierIndex' }"
+                            active-class="active"
+                            :class="{ active: isSupplierRoute }"
+                        >
+                            <i class="bi bi-circle"></i><span>Supplier</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'MachineStatusIndex' }"
+                            active-class="active"
+                            :class="{ active: isMachineStatusRoute }"
+                        >
+                            <i class="bi bi-circle"></i
+                            ><span>Machine Status</span>
+                        </router-link>
+                    </li>
+                </ul>
+            </li>
+            <!-- <li class="nav-item">
+                <a
+                    class="nav-link collapsed"
+                    data-bs-target="#rant-nav"
+                    data-bs-toggle="collapse"
+                    href="#"
+                >
+                    <i class="bi bi-layout-text-window-reverse"></i
+                    ><span>Rant</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul
+                    id="rant-nav"
+                    class="nav-content collapse"
+                    data-bs-parent="#sidebar-nav"
+                >
+                    <li>
+                        <router-link
+                            :to="{ name: 'RentIndex' }"
+                            active-class="active"
+                            :class="{ active: isRentIndex }"
+                        >
+                            <i class="bi bi-circle"></i><span>All Rent </span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'RentCreate' }"
+                            active-class="active"
+                            :class="{ active: isRentCreate }"
+                        >
+                            <i class="bi bi-circle"></i><span>Create Rent</span>
+                        </router-link>
+                    </li>
+                </ul>
+            </li> -->
 
-      <!-- Start Settings Nav -->
-      <li class="nav-item">
-        <a
-          class="nav-link collapsed"
-          data-bs-target="#settings-nav"
-          data-bs-toggle="collapse"
-          href="#"
-          :class="{ show: isSettingRouteShow }"
-        >
-          <i class="bi bi-layout-text-window-reverse"></i><span>Settings</span
-          ><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul
-          id="settings-nav"
-          class="nav-content collapse"
-          data-bs-parent="#sidebar-nav"
-          :class="{ show: isSettingRouteShow }"
-        >
-          <li>
-            <router-link
-              :to="{ name: 'BrandIndex' }"
-              active-class="active"
-              :class="{ active: isBrandRoute }"
-            >
-              <i class="bi bi-circle"></i><span>Brand</span>
-            </router-link>
-          </li>
-          <li>
-            <router-link
-              :to="{ name: 'CategoryIndex' }"
-              active-class="active"
-              :class="{ active: isCategoryRoute }"
-            >
-              <i class="bi bi-circle"></i><span>Category</span>
-            </router-link>
-          </li>
-          <li>
-            <router-link
-              :to="{ name: 'ModelIndex' }"
-              active-class="active"
-              :class="{ active: isModelRoute }"
-            >
-              <i class="bi bi-circle"></i><span>Model</span>
-            </router-link>
-          </li>
-          <li>
-            <router-link
-              :to="{ name: 'SupplierIndex' }"
-              active-class="active"
-              :class="{ active: isSupplierRoute }"
-            >
-              <i class="bi bi-circle"></i><span>Supplier</span>
-            </router-link>
-          </li>
-          <li>
-            <router-link
-              :to="{ name: 'ParseUnitIndex' }"
-              active-class="active"
-              :class="{ active: isParseUnitRoute }"
-            >
-              <i class="bi bi-circle"></i><span>Parse Unit</span>
-            </router-link>
-          </li>
-          <li>
-            <router-link
-              :to="{ name: 'LineIndex' }"
-              active-class="active"
-              :class="{ active: isLineRoute }"
-            >
-              <i class="bi bi-circle"></i><span>Line</span>
-            </router-link>
-          </li>
-          <li>
-            <router-link
-              :to="{ name: 'GroupIndex' }"
-              active-class="active"
-              :class="{ active: isGroupRoute }"
-            >
-              <i class="bi bi-circle"></i><span>Group</span>
-            </router-link>
-          </li>
-          <li>
-            <router-link
-              :to="{ name: 'FloorIndex' }"
-              active-class="active"
-              :class="{ active: isFloorRoute }"
-            >
-              <i class="bi bi-circle"></i><span>Floor</span>
-            </router-link>
-          </li>
+            <!-- Start Settings Nav -->
+            <li class="nav-item">
+                <a
+                    class="nav-link collapsed"
+                    data-bs-target="#settings-nav"
+                    data-bs-toggle="collapse"
+                    href="#"
+                    :class="{ show: isSettingRouteShow }"
+                >
+                    <i class="bi bi-layout-text-window-reverse"></i
+                    ><span>Settings</span
+                    ><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul
+                    id="settings-nav"
+                    class="nav-content collapse"
+                    data-bs-parent="#sidebar-nav"
+                    :class="{ show: isSettingRouteShow }"
+                >
+                    <li>
+                        <router-link
+                            :to="{ name: 'CategoryIndex' }"
+                            active-class="active"
+                            :class="{ active: isCategoryRoute }"
+                        >
+                            <i class="bi bi-circle"></i
+                            ><span>Parse Category</span>
+                        </router-link>
+                    </li>
+
+                    <li>
+                        <router-link
+                            :to="{ name: 'ParseUnitIndex' }"
+                            active-class="active"
+                            :class="{ active: isParseUnitRoute }"
+                        >
+                            <i class="bi bi-circle"></i><span>Parse Unit</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'TechnicianIndex' }"
+                            active-class="active"
+                            :class="{ active: isTechnicianRoute }"
+                        >
+                            <i class="bi bi-circle"></i><span>Technician</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link
+                            :to="{ name: 'OperatorIndex' }"
+                            active-class="active"
+                            :class="{ active: isOperatorRoute }"
+                        >
+                            <i class="bi bi-circle"></i><span>Operator</span>
+                        </router-link>
+                    </li>
+                </ul>
+            </li>
+            <!-- End Settings Nav -->
         </ul>
       </li>
       <!-- End Settings Nav -->
@@ -575,114 +639,172 @@ import { useRoute } from "vue-router";
 const route = useRoute();
 
 // Check if the current route is part of the Mechine-related routes
-const isMachineRoute = computed(() => {
-  return [
-    "UnitIndex",
-    "UnitCreate",
-    "UnitEdit",
-    "UnitTrash",
-    "MechineTypeIndex",
-    "MechineTypeCreate",
-    "MechineTypeEdit",
-    "MechineSourceIndex",
-    "MechineSourceCreate",
-    "MechineSourceEdit",
-  ].includes(route.name);
+const isMechineRouteShow = computed(() => {
+    return [
+        "MechineIndex",
+        "MechineCreate",
+        "MechineTrash",
+        "MachineMovement",
+        "MachineLocation",
+        "MechineHistoryList",
+    ].includes(route.name);
 });
 
+const isMachineRoute = computed(() =>
+    ["MechineIndex", "MechineEdit", "MechineTrash"].includes(route.name)
+);
+const isMachineCreateRoute = computed(() =>
+    ["MechineCreate"].includes(route.name)
+);
+const isMachineMovementRoute = computed(() =>
+    ["MachineMovement"].includes(route.name)
+);
+const isMachineLocationRoute = computed(() =>
+    ["MachineLocation"].includes(route.name)
+);
+const isMechineHistoryListRoute = computed(() =>
+    ["MechineHistoryList"].includes(route.name)
+);
+
+// organization
+const isOrganizationRouteShow = computed(() => {
+    return [
+        "AllCompanyIndex",
+        "CompanyCreate",
+        "CompanyEdit",
+        "CompanyTrash",
+        "FactoryIndex",
+        "FactoryCreate",
+        "FactoryEdit",
+        "FactoryTrash",
+        "FloorIndex",
+        "FloorCreate",
+        "FloorEdit",
+        "FloorTrash",
+        "UnitIndex",
+        "UnitCreate",
+        "UnitEdit",
+        "UnitTrash",
+        "LineIndex",
+        "LineCreate",
+        "LineEdit",
+        "LineTrash",
+    ].includes(route.name);
+});
+
+const isCompanyRoute = computed(() =>
+    [
+        "AllCompanyIndex",
+        "CompanyCreate",
+        "CompanyEdit",
+        "CompanyTrash",
+    ].includes(route.name)
+);
+const isFactoryRoute = computed(() =>
+    ["FactoryIndex", "FactoryCreate", "FactoryEdit", "FactoryTrash"].includes(
+        route.name
+    )
+);
+const isFloorRoute = computed(() =>
+    ["FloorIndex", "FloorCreate", "FloorEdit", "FloorTrash"].includes(
+        route.name
+    )
+);
+const isUnitRoute = computed(() =>
+    ["UnitIndex", "UnitCreate", "UnitEdit", "UnitTrash"].includes(route.name)
+);
+const isLineRoute = computed(() =>
+    ["LineIndex", "LineCreate", "LineEdit", "LineTrash"].includes(route.name)
+);
+
+const isCategoryRoute = computed(() =>
+    [
+        "CategoryIndex",
+        "CategoryCreate",
+        "CategoryEdit",
+        "CategoryTrash",
+    ].includes(route.name)
+);
+
+// const isGroupRoute = computed(() =>
+//     ["GroupIndex", "GroupCreate", "GroupEdit", "GroupTrash"].includes(
+//         route.name
+//     )
+// );
+
+//technician
+const isGroupRouteShow = computed(() => {
+    return ["GroupIndex", "GroupCreate", "GroupEdit", "GroupTrash"].includes(
+        route.name
+    );
+});
+const isGroupCreateActive = computed(() => route.name === "GroupCreate");
+const isGroupIndexActive = computed(() => route.name === "GroupIndex");
+
+//technician
+const isMachineManageSettingsRouteShow = computed(() => {
+    return [
+        "BrandIndex",
+        "BrandCreate",
+        "BrandEdit",
+        "BrandTrash",
+        "ModelIndex",
+        "ModelCreate",
+        "ModelEdit",
+        "ModelTrash",
+        "SupplierIndex",
+        "SupplierCreate",
+        "SupplierEdit",
+        "SupplierTrash",
+        "MechineTypeIndex",
+        "MechineTypeCreate",
+        "MechineTypeEdit",
+        "MechineSourceIndex",
+        "MechineSourceCreate",
+        "MechineSourceEdit",
+    ].includes(route.name);
+});
+const isBrandRoute = computed(() =>
+    ["BrandIndex", "BrandCreate", "BrandEdit", "BrandTrash"].includes(
+        route.name
+    )
+);
 // Check if the current route is for a specific model-related route
 const isModelRoute = computed(() =>
   ["ModelIndex", "ModelCreate", "ModelEdit", "ModelTrash"].includes(route.name)
 );
-
 // Check if the current route is for a specific supplier-related route
 const isSupplierRoute = computed(() =>
   ["SupplierIndex", "SupplierCreate", "SupplierEdit", "SupplierTrash"].includes(
     route.name
   )
 );
-const isCategoryRoute = computed(() =>
-  ["CategoryIndex", "CategoryCreate", "CategoryEdit", "CategoryTrash"].includes(
-    route.name
-  )
+
+const MechineTypeRoute = computed(() =>
+    [
+        "MechineTypeIndex",
+        "MechineTypeCreate",
+        "MechineTypeEdit",
+        "MechineTypeTrash",
+    ].includes(route.name)
 );
-const isBrandRoute = computed(() =>
-  ["BrandIndex", "BrandCreate", "BrandEdit", "BrandTrash"].includes(route.name)
-);
-const isLineRoute = computed(() =>
-  ["LineIndex", "LineCreate", "LineEdit", "LineTrash"].includes(route.name)
-);
-const isGroupRoute = computed(() =>
-  ["GroupIndex", "GroupCreate", "GroupEdit", "GroupTrash"].includes(route.name)
-);
-const isFloorRoute = computed(() =>
-  ["FloorIndex", "FloorCreate", "FloorEdit", "FloorTrash"].includes(route.name)
-);
-const isUnitRoute = computed(() =>
-  ["UnitIndex", "UnitCreate", "UnitEdit", "UnitTrash"].includes(route.name)
-);
-const isParseUnitRoute = computed(() =>
-  [
-    "ParseUnitIndex",
-    "ParseUnitCreate",
-    "ParseUnitEdit",
-    "ParseUnitTrash",
-  ].includes(route.name)
-);
-// Company
-const isCompanyRouteShow = computed(() => {
-  return [
-    "AllCompanyIndex",
-    "CompanyCreate",
-    "CompanyEdit",
-    "CompanyTrash",
-  ].includes(route.name);
-});
-// Parse
-const isParseRouteShow = computed(() => {
-  return ["ParseCreate", "CompanyEdit", "CompanyTrash"].includes(route.name);
-});
-const isCompanyCreateActive = computed(() => route.name === "CompanyCreate");
-const isCompanyIndexActive = computed(() => route.name === "AllCompanyIndex");
-const isRentRouteShow = computed(() => route.name === "ParseCreate");
-// Company
-const isFactoryRouteShow = computed(() => {
-  return [
-    "FactoryIndex",
-    "FactoryCreate",
-    "FactoryEdit",
-    "FactoryTrash",
-  ].includes(route.name);
-});
-const isFactoryCreateActive = computed(() => route.name === "FactoryCreate");
-const isFactoryIndexActive = computed(() => route.name === "FactoryIndex");
-//technician
-const isTechnicianRouteShow = computed(() => {
-  return [
-    "TechnicianIndex",
-    "TechnicianCreate",
-    "TechnicianEdit",
-    "TechnicianTrash",
-  ].includes(route.name);
-});
-const isTechnicianCreateActive = computed(
-  () => route.name === "TechnicianCreate"
-);
-const isTechnicianIndexActive = computed(
-  () => route.name === "TechnicianIndex"
+const isMechineSourceRoute = computed(() =>
+    [
+        "MechineSourceIndex",
+        "MechineSourceCreate",
+        "MechineSourceEdit",
+        "MechineSourceTrash",
+    ].includes(route.name)
 );
 
-//technician
-const isOperatorRouteShow = computed(() => {
-  return [
-    "OperatorIndex",
-    "OperatorCreate",
-    "OperatorEdit",
-    "OperatorTrash",
-  ].includes(route.name);
-});
-const isOperatorCreateActive = computed(() => route.name === "OperatorCreate");
-const isOperatorIndexActive = computed(() => route.name === "OperatorIndex");
+const isMachineStatusRoute = computed(() =>
+    [
+        "MachineStatusIndex",
+        "MachineStatusCreate",
+        "MachineStatusEdit",
+        "MachineStatusTrash",
+    ].includes(route.name)
+);
 
 // Company
 const isAdminUserRouteShow = computed(() => {
@@ -705,39 +827,50 @@ const isUserCreateActive = computed(() => route.name === "UserCreate");
 const isUserIndexActive = computed(() => route.name === "AllUserIndex");
 
 const isSettingRouteShow = computed(() => {
-  return [
-    "BrandIndex",
-    "BrandCreate",
-    "BrandEdit",
-    "BrandTrash",
-    "ModelIndex",
-    "ModelCreate",
-    "ModelEdit",
-    "ModelTrash",
-    "CategoryIndex",
-    "CategoryCreate",
-    "CategoryEdit",
-    "CategoryTrash",
-    "SupplierIndex",
-    "SupplierCreate",
-    "SupplierEdit",
-    "SupplierTrash",
-    "LineIndex",
-    "LineCreate",
-    "LineEdit",
-    "LineTrash",
-    "GroupIndex",
-    "GroupEdit",
-    "GroupTrash",
-    "FloorIndex",
-    "FloorEdit",
-    "FloorTrash",
-    "ParseUnitIndex",
-    "ParseUnitCreate",
-    "ParseUnitEdit",
-    "ParseUnitTrash",
-  ].includes(route.name);
+    return [
+        "CategoryIndex",
+        "CategoryCreate",
+        "CategoryEdit",
+        "CategoryTrash",
+        "ParseUnitIndex",
+        "ParseUnitCreate",
+        "ParseUnitEdit",
+        "ParseUnitTrash",
+        "TechnicianIndex",
+        "TechnicianCreate",
+        "TechnicianEdit",
+        "TechnicianTrash",
+        "OperatorIndex",
+        "OperatorCreate",
+        "OperatorEdit",
+        "OperatorTrash",
+    ].includes(route.name);
 });
+
+const isTechnicianRoute = computed(() =>
+    [
+        "TechnicianIndex",
+        "TechnicianCreate",
+        "TechnicianEdit",
+        "TechnicianTrash",
+    ].includes(route.name)
+);
+const isOperatorRoute = computed(() =>
+    [
+        "OperatorIndex",
+        "OperatorCreate",
+        "OperatorEdit",
+        "OperatorTrash",
+    ].includes(route.name)
+);
+const isParseUnitRoute = computed(() =>
+    [
+        "ParseUnitIndex",
+        "ParseUnitCreate",
+        "ParseUnitEdit",
+        "ParseUnitTrash",
+    ].includes(route.name)
+);
 </script>
 
 <style scoped>

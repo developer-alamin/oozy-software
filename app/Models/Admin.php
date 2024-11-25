@@ -184,15 +184,57 @@ class Admin extends Authenticatable
         return $this->morphMany(ParseStockIn::class, 'updater');
     }
 
+    // mechine Stock created by this user
+    public function createdMechineStocks(): MorphMany
+    {
+        return $this->morphMany(MechineStock::class, 'creator');
+    }
+    //  mechine Stock updated by this user
+    public function updatedMechineStocks(): MorphMany
+    {
+        return $this->morphMany(MechineStock::class, 'updater');
+    }
+
+    // mechine Stock created by this user
+    public function createdServices(): MorphMany
+    {
+        return $this->morphMany(Service::class, 'creator');
+    }
+    //  mechine Stock updated by this user
+    public function updatedServices(): MorphMany
+    {
+        return $this->morphMany(Service::class, 'updater');
+    }
+
+     // mechine Stock created by this user
+     public function createdServiceHistorys(): MorphMany
+     {
+         return $this->morphMany(ServiceHistory::class, 'creator');
+     }
+     //  mechine Stock updated by this user
+     public function updatedServiceHistorys(): MorphMany
+     {
+         return $this->morphMany(ServiceHistory::class, 'updater');
+     }
 
       // mechine Stock created by this user
-      public function createdMechineStocks(): MorphMany
-      {
-          return $this->morphMany(MechineStock::class, 'creator');
-      }
-      //  mechine Stock updated by this user
-      public function updatedMechineStocks(): MorphMany
-      {
-          return $this->morphMany(MechineStock::class, 'updater');
-      }
+    public function createdServiceParses(): MorphMany
+    {
+        return $this->morphMany(ServiceParse::class, 'creator');
+    }
+    //  mechine Stock updated by this user
+    public function updatedServiceParses(): MorphMany
+    {
+        return $this->morphMany(ServiceParse::class, 'updater');
+    }
+
+    public function createdMovement(): MorphMany
+    {
+        return $this->morphMany(Movement::class, 'creator');
+    }
+    //  movement 
+    public function updatedMovement(): MorphMany
+    {
+        return $this->morphMany(Movement::class, 'updater');
+    }
 }

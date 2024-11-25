@@ -55,7 +55,7 @@
 
         <!-- Restore Confirmation Dialog -->
         <RestoreConfirmDialog
-            :restroreDialogName="restroreDialogName"
+            :restoreDialogName="restoreDialogName"
             v-model:modelValue="restoreDialog"
             :onConfirm="confirmRestore"
             :onCancel="() => (restoreDialog = false)"
@@ -82,12 +82,13 @@ export default {
     },
     data() {
         return {
-            restroreDialogName: "Are you sure you want to restore this Floor?",
+            restoreDialogName: "Are you sure you want to restore this Floor?",
             dialogName: "Are you sure you want to delete this Floor ?",
 
             search: "",
             itemsPerPage: 15,
             headers: [
+                { title: "Factory", key: "factories.name", sortable: false },
                 { title: "Number", key: "name", sortable: true },
                 { title: "Description", key: "description", sortable: false },
                 {

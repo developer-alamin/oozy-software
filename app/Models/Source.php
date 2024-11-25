@@ -21,6 +21,7 @@ class Source extends Model
         'name',
         'description',
         'status',
+        'rate_applicable',
         'creator_type',
         'creator_id',
         'updater_type',
@@ -30,9 +31,10 @@ class Source extends Model
     public static function validationRules()
     {
         return [
-            'name'         => 'required|max:255',
-            'description'  => 'nullable',
-            'status'       => 'nullable|in:Active,Inactive',
+            'name'            => 'required|max:255',
+            'description'     => 'nullable',
+            'status'          => 'nullable|in:Active,Inactive',
+            'rate_applicable' => 'nullable',
         ];
     }
 

@@ -12,6 +12,7 @@ class Floor extends Model
 {
     use HasFactory,SoftDeletes;
 
+
     protected $fillable = [
         'uuid',
         'name',
@@ -21,18 +22,11 @@ class Floor extends Model
         'creator_id',
         'updater_type',
         'updater_id',
+        'factory_id',
     ];
-
-    public static function validationRules()
-    {
-        return [
-            'name'         => 'required|max:255',
-            'description'  => 'nullable',
-            'status'       => 'nullable',
-
-        ];
-    }
-
+    protected $casts = [
+        'factory_id' => 'integer', // Casts factory_id to an integer
+    ];
     // Polymorphic relationships
     public function creator()
     {
@@ -43,14 +37,14 @@ class Floor extends Model
     {
         return $this->morphTo();
     }
-    public function factories(): BelongsToMany
-    {
-        return $this->belongsToMany(Factory::class);
-    }
 
-    public function units(): BelongsToMany
+    public function factories()
     {
-        return $this->belongsToMany(Unit::class);
+        return $this->belongsTo(Factory::class, 'factory_id');
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'company_id');
     }
 
 }
