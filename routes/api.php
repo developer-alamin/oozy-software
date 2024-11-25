@@ -37,14 +37,14 @@ Route::get('/suppliers/{uuid}/edit', [SupplierController::class, 'edit'])->name(
 Route::put('/suppliers/{uuid}', [SupplierController::class, 'update'])->name('suppliers.update');
 // suppliers Group Controllers start form here
 Route::controller(SupplierController::class)
-->prefix('supplier')
-->as("supplier")
-->group(function () {
+  ->prefix('supplier')
+  ->as("supplier")
+  ->group(function () {
     Route::get('/trashed-count', 'suppliertrashedcount')->name('supplier.trashed.count');
     Route::get('/trashed', 'suppliertrashed')->name('supplier.trashed');
     Route::post('{id}/restore', 'supplierrestore')->name('line.Restore');
     Route::delete('{id}/force-delete', 'supplierforcedelete')->name('supplier.force.delete');
-});
+  });
 Route::resource('suppliers', SupplierController::class);
 
 // --------------------------------------------Floor route statr here-------------------------------------------------------------------
@@ -52,14 +52,14 @@ Route::resource('suppliers', SupplierController::class);
 Route::get('/floor/{uuid}/edit', [FloorController::class, 'edit'])->name('floor.edit');
 Route::put('/floor/{uuid}', [FloorController::class, 'update'])->name('floor.update');
 Route::controller(FloorController::class)
-->prefix("floors")
-->as("floors")
-->group(function(){
+  ->prefix("floors")
+  ->as("floors")
+  ->group(function () {
     Route::get('/trashed-count', 'floortrashedcount')->name('floor.trashed.count');
     Route::get('/trashed', 'floortrashed')->name('floor.trashed');
     Route::post('{id}/restore', 'floorrestore')->name('floor.restore');
     Route::delete('{id}/force-delete', 'floorforcedelete')->name('floor.force.delete');
-});
+  });
 Route::resource('floor', FloorController::class);
 
 // --------------------------------------------Machine route statr here-------------------------------------------------------------------
@@ -98,33 +98,32 @@ Route::post('/service/history', [ServiceController::class, 'storeHistory']);
 Route::resource('services',ServiceController::class);
 // -------------------------------------------- mechine typeroute statr here-------------------------------------------------------------------
 
-Route::prefix("/mechine")->group(function(){
-    Route::get('/type/{uuid}/edit', [TypeController::class, 'edit'])->name('type.edit');
-    Route::put('/type/{uuid}', [TypeController::class, 'update'])->name('type.update');
-    Route::resource('type', TypeController::class);
-    Route::controller(TypeController::class)
+Route::prefix("/mechine")->group(function () {
+  Route::get('/type/{uuid}/edit', [TypeController::class, 'edit'])->name('type.edit');
+  Route::put('/type/{uuid}', [TypeController::class, 'update'])->name('type.update');
+  Route::resource('type', TypeController::class);
+  Route::controller(TypeController::class)
     ->prefix('types')
     ->as("types")
     ->group(function () {
-         Route::get('/trashed-count', 'typestrashedcount')->name('types.trashed.count');
-         Route::get('/trashed', 'typestrashed')->name('types.trashed');
-         Route::post('{id}/restore', 'typesrestore')->name('types.restore');
-         Route::delete('{id}/force-delete', 'typesforcedelete')->name('types.force.delete');
+      Route::get('/trashed-count', 'typestrashedcount')->name('types.trashed.count');
+      Route::get('/trashed', 'typestrashed')->name('types.trashed');
+      Route::post('{id}/restore', 'typesrestore')->name('types.restore');
+      Route::delete('{id}/force-delete', 'typesforcedelete')->name('types.force.delete');
     });
 
-    // --------------------------------------------mechine source route statr here-------------------------------------------------------------------
+  // --------------------------------------------mechine source route statr here-------------------------------------------------------------------
 
-    Route::resource('source', SourceController::class);
-    Route::controller(SourceController::class)
+  Route::resource('source', SourceController::class);
+  Route::controller(SourceController::class)
     ->prefix('sources')
     ->as("sources")
     ->group(function () {
-         Route::get('/trashed-count', 'sourcestrashedcount')->name('sources.trashed.count');
-         Route::get('/trashed', 'sourcestrashed')->name('sources.trashed');
-         Route::post('{id}/restore', 'sourcesrestore')->name('source.restore');
-         Route::delete('{id}/force-delete', 'sourcesforcedelete')->name('sources.force.delete');
+      Route::get('/trashed-count', 'sourcestrashedcount')->name('sources.trashed.count');
+      Route::get('/trashed', 'sourcestrashed')->name('sources.trashed');
+      Route::post('{id}/restore', 'sourcesrestore')->name('source.restore');
+      Route::delete('{id}/force-delete', 'sourcesforcedelete')->name('sources.force.delete');
     });
-
 });
 
 // --------------------------------------------Models route statr here-------------------------------------------------------------------
@@ -153,14 +152,14 @@ Route::get('/line/{uuid}/edit', [LineController::class, 'edit'])->name('lines.ed
 Route::put('/line/{uuid}', [LineController::class, 'update'])->name('lines.update');
 // Line Group Controllers start form here
 Route::controller(LineController::class)
-->prefix('lines')
-->as("lines")
-->group(function () {
+  ->prefix('lines')
+  ->as("lines")
+  ->group(function () {
     Route::get('/trashed-count', 'lineTrashedCount')->name('line.Trashed.Count');
     Route::get('/trashed', 'lineTrashed')->name('line.Trashed');
     Route::post('{id}/restore', 'lineRestore')->name('line.Restore');
     Route::delete('{id}/forceDelete', 'lineforceDelete')->name('line.lineforce.Delete');
-});
+  });
 // Line Group Controllers end form here
 Route::resource('line', LineController::class);
 
@@ -171,14 +170,14 @@ Route::get('/group/{uuid}/edit', [GroupController::class, 'edit'])->name('group.
 Route::put('/group/{uuid}', [GroupController::class, 'update'])->name('group.update');
 // Groups Gorup Controller start form here
 Route::controller(GroupController::class)
-->prefix("groups")
-->as("groups")
-->group(function () {
+  ->prefix("groups")
+  ->as("groups")
+  ->group(function () {
     Route::get('/trashed-count', 'groupsTrashedCount')->name('groups.Trashed.Count');
     Route::get('/trashed', 'groupsTrashed')->name('groups.Trashed');
     Route::post('{id}/restore', 'groupsRestore')->name('groups.Restore');
     Route::delete('{id}/forceDelete', 'groupsforceDelete')->name('groups.groupsforce.Delete');
-});
+  });
 Route::get('get-technician', [GroupController::class, 'getTechnician']);
 // Groups Gorup Controller end form here
 Route::resource('group', GroupController::class);
@@ -186,14 +185,14 @@ Route::resource('group', GroupController::class);
 // --------------------------------------------Rent route statr here-------------------------------------------------------------------
 // Group Rents Controller start form here
 Route::controller(RentController::class)
-->prefix('rents')
-->as("rents")
-->group(function () {
-     Route::get('/trashed-count', 'rentstrashedcount')->name('rents.trashed.count');
-     Route::get('/trashed', 'rentstrashed')->name('rents.trashed');
-     Route::post('{id}/restore', 'rentsrestore')->name('rents.restore');
-     Route::delete('{id}/force-delete', 'rentsforcedelete')->name('rents.force.delete');
-});
+  ->prefix('rents')
+  ->as("rents")
+  ->group(function () {
+    Route::get('/trashed-count', 'rentstrashedcount')->name('rents.trashed.count');
+    Route::get('/trashed', 'rentstrashed')->name('rents.trashed');
+    Route::post('{id}/restore', 'rentsrestore')->name('rents.restore');
+    Route::delete('{id}/force-delete', 'rentsforcedelete')->name('rents.force.delete');
+  });
 Route::resource('rent', RentController::class);
 
 // --------------------------------------------Brand route statr here-------------------------------------------------------------------
@@ -302,18 +301,19 @@ Route::get('/get_lines_by_machine', [DynamicDataController::class, 'getLinesByMa
 
 // Admin Auth Routes
 Route::prefix('admin')->group(function () {
-    // admin user
-    Route::get('/user/all', [AuthController::class, 'fetchAdminAllUserInfo']);
-    Route::post('/user/store', [AuthController::class, 'adminUserCreate']);
-    Route::get('/user/edit/{id}', [AuthController::class, 'adminUserEdit']);
-    Route::get('/user/trash', [AuthController::class, 'fetchAdminAllUserTrashInfo']);
+  // admin user
+  Route::get('/user/all', [AuthController::class, 'fetchAdminAllUserInfo'])->middleware('auth:admin');
+  Route::post('/user/store', [AuthController::class, 'adminUserCreate']);
+  Route::get('/user/edit/{id}', [AuthController::class, 'adminUserEdit']);
+  Route::get('/user/trash', [AuthController::class, 'fetchAdminAllUserTrashInfo']);
 
-    Route::get('/company/user/all', [AuthController::class, 'allUserInfo']);
-    Route::post('/company/user/store', [AuthController::class, 'userCreate']);
+  Route::get('/company/user/all', [AuthController::class, 'allUserInfo']);
+  Route::post('/company/user/store', [AuthController::class, 'userCreate']);
 
-    Route::post('/login', [AdminAuthController::class, 'login']);
-    Route::post('/logout', [AdminAuthController::class, 'logout'])->middleware('auth:admin');
-    Route::get('/dashboard', [AdminController::class, 'dashboard'])->middleware('auth:admin');
+  Route::post('/login', [AdminAuthController::class, 'login']);
+  Route::post('/logout', [AdminAuthController::class, 'logout'])->middleware('auth:sanctum');
+  Route::get('/dashboard', [AdminController::class, 'dashboard'])->middleware('auth:admin');
+  Route::get('/verify-auth', [AdminController::class, 'verifyAuth']);
 });
 Route::get('/auth/user', [AuthController::class, 'fetchGobalUserAuthInfo']);
 Route::get('/user/role/auth', [AuthController::class, 'fetchUserAuthRoleInfo']);
