@@ -2,7 +2,7 @@
     <v-card>
         <v-card-title class="pt-5">
             <v-row>
-                <v-col cols="4"><span>Mechine Trash List</span></v-col>
+                <v-col cols="4"><span>Machine Trash List</span></v-col>
                 <v-col cols="8" class="d-flex justify-end">
                     <v-text-field
                         v-model="search"
@@ -18,7 +18,7 @@
                         clearable
                     ></v-text-field>
                     <v-btn
-                        @click="MechineIndex"
+                        @click="MachineIndex"
                         color="primary"
                         icon
                         style="width: 40px; height: 40px"
@@ -103,11 +103,16 @@ export default {
             search: "",
             itemsPerPage: 15,
             headers: [
-                { title: "Company Name", key: "user.name", sortable: false },
-                { title: "Factory Name", key: "factory.name", sortable: false },
-                { title: "Mechine Name", key: "name", sortable: true },
-                { title: "Mechine Code", key: "mechine_code", sortable: false },
-                { title: "Status", key: "status", sortable: true },
+                { title: "Factory", key: "factory.name", sortable: false },
+                { title: "Machine Name", key: "name", sortable: true },
+                { title: "Machine Code", key: "machine_code", sortable: false },
+                { title: "Model", key: "product_model.name", sortable: false },
+                { title: "Type", key: "mechine_type.name", sortable: false },
+                {
+                    title: "Status",
+                    key: "machine_status.name",
+                    sortable: true,
+                },
                 { title: "Creator", key: "creator.name", sortable: false },
                 { title: "Actions", key: "actions", sortable: false },
             ],

@@ -17,7 +17,7 @@
         </v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="submit">
-                <v-select
+                <!-- <v-select
                     v-model="supplier.type"
                     :rules="[rules.required]"
                     :items="statusSupplierItems"
@@ -28,7 +28,7 @@
                     <template v-slot:label>
                         Supplier Type <span style="color: red">*</span>
                     </template>
-                </v-select>
+                </v-select> -->
                 <!-- Name Field -->
                 <v-text-field
                     v-model="supplier.name"

@@ -19,11 +19,22 @@ export { default as MechineTransfer } from "../Pages/Admin/Mechine/Transfer.vue"
 export { default as MechineTransferList } from "../Pages/Admin/Mechine/TransferList.vue";
 export { default as MechineHistoryList } from "../Pages/Admin/Mechine/History.vue";
 
+export { default as MachineMovement } from "../Pages/Admin/Mechine/movement.vue";
+export { default as MachineLocation } from "../Pages/Admin/Mechine/Location.vue";
+
 // Factory components
 export { default as FactoryIndex } from "../Pages/Admin/Factory/Index.vue";
 export { default as FactoryCreate } from "../Pages/Admin/Factory/Create.vue";
 export { default as FactoryEdit } from "../Pages/Admin/Factory/Edit.vue";
 export { default as FactoryTrash } from "../Pages/Admin/Factory/Trash.vue";
+
+// Supplier components
+export { default as ServiceIndex } from "../Pages/Admin/Service/Index.vue";
+export { default as ServiceEdit } from "../Pages/Admin/Service/Edit.vue";
+export { default as ServiceCreate } from "../Pages/Admin/Service/Create.vue";
+export { default as ServiceHistoryCreate } from "../Pages/Admin/Service/CreateServiceHistory.vue";
+
+export { default as ServiceTrash } from "../Pages/Admin/Service/Trash.vue";
 
 // Supplier components
 export { default as SupplierIndex } from "../Pages/Admin/Supplier/Index.vue";
@@ -114,3 +125,8 @@ export { default as MechineSourceIndex } from "../Pages/Admin/Mechine/Source/Ind
 export { default as MechineSourceCreate } from "../Pages/Admin/Mechine/Source/Create.vue";
 export { default as MechineSourceEdit } from "../Pages/Admin/Mechine/Source/Edit.vue";
 export { default as MechineSourceTrash } from "../Pages/Admin/Mechine/Source/Trash.vue";
+//Mechine status Components
+export { default as MachineStatusIndex } from "../Pages/Admin/Mechine/MachineStatus/Index.vue";
+export { default as MachineStatusCreate } from "../Pages/Admin/Mechine/MachineStatus/Create.vue";
+export { default as MachineStatusEdit } from "../Pages/Admin/Mechine/MachineStatus/Edit.vue";
+export { default as MachineStatusTrash } from "../Pages/Admin/Mechine/MachineStatus/Trash.vue";

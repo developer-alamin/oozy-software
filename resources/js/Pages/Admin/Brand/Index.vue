@@ -122,7 +122,7 @@ export default {
             itemsPerPage: 15,
             headers: [
                 { title: "Brand Name", key: "name", sortable: true },
-                { title: "Brand Type", key: "type", sortable: false },
+                // { title: "Brand Type", key: "type", sortable: false },
                 { title: "Description", key: "description", sortable: false },
                 {
                     title: "Status",

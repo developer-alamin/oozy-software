@@ -2,7 +2,7 @@
     <v-card>
         <v-card-title class="pt-5">
             <v-row>
-                <v-col cols="6"><span>Type Trash List</span></v-col>
+                <v-col cols="6"><span>Machine Type Trash List</span></v-col>
                 <v-col cols="6" class="d-flex justify-end">
                     <v-text-field
                         v-model="search"
@@ -55,7 +55,7 @@
 
         <!-- Restore Confirmation Dialog -->
         <RestoreConfirmDialog
-            :restroreDialogName="restroreDialogName"
+            :restoreDialogName="restoreDialogName"
             v-model:modelValue="restoreDialog"
             :onConfirm="confirmRestore"
             :onCancel="() => (restoreDialog = false)"
@@ -82,14 +82,24 @@ export default {
     },
     data() {
         return {
-            restroreDialogName: "Are you sure you want to restore this Type?",
-            dialogName: "Are you sure you want to delete this Type ?",
+            restoreDialogName:
+                "Are you sure you want to restore this Machine Type?",
+            dialogName: "Are you sure you want to delete this Machine Type ?",
 
             search: "",
             itemsPerPage: 15,
             headers: [
                 { title: "Name", key: "name", sortable: true },
-                { title: "Day", key: "day", sortable: false },
+                {
+                    title: "Partial Maintenance Day",
+                    key: "partial_maintenance_day",
+                    sortable: false,
+                },
+                {
+                    title: "Full Maintenance Day",
+                    key: "full_maintenance_day",
+                    sortable: false,
+                },
                 { title: "Description", key: "description", sortable: false },
                 {
                     title: "Status",
@@ -97,6 +107,7 @@ export default {
                     value: "status",
                     sortable: true,
                 },
+                { title: "Creator", key: "creator.name", sortable: false },
                 { title: "Actions", key: "actions", sortable: false },
             ],
             serverItems: [],

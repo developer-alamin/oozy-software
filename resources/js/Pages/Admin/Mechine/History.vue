@@ -2,7 +2,7 @@
     <v-card>
         <v-card-title class="pt-5">
             <v-row>
-                <v-col cols="4"><span>Mechine History List</span></v-col>
+                <v-col cols="4"><span>Machine History </span></v-col>
                 <v-col cols="8" class="d-flex justify-end">
                     <v-text-field
                         v-model="search"
@@ -50,7 +50,7 @@
                                         mdi-trash-can-outline
                                     </v-icon>
                                 </template>
-                                <span>View trashed Mechines</span>
+                                <span>View trashed Machines</span>
                             </v-tooltip>
                         </v-btn>
                     </v-badge>
@@ -83,18 +83,18 @@
                 <span>{{ item.creator ? item.creator.name : "Unknown" }}</span>
             </template>
             <template v-slot:item.actions="{ item }">
-                <v-icon
+                <!-- <v-icon
                     @click="transferMachine(item.uuid)"
                     color="blue"
                     class="mr-2"
                     >mdi-transfer</v-icon
-                >
-                <v-icon @click="editMechine(item.uuid)" class="mr-2"
+                > -->
+                <!-- <v-icon @click="editMechine(item.uuid)" class="mr-2"
                     >mdi-pencil</v-icon
-                >
-                <v-icon @click="showConfirmDialog(item.id)" color="red"
+                > -->
+                <!-- <v-icon @click="showConfirmDialog(item.id)" color="red"
                     >mdi-delete</v-icon
-                >
+                > -->
             </template>
         </v-data-table-server>
 
@@ -126,13 +126,37 @@ export default {
             search: "",
             itemsPerPage: 10,
             headers: [
-                { title: "Company Name", key: "user.name", sortable: false },
-                { title: "Factory Name", key: "factory.name", sortable: false },
-                { title: "Mechine Name", key: "name", sortable: true },
-                { title: "Mechine Code", key: "mechine_code", sortable: false },
-                { title: "Status", key: "status", sortable: true },
-                { title: "Creator", key: "creator.name", sortable: false },
-                { title: "Actions", key: "actions", sortable: false },
+                { title: "Machine Name", key: "machine.name", sortable: true },
+                {
+                    title: "Company Name",
+                    key: "line.units.floors.factories.user.name",
+                    sortable: false,
+                },
+                {
+                    title: "Factory Name",
+                    key: "line.units.floors.factories.name",
+                    sortable: false,
+                },
+                {
+                    title: "Floor Name",
+                    key: "line.units.floors.name",
+                    sortable: false,
+                },
+                {
+                    title: "Unit Name",
+                    key: "line.units.name",
+                    sortable: false,
+                },
+                {
+                    title: "Line Name",
+                    key: "line.name",
+                    sortable: false,
+                },
+
+                // { title: "Machine Code", key: "machine_code", sortable: false },
+                // { title: "Status", key: "status", sortable: true },
+                // { title: "Creator", key: "creator.name", sortable: false },
+                // { title: "Actions", key: "actions", sortable: false },
             ],
             serverItems: [],
             loading: true,
@@ -149,7 +173,7 @@ export default {
             const sortKey = sortBy.length ? sortBy[0].key : "created_at";
             try {
                 const response = await this.$axios.get(
-                    "/mechine/history/list",
+                    "/machine-movement-history",
                     {
                         params: {
                             page,
@@ -160,6 +184,8 @@ export default {
                         },
                     }
                 );
+                // console.log(response.data.items);
+
                 this.serverItems = response.data.items || [];
                 this.totalItems = response.data.total || 0;
                 this.fetchTrashedMechinesCount();

@@ -2,7 +2,7 @@
     <v-card>
         <v-card-title class="pt-5">
             <v-row>
-                <v-col cols="6"><span>Technician Trash List</span></v-col>
+                <v-col cols="6"><span>Factory Trash List</span></v-col>
                 <v-col cols="6" class="d-flex justify-end">
                     <v-text-field
                         v-model="search"
@@ -54,13 +54,16 @@
         </v-data-table-server>
 
         <!-- Restore Confirmation Dialog -->
+        <!-- Restore Confirmation Dialog -->
         <RestoreConfirmDialog
+            :restoreDialogName="restoreDialogName"
             v-model:modelValue="restoreDialog"
             :onConfirm="confirmRestore"
             :onCancel="() => (restoreDialog = false)"
         />
         <!-- Delete Confirmation Dialog -->
         <ConfirmDialog
+            :dialogName="dialogName"
             v-model:modelValue="deleteDialog"
             :onConfirm="confirmDelete"
             :onCancel="() => (deleteDialog = false)"
@@ -80,17 +83,17 @@ export default {
     },
     data() {
         return {
+            restoreDialogName: "Are you sure you want to restore this Factory?",
+            dialogName: "Are you sure you want to delete this Factory ?",
             search: "",
             itemsPerPage: 15,
             headers: [
-                { title: "Technician Name", key: "name", sortable: true },
-                { title: "Description", key: "description", sortable: false },
-                {
-                    title: "Status",
-                    key: "status",
-                    value: "status",
-                    sortable: true,
-                },
+                { title: "Company Name", key: "user.name", sortable: true },
+                { title: "Factory Name", key: "name", sortable: true },
+                { title: "Factory Code", key: "factory_code", sortable: true },
+                { title: "Email", key: "email", sortable: true },
+                { title: "Phone", key: "phone", sortable: false },
+                { title: "Creator", key: "creator.name", sortable: false },
                 { title: "Actions", key: "actions", sortable: false },
             ],
             serverItems: [],
@@ -98,7 +101,7 @@ export default {
             totalItems: 0,
             restoreDialog: false, // Separate state for restore dialog
             deleteDialog: false, // Separate state for delete dialog
-            selectedTechnicianId: null,
+            selectedFactoryId: null,
         };
     },
     methods: {
@@ -107,7 +110,7 @@ export default {
             const sortOrder = sortBy.length ? sortBy[0].order : "desc";
             const sortKey = sortBy.length ? sortBy[0].key : "created_at";
             try {
-                const response = await this.$axios.get("/technician/trashed", {
+                const response = await this.$axios.get("/factory/trashed", {
                     params: {
                         page,
                         itemsPerPage,
@@ -125,49 +128,46 @@ export default {
             }
         },
         showRestoreDialog(id) {
-            this.selectedTechnicianId = id;
+            this.selectedFactoryId = id;
             this.restoreDialog = true; // Open restore dialog
         },
         showConfirmDialog(id) {
-            this.selectedTechnicianId = id;
+            this.selectedFactoryId = id;
             this.deleteDialog = true; // Open delete dialog
         },
         async confirmRestore() {
             this.restoreDialog = false; // Close the restore dialog
             try {
                 await this.$axios.post(
-                    `/technician/${this.selectedTechnicianId}/restore`
+                    `/factory/${this.selectedFactoryId}/restore`
                 );
                 this.loadItems({
                     page: 1,
                     itemsPerPage: this.itemsPerPage,
                     sortBy: [],
                 });
-                toast.success("Technician restored successfully!");
+                toast.success("factory restored successfully!");
             } catch (error) {
-                console.error("Error restoring technician:", error);
-                toast.error("Failed to restore technician.");
+                console.error("Error restoring factory:", error);
+                toast.error("Failed to restore factory.");
             }
         },
         async confirmDelete() {
             this.deleteDialog = false; // Close the delete dialog
             try {
                 await this.$axios.delete(
-                    `/technician/${this.selectedTechnicianId}/force-delete`
+                    `/factory/${this.selectedFactoryId}/force-delete`
                 );
                 this.loadItems({
                     page: 1,
                     itemsPerPage: this.itemsPerPage,
                     sortBy: [],
                 });
-                toast.success("technician deleted successfully!");
+                toast.success("factory deleted successfully!");
             } catch (error) {
-                console.error("Error deleting technician:", error);
-                toast.error("Failed to delete technician.");
+                console.error("Error deleting factory:", error);
+                toast.error("Failed to delete factory.");
             }
-        },
-        editTechnician(id) {
-            this.$router.push({ name: "TechnicianEdit", params: { id } });
         },
     },
     created() {

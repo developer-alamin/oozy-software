@@ -18,13 +18,17 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Auth\UserAuthController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\MachineMovementController;
 use App\Http\Controllers\Admin\MechineAssingController;
 use App\Http\Controllers\Admin\ParseController;
 use App\Http\Controllers\Admin\ParseUnitController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\Admin\ProductModelController;
+use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\DynamicDataController;
+use App\Http\Controllers\MachineStatusController;
 use App\Http\Controllers\OperatorController;
 use App\Models\MechineAssing;
 
@@ -58,15 +62,18 @@ Route::controller(FloorController::class)
 });
 Route::resource('floor', FloorController::class);
 
-// --------------------------------------------Mechine route statr here-------------------------------------------------------------------
+// --------------------------------------------Machine route statr here-------------------------------------------------------------------
 
 Route::get('/get_factories', [MechineAssingController::class, 'getFactories']);
-Route::get('/get_brands', [MechineAssingController::class, 'getBrands']);
-Route::get('/get_models', [MechineAssingController::class, 'getModels']);
+// Route::get('/get_brands', [MechineAssingController::class, 'getBrands']);
+
 Route::get('/get_types', [MechineAssingController::class, 'getTypes']);
 Route::get('/get_sources', [MechineAssingController::class, 'getSources']);
 Route::get('/get_suppliers', [MechineAssingController::class, 'getSuppliers']);
 Route::get('/get_rents', [MechineAssingController::class, 'getRents']);
+Route::get('/generate-machine-code', [MechineAssingController::class, 'generateMachineCode']);
+
+
 
 Route::get('/mechine/{uuid}/transfer', [MechineAssingController::class, 'mechineTransfer'])->name('mechine.transfer');
 Route::post('/mechine/transfer/{uuid}', [MechineAssingController::class, 'mechineTransferStore'])->name('mechine.transfer.store');
@@ -77,9 +84,18 @@ Route::delete('/mechine/assing/{id}/forceDelete', [MechineAssingController::clas
 Route::get('/mechine/transfer/list', [MechineAssingController::class,'mechineTransferList'])->name('mechine.transfer.list');
 Route::get('/mechine/history/list', [MechineAssingController::class,'mechineHistoryList'])->name('mechine.assing.trashed');
 Route::get('/mechine/assing/{uuid}/edit', [MechineAssingController::class,'edit'])->name('mechine.assing.trashed');
-Route::resource('mechine-assing',MechineAssingController::class);
+Route::resource('machine-assing',MechineAssingController::class);
+Route::get('/machine-movement-history',[MachineMovementController::class,'historyIndex'])->name('mechine.movement.history');
+Route::resource('machine-movement',MachineMovementController::class);
 
 
+// --------------------------------------------Mechine Service route statr here-------------------------------------------------------------------
+Route::get('/get_mechines', [ServiceController::class, 'getMechins']);
+Route::get('/get_operators', [ServiceController::class, 'getOperators']);
+Route::get('/get_technicians', [ServiceController::class, 'getTechnicians']);
+Route::get('/get_parses', [ServiceController::class, 'getParses']);
+Route::post('/service/history', [ServiceController::class, 'storeHistory']);
+Route::resource('services',ServiceController::class);
 // -------------------------------------------- mechine typeroute statr here-------------------------------------------------------------------
 
 Route::prefix("/mechine")->group(function(){
@@ -194,6 +210,8 @@ Route::get('/units/trashed', [UnitController::class, 'trashed']);
 Route::post('/units/{id}/restore', [UnitController::class, 'restore']);
 Route::delete('/units/{id}/force-delete', [UnitController::class, 'forceDelete']);
 Route::get('/units/trashed-count', [UnitController::class, 'trashedUnitsCount']);
+Route::get('/units/{uuid}/edit', [UnitController::class, 'edit']);
+Route::put('/units/{uuid}', [UnitController::class, 'update']);
 Route::resource('units', UnitController::class);
 
 /// --------------------------------------------Parse route statr here-------------------------------------------------------------------
@@ -253,15 +271,34 @@ Route::resource('operator', OperatorController::class);
 Route::resource('company', CompanyController::class);
 
 // --------------------------------------------Factory route statr here-------------------------------------------------------------------
-Route::get('/get_companys', [FactoryController::class, 'getCompanys']);
-Route::get('/get_floors', [FactoryController::class, 'getFloors']);
-Route::get('/get_units', [FactoryController::class, 'getUnits']);
-Route::get('/get_lines', [FactoryController::class, 'getLines']);
-Route::get('/factory/edit/{uuid}', [FactoryController::class, 'edit'])->name('factory.edit');
+
+Route::get('/factory/trashed', [FactoryController::class, 'trashed']);
+Route::post('/factory/{id}/restore', [FactoryController::class, 'restore']);
+Route::delete('/factory/{id}/force-delete', [FactoryController::class, 'forceDelete']);
+Route::get('/factory/trashed-count', [FactoryController::class, 'trashedFactoriesCount']);
+Route::get('/factory/{uuid}/edit', [FactoryController::class, 'edit'])->name('factory.edit');
 Route::put('/factory/{uuid}', [FactoryController::class, 'update'])->name('factory.update');
 Route::resource('factory', FactoryController::class);
 
+// --------------------------------------------Machine route statr here-------------------------------------------------------------------
+
+Route::get('/machine/status/trashed', [MachineStatusController::class, 'trashed']);
+Route::post('/machine/status/{id}/restore', [MachineStatusController::class, 'restore']);
+Route::delete('/machine/status/{id}/force-delete', [MachineStatusController::class, 'forceDelete']);
+Route::get('/machine/status/trashed-count', [MachineStatusController::class, 'trashedMachineStatusCount']);
+Route::get('/machine/status/{uuid}/edit', [MachineStatusController::class, 'edit'])->name('machine.status.edit');
+Route::put('/machine/status/{uuid}', [MachineStatusController::class, 'update'])->name('machine.status.update');
+Route::resource('machine-status', MachineStatusController::class);
 // Group Rents Controller End form here
+Route::get('/get_units', [DynamicDataController::class, 'getUnits']);
+Route::get('/get_floors', [DynamicDataController::class, 'getFloors']);
+Route::get('/get_factories', [DynamicDataController::class, 'getFactories']);
+Route::get('/get_companies', [DynamicDataController::class, 'getCompanies']);
+Route::get('/get_brand_alls', [DynamicDataController::class, 'getBrandAll']);
+Route::get('/get_brands', [DynamicDataController::class, 'getBrands']);
+Route::get('/get_models', [DynamicDataController::class, 'getModels']);
+Route::get('/get_machine_statuses', [DynamicDataController::class, 'getMachineStatus']);
+Route::get('/get_lines_by_machine', [DynamicDataController::class, 'getLinesByMachine']);
 
 // Admin Auth Routes
 Route::prefix('admin')->group(function () {
@@ -282,7 +319,6 @@ Route::get('/auth/user', [AuthController::class, 'fetchGobalUserAuthInfo']);
 Route::get('/user/role/auth', [AuthController::class, 'fetchUserAuthRoleInfo']);
 // User Auth Routes
 Route::prefix('user')->group(function () {
-
     Route::post('/register', [UserAuthController::class, 'register']);
     Route::post('/login', [UserAuthController::class, 'login']);
     Route::post('/logout', [UserAuthController::class, 'logout'])->middleware('auth:user');

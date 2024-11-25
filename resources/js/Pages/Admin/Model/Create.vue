@@ -3,6 +3,24 @@
         <v-card-title>Create model</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="submit">
+                <v-autocomplete
+                    v-model="model.brand_id"
+                    :items="brands"
+                    item-value="id"
+                    item-title="name"
+                    outlined
+                    clearable
+                    chips
+                    density="comfortable"
+                    :rules="[rules.required]"
+                    :error-messages="errors.brand_id ? errors.brand_id : ''"
+                    @update:search="fetchBrands"
+                >
+                    <template v-slot:label>
+                        Select Brand <span style="color: red">*</span>
+                    </template>
+                </v-autocomplete>
+
                 <!-- Name Field -->
                 <v-text-field
                     v-model="model.name"
@@ -17,7 +35,7 @@
                     </template>
                 </v-text-field>
 
-                <v-select
+                <!-- <v-select
                     v-model="model.type"
                     :rules="[rules.required]"
                     :items="statusModelItems"
@@ -28,7 +46,7 @@
                     <template v-slot:label>
                         Model Type <span style="color: red">*</span>
                     </template>
-                </v-select>
+                </v-select> -->
                 <!-- Featured Checkbox -->
                 <v-select
                     v-model="model.status"
@@ -92,6 +110,7 @@ export default {
             statusItems: ["Active", "Inactive"],
             statusModelItems: ["Mechine", "Parse"],
             model: {
+                brand_id: "",
                 name: "",
                 model_number: "",
                 type: "Mechine",
@@ -100,6 +119,7 @@ export default {
             },
             errors: {}, // Stores validation errors
             serverError: null, // Stores server-side error messages
+            brands: [],
             rules: {
                 required: (value) => !!value || "Required.",
             },
@@ -146,6 +166,20 @@ export default {
                     this.loading = false;
                 }
             }, 1000); // Simulates a 3-second loading duration
+        },
+        async fetchBrands(search) {
+            try {
+                const response = await this.$axios.get(`/get_brand_alls`, {
+                    params: {
+                        search: search,
+                        limit: this.limit,
+                    },
+                });
+                // console.log(response.data);
+                this.brands = response.data;
+            } catch (error) {
+                console.error("Error fetching brands:", error);
+            }
         },
         resetForm() {
             this.model = {
