@@ -77,12 +77,12 @@
     "src": "resources/img/login_page_img.png"
   },
   "resources/js/app.js": {
-    "file": "assets/app-bUJgHocT.js",
+    "file": "assets/app-D5sqFfcq.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "css": [
-      "assets/app-dbPUmnRk.css"
+      "assets/app-B7XYETOb.css"
     ],
     "assets": [
       "assets/login_page_img-CfsmQqeV.png",
