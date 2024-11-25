@@ -55,6 +55,6 @@ app.use(VueApexCharts);
 app.config.globalProperties.$toast = toast;
 
 app.config.globalProperties.$axios = axios; // Make Axios instance globally accessible
-app.component("apexchart", VueApexCharts);
+// app.component("apexchart", VueApexCharts);
 
 app.mount("#app");

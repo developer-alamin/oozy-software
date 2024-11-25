@@ -1,55 +1,70 @@
-// Import required packages
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import axios from "axios";
+import router from "@/router/router";
+import { useAuthStore } from "@/stores/authStore";
 
-// Create an Axios instance
-const axiosInstance = axios.create({
-  baseURL: "/api",
-  headers: {
-    "Content-Type": "application/json",
-    "Accept": "application/json",
-  },
-});
+const allowedMethods = ["get", "post", "put", "patch", "delete"] as const;
+type Method = (typeof allowedMethods)[number];
 
+export async function useAxios(
+  method: Method,
+  url: string,
+  data = null,
+  isAuth = true,
+  headers: {} = {}
+) {
+  const store = useAuthStore();
+  const api = axios.create({
+    baseURL: "/api",
+    xsrfCookieName: "XSRF-Token",
+    xsrfHeaderName: "X-SRF-Token",
+    headers: {
+      Accept: "application/json",
+      ContentType: "application/json",
+      ...headers,
+    },
+  });
 
-const isLoading = ref(false);
-
-// Interceptors to handle token
-axiosInstance.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+  api.interceptors.request.use(
+    (config) => {
+      const csrfToken = document.head.querySelector('meta[name="csrf-token"]');
+      if (csrfToken) {
+        config.headers["X-CSRF-TOKEN"] = csrfToken.content;
+      }
+      if (isAuth) {
+        config.withCredentials = true;
+        config.headers["Authorization"] = `Bearer ${store.getToken}`;
+      }
+      return config;
+    },
+    (error) => {
+      return Promise.reject(error);
     }
-    return config;
-  },
-  (error) => {
-    console.error("Request Error:", error);
-    return Promise.reject(error);
-  }
-);
+  );
 
+  // Response Interceptor to handle 403 errors
+  api.interceptors.response.use(
+    (response) => {
+      return response;
+    },
+    async (error) => {
+      if (
+        error.response &&
+        (error.response.status === 401 || error.response.status === 403)
+      ) {
+        let auth = await store.checkServerAuth();
+        if (!auth) {
+          store.removeUserToken();
+          router.push({ name: "Login" });
+        }
+      }
+      return Promise.reject(error);
+    }
+  );
 
-export function useAxios() {
-  const makeRequest = async (config: AxiosRequestConfig): Promise<AxiosResponse | undefined> => {
   try {
-    isLoading.value = true;
-    const response: AxiosResponse = await axiosInstance(config);
-    isLoading.value = false;
-    return response;
-  } catch (error: unknown) {
-    isLoading.value = false;
-    if (axios.isAxiosError(error)) {
-      return error.response;
-    } else {
-      return undefined;
-    }
+    return await (api as any)[method](url, data);
+  } catch (e: any) {
+    return e.response;
   }
-};
-
-  return {
-    axiosInstance,
-    makeRequest,
-    isLoading,
-  };
 }

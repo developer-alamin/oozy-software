@@ -11,13 +11,13 @@
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "paths": {
-      "@": ["resources/js/"]
+      "@/*": ["resources/js/*"]
     }
   },
   "include": [
     "resources/js/**/*.ts",
     "resources/js/**/*.d.ts",
     "resources/js/**/*.vue"
-  ],
+, "resources/js/middleware/adminAuth.js"  ],
   "exclude": ["node_modules", "public"]
 }
