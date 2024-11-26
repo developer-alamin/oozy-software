@@ -27,6 +27,21 @@ class DynamicDataController extends Controller
         // Return the users as JSON
         return response()->json($users);
     }
+    public function getCompanyWaysFactories(Request $request)
+    {
+      $search = $request->query('search', '');
+      $limit = $request->query('limit', 5);
+      $companyId = $request->query('company_id');
+
+      // Query factories by company and name
+      $factories = Factory::where('company_id', $companyId)
+          ->where('name', 'like', '%' . $search . '%')
+          ->limit($limit)
+          ->get();
+
+      return response()->json($factories);
+    }
+
     public function getFactories(Request $request){
 
         // Get search term and limit from the request, with defaults
@@ -112,8 +127,8 @@ class DynamicDataController extends Controller
     // }
     public function getModels(Request $request)
     {
-      $search = $request->query('search', '');
-      $limit = $request->query('limit', 5); // Default limit of 5
+      $search   = $request->query('search', '');
+      $limit    = $request->query('limit', 5); // Default limit of 5
       $brand_id = $request->query('brand_id');
 
       $query = ProductModel::query();

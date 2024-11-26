@@ -293,6 +293,7 @@ Route::get('/get_units', [DynamicDataController::class, 'getUnits']);
 Route::get('/get_floors', [DynamicDataController::class, 'getFloors']);
 Route::get('/get_factories', [DynamicDataController::class, 'getFactories']);
 Route::get('/get_companies', [DynamicDataController::class, 'getCompanies']);
+Route::get('/get_company_ways_factories', [DynamicDataController::class, 'getCompanyWaysFactories']);
 Route::get('/get_brand_alls', [DynamicDataController::class, 'getBrandAll']);
 Route::get('/get_brands', [DynamicDataController::class, 'getBrands']);
 Route::get('/get_models', [DynamicDataController::class, 'getModels']);
