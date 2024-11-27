@@ -30,6 +30,7 @@ class Technician extends Model
     // Type casting for specific attributes
     protected $casts = [
       'uuid'       => 'string',
+      'id'         => 'integer',
       'company_id' => 'integer',
       'factory_id' => 'integer',
       'creator_id' => 'integer',

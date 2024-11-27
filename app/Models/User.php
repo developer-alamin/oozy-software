@@ -26,6 +26,12 @@ class User extends Authenticatable
         'status'
     ];
 
+    protected $casts = [
+        'id'         => 'integer',
+        'created_at' => 'datetime', // Automatically cast 'created_at' to a Carbon instance
+        'updated_at' => 'datetime', // Automatically cast 'updated_at' to a Carbon instance
+    ];
+
     /**
      * The attributes that should be hidden for serialization.
      *
