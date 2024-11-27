@@ -9,7 +9,7 @@
               v-model="factory.company_id"
               :items="companies"
               item-value="id"
-              item-title="name"
+              :item-title="formatCompany"
               outlined
               clearable
               density="comfortable"
@@ -220,14 +220,14 @@ export default {
     };
   },
   methods: {
-    formatFloor(floor) {
-      if (floor) {
-        if (typeof floor == "number") {
-          floor = this.companies.find((item) => (item.id = floor));
+    formatCompany(company) {
+      if (company) {
+        if (typeof company == "number") {
+          company = this.companies.find((item) => (item.id = company));
         }
-        return `${floor.name || "No Floor Name"}`;
+        return `${company.name || "No Company Name"}`;
       }
-      return "No Floor Data";
+      return "No Company Data";
     },
     async submit() {
       // Reset errors and loading state before submission

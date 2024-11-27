@@ -73,4 +73,8 @@ class Technician extends Model
     {
         return $this->belongsTo(User::class, 'company_id');
     }
+    public function factory()
+    {
+        return $this->belongsTo(Factory::class, 'factory_id');
+    }
 }

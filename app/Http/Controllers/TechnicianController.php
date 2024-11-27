@@ -55,7 +55,7 @@ class TechnicianController extends Controller
         // Apply sorting
         $techniciansQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $technicians = $techniciansQuery->with('creator:id,name','user:id,name')->paginate($itemsPerPage);
+        $technicians = $techniciansQuery->with('creator:id,name','user:id,name','factory:id,name')->paginate($itemsPerPage);
         // Return the response as JSON
         return response()->json([
             'items' => $technicians->items(), // Current page items
