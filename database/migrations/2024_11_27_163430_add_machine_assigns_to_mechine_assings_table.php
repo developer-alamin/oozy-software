@@ -20,6 +20,11 @@ return new class extends Migration
           $table->string('capacity')->nullable();
           $table->enum('dimensions', ['Length','Width','Height'])->default('Length');
           $table->string('machine_weight')->nullable();
+          $table->string('material_compatibility')->nullable();
+          $table->string('maximum_speed')->nullable();
+          $table->string('optimum_speed')->nullable();
+          $table->string('operating_temperature_range')->nullable();
+          $table->string('tag')->nullable();
         });
     }
 
