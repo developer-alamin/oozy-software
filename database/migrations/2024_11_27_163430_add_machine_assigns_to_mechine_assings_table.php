@@ -12,7 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('mechine_assings', function (Blueprint $table) {
-
+          $table->string('serial_number')->nullable();
+          $table->dateTime('commission_date')->nullable();
+          $table->dateTime('commission_date')->nullable();
+          $table->string('ownership')->nullable();
+          $table->enum('power_requirements', ['Voltage','Amperage','Phase'])->default('Voltage');
+          $table->string('capacity')->nullable();
+          $table->enum('dimensions', ['Length','Width','Height'])->default('Length');
+          $table->string('machine_weight')->nullable();
         });
     }
 
