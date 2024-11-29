@@ -67,6 +67,7 @@
               density="comfortable"
               :rules="[rules.required]"
               :error-messages="errors.factory_id ? errors.factory_id : ''"
+              @update:model-value="fetchLines"
               @update:search="fetchFactories"
             >
               <template v-slot:label>
@@ -385,18 +386,167 @@
           </v-col>
         </v-row>
 
-        <!-- <v-text-field
-                    v-model="machine.factory_code"
-                    :rules="[rules.factory_code]"
-                    label="Factory Code"
-                    outlined
-                    density="comfortable"
-                    :error-messages="
-                        errors.factory_code ? errors.factory_code : ''
-                    "
-                >
-                    <template v-slot:label> Factory Code </template>
-                </v-text-field> -->
+        <v-row class="d-flex mb-2 mx-1">
+          <v-list class="mr-3">
+            <v-checkbox
+              v-model="showDetails"
+              label="Show Basic Details"
+              density="comfortable"
+              hide-details
+            ></v-checkbox>
+          </v-list>
+          <v-list>
+            <v-checkbox
+              v-model="showSpecifications"
+              label="Show Specifications"
+              density="comfortable"
+              hide-details
+            ></v-checkbox>
+          </v-list>
+        </v-row>
+
+        <v-row v-show="showDetails">
+          <v-col cols="3">
+            <v-text-field
+              v-model="machine.serial_number"
+              label="Serial Number"
+              outlined
+              density="comfortable"
+              :error-messages="errors.serial_number ? errors.serial_number : ''"
+            >
+            </v-text-field>
+          </v-col>
+          <v-col cols="3">
+            <v-date-input
+              v-model="machine.commission_date"
+              label="Commission Date"
+              density="comfortable"
+              :error-messages="
+                errors.commission_date ? errors.commission_date : ''
+              "
+            />
+          </v-col>
+          <v-col cols="3">
+            <v-date-input
+              v-model="machine.warranty_period"
+              label="Warranty Period"
+              density="comfortable"
+              :error-messages="
+                errors.warranty_period ? errors.warranty_period : ''
+              "
+            />
+          </v-col>
+
+          <v-col cols="3">
+            <v-text-field
+              v-model="machine.ownership"
+              label="Ownership"
+              outlined
+              density="comfortable"
+              :error-messages="errors.ownership ? errors.ownership : ''"
+            >
+            </v-text-field>
+          </v-col>
+        </v-row>
+
+        <v-row v-show="showSpecifications">
+          <v-col cols="3">
+            <v-select
+              v-model="machine.power_requirements"
+              :items="statusPowerRequirements"
+              label="Power Requirements"
+              clearable
+              density="comfortable"
+            ></v-select>
+          </v-col>
+          <v-col cols="3">
+            <v-text-field
+              v-model="machine.capacity"
+              label="Capacity"
+              outlined
+              density="comfortable"
+              :error-messages="errors.capacity ? errors.capacity : ''"
+            >
+            </v-text-field>
+          </v-col>
+          <v-col cols="3">
+            <v-select
+              v-model="machine.dimensions"
+              :items="statusDimensions"
+              label="Dimensions"
+              clearable
+              density="comfortable"
+            ></v-select>
+          </v-col>
+          <v-col cols="3">
+            <v-text-field
+              v-model="machine.weight"
+              label="Weight"
+              outlined
+              density="comfortable"
+              :error-messages="errors.weight ? errors.weight : ''"
+            >
+            </v-text-field>
+          </v-col>
+          <v-col cols="3">
+            <v-text-field
+              v-model="machine.material_compatibility"
+              label="Material Compatibility"
+              outlined
+              density="comfortable"
+              :error-messages="
+                errors.material_compatibility
+                  ? errors.material_compatibility
+                  : ''
+              "
+            >
+            </v-text-field>
+          </v-col>
+          <v-col cols="3">
+            <v-text-field
+              v-model="machine.maximum_speed"
+              label="Maximum Speed"
+              outlined
+              density="comfortable"
+              :error-messages="errors.maximum_speed ? errors.maximum_speed : ''"
+            >
+            </v-text-field>
+          </v-col>
+          <v-col cols="3">
+            <v-text-field
+              v-model="machine.optimum_speed"
+              label="Optimum Speed"
+              outlined
+              density="comfortable"
+              :error-messages="errors.optimum_speed ? errors.optimum_speed : ''"
+            >
+            </v-text-field>
+          </v-col>
+          <v-col cols="3">
+            <v-text-field
+              v-model="machine.operating_temperature_range"
+              label="Operating Temperature Range"
+              outlined
+              density="comfortable"
+              :error-messages="
+                errors.operating_temperature_range
+                  ? errors.operating_temperature_range
+                  : ''
+              "
+            >
+            </v-text-field>
+          </v-col>
+          <v-col cols="3">
+            <v-text-field
+              v-model="machine.tags"
+              label="Tags"
+              outlined
+              density="comfortable"
+              :error-messages="errors.tags ? errors.tags : ''"
+            >
+            </v-text-field>
+          </v-col>
+        </v-row>
 
         <v-textarea
           v-model="machine.note"
@@ -404,23 +554,52 @@
           density="comfortable"
           :error-messages="errors.note ? errors.note : ''"
         />
-
+        <v-row>
+          <v-col cols="6">
+            <v-select
+              v-model="machine.location_status"
+              :items="statusLocation"
+              label="Location"
+              clearable
+              density="comfortable"
+              :disabled="!machine.factory_id"
+              @update:model-value="handleLocationChange"
+            ></v-select>
+          </v-col>
+          <v-col cols="6">
+            <v-autocomplete
+              v-model="machine.machine_status_id"
+              :items="machine_statuses"
+              item-value="id"
+              item-title="name"
+              label="Select Machine Status"
+              density="comfortable"
+              clearable
+              :error-messages="
+                errors.machine_status_id ? errors.machine_status_id : ''
+              "
+              @update:search="fetchMachineStatus"
+            >
+              <template v-slot:label>
+                Select Machine Status
+                <span style="color: red">*</span>
+              </template>
+            </v-autocomplete>
+          </v-col>
+        </v-row>
         <v-autocomplete
-          v-model="machine.machine_status_id"
-          :items="machine_statuses"
+          v-if="machine.location_status == 'Sewing Line'"
+          v-model="machine.line_id"
+          :items="lines"
           item-value="id"
           item-title="name"
-          label="Select Machine Status"
-          density="comfortable"
+          label="Select Line"
+          outlined
           clearable
-          :error-messages="
-            errors.machine_status_id ? errors.machine_status_id : ''
-          "
-          @update:search="fetchMachineStatus"
+          density="comfortable"
         >
           <template v-slot:label>
-            Select Machine Status
-            <span style="color: red">*</span>
+            Select Line <span style="color: red">*</span>
           </template>
         </v-autocomplete>
 
@@ -471,17 +650,12 @@ export default {
     return {
       valid: false,
       loading: false, // Controls loading state of the button
-      statusItems: [
-        "Preventive",
-        "Production",
-        "Breakdown",
-        "Under Maintenance",
-        "Loan",
-        "Idol",
-        "AsFactory",
-        "Scraped",
-      ],
+      showDetails: false,
+      showSpecifications: false,
+      statusPowerRequirements: ["Voltage", "Amperage", "Phase"],
+      statusLocation: ["Out of Factory", "Sewing Line", "Idle Storage"],
       rentAmountItems: ["Monthly", "Yearly", "Fixed"],
+      statusDimensions: ["Length", "Width", "Height"],
 
       machine: {
         rent_date: new Date(),
@@ -506,6 +680,20 @@ export default {
         rent_amount_type: null,
         rent_price: "",
         rent_name: "",
+        serial_number: "",
+        commission_date: null,
+        warranty_period: null,
+        ownership: "",
+        power_requirements: "Voltage",
+        capacity: "",
+        dimensions: "Length",
+        weight: "",
+        material_compatibility: "",
+        maximum_speed: "",
+        optimum_speed: "",
+        operating_temperature_range: "",
+        tags: "",
+        location_status: "Idle Storage",
       },
       isRateApplicable: false,
       errors: {}, // Stores validation errors
@@ -513,6 +701,7 @@ export default {
       limit: 5,
       companys: [], // Array to store Company data
       factories: [], // Array to store factories data
+      lines: [],
       brands: [], // Array to store brands data
       models: [], // Array to store models data
       selectedModel: null, // Selected model ID
@@ -600,6 +789,48 @@ export default {
         }
       }, 1000); // Simulates a 3-second loading duration
     },
+    async fetchLines() {
+      if (!this.machine.factory_id) {
+        this.lines = [];
+        return;
+      }
+
+      try {
+        const response = await this.$axios.get(`/get_factory_lines`, {
+          params: {
+            factory_id: this.machine.factory_id,
+          },
+        });
+        this.lines = response.data;
+      } catch (error) {
+        console.error("Error fetching lines:", error);
+      }
+    },
+    handleLocationChange(value) {
+      // console.log(value);
+
+      if (value == "Sewing Line") {
+        // Find the 'Production' status in machine_statuses
+        const productionStatus = this.machine_statuses.find(
+          (status) => status.name == "Production"
+        );
+        if (productionStatus) {
+          // Automatically select the 'Production' status
+          this.machine.machine_status_id = productionStatus.id;
+        } else {
+          console.warn("Production status not found in machine_statuses.");
+        }
+      } else {
+        // Reset machine_status_id if location is not Sewing Line
+        this.machine.machine_status_id = null;
+      }
+
+      if (value !== "Sewing Line") {
+        // this.machine.factory_id = null;
+        this.machine.line_id = null;
+        this.lines = [];
+      }
+    },
 
     checkRateApplicable(id) {
       const selectedSource = this.sources.find((source) => source.id === id);
@@ -617,7 +848,8 @@ export default {
         name: "",
         email: "",
         phone: "",
-        factory_code: "",
+        serial_number: "",
+        commission_date: "",
         location: "",
         status: "Preventive", // New property for checkbox
       };

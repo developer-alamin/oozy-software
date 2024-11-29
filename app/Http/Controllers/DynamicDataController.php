@@ -217,5 +217,18 @@ class DynamicDataController extends Controller
 
         return response()->json($lines);
     }
+    public function getLinesByFactory(Request $request)
+    {
+        $factoryId = $request->input('factory_id');
+
+        // Fetch lines through the relationship chain
+        $lines = Line::whereHas('units.floors.factories', function ($query) use ($factoryId) {
+            $query->where('id', $factoryId);
+        })
+        ->select('id', 'name') // Select only necessary columns
+        ->get();
+
+        return response()->json($lines);
+    }
 
 }

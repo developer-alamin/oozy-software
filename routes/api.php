@@ -299,6 +299,7 @@ Route::get('/get_brands', [DynamicDataController::class, 'getBrands']);
 Route::get('/get_models', [DynamicDataController::class, 'getModels']);
 Route::get('/get_machine_statuses', [DynamicDataController::class, 'getMachineStatus']);
 Route::get('/get_lines_by_machine', [DynamicDataController::class, 'getLinesByMachine']);
+Route::get('/get_factory_lines', [DynamicDataController::class, 'getLinesByFactory']);
 
 // Admin Auth Routes
 Route::prefix('admin')->group(function () {

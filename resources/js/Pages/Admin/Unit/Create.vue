@@ -164,7 +164,7 @@ export default {
         });
 
         this.floors = response.data;
-        // console.log(response.data);
+        console.log(response.data);
       } catch (error) {
         console.error("Error fetching floors:", error);
       }
@@ -172,9 +172,9 @@ export default {
 
     formatFloor(floor) {
       if (floor) {
-        if (typeof floor == "number") {
-          floor = this.floors.find((item) => (item.id = floor));
-        }
+        // if (typeof floor == "number") {
+        //   floor = this.floors.find((item) => (item.id = floor));
+        // }
         const factoryName = floor.factories?.name || "No Factory Name";
         const userName = floor.factories?.user?.name || "No Company";
         return `${
