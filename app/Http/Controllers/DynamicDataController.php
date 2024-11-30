@@ -195,10 +195,10 @@ class DynamicDataController extends Controller
 
         // Get search term and limit from the request, with defaults
         $search = $request->query('search', '');
-        $limit  = $request->query('limit', 5); // Default limit of 10
+        $limit  = $request->query('limit', 20); // Default limit of 10
         // Query to search for brands by name with a limit
         $machineStatus  = MachineStatus::where('name', 'like', '%' . $search . '%')
-                     ->limit($limit)
+                    //  ->limit($limit)
                      ->get();
         // Return the machineStatus as JSON
         return response()->json($machineStatus);

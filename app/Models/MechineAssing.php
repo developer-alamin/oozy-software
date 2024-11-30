@@ -35,7 +35,24 @@ class MechineAssing extends Model
         'note',
         'status',
         'machine_status_id',
-        'qr_code_path'
+        'qr_code_path',
+        'serial_number',
+        'commission_date',
+        'warranty_period',
+        'ownership',
+        'power_requirements',
+        'capacity',
+        'dimensions',
+        'machine_weight',
+        'material_compatibility',
+        'maximum_speed',
+        'optimum_speed',
+        'operating_temperature_range',
+        'location_status',
+        'tag',
+        'line_id',
+        'show_basic_details',
+        'show_specifications'
     ];
 
     // Optionally, cast some fields to specific types (e.g., dates)

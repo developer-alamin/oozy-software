@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\HelperController;
+use App\Http\Requests\MachineAssignStoreRequest;
 use App\Http\Requests\MechineTransferStore;
 use App\Models\Admin;
 use App\Models\MechineAssing;
@@ -179,7 +180,7 @@ class MechineAssingController extends Controller
      * Store a newly created resource in storage.
      */
 
-    public function store(Request $request)
+    public function store(MachineAssignStoreRequest $request)
     {
 
         // dd($request->all());
@@ -193,28 +194,7 @@ class MechineAssingController extends Controller
         }
 
         // Validate the incoming request data
-        $validatedData = $request->validate([
-            'name'                    => 'required|string|max:255',
-            'factory_id'              => 'required|integer',
-            'brand_id'                => 'required|integer',
-            'model_id'                => 'required|integer',
-            'machine_type_id'         => 'required|integer',
-            'machine_source_id'       => 'nullable',
-            'supplier_id'             => 'nullable',
-            'rent_date'               => 'nullable',
-            'rent_name'               => 'nullable|string|max:255',
-            'rent_note'               => 'nullable|string',
-            'rent_amount_type'        => 'nullable|string',
-            'machine_code'            => 'required|string|max:255',
-            'partial_maintenance_day' => 'nullable',
-            'full_maintenance_day'    => 'nullable',
-            'purchase_price'          => 'nullable',
-            'purchase_date'           => 'nullable',
-            'status'                  => 'nullable',  // Example: assumes "status" has specific values
-            'note'                    => 'nullable|string',
-            'machine_status_id'       => 'required',
-            'qr_code_path'            => 'nullable'
-        ]);
+        $validatedData = $request->validated();
         // dd($request->all());
         // Process dates to handle timezone issues and format them properly
         if (!empty($request->purchase_date) && $request->purchase_date !== 'null') {
@@ -234,10 +214,31 @@ class MechineAssingController extends Controller
         } else {
             $validatedData['rent_date'] = null; // Set to null if no valid date is provided
         }
+        
+        if (!empty($request->commission_date) && $request->commission_date !== 'null') {
+            // Remove extra characters like "(timezone)" if any and parse the date
+            $validatedData['commission_date'] = Carbon::parse(
+                preg_replace('/\s*\(.*\)$/', '', $request->commission_date)
+            )->format('Y-m-d');
+        } else {
+            $validatedData['commission_date'] = null; // Set to null if no valid date is provided
+        }
+
+        if (!empty($request->warranty_period) && $request->warranty_period !== 'null') {
+            // Remove extra characters like "(timezone)" if any and parse the date
+            $validatedData['warranty_period'] = Carbon::parse(
+                preg_replace('/\s*\(.*\)$/', '', $request->warranty_period)
+            )->format('Y-m-d');
+        } else {
+            $validatedData['warranty_period'] = null; // Set to null if no valid date is provided
+        }
 
         // Create the new MachineAssing instance with validated data
-        $mechineAssing                    = new MechineAssing($validatedData);
-        $mechineAssing->machine_source_id = ($request->machine_source_id && $request->machine_source_id !== 'null') ? $request->machine_source_id : 0;
+        $mechineAssing                      = new MechineAssing($validatedData);
+        $mechineAssing->machine_source_id   = ($request->machine_source_id && $request->machine_source_id !== 'null') ? $request->machine_source_id : 0;
+        $mechineAssing->line_id             = ($request->line_id && $request->line_id !== 'null') ? $request->line_id : 0;
+        $mechineAssing->show_basic_details  = $request->show_basic_details == "true" ? true : false;
+        $mechineAssing->show_specifications = $request->show_specifications == "true" ? true : false;
         // Associate the creator and updater polymorphically
         $mechineAssing->uuid              = HelperController::generateUuid();
         $mechineAssing->status            = "Assign";

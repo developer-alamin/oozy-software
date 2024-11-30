@@ -389,7 +389,7 @@
         <v-row class="d-flex mb-2 mx-1">
           <v-list class="mr-3">
             <v-checkbox
-              v-model="showDetails"
+              v-model="machine.show_basic_details"
               label="Show Basic Details"
               density="comfortable"
               hide-details
@@ -397,7 +397,7 @@
           </v-list>
           <v-list>
             <v-checkbox
-              v-model="showSpecifications"
+              v-model="machine.show_specifications"
               label="Show Specifications"
               density="comfortable"
               hide-details
@@ -405,7 +405,7 @@
           </v-list>
         </v-row>
 
-        <v-row v-show="showDetails">
+        <v-row v-show="machine.show_basic_details">
           <v-col cols="3">
             <v-text-field
               v-model="machine.serial_number"
@@ -449,7 +449,7 @@
           </v-col>
         </v-row>
 
-        <v-row v-show="showSpecifications">
+        <v-row v-show="machine.show_specifications">
           <v-col cols="3">
             <v-select
               v-model="machine.power_requirements"
@@ -480,11 +480,13 @@
           </v-col>
           <v-col cols="3">
             <v-text-field
-              v-model="machine.weight"
-              label="Weight"
+              v-model="machine.machine_weight"
+              label="Machine Weight"
               outlined
               density="comfortable"
-              :error-messages="errors.weight ? errors.weight : ''"
+              :error-messages="
+                errors.machine_weight ? errors.machine_weight : ''
+              "
             >
             </v-text-field>
           </v-col>
@@ -538,13 +540,50 @@
           </v-col>
           <v-col cols="3">
             <v-text-field
-              v-model="machine.tags"
+              v-model="machine.tag"
               label="Tags"
               outlined
               density="comfortable"
-              :error-messages="errors.tags ? errors.tags : ''"
+              :error-messages="errors.tag ? errors.tag : ''"
             >
             </v-text-field>
+            <!-- <v-text-field
+              v-model="currentTag"
+              label="Add Tags"
+              outlined
+              density="comfortable"
+              @keydown.enter.prevent="addTag"
+              placeholder="Type a tag and press Enter"
+              :error-messages="errors.tag ? errors.tag : ''"
+              append-outer-icon="mdi-tag"
+              append-outer
+            >
+            
+              <template v-slot:append>
+                <v-chip
+                  v-for="(tag, index) in machine.tag"
+                  :key="index"
+                  small
+                  pill
+                  class="ma-1"
+                  close
+                  @click:close="removeTag(index)"
+                >
+                  {{ tag }}
+                </v-chip>
+              </template>
+            </v-text-field>
+
+            <v-chip-group v-model="machine.tag" multiple class="mt-3">
+              <v-chip
+                v-for="(tag, index) in machine.tag"
+                :key="index"
+                close
+                @click:close="removeTag(index)"
+              >
+                {{ tag }}
+              </v-chip>
+            </v-chip-group> -->
           </v-col>
         </v-row>
 
@@ -656,6 +695,7 @@ export default {
       statusLocation: ["Out of Factory", "Sewing Line", "Idle Storage"],
       rentAmountItems: ["Monthly", "Yearly", "Fixed"],
       statusDimensions: ["Length", "Width", "Height"],
+      currentTag: "",
 
       machine: {
         rent_date: new Date(),
@@ -687,18 +727,23 @@ export default {
         power_requirements: "Voltage",
         capacity: "",
         dimensions: "Length",
-        weight: "",
+        machine_weight: "",
         material_compatibility: "",
         maximum_speed: "",
         optimum_speed: "",
         operating_temperature_range: "",
-        tags: "",
+        // tag: [],
+        tag: "",
         location_status: "Idle Storage",
+        line_id: null,
+        show_basic_details: false,
+        show_specifications: false,
       },
       isRateApplicable: false,
       errors: {}, // Stores validation errors
       serverError: null, // Stores server-side error messages
       limit: 5,
+      tags: [],
       companys: [], // Array to store Company data
       factories: [], // Array to store factories data
       lines: [],
@@ -743,6 +788,24 @@ export default {
     // this.fetchModels();
   },
   methods: {
+    addTag() {
+      if (!this.currentTag.trim()) {
+        this.errors.tag = "Tag cannot be empty.";
+        return;
+      }
+
+      const tag = this.currentTag.trim();
+      if (this.machine.tag.includes(tag)) {
+        this.errors.tag = "Tag already exists.";
+      } else {
+        this.machine.tag.push(tag); // Add the tag
+        this.currentTag = ""; // Clear the input field
+        this.errors.tag = null; // Clear any error
+      }
+    },
+    removeTag(index) {
+      this.machine.tag.splice(index, 1); // Remove the tag at the given index
+    },
     async submit() {
       // Reset errors and loading state before submission
       this.errors = {};
@@ -818,7 +881,29 @@ export default {
           // Automatically select the 'Production' status
           this.machine.machine_status_id = productionStatus.id;
         } else {
-          console.warn("Production status not found in machine_statuses.");
+          console.warn("Idle status not found in machine statuses.");
+        }
+      } else if (value == "Idle Storage") {
+        // Find the 'Production' status in machine_statuses
+        const IdleStatus = this.machine_statuses.find(
+          (status) => status.name == "Idle"
+        );
+        if (IdleStatus) {
+          // Automatically select the 'Production' status
+          this.machine.machine_status_id = IdleStatus.id;
+        } else {
+          console.warn("Idle status not found in machine statuses.");
+        }
+      } else if (value == "Out of Factory") {
+        // Find the 'Production' status in machine_statuses
+        const factoryOutStatus = this.machine_statuses.find(
+          (status) => status.name == "Factory Out"
+        );
+        if (factoryOutStatus) {
+          // Automatically select the 'Production' status
+          this.machine.machine_status_id = factoryOutStatus.id;
+        } else {
+          console.warn("Factory Out status not found in machine statuses.");
         }
       } else {
         // Reset machine_status_id if location is not Sewing Line
