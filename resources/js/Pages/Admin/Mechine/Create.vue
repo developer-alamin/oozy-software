@@ -558,7 +558,7 @@
               append-outer-icon="mdi-tag"
               append-outer
             >
-            
+
               <template v-slot:append>
                 <v-chip
                   v-for="(tag, index) in machine.tag"
@@ -911,7 +911,6 @@ export default {
       }
 
       if (value !== "Sewing Line") {
-        // this.machine.factory_id = null;
         this.machine.line_id = null;
         this.lines = [];
       }

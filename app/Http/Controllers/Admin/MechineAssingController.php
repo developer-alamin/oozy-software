@@ -214,7 +214,7 @@ class MechineAssingController extends Controller
         } else {
             $validatedData['rent_date'] = null; // Set to null if no valid date is provided
         }
-        
+
         if (!empty($request->commission_date) && $request->commission_date !== 'null') {
             // Remove extra characters like "(timezone)" if any and parse the date
             $validatedData['commission_date'] = Carbon::parse(
@@ -318,13 +318,15 @@ class MechineAssingController extends Controller
             'mechineAssing' => $mechineAssing
         ], Response::HTTP_OK);
     }
-    public function mechineTransfer($uuid){
-
+    public function mechineTransfer(Request $request, $uuid)
+    {
         $mechineTransfer = MechineAssing::where('uuid', $uuid)->firstOrFail();
+
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('admin')->user();
             $creatorType = Admin::class;
+
             // Check if the admin is a super admin
             if ($currentUser->role === 'superadmin') {
                 // Super admins can edit any mechineTransfer
@@ -339,11 +341,29 @@ class MechineAssingController extends Controller
         } else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
+
         // Check if the mechineTransfer belongs to the current user or admin
         if ($mechineTransfer->creator_type !== $creatorType || $mechineTransfer->creator_id !== $currentUser->id) {
             return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to edit this mechineTransfer.'], 403);
         }
-        // Return the mechineTransfer data if authorized
+
+        // Validate the location and status settings
+        if ($mechineTransfer->location_status == 'Sewing Line' && !$mechineTransfer->line_id) {
+            return response()->json(['success' => false, 'message' => 'Line must be selected for Sewing Line location.'], 400);
+        }
+
+        // Optionally, you can validate machine status if needed
+        if (!$mechineTransfer->machine_status_id) {
+            return response()->json(['success' => false, 'message' => 'Machine status is required.'], 400);
+        }
+
+        // Transfer machine logic (save updated details)
+        // $mechineTransfer->update([
+        //     'location_status' => $request->machine['location_status'],
+        //     'machine_status_id' => $request->machine['machine_status_id'],
+        //     'line_id' => $request->machine['line_id'],
+        // ]);
+
         return response()->json([
             'success' => true,
             'mechineTransfer' => $mechineTransfer

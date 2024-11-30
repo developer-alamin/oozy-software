@@ -95,12 +95,9 @@
         <span>{{ item.creator ? item.creator.name : "Unknown" }}</span>
       </template>
       <template v-slot:item.actions="{ item }">
-        <!-- <v-icon
-                    @click="transferMachine(item.uuid)"
-                    color="blue"
-                    class="mr-2"
-                    >mdi-transfer</v-icon
-                > -->
+        <v-icon @click="transferMachine(item.uuid)" color="blue" class="mr-2"
+          >mdi-transfer</v-icon
+        >
         <v-icon @click="editMechine(item.uuid)" class="mr-2">mdi-pencil</v-icon>
         <v-icon @click="showConfirmDialog(item.id)" color="red"
           >mdi-delete</v-icon

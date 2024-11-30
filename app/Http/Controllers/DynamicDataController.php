@@ -49,7 +49,7 @@ class DynamicDataController extends Controller
         $limit  = $request->query('limit', 5); // Default limit of 10
         // Query to search for factories by name with a limit
         $factories = Factory::with('user:id,name')->where('name', 'like', '%' . $search . '%')
-                     ->limit($limit)
+                    //  ->limit($limit)
                      ->get();
         // Return the factories as JSON
         return response()->json($factories);
@@ -74,7 +74,7 @@ class DynamicDataController extends Controller
         $limit  = $request->query('limit', 5); // Default limit of 10
         // Query to search for factories by name with a limit
         $factories = Unit::with(['floors.factories.user'])->where('name', 'like', '%' . $search . '%')
-                     ->limit($limit)
+                    //  ->limit($limit)
                      ->get();
         // Return the factories as JSON
         return response()->json($factories);
@@ -220,6 +220,7 @@ class DynamicDataController extends Controller
     public function getLinesByFactory(Request $request)
     {
         $factoryId = $request->input('factory_id');
+        // dd( $factoryId);
 
         // Fetch lines through the relationship chain
         $lines = Line::whereHas('units.floors.factories', function ($query) use ($factoryId) {
