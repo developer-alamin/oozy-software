@@ -84,7 +84,9 @@ Route::delete('/mechine/assing/{id}/forceDelete', [MechineAssingController::clas
 Route::get('/mechine/transfer/list', [MechineAssingController::class,'mechineTransferList'])->name('mechine.transfer.list');
 Route::get('/mechine/history/list', [MechineAssingController::class,'mechineHistoryList'])->name('mechine.assing.trashed');
 Route::get('/mechine/assing/{uuid}/edit', [MechineAssingController::class,'edit'])->name('mechine.assing.trashed');
+Route::post('/machine/transfer/update/{uuid}', [MechineAssingController::class,'mechineTransferUpdate'])->name('machine.transfer.update');
 Route::resource('machine-assing',MechineAssingController::class);
+
 Route::get('/machine-movement-history',[MachineMovementController::class,'historyIndex'])->name('mechine.movement.history');
 Route::resource('machine-movement',MachineMovementController::class);
 

@@ -370,8 +370,8 @@ class MechineAssingController extends Controller
         ], Response::HTTP_OK);
     }
 
-    public function mechineTransferStore(MechineTransferStore $request,$uuid){
-        // dd($request->all());
+    public function mechineTransferUpdate(MechineTransferStore $request,$uuid){
+        dd($request->all());
         $mechine = MechineAssing::where('uuid', $uuid)->firstOrFail();
         // dd($mechine);
         // Check which authentication guard is in use and set the creator
@@ -383,7 +383,7 @@ class MechineAssingController extends Controller
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
 
-        // validataion
+        // validation
         $validatedData = $request->validated();
         if (!empty($request->purchase_date) && $request->purchase_date !== 'null') {
             // Remove extra characters like "(timezone)" if any and parse the date
