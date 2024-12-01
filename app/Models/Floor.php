@@ -52,5 +52,9 @@ class Floor extends Model
     {
         return $this->belongsTo(User::class, 'company_id');
     }
+    public function units()
+    {
+        return $this->hasMany(Unit::class);
+    }
 
 }

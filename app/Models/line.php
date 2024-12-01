@@ -29,7 +29,7 @@ class Line extends Model
         'status',
         'description',
     ];
-    
+
     protected $casts = [
         'unit_id'    => 'integer', // Casts factory_id to an integer
         'uuid'       => 'string',
@@ -58,5 +58,9 @@ class Line extends Model
     {
         return $this->belongsToMany(Line::class, 'line_unit', 'unit_id', 'line_id')
                     ->withPivot('unit_id', 'line_id');
+    }
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class);
     }
 }

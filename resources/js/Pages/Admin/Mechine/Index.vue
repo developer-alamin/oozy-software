@@ -81,6 +81,21 @@
       loading-text="Loading... Please wait"
       @update:options="loadItems"
     >
+
+    <template v-slot:item["factory.floors"]="{ item }">
+      <span>{{ item.factory.floors.map(floor => floor.name).join(", ") }}</span>
+    </template>
+
+    <!-- Custom slot for displaying unit -->
+    <template v-slot:item["factory.floors.0.units"]="{ item }">
+      <span>{{ item.factory.floors[0].units.map(unit => unit.name).join(", ") }}</span>
+    </template>
+
+    <!-- Custom slot for displaying line -->
+    <template v-slot:item["factory.floors.0.units.0.lines"]="{ item }">
+      <span>{{ item.factory.floors[0].units[0].lines.map(line => line.name).join(", ") }}</span>
+    </template>
+    
       <template v-slot:item.status="{ item }">
         <v-chip
           :color="getStatusColor(item.status)"
@@ -91,6 +106,7 @@
           {{ item.status }}
         </v-chip>
       </template>
+
       <template v-slot:item.creator_name="{ item }">
         <span>{{ item.creator ? item.creator.name : "Unknown" }}</span>
       </template>
@@ -133,12 +149,27 @@ export default {
       search: "",
       itemsPerPage: 10,
       headers: [
-        // { title: "Company Name", key: "user.name", sortable: false },
+        { title: "Machine", key: "name", sortable: true },
+        { title: "Company", key: "factory.user.name", sortable: false },
         { title: "Factory", key: "factory.name", sortable: false },
-        { title: "Machine Name", key: "name", sortable: true },
-        { title: "Machine Code", key: "machine_code", sortable: false },
-        { title: "Model", key: "product_model.name", sortable: false },
-        { title: "Type", key: "mechine_type.name", sortable: false },
+        {
+          title: "Floor",
+          key: "factory.floors.0.name", // Corresponds to the nested "floors" data
+          sortable: false,
+        },
+        {
+          title: "Unit",
+          key: "factory.floors.0.units.0.name", // Corresponds to the nested "floors" data
+          sortable: false,
+        },
+        {
+          title: "Line",
+          key: "factory.floors.0.units.0.lines.0.name", // Corresponds to the nested "floors" data
+          sortable: false,
+        },
+        // { title: "Machine Code", key: "machine_code", sortable: false },
+        // { title: "Model", key: "product_model.name", sortable: false },
+        // { title: "Type", key: "mechine_type.name", sortable: false },
         {
           title: "Status",
           key: "machine_status.name",

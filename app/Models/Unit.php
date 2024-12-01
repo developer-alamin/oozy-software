@@ -52,11 +52,15 @@ class Unit extends Model
         return $this->morphTo();
     }
 
-
     public function lines()
     {
-        return $this->belongsToMany(Line::class, 'line_unit', 'unit_id', 'line_id')
-                    ->withPivot('unit_id', 'line_id');
+        return $this->hasMany(Line::class);
     }
+
+    // public function lines()
+    // {
+    //     return $this->belongsToMany(Line::class, 'line_unit', 'unit_id', 'line_id')
+    //                 ->withPivot('unit_id', 'line_id');
+    // }
 
 }

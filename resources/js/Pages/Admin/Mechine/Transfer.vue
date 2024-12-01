@@ -169,7 +169,7 @@ export default {
     },
 
     async handleLocationChange(value) {
-      if (value === "Sewing Line") {
+      if (value == "Sewing Line") {
         const productionStatus = this.machine_statuses.find(
           (status) => status.name == "Production"
         );
@@ -177,16 +177,16 @@ export default {
           this.machine.machine_status_id = productionStatus.id;
         }
         this.fetchLines(); // Fetch lines when 'Sewing Line' is selected
-      } else if (value === "Idle Storage") {
+      } else if (value == "Idle Storage") {
         const idleStatus = this.machine_statuses.find(
-          (status) => status.name === "Idle"
+          (status) => status.name == "Idle"
         );
         if (idleStatus) {
           this.machine.machine_status_id = idleStatus.id;
         }
-      } else if (value === "Out of Factory") {
+      } else if (value == "Out of Factory") {
         const factoryOutStatus = this.machine_statuses.find(
-          (status) => status.name === "Factory Out"
+          (status) => status.name == "Factory Out"
         );
         if (factoryOutStatus) {
           this.machine.machine_status_id = factoryOutStatus.id;

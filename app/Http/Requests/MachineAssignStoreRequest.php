@@ -59,7 +59,9 @@ class MachineAssignStoreRequest extends FormRequest
             'line_id'                     => 'nullable',
             'show_basic_details'          => 'nullable',
             'show_specifications'         => 'nullable',
-        
+            'machine_id'                  => 'nullable',
+            'uuid'                        => 'nullable'
+
         ];
     }
 }

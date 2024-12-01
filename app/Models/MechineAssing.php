@@ -52,7 +52,8 @@ class MechineAssing extends Model
         'tag',
         'line_id',
         'show_basic_details',
-        'show_specifications'
+        'show_specifications',
+        'machine_id'
     ];
 
     // Optionally, cast some fields to specific types (e.g., dates)

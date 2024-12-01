@@ -66,7 +66,19 @@ class MechineAssingController extends Controller
         // Apply sorting
         $mechineAssingQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $mechineAssing = $mechineAssingQuery->where('status','Assign')->with('creator:id,name','factory:id,name','machineStatus:id,name','productModel:id,name','mechineType:id,name')->paginate($itemsPerPage);
+        $mechineAssing = $mechineAssingQuery->where('status', '!=', 'History')
+                          ->with([
+                            'creator:id,name',                          // Creator of the machine assignment
+                            'factory:id,name,company_id',
+                            'factory.user:id,name',                           // Direct factory relationship
+                            'factory.floors:id,name,factory_id',        // Floors within the factory
+                            'factory.floors.units:id,name,floor_id',    // Units within the floors
+                            'factory.floors.units.lines:id,name,unit_id', // Lines within the units
+                            'machineStatus:id,name',                   // Machine status
+                            'productModel:id,name',                    // Product model
+                            'mechineType:id,name'                      // Machine type
+                        ])
+                        ->paginate($itemsPerPage);
         // Return the response as JSON
         return response()->json([
             'items' => $mechineAssing->items(), // Current page items
@@ -370,9 +382,9 @@ class MechineAssingController extends Controller
         ], Response::HTTP_OK);
     }
 
-    public function mechineTransferUpdate(MechineTransferStore $request,$uuid){
-        dd($request->all());
-        $mechine = MechineAssing::where('uuid', $uuid)->firstOrFail();
+    public function mechineTransferUpdate(MachineAssignStoreRequest $request,$uuid){
+        // dd($request->all());
+        $machine = MechineAssing::where('uuid', $uuid)->firstOrFail();
         // dd($mechine);
         // Check which authentication guard is in use and set the creator
         if (Auth::guard('admin')->check()) {
@@ -402,34 +414,61 @@ class MechineAssingController extends Controller
         } else {
             $validatedData['rent_date'] = null; // Set to null if no valid date is provided
         }
+
+        if (!empty($request->commission_date) && $request->commission_date !== 'null') {
+          // Remove extra characters like "(timezone)" if any and parse the date
+          $validatedData['commission_date'] = Carbon::parse(
+              preg_replace('/\s*\(.*\)$/', '', $request->commission_date)
+          )->format('Y-m-d');
+        } else {
+          $validatedData['commission_date'] = null; // Set to null if no valid date is provided
+        }
+
+        if (!empty($request->warranty_period) && $request->warranty_period !== 'null') {
+            // Remove extra characters like "(timezone)" if any and parse the date
+            $validatedData['warranty_period'] = Carbon::parse(
+                preg_replace('/\s*\(.*\)$/', '', $request->warranty_period)
+            )->format('Y-m-d');
+        } else {
+            $validatedData['warranty_period'] = null; // Set to null if no valid date is provided
+        }
+
          // Update the original machine status to "history"
 
 
-        $mechineTransfer                            = new MechineAssing();
-        $mechineTransfer->uuid                      = HelperController::generateUuid();
-        $mechineTransfer->factory_id                = $request->factory_id;
-        $mechineTransfer->brand_id                  = $request->brand_id;
-        $mechineTransfer->model_id                  = $request->model_id;
-        $mechineTransfer->mechine_type_id           = $request->mechine_type_id;
-        $mechineTransfer->mechine_source_id         = $request->mechine_source_id;
-        $mechineTransfer->supplier_id               = ($request->supplier_id && $request->supplier_id !== 'null') ? $request->supplier_id : 0;
-        $mechineTransfer->rent_id                   = ($request->rent_id && $request->rent_id !== 'null') ? $request->rent_id : 0;
-        $mechineTransfer->rent_date                 = $request->rent_date;
-        $mechineTransfer->name                      = $request->name;
-        $mechineTransfer->mechine_code              = $request->mechine_code;
-        $mechineTransfer->preventive_service_days   = $request->preventive_service_days;
-        $mechineTransfer->purchace_price            = $request->purchace_price;
-        $mechineTransfer->purchase_date             = $request->purchase_date;
-        $mechineTransfer->status                    = $request->status;
-        $mechineTransfer->note                      = $request->note;
-        $mechineTransfer->mechine_transfer_id       = $mechine->id;
-        $mechineTransfer->mechine_status            = "Transferred";
+        $mechineTransfer                      = new MechineAssing( $validatedData);
+        $mechineTransfer->machine_id          = $machine->id;
+        $mechineTransfer->uuid                = HelperController::generateUuid();
+        $mechineTransfer->machine_source_id   = ($request->machine_source_id && $request->machine_source_id !== 'null') ? $request->machine_source_id : 0;
+        $mechineTransfer->line_id             = ($request->line_id && $request->line_id !== 'null') ? $request->line_id : 0;
+        $mechineTransfer->show_basic_details  = $request->show_basic_details == "true" ? true : false;
+        $mechineTransfer->show_specifications = $request->show_specifications == "true" ? true : false;
+
+        $mechineTransfer->status              = "Transferred";
 
         $mechineTransfer->creator()->associate($creator);
         $mechineTransfer->updater()->associate($creator);
         $mechineTransfer->save();
+        // $mechineTransfer->uuid                      = HelperController::generateUuid();
+        // $mechineTransfer->factory_id                = $request->factory_id;
+        // $mechineTransfer->brand_id                  = $request->brand_id;
+        // $mechineTransfer->model_id                  = $request->model_id;
+        // $mechineTransfer->mechine_type_id           = $request->mechine_type_id;
+        // $mechineTransfer->mechine_source_id         = $request->mechine_source_id;
+        // $mechineTransfer->supplier_id               = ($request->supplier_id && $request->supplier_id !== 'null') ? $request->supplier_id : 0;
+        // $mechineTransfer->rent_id                   = ($request->rent_id && $request->rent_id !== 'null') ? $request->rent_id : 0;
+        // $mechineTransfer->rent_date                 = $request->rent_date;
+        // $mechineTransfer->name                      = $request->name;
+        // $mechineTransfer->mechine_code              = $request->mechine_code;
+        // $mechineTransfer->preventive_service_days   = $request->preventive_service_days;
+        // $mechineTransfer->purchace_price            = $request->purchace_price;
+        // $mechineTransfer->purchase_date             = $request->purchase_date;
+        // $mechineTransfer->status                    = $request->status;
+        // $mechineTransfer->note                      = $request->note;
+        // $mechineTransfer->mechine_transfer_id       = $mechine->id;
 
-        $mechine->update(['mechine_status' => 'History']);
+
+        $machine->update(['status' => 'History']);
 
         return response()->json([
             'success' => true,
