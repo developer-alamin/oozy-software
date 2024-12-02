@@ -56,5 +56,9 @@ class Floor extends Model
     {
         return $this->hasMany(Unit::class);
     }
+    public function factory()
+    {
+        return $this->belongsTo(Factory::class, 'factory_id');
+    }
 
 }

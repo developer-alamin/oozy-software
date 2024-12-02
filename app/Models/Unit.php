@@ -56,7 +56,10 @@ class Unit extends Model
     {
         return $this->hasMany(Line::class);
     }
-
+    public function floor()
+    {
+        return $this->belongsTo(Floor::class, 'floor_id');
+    }
     // public function lines()
     // {
     //     return $this->belongsToMany(Line::class, 'line_unit', 'unit_id', 'line_id')

@@ -71,9 +71,11 @@ class MechineAssingController extends Controller
                             'creator:id,name',                          // Creator of the machine assignment
                             'factory:id,name,company_id',
                             'factory.user:id,name',                           // Direct factory relationship
-                            'factory.floors:id,name,factory_id',        // Floors within the factory
-                            'factory.floors.units:id,name,floor_id',    // Units within the floors
-                            'factory.floors.units.lines:id,name,unit_id', // Lines within the units
+                            // 'factory.floors:id,name,factory_id',        // Floors within the factory
+                            // 'factory.floors.units:id,name,floor_id',    // Units within the floors
+                            // 'factory.floors.units.lines:id,name,unit_id', // Lines within the units
+                            'machineStatus:id,name',                   // Machine status
+                            'line.unit.floor.factory.user:id,name',   
                             'machineStatus:id,name',                   // Machine status
                             'productModel:id,name',                    // Product model
                             'mechineType:id,name'                      // Machine type
@@ -85,6 +87,81 @@ class MechineAssingController extends Controller
             'total' => $mechineAssing->total(), // Total number of records
         ]);
     }
+    // public function index(Request $request)
+    // {
+    //     $page = $request->input('page', 1);
+    //     $itemsPerPage = $request->input('itemsPerPage', 5);
+    //     $sortBy = $request->input('sortBy', 'created_at'); // Default sort by created_at
+    //     $sortOrder = $request->input('sortOrder', 'desc'); // Default sort order is descending
+    //     $search = $request->input('search', ''); // Search term, default is empty
+
+    //     // Determine the authenticated user (admin or user)
+    //     if (Auth::guard('admin')->check()) {
+    //         $currentUser = Auth::guard('admin')->user();
+    //         $creatorType = Admin::class;
+
+    //         $mechineAssingQuery = $currentUser->role === 'superadmin'
+    //             ? MechineAssing::query()
+    //             : MechineAssing::where('creator_type', $creatorType)
+    //                 ->where('creator_id', $currentUser->id);
+    //     } elseif (Auth::guard('user')->check()) {
+    //         $currentUser = Auth::guard('user')->user();
+    //         $creatorType = User::class;
+
+    //         $mechineAssingQuery = MechineAssing::where('creator_type', $creatorType)
+    //             ->where('creator_id', $currentUser->id);
+    //     } else {
+    //         return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+    //     }
+
+    //     // Apply search filter
+    //     if (!empty($search)) {
+    //         $mechineAssingQuery->where('name', 'LIKE', '%' . $search . '%');
+    //     }
+
+    //     // Apply sorting
+    //     $mechineAssingQuery->orderBy($sortBy, $sortOrder);
+
+    //     // Retrieve paginated data with relationships
+    //     $mechineAssing = $mechineAssingQuery
+    //         ->where('status', '!=', 'History')
+    //         ->with([
+    //             'creator:id,name',
+    //             'factory:id,name,company_id',
+    //             'factory.user:id,name', // Factory owner
+    //             'factory.floors:id,name,factory_id',
+    //             'factory.floors.units:id,name,floor_id',
+    //             'factory.floors.units.lines:id,name,unit_id',
+    //             'machineStatus:id,name',
+    //             'productModel:id,name',
+    //             'mechineType:id,name'
+    //         ])
+    //         ->paginate($itemsPerPage);
+
+    //     // Process nested relationships if needed
+    //     $items = $mechineAssing->items(); // Get current page data
+    //     foreach ($items as $item) {
+    //         // Convert factory floors to a collection (if needed)
+    //         $item->factory->floors = collect($item->factory->floors)->map(function ($floor) {
+    //             $floor->units = collect($floor->units)->map(function ($unit) {
+    //                 $unit->lines = collect($unit->lines)->map(function ($line) {
+    //                     // Add or modify line data if necessary
+    //                     return $line;
+    //                 });
+    //                 return $unit;
+    //             });
+    //             return $floor;
+    //         });
+    //     }
+
+    //     // Return the response as JSON
+    //     return response()->json([
+    //         'items' => $items, // Transformed current page items
+    //         'total' => $mechineAssing->total(), // Total number of records
+    //     ]);
+    // }
+
+
 
       /**
      * Display a listing of the resource.

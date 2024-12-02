@@ -66,6 +66,10 @@ class MechineAssing extends Model
     {
         return $this->belongsTo(User::class, 'company_id');
     }
+    public function line()
+    {
+        return $this->belongsTo(Line::class, 'line_id');
+    }
     public function machineStatus()
     {
         return $this->belongsTo(MachineStatus::class, 'machine_status_id');
