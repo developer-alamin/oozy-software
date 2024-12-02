@@ -76,13 +76,25 @@
     "file": "assets/login_page_img-CfsmQqeV.png",
     "src": "resources/img/login_page_img.png"
   },
+  "resources/js/Pages/Admin/License/index.vue": {
+    "file": "assets/index-RRlJL2yJ.js",
+    "name": "index",
+    "src": "resources/js/Pages/Admin/License/index.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
   "resources/js/app.js": {
-    "file": "assets/app-D5sqFfcq.js",
+    "file": "assets/app-_miZBkTs.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
+    "dynamicImports": [
+      "resources/js/Pages/Admin/License/index.vue"
+    ],
     "css": [
-      "assets/app-B7XYETOb.css"
+      "assets/app-BUrdeMqo.css"
     ],
     "assets": [
       "assets/login_page_img-CfsmQqeV.png",

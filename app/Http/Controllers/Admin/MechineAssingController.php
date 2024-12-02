@@ -44,29 +44,29 @@ class MechineAssingController extends Controller
             // Check if the admin is a super admin
             if ($currentUser->role === 'superadmin') {
                 // If superadmin, retrieve all technicians
-                $mechineAssingQuery = MechineAssing::query(); // No filters applied
+                $machineAssignQuery = MechineAssing::query(); // No filters applied
             } else {
                 // If not superadmin, filter by creator type and id
-                $mechineAssingQuery = MechineAssing::where('creator_type', $creatorType)
+                $machineAssignQuery = MechineAssing::where('creator_type', $creatorType)
                     ->where('creator_id', $currentUser->id);
             }
         } elseif (Auth::guard('user')->check()) {
             $currentUser = Auth::guard('user')->user();
             $creatorType = User::class;
             // For regular users, filter by creator type and id
-            $mechineAssingQuery = MechineAssing::where('creator_type', $creatorType)
+            $machineAssignQuery = MechineAssing::where('creator_type', $creatorType)
                 ->where('creator_id', $currentUser->id);
         } else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
         // Apply search if the search term is not empty
         if (!empty($search)) {
-            $mechineAssingQuery->where('name', 'LIKE', '%' . $search . '%');
+            $machineAssignQuery->where('name', 'LIKE', '%' . $search . '%');
         }
         // Apply sorting
-        $mechineAssingQuery->orderBy($sortBy, $sortOrder);
+        $machineAssignQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $mechineAssing = $mechineAssingQuery->where('status', '!=', 'History')
+        $machineAssign = $machineAssignQuery->where('status', '!=', 'History')
                           ->with([
                             'creator:id,name',                          // Creator of the machine assignment
                             'factory:id,name,company_id',
@@ -75,7 +75,7 @@ class MechineAssingController extends Controller
                             // 'factory.floors.units:id,name,floor_id',    // Units within the floors
                             // 'factory.floors.units.lines:id,name,unit_id', // Lines within the units
                             'machineStatus:id,name',                   // Machine status
-                            'line.unit.floor.factory.user:id,name',   
+                            'line.unit.floor.factory.user:id,name',
                             'machineStatus:id,name',                   // Machine status
                             'productModel:id,name',                    // Product model
                             'mechineType:id,name'                      // Machine type
@@ -83,83 +83,10 @@ class MechineAssingController extends Controller
                         ->paginate($itemsPerPage);
         // Return the response as JSON
         return response()->json([
-            'items' => $mechineAssing->items(), // Current page items
-            'total' => $mechineAssing->total(), // Total number of records
+            'items' => $machineAssign->items(), // Current page items
+            'total' => $machineAssign->total(), // Total number of records
         ]);
     }
-    // public function index(Request $request)
-    // {
-    //     $page = $request->input('page', 1);
-    //     $itemsPerPage = $request->input('itemsPerPage', 5);
-    //     $sortBy = $request->input('sortBy', 'created_at'); // Default sort by created_at
-    //     $sortOrder = $request->input('sortOrder', 'desc'); // Default sort order is descending
-    //     $search = $request->input('search', ''); // Search term, default is empty
-
-    //     // Determine the authenticated user (admin or user)
-    //     if (Auth::guard('admin')->check()) {
-    //         $currentUser = Auth::guard('admin')->user();
-    //         $creatorType = Admin::class;
-
-    //         $mechineAssingQuery = $currentUser->role === 'superadmin'
-    //             ? MechineAssing::query()
-    //             : MechineAssing::where('creator_type', $creatorType)
-    //                 ->where('creator_id', $currentUser->id);
-    //     } elseif (Auth::guard('user')->check()) {
-    //         $currentUser = Auth::guard('user')->user();
-    //         $creatorType = User::class;
-
-    //         $mechineAssingQuery = MechineAssing::where('creator_type', $creatorType)
-    //             ->where('creator_id', $currentUser->id);
-    //     } else {
-    //         return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
-    //     }
-
-    //     // Apply search filter
-    //     if (!empty($search)) {
-    //         $mechineAssingQuery->where('name', 'LIKE', '%' . $search . '%');
-    //     }
-
-    //     // Apply sorting
-    //     $mechineAssingQuery->orderBy($sortBy, $sortOrder);
-
-    //     // Retrieve paginated data with relationships
-    //     $mechineAssing = $mechineAssingQuery
-    //         ->where('status', '!=', 'History')
-    //         ->with([
-    //             'creator:id,name',
-    //             'factory:id,name,company_id',
-    //             'factory.user:id,name', // Factory owner
-    //             'factory.floors:id,name,factory_id',
-    //             'factory.floors.units:id,name,floor_id',
-    //             'factory.floors.units.lines:id,name,unit_id',
-    //             'machineStatus:id,name',
-    //             'productModel:id,name',
-    //             'mechineType:id,name'
-    //         ])
-    //         ->paginate($itemsPerPage);
-
-    //     // Process nested relationships if needed
-    //     $items = $mechineAssing->items(); // Get current page data
-    //     foreach ($items as $item) {
-    //         // Convert factory floors to a collection (if needed)
-    //         $item->factory->floors = collect($item->factory->floors)->map(function ($floor) {
-    //             $floor->units = collect($floor->units)->map(function ($unit) {
-    //                 $unit->lines = collect($unit->lines)->map(function ($line) {
-    //                     // Add or modify line data if necessary
-    //                     return $line;
-    //                 });
-    //                 return $unit;
-    //             });
-    //             return $floor;
-    //         });
-    //     }
-
-    //     // Return the response as JSON
-    //     return response()->json([
-    //         'items' => $items, // Transformed current page items
-    //         'total' => $mechineAssing->total(), // Total number of records
-    //     ]);
-    // }
 
 
 
@@ -213,7 +140,7 @@ class MechineAssingController extends Controller
       /**
      * Display a listing of the resource.
      */
-    public function mechineHistoryList(Request $request)
+    public function machineHistoryList(Request $request)
     {
         $page         = $request->input('page', 1);
         $itemsPerPage = $request->input('itemsPerPage', 5);
@@ -227,33 +154,42 @@ class MechineAssingController extends Controller
             // Check if the admin is a super admin
             if ($currentUser->role === 'superadmin') {
                 // If superadmin, retrieve all technicians
-                $mechineAssingQuery = MechineAssing::query(); // No filters applied
+                $machineAssignQuery = MechineAssing::query(); // No filters applied
             } else {
                 // If not superadmin, filter by creator type and id
-                $mechineAssingQuery = MechineAssing::where('creator_type', $creatorType)
+                $machineAssignQuery = MechineAssing::where('creator_type', $creatorType)
                     ->where('creator_id', $currentUser->id);
             }
         } elseif (Auth::guard('user')->check()) {
             $currentUser = Auth::guard('user')->user();
             $creatorType = User::class;
             // For regular users, filter by creator type and id
-            $mechineAssingQuery = MechineAssing::where('creator_type', $creatorType)
+            $machineAssignQuery = MechineAssing::where('creator_type', $creatorType)
                 ->where('creator_id', $currentUser->id);
         } else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
         // Apply search if the search term is not empty
         if (!empty($search)) {
-            $mechineAssingQuery->where('name', 'LIKE', '%' . $search . '%');
+            $machineAssignQuery->where('name', 'LIKE', '%' . $search . '%');
         }
         // Apply sorting
-        $mechineAssingQuery->orderBy($sortBy, $sortOrder);
+        $machineAssignQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $mechineAssing = $mechineAssingQuery->where('mechine_status','History')->with('creator:id,name','user:id,name','factory:id,name')->paginate($itemsPerPage);
+        $machineAssign = $machineAssignQuery->where('status','History')->with([
+          'creator:id,name',                          // Creator of the machine assignment
+          'factory:id,name,company_id',
+          'factory.user:id,name',                           // Direct factory relationship
+          'machineStatus:id,name',                   // Machine status
+          'line.unit.floor.factory.user:id,name',
+          'machineStatus:id,name',                   // Machine status
+          'productModel:id,name',                    // Product model
+          'mechineType:id,name'                      // Machine type
+        ])->paginate($itemsPerPage);
         // Return the response as JSON
         return response()->json([
-            'items' => $mechineAssing->items(), // Current page items
-            'total' => $mechineAssing->total(), // Total number of records
+            'items' => $machineAssign->items(), // Current page items
+            'total' => $machineAssign->total(), // Total number of records
         ]);
     }
 
@@ -369,10 +305,176 @@ class MechineAssingController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(MechineAssing $mechineAssing)
+    public function show(Request $request,$uuid)
     {
-        //
+        $machineAssign = MechineAssing::with([
+          'creator:id,name',                          // Creator of the machine assignment
+          'factory:id,name,company_id',
+          'factory.user:id,name',                           // Direct factory relationship
+          'machineStatus:id,name',                   // Machine status
+          'line.unit.floor.factory.user:id,name',
+          'machineStatus:id,name',
+          'brand:id,name',                 // Machine status
+          'productModel:id,name',                    // Product model
+          'mechineType:id,name',
+          'source:id,name',
+          'supplier:id,name',                      // Machine type
+        ])->where('uuid', $uuid)->firstOrFail();
+
+        $page         = $request->input('page', 1);
+        $itemsPerPage = $request->input('itemsPerPage', 5);
+        $sortBy       = $request->input('sortBy', 'created_at'); // Default sort by created_at
+        $sortOrder    = $request->input('sortOrder', 'desc');    // Default sort order is descending
+        $search       = $request->input('search', '');           // Search term, default is empty
+
+      // If superadmin, retrieve all technicians
+      // $machineAssignQuery = MechineAssing::query(); // No filters applied
+
+
+      //   // Apply search if the search term is not empty
+      //   if (!empty($search)) {
+      //       $machineAssignQuery->where('name', 'LIKE', '%' . $search . '%');
+      //   }
+      //   // Apply sorting
+      //   $machineAssignQuery->orderBy($sortBy, $sortOrder);
+      //   // Paginate results
+      //   $history = $machineAssignQuery->where('status','History')
+      //   ->where('machine_id',$machineAssign->machine_id)
+      //   ->with([
+      //     'creator:id,name',                          // Creator of the machine assignment
+      //     'factory:id,name,company_id',
+      //     'factory.user:id,name',                           // Direct factory relationship
+      //     'machineStatus:id,name',                   // Machine status
+      //     'line.unit.floor.factory.user:id,name',
+      //     'machineStatus:id,name',                   // Machine status
+      //     'productModel:id,name',                    // Product model
+      //     'mechineType:id,name'                      // Machine type
+      //   ])->paginate($itemsPerPage);
+
+        $history = MechineAssing::where('status', 'History')->where('machine_id',$machineAssign->machine_id)->with([
+              'creator:id,name',                          // Creator of the machine assignment
+              'factory:id,name,company_id',
+              'factory.user:id,name',                           // Direct factory relationship
+              'machineStatus:id,name',                   // Machine status
+              'line.unit.floor.factory.user:id,name',
+              'machineStatus:id,name',                   // Machine status
+              'productModel:id,name',                    // Product model
+              'mechineType:id,name'                      // Machine type
+            ])->get();
+
+        if (Auth::guard('admin')->check()) {
+          $currentUser = Auth::guard('admin')->user();
+          $creatorType = Admin::class;
+          // Check if the admin is a super admin
+          if ($currentUser->role === 'superadmin') {
+              // Super admins can edit any mechineAssing
+              return response()->json([
+                  'success'          => true,
+                  'machineAssign'    => $machineAssign,
+                  'items' =>  $history,
+              ], Response::HTTP_OK);
+          }
+      } elseif (Auth::guard('user')->check()) {
+          $currentUser = Auth::guard('user')->user();
+          $creatorType = User::class;
+      } else {
+          return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+      }
+      // Check if the machineAssign belongs to the current user or admin
+      if ($machineAssign->creator_type !== $creatorType || $machineAssign->creator_id !== $currentUser->id) {
+          return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to edit this machineAssign.'], 403);
+      }
+
+      //  // Return the machineAssign data if authorized
+      //  return response()->json([
+      //   'success'       => true,
+      //   'machineAssign' => $machineAssign,
+      //   // 'items'         => $machineAssignHistory, // Current page items
+      //   // 'total'         => $machineAssignHistory->total(),
+      // ], Response::HTTP_OK);
+
+      // $page         = $request->input('page', 1);
+      //   $itemsPerPage = $request->input('itemsPerPage', 5);
+      //   $sortBy       = $request->input('sortBy', 'created_at'); // Default sort by created_at
+      //   $sortOrder    = $request->input('sortOrder', 'desc');    // Default sort order is descending
+      //   $search       = $request->input('search', '');           // Search term, default is empty
+      //   // Determine the authenticated user (either from 'admin' or 'user' guard)
+      //   if (Auth::guard('admin')->check()) {
+      //       $currentUser = Auth::guard('admin')->user();
+      //       $creatorType = Admin::class;
+      //       // Check if the admin is a super admin
+      //       if ($currentUser->role === 'superadmin') {
+      //           // If superadmin, retrieve all technicians
+      //           $machineAssignQuery = MechineAssing::query(); // No filters applied
+      //       } else {
+      //           // If not superadmin, filter by creator type and id
+      //           $machineAssignQuery = MechineAssing::where('creator_type', $creatorType)
+      //               ->where('creator_id', $currentUser->id);
+      //       }
+      //   } elseif (Auth::guard('user')->check()) {
+      //       $currentUser = Auth::guard('user')->user();
+      //       $creatorType = User::class;
+      //       // For regular users, filter by creator type and id
+      //       $machineAssignQuery = MechineAssing::where('creator_type', $creatorType)
+      //           ->where('creator_id', $currentUser->id);
+      //   } else {
+      //       return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+      //   }
+      //   // Apply search if the search term is not empty
+      //   if (!empty($search)) {
+      //       $machineAssignQuery->where('name', 'LIKE', '%' . $search . '%');
+      //   }
+      //   // Apply sorting
+      //   $machineAssignQuery->orderBy($sortBy, $sortOrder);
+      //   // Paginate results
+      //   $history = $machineAssignQuery->where('status','History')->with([
+      //     'creator:id,name',                          // Creator of the machine assignment
+      //     'factory:id,name,company_id',
+      //     'factory.user:id,name',                           // Direct factory relationship
+      //     'machineStatus:id,name',                   // Machine status
+      //     'line.unit.floor.factory.user:id,name',
+      //     'machineStatus:id,name',                   // Machine status
+      //     'productModel:id,name',                    // Product model
+      //     'mechineType:id,name'                      // Machine type
+      //   ])->paginate($itemsPerPage);
+      //   // Return the response as JSON
+      //   return response()->json([
+      //       'success'       => true,
+      //       'machineAssign' => $machineAssign,
+      //       'items'         => $history->isEmpty() ? [] : $history->items(), // Current page items
+      //       'total' => $history->total(), // Total number of records
+      //   ]);
+      // $history = MechineAssing::where('machine_id', $machineAssign->id)
+      //   ->paginate(10); // Adjust pagination limit as needed
+
+    // return response()->json([
+    //     'success' => true,
+    //     'machineAssign' => $machineAssign,
+    //     'items' => $history->items(), // Current page items
+    //     'total' => $history->total(), // Total number of records
+    // ]);
+
     }
+//     public function show($uuid)
+// {
+//     $machineAssign = MechineAssing::where('uuid', $uuid)
+//         ->first();
+
+//     if (!$machineAssign) {
+//         return response()->json(['success' => false, 'message' => 'Machine assignment not found.'], 404);
+//     }
+
+//     $history = MechineAssing::where('machine_id', $machineAssign->id)
+//         ->paginate(10); // Adjust pagination limit as needed
+
+//     return response()->json([
+//         'success' => true,
+//         'machineAssign' => $machineAssign,
+//         'items' => $history->items(), // Current page items
+//         'total' => $history->total(), // Total number of records
+//     ]);
+// }
+
 
     /**
      * Show the form for editing the specified resource.
@@ -457,12 +559,17 @@ class MechineAssingController extends Controller
             'success' => true,
             'mechineTransfer' => $mechineTransfer
         ], Response::HTTP_OK);
+
+
     }
 
     public function mechineTransferUpdate(MachineAssignStoreRequest $request,$uuid){
         // dd($request->all());
         $machine = MechineAssing::where('uuid', $uuid)->firstOrFail();
-        // dd($mechine);
+        $machineCode = $machine->machine_code;
+        $machineCodeData = MechineAssing::where('machine_code', $machine->machine_code)->first();
+        $machineId = $machineCodeData->id;
+        // dd($machineId);
         // Check which authentication guard is in use and set the creator
         if (Auth::guard('admin')->check()) {
             $creator = Auth::guard('admin')->user();
@@ -514,7 +621,7 @@ class MechineAssingController extends Controller
 
 
         $mechineTransfer                      = new MechineAssing( $validatedData);
-        $mechineTransfer->machine_id          = $machine->id;
+        $mechineTransfer->machine_id          = $machineId;
         $mechineTransfer->uuid                = HelperController::generateUuid();
         $mechineTransfer->machine_source_id   = ($request->machine_source_id && $request->machine_source_id !== 'null') ? $request->machine_source_id : 0;
         $mechineTransfer->line_id             = ($request->line_id && $request->line_id !== 'null') ? $request->line_id : 0;

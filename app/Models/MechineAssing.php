@@ -78,6 +78,10 @@ class MechineAssing extends Model
     {
         return $this->belongsTo(ProductModel::class, 'model_id');
     }
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class, 'brand_id');
+    }
     public function mechineType()
     {
         return $this->belongsTo(MechineType::class, 'machine_type_id');
@@ -85,6 +89,14 @@ class MechineAssing extends Model
     public function factory()
     {
         return $this->belongsTo(Factory::class, 'factory_id');
+    }
+    public function source()
+    {
+        return $this->belongsTo(Source::class, 'machine_source_id');
+    }
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class, 'supplier_id');
     }
     public function creator()
     {

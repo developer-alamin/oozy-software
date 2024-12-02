@@ -12,8 +12,7 @@
       <li class="nav-item">
         <a
           class="nav-link collapsed"
-          :class="{ show: isMachineRoute }"
-          data-bs-target="#license"
+          data-bs-target="#license-license"
           data-bs-toggle="collapse"
           href="#"
         >
@@ -22,9 +21,8 @@
           <i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul
-          id="license"
+          id="license-license"
           class="nav-content collapse"
-          :class="{ show: isMachineRoute }"
           data-bs-parent="#sidebar-nav"
         >
           <li>
@@ -71,7 +69,7 @@
               <i class="bi bi-circle"></i><span> Machine All </span>
             </router-link>
           </li>
-          <li>
+          <!-- <li>
             <router-link
               :to="{ name: 'MachineMovement' }"
               active-class="active"
@@ -79,8 +77,8 @@
             >
               <i class="bi bi-circle"></i><span> Machine Movement </span>
             </router-link>
-          </li>
-          <li>
+          </li> -->
+          <!-- <li>
             <router-link
               :to="{ name: 'MachineLocation' }"
               active-class="active"
@@ -89,7 +87,7 @@
               <i class="bi bi-circle"></i
               ><span> Machine Movement Location List </span>
             </router-link>
-          </li>
+          </li> -->
 
           <li>
             <router-link
@@ -98,7 +96,7 @@
               :class="{ active: isMechineHistoryListRoute }"
             >
               <i class="bi bi-circle"></i
-              ><span> Machine Movement History List </span>
+              ><span> All Movement History List </span>
             </router-link>
           </li>
         </ul>
@@ -630,11 +628,19 @@ const isMechineRouteShow = computed(() => {
     "MachineMovement",
     "MachineLocation",
     "MechineHistoryList",
+    "MechineTransfer",
+    "MachineShow",
   ].includes(route.name);
 });
 
 const isMachineRoute = computed(() =>
-  ["MechineIndex", "MechineEdit", "MechineTrash"].includes(route.name)
+  [
+    "MechineIndex",
+    "MechineEdit",
+    "MechineTrash",
+    "MechineTransfer",
+    "MachineShow",
+  ].includes(route.name)
 );
 const isMachineCreateRoute = computed(() =>
   ["MechineCreate"].includes(route.name)

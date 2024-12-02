@@ -17,7 +17,7 @@
             single-line
             clearable
           ></v-text-field>
-          <v-btn
+          <!-- <v-btn
             @click="createMachineMovement"
             color="success"
             class="mr-2"
@@ -32,7 +32,7 @@
               </template>
               <span>Add Machine Movement</span>
             </v-tooltip>
-          </v-btn>
+          </v-btn> -->
 
           <v-btn
             @click="createMechine"
@@ -85,7 +85,14 @@
       <!-- <template v-slot:item["factory.floors.0.units.0.lines"]="{ item }">
       <span>{{ item.factory.floors[0].units[0].lines.map(line => line.name).join(", ") }}</span>
     </template> -->
-
+      <template v-slot:item.name="{ item }">
+        <span
+          class="text-decoration-none text-primary cursor-pointer"
+          @click="viewMachineDetail(item.uuid)"
+        >
+          {{ item.name }}
+        </span>
+      </template>
       <template v-slot:item.status="{ item }">
         <v-chip
           :color="getStatusColor(item.status)"
@@ -102,9 +109,10 @@
       </template>
       <template v-slot:item.actions="{ item }">
         <v-icon @click="transferMachine(item.uuid)" color="blue" class="mr-2"
-          >mdi-transfer</v-icon
+          >mdi-swap-horizontal</v-icon
         >
-        <v-icon @click="editMechine(item.uuid)" class="mr-2">mdi-pencil</v-icon>
+
+        <!-- <v-icon @click="editMechine(item.uuid)" class="mr-2">mdi-pencil</v-icon> -->
         <v-icon @click="showConfirmDialog(item.id)" color="red"
           >mdi-delete</v-icon
         >
@@ -161,11 +169,17 @@ export default {
         // { title: "Model", key: "product_model.name", sortable: false },
         // { title: "Type", key: "mechine_type.name", sortable: false },
         {
+          title: "Location",
+          key: "location_status",
+          sortable: false,
+        },
+
+        {
           title: "Status",
           key: "machine_status.name",
-          sortable: true,
+          sortable: false,
         },
-        { title: "Creator", key: "creator.name", sortable: false },
+        // { title: "Creator", key: "creator.name", sortable: false },
         { title: "Actions", key: "actions", sortable: false },
       ],
       serverItems: [],
@@ -214,6 +228,9 @@ export default {
     },
     editMechine(uuid) {
       this.$router.push({ name: "MechineEdit", params: { uuid } });
+    },
+    viewMachineDetail(uuid) {
+      this.$router.push({ name: "MachineShow", params: { uuid } });
     },
     transferMachine(uuid) {
       this.$router.push({ name: "MechineTransfer", params: { uuid } });
