@@ -22,18 +22,19 @@ class ParseUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'company_id'              => 'required|integer',
-            'category_id'             => 'required|integer',
-            'supplier_id'             => 'required|integer',
-            'brand_id'                => 'required|integer',
-            'model_id'                => 'required|integer',
-            'parse_unit_id'           => 'required|integer',
-            'name'                    => 'required|string|max:255',
-            'quantity'                => 'nullable|numeric',
-            'purchace_price'          => 'nullable|numeric',
-            'purchase_date'           => 'nullable',
-            'status'                  => 'nullable',  // Example: assumes "status" has specific values
-            'note'                    => 'nullable|string',
+          'company_id'              => 'required|integer',
+          'factory_id'              => 'required|integer',
+          'category_id'             => 'required|integer',
+          'supplier_name'           => 'required',
+          'brand_name'              => 'required',
+          'model_name'              => 'required',
+          'parse_unit_id'           => 'required|integer',
+          'name'                    => 'required|string|max:255',
+          'quantity'                => 'nullable|numeric',
+          'purchase_price'          => 'nullable|numeric',
+          'purchase_date'           => 'nullable',
+          'status'                  => 'nullable',  // Example: assumes "status" has specific values
+          'note'                    => 'nullable|string',
         ];
     }
 }
