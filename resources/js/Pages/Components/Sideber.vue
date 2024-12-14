@@ -69,7 +69,7 @@
               <i class="bi bi-circle"></i><span> Machine All </span>
             </router-link>
           </li>
-          <!-- <li>
+          <li>
             <router-link
               :to="{ name: 'MachineMovement' }"
               active-class="active"
@@ -77,7 +77,7 @@
             >
               <i class="bi bi-circle"></i><span> Machine Movement </span>
             </router-link>
-          </li> -->
+          </li>
           <!-- <li>
             <router-link
               :to="{ name: 'MachineLocation' }"
@@ -262,14 +262,11 @@
             </router-link>
           </li>
 
-          <!-- <li>
-                        <router-link
-                            :to="{ name: 'ServiceIndex' }"
-                            active-class="active"
-                        >
-                            <i class="bi bi-circle"></i><span>All Service</span>
-                        </router-link>
-                    </li> -->
+          <li>
+            <router-link :to="{ name: 'ServiceIndex' }" active-class="active">
+              <i class="bi bi-circle"></i><span>All Service</span>
+            </router-link>
+          </li>
         </ul>
       </li>
 
@@ -601,7 +598,16 @@
               active-class="active"
               :class="{ active: isOperatorRoute }"
             >
-              <i class="bi bi-circle"></i><span>Operator</span>
+              <i class="bi bi-circle"></i><span>Supervisor</span>
+            </router-link>
+          </li>
+          <li>
+            <router-link
+              :to="{ name: 'BreakDownNoteIndex' }"
+              active-class="active"
+              :class="{ active: isBreakDownNoteRoute }"
+            >
+              <i class="bi bi-circle"></i><span>Breakdown Problem Note</span>
             </router-link>
           </li>
         </ul>
@@ -705,6 +711,14 @@ const isCategoryRoute = computed(() =>
   ["CategoryIndex", "CategoryCreate", "CategoryEdit", "CategoryTrash"].includes(
     route.name
   )
+);
+const isBreakDownNoteRoute = computed(() =>
+  [
+    "BreakDownNoteIndex",
+    "BreakDownNoteCreate",
+    "BreakDownNoteEdit",
+    "BreakDownNoteTrash",
+  ].includes(route.name)
 );
 
 // const isGroupRoute = computed(() =>

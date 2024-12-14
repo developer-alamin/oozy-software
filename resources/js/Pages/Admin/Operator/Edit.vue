@@ -1,6 +1,6 @@
 <template>
   <v-card outlined class="mx-auto my-5" max-width="900">
-    <v-card-title>Edit Operator</v-card-title>
+    <v-card-title>Edit supervisor</v-card-title>
     <v-card-text>
       <v-form ref="form" v-model="valid" @submit.prevent="update">
         <!-- Company Selection -->
@@ -65,7 +65,6 @@
         <!-- Email Field -->
         <v-text-field
           v-model="operator.email"
-          :rules="[rules.email]"
           label="Email"
           outlined
           :error-messages="errors.email ? errors.email : ''"
@@ -120,7 +119,7 @@
               :disabled="!valid || loading"
               :loading="loading"
             >
-              Update Operator
+              Update supervisor
             </v-btn>
           </v-col>
         </v-row>
@@ -186,7 +185,7 @@ export default {
           this.operator.company_id = selectedCompany.id; // Set the company_id for v-autocomplete
         }
       } catch (error) {
-        this.serverError = "Error fetching operator data.";
+        this.serverError = "Error fetching supervisor data.";
       }
     },
     async fetchCompanies(search) {
@@ -240,14 +239,14 @@ export default {
         );
         if (response.data.success) {
           this.$router.push({ name: "OperatorIndex" });
-          toast.success("Operator updated successfully!");
+          toast.success("Supervisor updated successfully!");
         }
       } catch (error) {
         if (error.response && error.response.status === 422) {
           this.errors = error.response.data.errors || {};
-          toast.error("Failed to update operator.");
+          toast.error("Failed to update supervisor.");
         } else {
-          this.serverError = "Error updating operator.";
+          this.serverError = "Error updating supervisor.";
           toast.error(this.serverError);
         }
       } finally {

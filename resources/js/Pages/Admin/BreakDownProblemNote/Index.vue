@@ -2,7 +2,7 @@
   <v-card>
     <v-card-title class="pt-5">
       <v-row>
-        <v-col cols="4"><span>Supervisor List</span></v-col>
+        <v-col cols="4"><span>Breakdown Problem Note List</span></v-col>
         <v-col cols="8" class="d-flex justify-end">
           <v-text-field
             v-model="search"
@@ -18,8 +18,7 @@
             clearable
           ></v-text-field>
           <v-btn
-            v-if="isAuthorized"
-            @click="createOperator"
+            @click="createCategory"
             color="primary"
             icon
             style="width: 40px; height: 40px"
@@ -28,7 +27,7 @@
               <template v-slot:activator="{ props }">
                 <v-icon v-bind="props" style="font-size: 20px">mdi-plus</v-icon>
               </template>
-              <span>Add a new operator</span>
+              <span>Add a new Breakdown Problem Note</span>
             </v-tooltip>
           </v-btn>
 
@@ -46,7 +45,7 @@
                     mdi-trash-can-outline
                   </v-icon>
                 </template>
-                <span>View trashed operators</span>
+                <span>View trashed Breakdown Problem Note </span>
               </v-tooltip>
             </v-btn>
           </v-badge>
@@ -76,8 +75,12 @@
         </v-chip>
       </template>
 
+      <template v-slot:item.creator_name="{ item }">
+        <span>{{ item.creator ? item.creator.name : "Unknown" }}</span>
+      </template>
+
       <template v-slot:item.actions="{ item }">
-        <v-icon @click="editOperator(item.uuid)" class="mr-2"
+        <v-icon @click="editCategory(item.uuid)" class="mr-2"
           >mdi-pencil</v-icon
         >
         <v-icon @click="showConfirmDialog(item.id)" color="red"
@@ -109,16 +112,17 @@ export default {
   },
   data() {
     return {
-      dialogName: "Are you sure you want to delete this Operator ?",
+      dialogName:
+        "Are you sure you want to delete this Breakdown Problem Note ?",
       search: "",
       itemsPerPage: 15,
       headers: [
-        { title: "Company", key: "user.name", sortable: false },
-        { title: "Factory", key: "factory.name", sortable: false },
-        { title: "Name", key: "name", sortable: true },
-        { title: "Email", key: "email", sortable: true },
-        { title: "Phone", key: "phone", sortable: true },
-        { title: "Type", key: "type", sortable: true },
+        // { title: "Category Name", key: "name", sortable: true },
+        {
+          title: "Breakdown Problem Note",
+          key: "break_down_problem_note",
+          sortable: false,
+        },
         {
           title: "Status",
           key: "status",
@@ -132,30 +136,17 @@ export default {
       loading: true,
       totalItems: 0,
       dialog: false,
-      selectedOperatorId: null,
+      selectedCategoryId: null,
       trashedCount: 0,
-      user: {},
     };
   },
-  computed: {
-    // Check if the user is authorized to create Operators
-    isAuthorized() {
-      // You can customize the logic based on your needs
-      return (
-        this.user.superadmin === true ||
-        this.user.admin === true ||
-        this.user.user_role === true
-      );
-    },
-  },
-
   methods: {
     async loadItems({ page, itemsPerPage, sortBy }) {
       this.loading = true;
       const sortOrder = sortBy.length ? sortBy[0].order : "desc";
       const sortKey = sortBy.length ? sortBy[0].key : "created_at";
       try {
-        const response = await this.$axios.get("/operator", {
+        const response = await this.$axios.get("/breakdown-problem-notes", {
           params: {
             page,
             itemsPerPage,
@@ -166,57 +157,52 @@ export default {
         });
         this.serverItems = response.data.items || [];
         this.totalItems = response.data.total || 0;
-        this.fetchTrashedOperatorsCount();
+        this.fetchTrashedCategorysCount();
       } catch (error) {
         console.error("Error loading items:", error);
       } finally {
         this.loading = false;
       }
     },
-    createOperator() {
-      this.$router.push({ name: "OperatorCreate" });
+    createCategory() {
+      this.$router.push({ name: "BreakDownNoteCreate" });
     },
     viewTrash() {
-      this.$router.push({ name: "OperatorTrash" });
+      this.$router.push({ name: "BreakDownNoteTrash" });
     },
-    editOperator(uuid) {
-      this.$router.push({ name: "OperatorEdit", params: { uuid } });
+    editCategory(uuid) {
+      this.$router.push({ name: "BreakDownNoteEdit", params: { uuid } });
     },
     showConfirmDialog(id) {
-      this.selectedOperatorId = id;
+      this.selectedCategoryId = id;
       this.dialog = true;
     },
     async confirmDelete() {
       this.dialog = false; // Close the dialog
       try {
-        await this.$axios.delete(`/operator/${this.selectedOperatorId}`);
+        await this.$axios.delete(
+          `/breakdown-problem-notes/${this.selectedCategoryId}`
+        );
         this.loadItems({
           page: 1,
           itemsPerPage: this.itemsPerPage,
           sortBy: [],
         });
-        toast.success("Operator deleted successfully!");
+        toast.success("Breakdown Problem Note deleted successfully!");
       } catch (error) {
-        console.error("Error deleting Operator:", error);
-        toast.error("Failed to delete Operator.");
+        console.error("Error deleting Breakdown Problem Note:", error);
+        toast.error("Failed to delete Breakdown Problem Note.");
       }
     },
-    async fetchTrashedOperatorsCount() {
+    async fetchTrashedCategorysCount() {
       try {
-        const response = await this.$axios.get("/operator/trashed-count");
-        this.trashedCount = response.data.trashedCount
-          ? response.data.trashedCount
-          : 0;
+        const response = await this.$axios.get("/category/trashed-count");
+        this.trashedCount = response.data.trashedCount;
       } catch (error) {
-        console.error("Error fetching trashed operators count:", error);
-      }
-    },
-    async fetchUserInfo() {
-      try {
-        const response = await this.$axios.get("/user/role/auth"); // Adjust to your API
-        this.user = response.data; // Ensure you set user role data here
-      } catch (error) {
-        console.error("Error fetching user info:", error);
+        console.error(
+          "Error fetching trashed Breakdown Problem Note count:",
+          error
+        );
       }
     },
   },
@@ -227,8 +213,7 @@ export default {
       itemsPerPage: this.itemsPerPage,
       sortBy: [],
     });
-    this.fetchUserInfo();
-    this.fetchTrashedOperatorsCount();
+    this.fetchTrashedCategorysCount();
   },
 };
 </script>

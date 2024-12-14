@@ -302,6 +302,33 @@ const routes = [
         component: adminComponents.CategoryTrash,
         meta: { title: "Category Trash" },
       },
+      //
+      {
+        path: "break/down/problem/note/index", // New route for Contact
+        name: "BreakDownNoteIndex",
+        component: adminComponents.BreakDownNoteIndex,
+        meta: { title: "Breakdown Note Index" },
+      },
+      {
+        path: "break/down/problem/note/create", // New route for Contact
+        name: "BreakDownNoteCreate",
+        component: adminComponents.BreakDownNoteCreate,
+        meta: { title: "Breakdown Note Create" },
+      },
+
+      {
+        path: "break/down/problem/note/edit/:uuid", // Dynamic route for Category Edit
+        name: "BreakDownNoteEdit",
+        component: adminComponents.BreakDownNoteEdit,
+        meta: { title: "Edit Breakdown Note Edit" },
+        props: true, // Enables passing route params as props
+      },
+      {
+        path: "break/down/problem/note/trash", // New route for Contact
+        name: "BreakDownNoteTrash",
+        component: adminComponents.BreakDownNoteTrash,
+        meta: { title: "Breakdown Note Trash" },
+      },
       // brand
       {
         path: "brand/index", // New route for Contact

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Brand;
+use App\Models\BreakDownProblemNote;
 use App\Models\Factory;
 use App\Models\Floor;
 use App\Models\Line;
@@ -230,6 +231,54 @@ class DynamicDataController extends Controller
         ->get();
 
         return response()->json($lines);
+    }
+    public function getMachineCodes(Request $request)
+    {
+        // Get search term and limit from the request, with defaults
+        $search      = $request->query('search', '');
+        $limit       = $request->query('limit', 5); // Default limit of 10
+        // Query to search for machines by code with a limit
+        $machineCodes = MechineAssing::selectRaw('
+                            MAX(id) as id,
+                            machine_code,
+                            MAX(location_status) as location_status,
+                            MAX(created_at) as created_at
+                        ')
+                        ->where('machine_code', 'like', '%' . $search . '%')
+                        ->where('location_status', 'Sewing Line')
+                        ->groupBy('machine_code') // Group by machine_code to ensure uniqueness
+                        ->limit($limit)
+                        ->get();
+        // Return the machineCodes as JSON
+        return response()->json($machineCodes);
+    }
+    public function getMachineLines(Request $request)
+    {
+        $machineId = $request->get('machine_id');
+        // Validate machine_id
+        if (!$machineId) {
+            return response()->json(['error' => 'Machine ID is required.'], 400);
+        }
+        // Fetch assigned line IDs from MachineAssign
+        $assignedLineIds = MechineAssing::where('id', $machineId)->pluck('line_id');
+        // Fetch the lines corresponding to these IDs
+        $lines = Line::whereIn('id', $assignedLineIds)->get();
+
+        return response()->json($lines);
+    }
+
+    public function getBreakdownProblemNotes(Request $request)
+    {
+        $search = $request->query('search', '');
+        $limit = $request->query('limit', 5); // Default limit of 5
+
+        // Query to search for brands by name with a limit
+        $breakDownProblemNotes = BreakDownProblemNote::where('break_down_problem_note', 'like', '%' . $search . '%')
+            ->limit($limit)
+            ->get();
+
+        // Return the BreakDownProblemNotes as JSON
+        return response()->json($breakDownProblemNotes);
     }
 
 }

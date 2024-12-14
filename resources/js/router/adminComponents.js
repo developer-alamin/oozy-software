@@ -55,6 +55,12 @@ export { default as CategoryCreate } from "../Pages/Admin/Category/Create.vue";
 export { default as CategoryEdit } from "../Pages/Admin/Category/Edit.vue";
 export { default as CategoryTrash } from "../Pages/Admin/Category/Trash.vue";
 
+// BreakDown Note components
+export { default as BreakDownNoteIndex } from "../Pages/Admin/BreakDownProblemNote/Index.vue";
+export { default as BreakDownNoteCreate } from "../Pages/Admin/BreakDownProblemNote/Create.vue";
+export { default as BreakDownNoteEdit } from "../Pages/Admin/BreakDownProblemNote/Edit.vue";
+export { default as BreakDownNoteTrash } from "../Pages/Admin/BreakDownProblemNote/Trash.vue";
+
 // Brand components
 export { default as BrandIndex } from "../Pages/Admin/Brand/Index.vue";
 export { default as BrandTrash } from "../Pages/Admin/Brand/Trash.vue";

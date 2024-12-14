@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\SourceController;
 
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\BrandController;
+use App\Http\Controllers\Admin\BreakDownProblemNoteController;
 use App\Http\Controllers\Auth\UserAuthController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\MachineMovementController;
@@ -290,6 +291,7 @@ Route::get('/machine/status/trashed-count', [MachineStatusController::class, 'tr
 Route::get('/machine/status/{uuid}/edit', [MachineStatusController::class, 'edit'])->name('machine.status.edit');
 Route::put('/machine/status/{uuid}', [MachineStatusController::class, 'update'])->name('machine.status.update');
 Route::resource('machine-status', MachineStatusController::class);
+Route::resource('breakdown-problem-notes', BreakDownProblemNoteController::class);
 // Group Rents Controller End form here
 Route::get('/get_units', [DynamicDataController::class, 'getUnits']);
 Route::get('/get_floors', [DynamicDataController::class, 'getFloors']);
@@ -301,7 +303,11 @@ Route::get('/get_brands', [DynamicDataController::class, 'getBrands']);
 Route::get('/get_models', [DynamicDataController::class, 'getModels']);
 Route::get('/get_machine_statuses', [DynamicDataController::class, 'getMachineStatus']);
 Route::get('/get_lines_by_machine', [DynamicDataController::class, 'getLinesByMachine']);
+Route::get('/get_machine_lines', [DynamicDataController::class, 'getMachineLines']);
 Route::get('/get_factory_lines', [DynamicDataController::class, 'getLinesByFactory']);
+Route::get('/get_machine_codes', [DynamicDataController::class, 'getMachineCodes']);
+Route::get('/get_breakdown_problem_notes', [DynamicDataController::class, 'getBreakdownProblemNotes']);
+
 
 // Admin Auth Routes
 Route::prefix('admin')->group(function () {

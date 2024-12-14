@@ -1,6 +1,6 @@
 <template>
   <v-card outlined class="mx-auto my-5" max-width="">
-    <v-card-title>Create operator</v-card-title>
+    <v-card-title>Create supervisor</v-card-title>
     <v-card-text>
       <v-form ref="form" v-model="valid" @submit.prevent="submit">
         <v-autocomplete
@@ -62,7 +62,6 @@
         <!-- Name Field -->
         <v-text-field
           v-model="operator.email"
-          :rules="[rules.email]"
           label="Email"
           outlined
           :error-messages="errors.email ? errors.email : ''"
@@ -120,7 +119,7 @@
               :disabled="!valid || loading"
               :loading="loading"
             >
-              Create operator
+              Create supervisor
             </v-btn>
           </v-col>
         </v-row>
@@ -184,16 +183,16 @@ export default {
           const response = await this.$axios.post("/operator", formData);
 
           if (response.data.success) {
-            toast.success("Operator create successfully!");
+            toast.success("Supervisor create successfully!");
             this.resetForm();
           }
         } catch (error) {
           if (error.response && error.response.status === 422) {
-            toast.error("Failed to create operator.");
+            toast.error("Failed to create supervisor.");
             // Handle validation errors from the server
             this.errors = error.response.data.errors || {};
           } else {
-            toast.error("Failed to create operator.");
+            toast.error("Failed to create supervisor.");
             // Handle other server errors
             this.serverError = "An error occurred. Please try again.";
           }
