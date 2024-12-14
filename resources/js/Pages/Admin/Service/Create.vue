@@ -29,7 +29,7 @@
           <!-- Location Dropdown -->
           <v-col cols="6">
             <v-select
-              v-model="breakdown_service.location_status"
+              v-model="breakdown_service.location"
               :items="statusLocation"
               label="Location"
               outlined
@@ -79,10 +79,10 @@
           <template v-slot:label> Select Breakdown Problem Note </template>
         </v-autocomplete>
         <v-textarea
-          v-model="breakdown_service.break_down_problem_note"
+          v-model="breakdown_service.breakdown_problem_note"
           label="Note"
           :error-messages="
-            errors.break_down_problem_note ? errors.break_down_problem_note : ''
+            errors.breakdown_problem_note ? errors.breakdown_problem_note : ''
           "
         />
         <v-row>
@@ -118,7 +118,7 @@
           </v-col> -->
           <v-col cols="6">
             <v-select
-              v-model="breakdown_service.status"
+              v-model="breakdown_service.breakdown_service_status"
               :items="statusItems"
               label="Breakdown Service Status"
               clearable
@@ -127,7 +127,7 @@
           </v-col>
           <v-col cols="6">
             <v-select
-              v-model="breakdown_service.status"
+              v-model="breakdown_service.breakdown_service_technician_status"
               :items="statusTechnicianItems"
               label="Technician Status"
               clearable
@@ -191,12 +191,15 @@ export default {
       ],
       statusLocation: ["Sewing Line"],
       breakdown_service: {
-        location_status: null,
+        location: null,
         service_time: this.getCurrentTime(),
         service_date: this.getCurrentDate(),
         machine_id: null,
         line_id: null,
         breakdown_problem_note_id: null,
+        breakdown_problem_note: null,
+        breakdown_service_status: "Pending",
+        breakdown_service_technician_status: "Pending",
         description: "",
         status: "Pending", // New property for checkbox
         service_type_status: "Preventive",
@@ -263,7 +266,7 @@ export default {
      */
     async onMachineCodeSelected(machineId) {
       // Reset dependent fields
-      this.breakdown_service.location_status = null;
+      this.breakdown_service.location = null;
       this.breakdown_service.line_id = null;
       this.lines = [];
 
@@ -273,7 +276,7 @@ export default {
       const selectedMachine = this.machine_codes.find(
         (machine) => machine.id === machineId
       );
-      this.breakdown_service.location_status = selectedMachine
+      this.breakdown_service.location = selectedMachine
         ? selectedMachine.location_status
         : null;
 
@@ -294,25 +297,27 @@ export default {
       setTimeout(async () => {
         try {
           // Assuming the actual API call here
-          const response = await this.$axios.post("/services", formData);
+          const response = await this.$axios.post(
+            "/breakdown-service",
+            formData
+          );
 
           if (response.data.success) {
-            toast.success("mechine assing create successfully!");
-            console.log(response.data.service.id);
-            this.$router.push({
-              name: "ServiceHistoryCreate",
-              params: { id: response.data.service.id }, // Pass the ID here
-            });
-
+            toast.success("breakdown service create successfully!");
+            // console.log(response.data.service.id);
+            // this.$router.push({
+            //   name: "ServiceHistoryCreate",
+            //   params: { id: response.data.service.id }, // Pass the ID here
+            // });
             this.resetForm();
           }
         } catch (error) {
           if (error.response && error.response.status === 422) {
-            toast.error("Failed to create mechine assing.");
+            toast.error("Failed to create breakdown service.");
             // Handle validation errors from the server
             this.errors = error.response.data.errors || {};
           } else {
-            toast.error("Failed to create mechine assing.");
+            toast.error("Failed to create breakdown service.");
             // Handle other server errors
             this.serverError = "An error occurred. Please try again.";
           }
@@ -322,65 +327,6 @@ export default {
         }
       }, 1000); // Simulates a 3-second loading duration
     },
-    // async fetchLines(machineId) {
-    //   if (!this.breakdown_service.machine_id) {
-    //     this.lines = [];
-    //     this.breakdown_service.line_id = null;
-    //     return;
-    //   }
-    //   try {
-    //     const response = await this.$axios.get("/get_machine_lines", {
-    //       params: { machine_id: machineId },
-    //     });
-    //     this.lines = response.data; // Populate lines for selected machine
-    //   } catch (error) {
-    //     console.error("Error fetching lines:", error);
-    //   }
-    // },
-    // async submit() {
-    //     this.errors = {};
-    //     this.serverError = null;
-    //     this.loading = true;
-    //     const formData = new FormData();
-    //     Object.entries(this.breakdown_service).forEach(([key, value]) => {
-    //         if (key === "parses") {
-    //             value.forEach((parse, index) => {
-    //                 formData.append(
-    //                     `parses[${index}][parse_id]`,
-    //                     parse.parse_id
-    //                 );
-    //                 formData.append(
-    //                     `parses[${index}][quantity]`,
-    //                     parse.quantity
-    //                 );
-    //             });
-    //         } else {
-    //             formData.append(key, value);
-    //         }
-    //     });
-    //     setTimeout(async () => {
-    //         try {
-    //             const response = await this.$axios.post(
-    //                 "/mechine-assing",
-    //                 formData
-    //             );
-    //             if (response.data.success) {
-    //                 toast.success("Mechine assigned successfully!");
-    //                 this.resetForm();
-    //             }
-    //         } catch (error) {
-    //             if (error.response && error.response.status === 422) {
-    //                 toast.error("Failed to create mechine assignment.");
-    //                 this.errors = error.response.data.errors || {};
-    //             } else {
-    //                 this.serverError =
-    //                     "An error occurred. Please try again.";
-    //             }
-    //         } finally {
-    //             this.loading = false;
-    //         }
-    //     }, 1000);
-    // },
 
     addParse() {
       this.breakdown_service.parses.push({ parse_id: null, quantity: 1 });
@@ -437,8 +383,8 @@ export default {
     //   const selectedMachine = this.machine_codes.find(
     //     (machine) => machine.id === machineId
     //   );
-    //   this.breakdown_service.location_status = selectedMachine
-    //     ? selectedMachine.location_status
+    //   this.breakdown_service.location = selectedMachine
+    //     ? selectedMachine.location
     //     : null;
     // },
     async fetchOperator(search) {

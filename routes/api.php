@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\SourceController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\BreakDownProblemNoteController;
+use App\Http\Controllers\Admin\BreakdownServiceController;
 use App\Http\Controllers\Auth\UserAuthController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\MachineMovementController;
@@ -31,6 +32,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\DynamicDataController;
 use App\Http\Controllers\MachineStatusController;
 use App\Http\Controllers\OperatorController;
+use App\Models\BreakdownService;
 use App\Models\MechineAssing;
 
 // --------------------------------------------supplier route statr here-------------------------------------------------------------------
@@ -98,6 +100,8 @@ Route::get('/get_operators', [ServiceController::class, 'getOperators']);
 Route::get('/get_technicians', [ServiceController::class, 'getTechnicians']);
 Route::get('/get_parses', [ServiceController::class, 'getParses']);
 Route::post('/service/history', [ServiceController::class, 'storeHistory']);
+Route::get('/breakdown-service/{uuid}/edit', [BreakdownServiceController::class,'edit']);
+Route::resource('breakdown-service',BreakdownServiceController::class);
 Route::resource('services',ServiceController::class);
 // -------------------------------------------- mechine typeroute statr here-------------------------------------------------------------------
 
