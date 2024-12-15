@@ -6,6 +6,7 @@ use App\Models\Brand;
 use App\Models\BreakDownProblemNote;
 use App\Models\Factory;
 use App\Models\Floor;
+use App\Models\Group;
 use App\Models\Line;
 use App\Models\MachineStatus;
 use App\Models\MechineAssing;
@@ -165,6 +166,21 @@ class DynamicDataController extends Controller
       // Return the brands as JSON
       return response()->json($brands);
   }
+  public function getGroups(Request $request)
+    {
+      // Get search term and limit from the request, with defaults
+      $search = $request->query('search', '');
+      $limit = $request->query('limit', 5); // Default limit of 5
+
+      // Query to search for brands by name with a limit
+      $groups = Group::where('name', 'like', '%' . $search . '%')
+          ->limit($limit)
+          ->get();
+
+      // Return the groups as JSON
+      return response()->json($groups);
+  }
+
     // public function getBrands(Request $request)
     // {
     //     $modelId = $request->query('model_id');

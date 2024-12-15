@@ -48,6 +48,10 @@ class BreakdownService extends Model
     {
         return $this->belongsTo(Line::class, 'line_id');
     }
+    public function technician()
+    {
+        return $this->belongsTo(Technician::class, 'technician_id');
+    }
     public function mechineAssing()
     {
         return $this->belongsTo(MechineAssing::class, 'machine_id');

@@ -121,6 +121,12 @@ export { default as FloorCreate } from "../Pages/Admin/Floor/Create.vue";
 export { default as FloorEdit } from "../Pages/Admin/Floor/Edit.vue";
 export { default as FloorTrash } from "../Pages/Admin/Floor/Trash.vue";
 
+//Floor Components
+export { default as TagIndex } from "../Pages/Admin/Tag/Index.vue";
+export { default as TagCreate } from "../Pages/Admin/Tag/Create.vue";
+export { default as TagEdit } from "../Pages/Admin/Tag/Edit.vue";
+export { default as TagTrash } from "../Pages/Admin/Tag/Trash.vue";
+
 //Mechine Type Components
 export { default as MechineTypeIndex } from "../Pages/Admin/Mechine/Type/Index.vue";
 export { default as MechineTypeCreate } from "../Pages/Admin/Mechine/Type/Create.vue";

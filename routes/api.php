@@ -31,6 +31,7 @@ use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\DynamicDataController;
 use App\Http\Controllers\MachineStatusController;
+use App\Http\Controllers\MachineTagController;
 use App\Http\Controllers\OperatorController;
 use App\Models\BreakdownService;
 use App\Models\MechineAssing;
@@ -102,6 +103,7 @@ Route::get('/get_parses', [ServiceController::class, 'getParses']);
 Route::post('/service/history', [ServiceController::class, 'storeHistory']);
 Route::get('/breakdown-service/{uuid}/edit', [BreakdownServiceController::class,'edit']);
 Route::resource('breakdown-service',BreakdownServiceController::class);
+Route::post('/breakdown-service/technician-update-status', [BreakdownServiceController::class, 'acknowledge']);
 Route::resource('services',ServiceController::class);
 // -------------------------------------------- mechine typeroute statr here-------------------------------------------------------------------
 
@@ -296,6 +298,7 @@ Route::get('/machine/status/{uuid}/edit', [MachineStatusController::class, 'edit
 Route::put('/machine/status/{uuid}', [MachineStatusController::class, 'update'])->name('machine.status.update');
 Route::resource('machine-status', MachineStatusController::class);
 Route::resource('breakdown-problem-notes', BreakDownProblemNoteController::class);
+Route::resource('machine-tag', MachineTagController::class);
 // Group Rents Controller End form here
 Route::get('/get_units', [DynamicDataController::class, 'getUnits']);
 Route::get('/get_floors', [DynamicDataController::class, 'getFloors']);
@@ -311,6 +314,7 @@ Route::get('/get_machine_lines', [DynamicDataController::class, 'getMachineLines
 Route::get('/get_factory_lines', [DynamicDataController::class, 'getLinesByFactory']);
 Route::get('/get_machine_codes', [DynamicDataController::class, 'getMachineCodes']);
 Route::get('/get_breakdown_problem_notes', [DynamicDataController::class, 'getBreakdownProblemNotes']);
+Route::get('/get_groups', [DynamicDataController::class, 'getGroups']);
 
 
 // Admin Auth Routes

@@ -78,13 +78,35 @@
         <span>{{ item.creator ? item.creator.name : "Unknown" }}</span>
       </template>
       <template v-slot:item.actions="{ item }">
-        <v-icon @click="transferMachine(item.uuid)" color="blue" class="mr-2"
+        <v-tooltip location="top" activator="parent">
+          <template v-slot:activator="{ props }">
+            <v-icon
+              v-bind="props"
+              style="font-size: 20px"
+              @click="acknowledge(item.uuid)"
+              color="green"
+              class="mr-2"
+            >
+              mdi-checkbox-marked-circle
+            </v-icon>
+          </template>
+          <span>Acknowledge</span>
+        </v-tooltip>
+        <!-- <v-icon @click="transferMachine(item.uuid)" color="blue" class="mr-2"
           >mdi-transfer</v-icon
-        >
+        > -->
         <v-icon @click="editMechine(item.uuid)" class="mr-2">mdi-pencil</v-icon>
-        <v-icon @click="showConfirmDialog(item.id)" color="red"
+        <!-- <v-icon @click="showConfirmDialog(item.id)" color="red"
           >mdi-delete</v-icon
-        >
+        > -->
+        <!-- Acknowledge Action -->
+
+        <!-- <v-tooltip location="top" activator="parent">
+          <template v-slot:activator="{ props }">
+            <v-icon v-bind="props" style="font-size: 20px">mdi-plus</v-icon>
+          </template>
+          <span>Add New a Breakdown Service</span>
+        </v-tooltip> -->
       </template>
     </v-data-table-server>
 
@@ -116,13 +138,18 @@ export default {
       search: "",
       itemsPerPage: 10,
       headers: [
+        // {
+        //   title: "Machine Code",
+        //   key: "mechine_assing.machine_code",
+        //   sortable: false,
+        // },
         {
-          title: "Machine Code",
-          key: "mechine_assing.machine_code",
+          title: "Technician",
+          key: "technician.name",
           sortable: false,
         },
         // { title: "Company Name", key: "user.name", sortable: false },
-        { title: "Line", key: "line.name", sortable: false },
+        { title: "Location", key: "line.name", sortable: false },
         {
           title: "Technician Status",
           key: "breakdown_service_technician_status",
@@ -171,6 +198,26 @@ export default {
         this.loading = false;
       }
     },
+    acknowledge(uuid) {
+      // Make an API call to update breakdown_service_technician_status
+      this.$axios
+        .post("/breakdown-service/technician-update-status", {
+          uuid: uuid,
+        })
+        .then((response) => {
+          this.$emit("refresh-data"); // Emit event to refresh the table
+          this.$toast.success("Technician Update successfully"); // Notify the user
+          this.loadItems({
+            page: 1,
+            itemsPerPage: this.itemsPerPage,
+            sortBy: [],
+          });
+        })
+        .catch((error) => {
+          console.error("Error Technician Update:", error);
+          this.$toast.error("Failed to Technician Update");
+        });
+    },
     createService() {
       this.$router.push({ name: "ServiceCreate" });
     },
@@ -187,6 +234,7 @@ export default {
       this.selectedMechineId = id;
       this.dialog = true;
     },
+
     async confirmDelete() {
       this.dialog = false; // Close the dialog
       try {

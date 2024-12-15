@@ -14,6 +14,7 @@ class Technician extends Model
         'uuid',
         'company_id',
         'factory_id',
+        'group_id',
         'name',
         'type',
         'email',
@@ -33,6 +34,7 @@ class Technician extends Model
       'id'         => 'integer',
       'company_id' => 'integer',
       'factory_id' => 'integer',
+      'group_id'   => 'integer',
       'creator_id' => 'integer',
       'updater_id' => 'integer',
       'created_at' => 'datetime', // Automatically cast 'created_at' to a Carbon instance
@@ -54,6 +56,7 @@ class Technician extends Model
             'uuid'          => 'nullable',
             'company_id'    => 'required|integer',
             'factory_id'    => 'required|integer',
+            'group_id'      => 'required|integer',
             'name'          => 'required|string|max:255',
             'type'          => 'required|string|max:255',
             'email'         => 'nullable',
@@ -72,6 +75,10 @@ class Technician extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'company_id');
+    }
+    public function group()
+    {
+        return $this->belongsTo(Group::class, 'group_id');
     }
     public function factory()
     {

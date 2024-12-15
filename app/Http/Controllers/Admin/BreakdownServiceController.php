@@ -52,7 +52,7 @@ class BreakdownServiceController extends Controller
         // Apply sorting
         $breakDownProblemNotesQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $breakDownProblemNotes = $breakDownProblemNotesQuery->with('mechineAssing:id,machine_code','creator:id,name','line:id,name')->paginate($itemsPerPage);
+        $breakDownProblemNotes = $breakDownProblemNotesQuery->with('mechineAssing:id,machine_code','creator:id,name','line:id,name','technician:id,name')->paginate($itemsPerPage);
         // Return the response as JSON
         return response()->json([
             'items' => $breakDownProblemNotes->items(), // Current page items
@@ -92,7 +92,7 @@ class BreakdownServiceController extends Controller
              return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
          }
 
-         $technicianId = Technician::pluck('id')->first();
+         $technicianId = Technician::where('status','Available')->pluck('id')->first();
 
          // Create the technician and associate it with the creator
          $breakDownProblem                = new BreakdownService($validatedData);
@@ -101,6 +101,8 @@ class BreakdownServiceController extends Controller
          $breakDownProblem->creator()->associate($creator);  // Assign creator polymorphically
          $breakDownProblem->updater()->associate($creator);  // Associate the updater
          $breakDownProblem->save(); // Save the technician to the database
+        // Update the technician's status
+        Technician::where('id', $technicianId)->update(['status' => 'Not Available']);
          // Return a success response
         return response()->json(['success' => true, 'message' => 'BreakDown Problem  created successfully.'], 201);
     }
@@ -135,5 +137,26 @@ class BreakdownServiceController extends Controller
     public function destroy(BreakdownService $breakdownService)
     {
         //
+    }
+
+     /**
+     * Acknowledge the Breakdown Service.
+     */
+    public function acknowledge(Request $request)
+    {
+        // Update the breakdown service's technician status
+        $updated = BreakdownService::where('uuid', $request->uuid)
+            ->update(['breakdown_service_technician_status' => 'Coming']);
+        if ($updated) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Breakdown Technician status updated successfully!',
+            ], 200);
+        }
+        // If no rows were updated, return an error response
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to update breakdown service status.',
+        ], 400);
     }
 }

@@ -688,6 +688,34 @@ const routes = [
         meta: { title: "Machine Status Trash" },
         props: true,
       },
+      {
+        path: "tag/index", // New route for Floor index
+        name: "TagIndex",
+        component: adminComponents.TagIndex,
+        meta: { title: "Tag index" },
+        props: true,
+      },
+      {
+        path: "tag/create", // New route for Floor create
+        name: "TagCreate",
+        component: adminComponents.TagCreate,
+        meta: { title: "Tag Create" },
+        props: true,
+      },
+      {
+        path: "tag/:uuid/edit", // New route for Floor create
+        name: "TagEdit",
+        component: adminComponents.TagEdit,
+        meta: { title: "Tag Edit" },
+        props: true,
+      },
+      {
+        path: "tag/trash", // New route for floor trash
+        name: "TagTrash",
+        component: adminComponents.TagTrash,
+        meta: { title: "Tag Trash" },
+        props: true,
+      },
     ],
   },
   // {

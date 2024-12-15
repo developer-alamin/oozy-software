@@ -69,7 +69,7 @@
               <i class="bi bi-circle"></i><span> Machine All </span>
             </router-link>
           </li>
-          <li>
+          <!-- <li>
             <router-link
               :to="{ name: 'MachineMovement' }"
               active-class="active"
@@ -77,7 +77,7 @@
             >
               <i class="bi bi-circle"></i><span> Machine Movement </span>
             </router-link>
-          </li>
+          </li> -->
           <!-- <li>
             <router-link
               :to="{ name: 'MachineLocation' }"
@@ -89,7 +89,7 @@
             </router-link>
           </li> -->
 
-          <li>
+          <!-- <li>
             <router-link
               :to="{ name: 'MechineHistoryList' }"
               active-class="active"
@@ -98,7 +98,7 @@
               <i class="bi bi-circle"></i
               ><span> All Movement History List </span>
             </router-link>
-          </li>
+          </li> -->
         </ul>
       </li>
       <!-- End Components Nav -->
@@ -610,6 +610,15 @@
               <i class="bi bi-circle"></i><span>Breakdown Problem Note</span>
             </router-link>
           </li>
+          <li>
+            <router-link
+              :to="{ name: 'TagIndex' }"
+              active-class="active"
+              :class="{ active: isTagRoute }"
+            >
+              <i class="bi bi-circle"></i><span>Machine Tags</span>
+            </router-link>
+          </li>
         </ul>
       </li>
       <!-- End Settings Nav -->
@@ -837,6 +846,14 @@ const isSettingRouteShow = computed(() => {
     "OperatorCreate",
     "OperatorEdit",
     "OperatorTrash",
+    "TagIndex",
+    "TagCreate",
+    "TagEdit",
+    "TagTrash",
+    "BreakDownNoteIndex",
+    "BreakDownNoteCreate",
+    "BreakDownNoteEdit",
+    "BreakDownNoteTrash",
   ].includes(route.name);
 });
 
@@ -852,6 +869,9 @@ const isOperatorRoute = computed(() =>
   ["OperatorIndex", "OperatorCreate", "OperatorEdit", "OperatorTrash"].includes(
     route.name
   )
+);
+const isTagRoute = computed(() =>
+  ["TagIndex", "TagCreate", "TagEdit", "TagTrash"].includes(route.name)
 );
 const isParseUnitRoute = computed(() =>
   [
