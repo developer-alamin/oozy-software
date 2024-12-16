@@ -146,7 +146,8 @@ class BreakdownServiceController extends Controller
     {
         // Update the breakdown service's technician status
         $updated = BreakdownService::where('uuid', $request->uuid)
-            ->update(['breakdown_service_technician_status' => 'Coming']);
+            ->update(['breakdown_service_technician_status' => 'Coming',
+                    'technician_acknowledge_start_time' => now()]);
         if ($updated) {
             return response()->json([
                 'success' => true,
