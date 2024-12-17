@@ -1,25 +1,33 @@
 <template>
   <v-card outlined class="mx-auto my-5" max-width="">
-    <v-card-title>Start Breakdown Service</v-card-title>
+    <v-card-title>Breakdown Service</v-card-title>
     <v-card-text>
       <v-form ref="form" v-model="valid" @submit.prevent="submit">
         <v-autocomplete
-          v-model="breakdown_service.machine_id"
-          :items="machine_codes"
+          v-model="breakdown_service.breakdown_problem_note_id"
+          :items="breakdown_problem_notes"
           item-value="id"
-          item-title="machine_code"
+          item-title="break_down_problem_note"
           label="Select Machine Code"
           outlined
           clearable
           density="comfortable"
-          :rules="[rules.required]"
-          :error-messages="errors.machine_id ? errors.machine_id : ''"
-          @update:search="fetchMachineCodes"
+          :error-messages="
+            errors.breakdown_problem_note_id
+              ? errors.breakdown_problem_note_id
+              : ''
+          "
+          @update:search="fetchBreakdownProblemNote"
         >
-          <template v-slot:label>
-            Select Machine Code <span style="color: red">*</span>
-          </template>
+          <template v-slot:label> Select Breakdown Problem Note </template>
         </v-autocomplete>
+        <v-textarea
+          v-model="breakdown_service.breakdown_problem_note"
+          label="Supervisor Note"
+          :error-messages="
+            errors.breakdown_problem_note ? errors.breakdown_problem_note : ''
+          "
+        />
         <v-select
           v-model="breakdown_service.breakdown_service_status"
           :items="statusItems"
@@ -75,7 +83,7 @@ export default {
     return {
       valid: false,
       loading: false, // Controls loading state of the button
-      statusItems: ["Processing"],
+      statusItems: ["Processing", "Done", "Cancel"],
 
       statusTechnicianItems: [
         "Pending",
@@ -84,15 +92,16 @@ export default {
         "Success",
         "Failed",
       ],
-
       breakdown_service: {
-        machine_id: null,
-        breakdown_service_status: "Processing", // New property for checkbox
+        breakdown_problem_note_id: null,
+        breakdown_problem_note: "",
+        breakdown_service_status: null, // New property for checkbox
       },
       errors: {}, // Stores validation errors
       serverError: null, // Stores server-side error messages
       limit: 5,
       machine_codes: [], // Array to store machine_codes data
+      breakdown_problem_notes: [],
       selectedCompany: null, // Bound to selected Company in v-autocomplete
 
       rules: {
@@ -107,6 +116,7 @@ export default {
       confirm_visible: false,
     };
   },
+
   computed: {
     // Function to limit the allowed dates within the min and max date range
     allowedDates() {
@@ -115,8 +125,33 @@ export default {
       };
     },
   },
-  created() {},
+  created() {
+    this.fetchItem();
+    this.fetchBreakdownProblemNote();
+  },
   methods: {
+    async fetchItem() {
+      // Fetch the brand data to populate the form
+      const itemId = this.$route.params.uuid; // Assuming the brand ID is passed in the route params
+      try {
+        const response = await this.$axios.get(
+          `/breakdown-service/${itemId}/processing`
+        );
+        // console.log(response.data);
+        this.breakdown_service = response.data.breakdownService; // Populate form with the existing brand data
+        this.breakdown_service.breakdown_service_status =
+          this.breakdown_service.breakdown_service_status == "Processing"
+            ? "Processing"
+            : "";
+        this.breakdown_service.breakdown_problem_note =
+          this.breakdown_service.breakdown_problem_note == null
+            ? ""
+            : this.breakdown_service.breakdown_problem_note;
+        // this.brand.type = this.brand.type === "Mechine" ? "Mechine" : "Parse";
+      } catch (error) {
+        this.serverError = "Error fetching Breakdown Service data.";
+      }
+    },
     async fetchMachineCodes(search = "") {
       try {
         const response = await this.$axios.get("/get_machine_codes", {
@@ -127,6 +162,20 @@ export default {
         this.machine_codes = response.data; // Populate machine codes
       } catch (error) {
         console.error("Error fetching machine codes:", error);
+      }
+    },
+    async fetchBreakdownProblemNote(search) {
+      try {
+        const response = await this.$axios.get(`/get_breakdown_problem_notes`, {
+          params: {
+            search: search,
+            limit: this.limit,
+          },
+        });
+        // console.log(response.data);
+        this.breakdown_problem_notes = response.data;
+      } catch (error) {
+        console.error("Error fetching breakdown problem notes:", error);
       }
     },
 

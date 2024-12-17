@@ -95,7 +95,33 @@
         <!-- <v-icon @click="transferMachine(item.uuid)" color="blue" class="mr-2"
           >mdi-transfer</v-icon
         > -->
-        <v-icon @click="editMechine(item.uuid)" class="mr-2">mdi-pencil</v-icon>
+        <v-tooltip location="top" activator="parent">
+          <template v-slot:activator="{ props }">
+            <v-icon
+              @click="serviceStart(item.uuid)"
+              v-bind="props"
+              color="black"
+              class="mr-2"
+              >mdi-play-circle</v-icon
+            >
+          </template>
+          <span>Service Start</span>
+        </v-tooltip>
+
+        <v-tooltip location="top" activator="parent">
+          <template v-slot:activator="{ props }">
+            <v-icon
+              @click="serviceProcessing(item.uuid)"
+              class="mr-2"
+              color="primary"
+              v-bind="props"
+            >
+              mdi-cogs
+            </v-icon>
+          </template>
+          <span>Service Processing</span>
+        </v-tooltip>
+
         <!-- <v-icon @click="showConfirmDialog(item.id)" color="red"
           >mdi-delete</v-icon
         > -->
@@ -133,7 +159,7 @@ export default {
   },
   data() {
     return {
-      dialogName: "Are you sure you want to delete this Mechine ?",
+      dialogName: "Are you sure you want to delete this Service ?",
 
       search: "",
       itemsPerPage: 10,
@@ -187,7 +213,7 @@ export default {
             search: this.search,
           },
         });
-        console.log(response.data.items);
+        // console.log(response.data.items);
 
         this.serverItems = response.data.items || [];
         this.totalItems = response.data.total || 0;
@@ -224,9 +250,13 @@ export default {
     viewTrash() {
       this.$router.push({ name: "MechineTrash" });
     },
-    editMechine(uuid) {
-      this.$router.push({ name: "MechineEdit", params: { uuid } });
+    serviceStart(uuid) {
+      this.$router.push({ name: "ServiceEdit", params: { uuid } });
     },
+    serviceProcessing(uuid) {
+      this.$router.push({ name: "ServiceProcessing", params: { uuid } });
+    },
+
     transferMachine(uuid) {
       this.$router.push({ name: "MechineTransfer", params: { uuid } });
     },

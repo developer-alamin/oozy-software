@@ -194,25 +194,32 @@ const routes = [
         path: "survice/index", // New route for Contact
         name: "ServiceIndex",
         component: adminComponents.ServiceIndex,
-        meta: { title: "Survice Index" },
+        meta: { title: "Service Index" },
       },
       {
         path: "survice/create", // New route for Contact
         name: "ServiceCreate",
         component: adminComponents.ServiceCreate,
-        meta: { title: "Survice Create" },
+        meta: { title: "Service Create" },
       },
       {
         path: "survice/history/create/:id", // New route for Contact
         name: "ServiceHistoryCreate",
         component: adminComponents.ServiceHistoryCreate,
-        meta: { title: "Survice History Create" },
+        meta: { title: "Service History Create" },
       },
       {
         path: "survice/:uuid/edit", // Dynamic route for Survice Edit
         name: "ServiceEdit",
         component: adminComponents.ServiceEdit,
-        meta: { title: "Edit Survice" },
+        meta: { title: "Edit Service" },
+        props: true, // Enables passing route params as props
+      },
+      {
+        path: "service/:uuid/processing", // Dynamic route for Survice Edit
+        name: "ServiceProcessing",
+        component: adminComponents.ServiceProcessing,
+        meta: { title: "Service Processing" },
         props: true, // Enables passing route params as props
       },
       {

@@ -102,6 +102,7 @@ Route::get('/get_technicians', [ServiceController::class, 'getTechnicians']);
 Route::get('/get_parses', [ServiceController::class, 'getParses']);
 Route::post('/service/history', [ServiceController::class, 'storeHistory']);
 Route::get('/breakdown-service/{uuid}/edit', [BreakdownServiceController::class,'edit']);
+Route::get('/breakdown-service/{uuid}/processing', [BreakdownServiceController::class,'serviceProcessing']);
 Route::resource('breakdown-service',BreakdownServiceController::class);
 Route::post('/breakdown-service/technician-update-status', [BreakdownServiceController::class, 'acknowledge']);
 Route::resource('services',ServiceController::class);

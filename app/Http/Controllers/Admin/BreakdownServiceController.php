@@ -10,6 +10,7 @@ use App\Models\Technician;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Response;
 
 class BreakdownServiceController extends Controller
 {
@@ -122,13 +123,98 @@ class BreakdownServiceController extends Controller
     {
         //
     }
+    public function serviceProcessing($uuid)
+    {
+      $breakdownService = BreakdownService::where('uuid', $uuid)->firstOrFail();
+      // Determine the authenticated user (either from 'admin' or 'user' guard)
+      if (Auth::guard('admin')->check()) {
+          $currentUser = Auth::guard('admin')->user();
+          $creatorType = Admin::class;
+          // Check if the admin is a super admin
+          if ($currentUser->role === 'superadmin') {
+              // Super admins can edit any breakdownService
+              return response()->json([
+                  'success' => true,
+                  'breakdownService' => $breakdownService
+              ], Response::HTTP_OK);
+          }
+      } elseif (Auth::guard('user')->check()) {
+          $currentUser = Auth::guard('user')->user();
+          $creatorType = User::class;
+      } else {
+          return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+      }
+      // Check if the breakdownService belongs to the current user or admin
+      if ($breakdownService->creator_type !== $creatorType || $breakdownService->creator_id !== $currentUser->id) {
+          return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to edit this breakdownService.'], 403);
+      }
+      // Return the breakdownService data if authorized
+      return response()->json([
+          'success'          => true,
+          'breakdownService' => $breakdownService
+      ], Response::HTTP_OK);
+    }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, BreakdownService $breakdownService)
+    // public function update(Request $request, BreakdownService $breakdownService)
+    // {
+    //     //
+    // }
+    public function update(Request $request, $uuid)
     {
-        //
+      // dd($request->all());
+        $breakdownService = BreakdownService::where('uuid', $uuid)->firstOrFail();
+        // Validate only the breakdown_service_status field
+        $validatedData = $request->validate([
+            'breakdown_service_status' => 'required|in:Processing',
+            'machine_id'               => 'nullable|exists:mechine_assings,id', // Validate machine_id if provided
+        ]);
+
+        // Check if the machine_id exists in the database (if provided)
+        if (!empty($validatedData['machine_id']) && $validatedData['machine_id'] != $breakdownService->machine_id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid Machine ID. Please provide a valid machine.',
+            ], 422);
+        }
+
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
+
+            // Check if the admin is a superadmin
+            if ($currentUser->role !== 'superadmin') {
+                if ($breakdownService->creator_type !== $creatorType || $breakdownService->creator_id !== $currentUser->id) {
+                    return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to update this breakdownService.'], 403);
+                }
+            }
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+
+            if ($breakdownService->creator_type !== $creatorType || $breakdownService->creator_id !== $currentUser->id) {
+                return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to update this breakdownService.'], 403);
+            }
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        // Update only the breakdown_service_status
+        $breakdownService->breakdown_service_status      = $validatedData['breakdown_service_status'];
+        $breakdownService->breakdown_service_technician_status      = 'Service Running';
+        $breakdownService->technician_service_start_time = now();
+        $breakdownService->updater()->associate($currentUser); // Associate the updater
+        $breakdownService->save();
+
+        // Return a success response
+        return response()->json([
+            'success' => true,
+            'message' => 'Breakdown Service updated successfully.',
+            'breakdownService' => $breakdownService,
+        ], 200);
     }
 
     /**
