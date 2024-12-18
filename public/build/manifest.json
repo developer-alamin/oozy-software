@@ -77,7 +77,7 @@
     "src": "resources/img/login_page_img.png"
   },
   "resources/js/Pages/Admin/License/index.vue": {
-    "file": "assets/index-RRlJL2yJ.js",
+    "file": "assets/index-DtKU22k9.js",
     "name": "index",
     "src": "resources/js/Pages/Admin/License/index.vue",
     "isDynamicEntry": true,
@@ -86,7 +86,7 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-_miZBkTs.js",
+    "file": "assets/app-B920VDf_.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
@@ -94,7 +94,7 @@
       "resources/js/Pages/Admin/License/index.vue"
     ],
     "css": [
-      "assets/app-BUrdeMqo.css"
+      "assets/app-Edkd-_NO.css"
     ],
     "assets": [
       "assets/login_page_img-CfsmQqeV.png",

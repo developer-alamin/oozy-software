@@ -221,7 +221,9 @@ class BreakdownServiceController extends Controller
         // dd($breakdownServiceId);
 
         // dd($dd);
-        $oldData = BreakdownService::where('id', $breakdownServiceId->break_down_service_id ?? $breakdownServiceId->id)->first();
+        $oldData = BreakdownService::where('id', $breakdownServiceId->id)
+        ->orWhere('break_down_service_id', $breakdownServiceId->break_down_service_id)
+        ->first();
         // dd($oldData);
         // $validatedData = $request->validate(BreakdownService::validationRules());
         // Determine the authenticated user (either from 'admin' or 'user' guard)
@@ -247,6 +249,7 @@ class BreakdownServiceController extends Controller
          $breakDownProblem->location                  = $oldData->location;
          $breakDownProblem->line_id                   = $oldData->line_id;
          $breakDownProblem->breakdown_problem_note_id = $oldData->breakdown_problem_note_id;
+         $breakDownProblem->breakdown_problem_note    = $oldData->breakdown_problem_note;
          $breakDownProblem->break_down_service_id     =  $breakdownServiceId->break_down_service_id ? $breakdownServiceId->break_down_service_id : $breakdownServiceId->id;
          $breakDownProblem->service_time              = now()->format('H:i:s');
          $breakDownProblem->service_date              = now()->format('Y-m-d');
