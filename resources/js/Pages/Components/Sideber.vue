@@ -246,6 +246,7 @@
           class="nav-link collapsed"
           data-bs-target="#tables-nav-Service"
           data-bs-toggle="collapse"
+          :class="{ show: isBreakdownRouteShow }"
           href="#"
         >
           <i class="bi bi-layout-text-window-reverse"></i><span>Service</span
@@ -255,16 +256,37 @@
           id="tables-nav-Service"
           class="nav-content collapse"
           data-bs-parent="#sidebar-nav"
+          :class="{ show: isBreakdownRouteShow }"
         >
           <li>
-            <router-link :to="{ name: 'ServiceCreate' }" active-class="active">
-              <i class="bi bi-circle"></i><span>Create Service</span>
+            <router-link
+              :to="{ name: 'ServiceCreate' }"
+              :class="{ active: isBreakdownServiceRouteCreate }"
+              active-class="active"
+            >
+              <i class="bi bi-circle"></i><span>Create Breakdown Service</span>
             </router-link>
           </li>
 
           <li>
-            <router-link :to="{ name: 'ServiceIndex' }" active-class="active">
-              <i class="bi bi-circle"></i><span>All Service</span>
+            <router-link
+              :to="{ name: 'ServiceIndex' }"
+              :class="{ active: isBreakdownServiceRouteIndex }"
+              active-class="active"
+            >
+              <i class="bi bi-circle"></i><span>Breakdown Service</span>
+            </router-link>
+          </li>
+          <li>
+            <router-link
+              :to="{ name: 'BreakdownServiceHistory' }"
+              :class="{
+                active: isBreakdownServiceRouteBreakdownServiceHistory,
+              }"
+              active-class="active"
+            >
+              <i class="bi bi-circle"></i
+              ><span> Breakdown Service History</span>
             </router-link>
           </li>
         </ul>
@@ -656,6 +678,26 @@ const isMachineRoute = computed(() =>
     "MechineTransfer",
     "MachineShow",
   ].includes(route.name)
+);
+const isBreakdownRouteShow = computed(() => {
+  return [
+    "ServiceCreate",
+    "ServiceIndex",
+    "ServiceEdit",
+    "ServiceTrash",
+    "ServiceProcessing",
+    "BreakdownServiceHistory",
+  ].includes(route.name);
+});
+
+const isBreakdownServiceRouteIndex = computed(() =>
+  ["ServiceIndex"].includes(route.name)
+);
+const isBreakdownServiceRouteCreate = computed(() =>
+  ["ServiceCreate"].includes(route.name)
+);
+const isBreakdownServiceRouteBreakdownServiceHistory = computed(() =>
+  ["BreakdownServiceHistory"].includes(route.name)
 );
 const isMachineCreateRoute = computed(() =>
   ["MechineCreate"].includes(route.name)

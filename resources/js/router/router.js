@@ -200,7 +200,7 @@ const routes = [
         path: "survice/create", // New route for Contact
         name: "ServiceCreate",
         component: adminComponents.ServiceCreate,
-        meta: { title: "Service Create" },
+        meta: { title: "Breakdown Service Create" },
       },
       {
         path: "survice/history/create/:id", // New route for Contact
@@ -219,14 +219,21 @@ const routes = [
         path: "service/:uuid/processing", // Dynamic route for Survice Edit
         name: "ServiceProcessing",
         component: adminComponents.ServiceProcessing,
-        meta: { title: "Service Processing" },
+        meta: { title: "Breakdown Service Processing" },
+        props: true, // Enables passing route params as props
+      },
+      {
+        path: "breakdown/service/history", // Dynamic route for Survice Edit
+        name: "BreakdownServiceHistory",
+        component: adminComponents.BreakdownServiceHistory,
+        meta: { title: "Breakdown Service History" },
         props: true, // Enables passing route params as props
       },
       {
         path: "survice/trash", // Dynamic route for Survice Edit
         name: "ServiceTrash",
         component: adminComponents.ServiceTrash,
-        meta: { title: "Trash Survice" },
+        meta: { title: "Trash Service" },
         props: true, // Enables passing route params as props
       },
 
