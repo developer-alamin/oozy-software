@@ -28,6 +28,50 @@
             errors.breakdown_problem_note ? errors.breakdown_problem_note : ''
           "
         />
+
+        <v-textarea
+          v-model="breakdown_service.breakdown_technician_problem_note"
+          :rules="[rules.required]"
+          :error-messages="errors.breakdown_technician_problem_note || ''"
+        >
+          <template v-slot:label>
+            Technician Note <span style="color: red">*</span>
+          </template>
+        </v-textarea>
+        <v-row>
+          <v-col cols="6">
+            <v-autocomplete
+              v-model="breakdown_service.parts_id"
+              :items="parts"
+              item-value="id"
+              item-title="name"
+              label="Select Parts"
+              outlined
+              clearable
+              density="comfortable"
+              :error-messages="errors.parts_id ? errors.parts_id : ''"
+              @update:search="fetchParts"
+              @update:model-value="updatePartsUnit"
+            >
+              <template v-slot:label> Select Parts </template>
+            </v-autocomplete>
+          </v-col>
+          <v-col cols="6">
+            <v-text-field
+              v-model="breakdown_service.parts_quantity"
+              label="Quantity"
+              outlined
+              density="comfortable"
+              :error-messages="
+                errors.parts_quantity ? errors.parts_quantity : ''
+              "
+            >
+              <template v-slot:label> Quantity </template>
+            </v-text-field>
+            <b>Total Qty : {{ breakdown_service.parts_quantity_show }}</b>
+          </v-col>
+        </v-row>
+
         <v-select
           v-model="breakdown_service.breakdown_service_status"
           :items="statusItems"
@@ -57,7 +101,7 @@
               :disabled="!valid || loading"
               :loading="loading"
             >
-              Start Service
+              Service
             </v-btn>
           </v-col>
         </v-row>
@@ -96,11 +140,15 @@ export default {
         breakdown_problem_note_id: null,
         breakdown_problem_note: "",
         breakdown_service_status: null, // New property for checkbox
+        breakdown_technician_problem_note: null,
+        parts_id: null,
+        parts_quantity: "",
+        parts_quantity_show: "",
       },
       errors: {}, // Stores validation errors
       serverError: null, // Stores server-side error messages
       limit: 5,
-      machine_codes: [], // Array to store machine_codes data
+      parts: [], // Array to store machine_codes data
       breakdown_problem_notes: [],
       selectedCompany: null, // Bound to selected Company in v-autocomplete
 
@@ -128,6 +176,7 @@ export default {
   created() {
     this.fetchItem();
     this.fetchBreakdownProblemNote();
+    this.fetchParts();
   },
   methods: {
     async fetchItem() {
@@ -152,16 +201,16 @@ export default {
         this.serverError = "Error fetching Breakdown Service data.";
       }
     },
-    async fetchMachineCodes(search = "") {
+    async fetchParts(search = "") {
       try {
-        const response = await this.$axios.get("/get_machine_codes", {
+        const response = await this.$axios.get("/get_parts", {
           params: {
             search,
           },
         });
-        this.machine_codes = response.data; // Populate machine codes
+        this.parts = response.data; // Populate parts
       } catch (error) {
-        console.error("Error fetching machine codes:", error);
+        console.error("Error fetching parts:", error);
       }
     },
     async fetchBreakdownProblemNote(search) {
@@ -178,7 +227,16 @@ export default {
         console.error("Error fetching breakdown problem notes:", error);
       }
     },
+    updatePartsUnit() {
+      const selectedType = this.parts.find(
+        (part) => part.id == this.breakdown_service.parts_id
+      );
+      // console.log("Selected Type:", selectedType); // Debugging log
 
+      this.breakdown_service.parts_quantity_show = selectedType
+        ? selectedType.quantity
+        : "";
+    },
     async submit() {
       this.errors = {}; // Reset errors before submission
       this.serverError = null;
@@ -187,12 +245,12 @@ export default {
       setTimeout(async () => {
         try {
           const response = await this.$axios.put(
-            `/breakdown-service/${serviceId}`,
+            `/breakdown-service-processing/${serviceId}`,
             this.breakdown_service
           );
 
           if (response.data.success) {
-            toast.success("Breakdown Service Start successfully!");
+            toast.success("Breakdown Service successfully!");
             this.$router.push({ name: "ServiceIndex" }); // Redirect to brand list page
           }
         } catch (error) {

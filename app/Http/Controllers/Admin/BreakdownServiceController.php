@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\HelperController;
 use App\Models\Admin;
 use App\Models\BreakdownService;
+use App\Models\Parse;
 use App\Models\Technician;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -162,6 +163,76 @@ class BreakdownServiceController extends Controller
     // {
     //     //
     // }
+    
+    public function serviceProcessingUpdate(Request $request, $uuid)
+    {
+      dd($request->all());
+        $breakdownService = BreakdownService::where('uuid', $uuid)->firstOrFail();
+        // Validate only the breakdown_service_status field
+        $validatedData = $request->validate([
+            'breakdown_service_status'          => 'required|in:Done,Cancel',
+            'breakdown_problem_note_id'         => 'nullable', // Validate machine_id if provided
+            'breakdown_problem_note'            => 'nullable',
+            'breakdown_technician_problem_note' => 'nullable',
+            'parts_id'                          => 'nullable',
+            'parts_quantity'                    => 'nullable',   
+        ]);
+        
+
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
+
+            // Check if the admin is a superadmin
+            if ($currentUser->role !== 'superadmin') {
+                if ($breakdownService->creator_type !== $creatorType || $breakdownService->creator_id !== $currentUser->id) {
+                    return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to update this breakdownService.'], 403);
+                }
+            }
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+
+            if ($breakdownService->creator_type !== $creatorType || $breakdownService->creator_id !== $currentUser->id) {
+                return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to update this breakdownService.'], 403);
+            }
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+        if (!empty($validatedData['parts_id']) && !empty($validatedData['parts_quantity'])) {
+            $part = Parse::find($validatedData['parts_id']); // Assuming `Part` is the model for the parts table
+    
+            if ($part->quantity < $validatedData['parts_quantity']) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Insufficient quantity in inventory for the selected part.',
+                ], 422);
+            }
+    
+            // Deduct the quantity
+            $part->quantity -= $validatedData['parts_quantity'];
+            $part->save();
+        }
+        // Update only the breakdown_service_status
+        $breakdownService->breakdown_problem_note_id                = $validatedData['breakdown_problem_note_id'] ? $validatedData['breakdown_problem_note_id'] : 0;
+        $breakdownService->breakdown_service_status                 = $validatedData['breakdown_service_status'];
+        $breakdownService->breakdown_problem_note                   = $validatedData['breakdown_problem_note'];
+        $breakdownService->breakdown_technician_problem_note        = $validatedData['breakdown_technician_problem_note'];
+        $breakdownService->parts_id                                 = $validatedData['parts_id'] ? $validatedData['parts_id'] : 0;
+        $breakdownService->parts_quantity                           = $validatedData['parts_quantity'] ? $validatedData['parts_quantity'] : 0;
+        $breakdownService->breakdown_service_technician_status      = $validatedData['breakdown_service_status'] == "Done" ? "Success" : "Failed";
+        $breakdownService->technician_service_end_time              = now();
+        $breakdownService->updater()->associate($currentUser); // Associate the updater
+        $breakdownService->save();
+
+        // Return a success response
+        return response()->json([
+            'success' => true,
+            'message' => 'Breakdown Service updated successfully.',
+            'breakdownService' => $breakdownService,
+        ], 200);
+    }
     public function update(Request $request, $uuid)
     {
       // dd($request->all());

@@ -103,6 +103,7 @@ Route::get('/get_parses', [ServiceController::class, 'getParses']);
 Route::post('/service/history', [ServiceController::class, 'storeHistory']);
 Route::get('/breakdown-service/{uuid}/edit', [BreakdownServiceController::class,'edit']);
 Route::get('/breakdown-service/{uuid}/processing', [BreakdownServiceController::class,'serviceProcessing']);
+Route::put('/breakdown-service-processing/{uuid}', [BreakdownServiceController::class,'serviceProcessingUpdate']);
 Route::resource('breakdown-service',BreakdownServiceController::class);
 Route::post('/breakdown-service/technician-update-status', [BreakdownServiceController::class, 'acknowledge']);
 Route::resource('services',ServiceController::class);
@@ -316,6 +317,7 @@ Route::get('/get_factory_lines', [DynamicDataController::class, 'getLinesByFacto
 Route::get('/get_machine_codes', [DynamicDataController::class, 'getMachineCodes']);
 Route::get('/get_breakdown_problem_notes', [DynamicDataController::class, 'getBreakdownProblemNotes']);
 Route::get('/get_groups', [DynamicDataController::class, 'getGroups']);
+Route::get('/get_parts', [DynamicDataController::class, 'getParts']);
 
 
 // Admin Auth Routes

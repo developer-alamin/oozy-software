@@ -10,6 +10,7 @@ use App\Models\Group;
 use App\Models\Line;
 use App\Models\MachineStatus;
 use App\Models\MechineAssing;
+use App\Models\Parse;
 use App\Models\ProductModel;
 use App\Models\Unit;
 use App\Models\User;
@@ -179,6 +180,20 @@ class DynamicDataController extends Controller
 
       // Return the groups as JSON
       return response()->json($groups);
+  }
+  public function getParts(Request $request)
+  {
+      // Get search term and limit from the request, with defaults
+      $search = $request->query('search', '');
+      $limit = $request->query('limit', 5); // Default limit of 5
+
+      // Query to search for brands by name with a limit
+      $parts = Parse::where('name', 'like', '%' . $search . '%')
+          ->limit($limit)
+          ->get();
+
+      // Return the parts as JSON
+      return response()->json($parts);
   }
 
     // public function getBrands(Request $request)
