@@ -229,6 +229,7 @@ export default {
           },
         });
         this.machine_codes = response.data; // Populate machine codes
+        console.log(response.data);
       } catch (error) {
         console.error("Error fetching machine codes:", error);
       }

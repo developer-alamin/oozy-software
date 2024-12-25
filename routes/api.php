@@ -36,6 +36,7 @@ use App\Http\Controllers\OperatorController;
 use App\Models\BreakdownService;
 use App\Models\MechineAssing;
 
+
 // --------------------------------------------supplier route statr here-------------------------------------------------------------------
 Route::get('/suppliers/{uuid}/edit', [SupplierController::class, 'edit'])->name('suppliers.edit');
 Route::put('/suppliers/{uuid}', [SupplierController::class, 'update'])->name('suppliers.update');
@@ -316,6 +317,7 @@ Route::get('/get_lines_by_machine', [DynamicDataController::class, 'getLinesByMa
 Route::get('/get_machine_lines', [DynamicDataController::class, 'getMachineLines']);
 Route::get('/get_factory_lines', [DynamicDataController::class, 'getLinesByFactory']);
 Route::get('/get_machine_codes', [DynamicDataController::class, 'getMachineCodes']);
+Route::get('/get-machine-code-ways/details/{machine_code}', [DynamicDataController::class, 'getManuallyApiMachineDetails']);
 Route::get('/get_breakdown_problem_notes', [DynamicDataController::class, 'getBreakdownProblemNotes']);
 Route::get('/get_groups', [DynamicDataController::class, 'getGroups']);
 Route::get('/get_parts', [DynamicDataController::class, 'getParts']);

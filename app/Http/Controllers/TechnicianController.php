@@ -9,12 +9,50 @@ use App\Models\Technician;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Response;
-
+/**
+ * @OA\Tag(
+ *     name="Technicians",
+ *     description="API Endpoints for managing technicians"
+ * )
+ */
 class TechnicianController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     */
+   * @OA\Get(
+   *     path="/technician",
+   *     tags={"Technicians"},
+   *     summary="Retrieve a list of technicians",
+   *     description="Returns a paginated list of technicians.",
+   *     security={{"bearerAuth": {}}},
+   *     @OA\Parameter(
+  *         name="page",
+  *         in="query",
+  *         description="Page number for pagination",
+  *         required=false,
+  *         @OA\Schema(type="integer", example=1)
+  *     ),
+  *     @OA\Parameter(
+  *         name="itemsPerPage",
+  *         in="query",
+  *         description="Number of items per page",
+  *         required=false,
+  *         @OA\Schema(type="integer", example=10)
+  *     ),
+   *     @OA\Response(
+   *         response=200,
+   *         description="Successful operation",
+   *         @OA\JsonContent(
+   *             @OA\Property(property="data", type="array", @OA\Items(type="object")),
+   *             @OA\Property(property="links", type="object"),
+   *             @OA\Property(property="meta", type="object")
+   *         )
+   *     ),
+   *     @OA\Response(
+   *         response=401,
+   *         description="Unauthorized"
+   *     )
+   * )
+   */
     public function index(Request $request)
     {
         // Get parameters from the request
@@ -23,7 +61,6 @@ class TechnicianController extends Controller
         $sortBy       = $request->input('sortBy', 'created_at'); // Default sort by created_at
         $sortOrder    = $request->input('sortOrder', 'desc');    // Default sort order is descending
         $search       = $request->input('search', '');           // Search term, default is empty
-
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('admin')->user();
@@ -60,6 +97,7 @@ class TechnicianController extends Controller
         return response()->json([
             'items' => $technicians->items(), // Current page items
             'total' => $technicians->total(), // Total number of records
+
         ]);
     }
 
@@ -71,8 +109,70 @@ class TechnicianController extends Controller
 
     }
 
-    /**
-     * Store a newly created resource in storage.
+     /**
+     * @OA\Post(
+     *     path="/technician",
+     *     tags={"Technicians"},
+     *     summary="Create a new technician",
+     *     description="Adds a new technician to the system. The request requires authentication and certain fields to be validated before creating the technician.Technician types can be 'General', 'Special', or 'Manager'.",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"company_id", "factory_id", "group_id", "name", "type"},
+     *
+     *             @OA\Property(property="company_id", type="integer", example=1, description="ID of the company"),
+     *             @OA\Property(property="factory_id", type="integer", example=2, description="ID of the factory"),
+     *             @OA\Property(property="group_id", type="integer", example=3, description="ID of the group"),
+     *             @OA\Property(property="name", type="string", example="John Doe", description="Name of the technician"),
+     *             @OA\Property(property="type", type="string", enum={"General", "Special", "Manager"}, example="General",description="Type of the technician"),
+     *             @OA\Property(property="email", type="string", example="johndoe@example.com", description="Technician's email address"),
+     *             @OA\Property(property="phone", type="string", example="1234567890", description="Technician's phone number"),
+     *             @OA\Property(property="photo", type="string", example="photo-url.jpg", description="Photo URL of the technician"),
+     *             @OA\Property(property="address", type="string", example="123 Street, City", description="Technician's address"),
+     *             @OA\Property(property="description", type="string", example="A skilled technician", description="Brief description"),
+     *             @OA\Property(property="status", type="string", example="Available", description="Status of the technician"),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Technician created successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Technician created successfully."),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="uuid", type="string", example="123e4567-e89b-12d3-a456-426614174000"),
+     *                 @OA\Property(property="name", type="string", example="John Doe")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad Request",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Validation errors."),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Unauthorized")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Internal server error.")
+     *         )
+     *     )
+     * )
      */
     public function store(Request $request)
     {
@@ -121,6 +221,59 @@ class TechnicianController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
+
+    /**
+     * @OA\Get(
+     *     path="/technician/{uuid}/edit",
+     *     tags={"Technicians"},
+     *     summary="Get a technician for editing",
+     *     description="Retrieve a technician's details by UUID to edit. Only authorized users can access this endpoint. Super admins can edit any technician.",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(
+     *         name="uuid",
+     *         in="path",
+     *         required=true,
+     *         description="The UUID of the technician to edit",
+     *         @OA\Schema(type="string", example="cbc2fea1-2ede-4285-82bb-ec4004073344")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Technician data retrieved successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="technician",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="uuid", type="string", example="cbc2fea1-2ede-4285-82bb-ec4004073344"),
+     *                 @OA\Property(property="name", type="string", example="Jane Doe"),
+     *                 @OA\Property(property="type", type="string", example="General"),
+     *                 @OA\Property(property="creator_type", type="string", example="Admin"),
+     *                 @OA\Property(property="creator_id", type="integer", example=1),
+     *                 @OA\Property(property="status", type="string", example="active"),
+     *                 @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T12:00:00Z"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time", example="2024-01-02T15:30:00Z")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Unauthorized or Forbidden",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Unauthorized")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Technician not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Technician not found")
+     *         )
+     *     )
+     * )
+    */
     public function edit($uuid)
     {
         $technician = Technician::where('uuid', $uuid)->firstOrFail();
@@ -201,6 +354,46 @@ class TechnicianController extends Controller
     /**
      * Remove the specified resource from storage.
      */
+    /**
+ * @OA\Delete(
+ *     path="/technician/{id}",
+ *     tags={"Technicians"},
+ *     summary="Delete a technician",
+ *     description="Delete a technician by ID. Superadmins can delete any technician. Regular admins and users can only delete technicians they created.",
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         required=true,
+ *         description="The ID of the technician to delete",
+ *         @OA\Schema(type="integer", example=1)
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Technician deleted successfully",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="success", type="boolean", example=true),
+ *             @OA\Property(property="message", type="string", example="Technician deleted successfully.")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=403,
+ *         description="Unauthorized or Forbidden",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="success", type="boolean", example=false),
+ *             @OA\Property(property="message", type="string", example="Forbidden: You are not authorized to delete this technician.")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Technician not found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="success", type="boolean", example=false),
+ *             @OA\Property(property="message", type="string", example="Technician not found.")
+ *         )
+ *     ),
+ *     security={{"bearerAuth": {}}}
+ * )
+ */
     public function destroy(Technician $technician)
     {
     // Determine the authenticated user (either from 'admin' or 'user' guard)
@@ -234,7 +427,66 @@ class TechnicianController extends Controller
         return response()->json(['success' => true, 'message' => 'Technician deleted successfully.'], 200);
     }
 
-
+    /**
+ * @OA\Get(
+ *     path="/technician/trashed",
+ *     tags={"Technicians"},
+ *     summary="List trashed (soft-deleted) technicians",
+ *     description="Retrieve a list of soft-deleted technicians. Superadmins can view all trashed technicians, while regular admins and users can only view the ones they created.",
+ *     @OA\Parameter(
+ *         name="page",
+ *         in="query",
+ *         required=false,
+ *         description="Page number for pagination",
+ *         @OA\Schema(type="integer", example=1)
+ *     ),
+ *     @OA\Parameter(
+ *         name="itemsPerPage",
+ *         in="query",
+ *         required=false,
+ *         description="Number of items per page",
+ *         @OA\Schema(type="integer", example=10)
+ *     ),
+ *     @OA\Parameter(
+ *         name="sortBy",
+ *         in="query",
+ *         required=false,
+ *         description="Column to sort by (default: created_at)",
+ *         @OA\Schema(type="string", example="name")
+ *     ),
+ *     @OA\Parameter(
+ *         name="sortOrder",
+ *         in="query",
+ *         required=false,
+ *         description="Sort order (asc or desc)",
+ *         @OA\Schema(type="string", example="desc")
+ *     ),
+ *     @OA\Parameter(
+ *         name="search",
+ *         in="query",
+ *         required=false,
+ *         description="Search term",
+ *         @OA\Schema(type="string", example="John")
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="List of trashed technicians",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="items", type="array", @OA\Items(type="object")),
+ *             @OA\Property(property="total", type="integer", example=50)
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=403,
+ *         description="Unauthorized",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="success", type="boolean", example=false),
+ *             @OA\Property(property="message", type="string", example="Unauthorized")
+ *         )
+ *     ),
+ *     security={{"bearerAuth": {}}}
+ * )
+ */
     public function trashed(Request $request)
     {
         // Determine the authenticated user (either from 'admin' or 'user' guard)
@@ -302,6 +554,46 @@ class TechnicianController extends Controller
     }
 
     // Permanently delete a technician from trash
+    /**
+ * @OA\Delete(
+ *     path="/technicians/trashed/{id}",
+ *     tags={"Technicians"},
+ *     summary="Permanently delete a trashed technician",
+ *     description="Permanently delete a soft-deleted technician by ID. Superadmins can delete any trashed technician. Regular admins and users can only delete technicians they created.",
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         required=true,
+ *         description="The ID of the trashed technician to permanently delete",
+ *         @OA\Schema(type="integer", example=1)
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Technician permanently deleted",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Technician permanently deleted")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=403,
+ *         description="Unauthorized or Forbidden",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="success", type="boolean", example=false),
+ *             @OA\Property(property="message", type="string", example="Forbidden: You are not authorized to delete this technician.")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Technician not found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="success", type="boolean", example=false),
+ *             @OA\Property(property="message", type="string", example="Technician not found.")
+ *         )
+ *     ),
+ *     security={{"bearerAuth": {}}}
+ * )
+ */
+
     public function forceDelete($id)
     {
         // Determine the authenticated user (either from 'admin' or 'user' guard)
