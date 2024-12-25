@@ -1,0 +1,1155 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Laravel API Documentation",
+        "description": "This is the API documentation for the Laravel project.",
+        "contact": {
+            "email": "ferdawusa@gmail.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://gi-mis-api.test/api",
+            "description": "Local Development Server"
+        }
+    ],
+    "paths": {
+        "/user/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Authenticate user or admin and retrieve a token",
+                "description": "This endpoint allows a user or admin to log in using their email and password. It validates the credentials against the database. If the credentials match an admin, a token with the role 'admin' is generated and returned. Similarly, if the credentials match a user, a token with the role 'user' is generated and returned. The response includes the token, user details, and the role.",
+                "operationId": "9d0db60b7e32ac0bd826aa291b5d437f",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "admin@gmail.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "12345678"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string"
+                                        },
+                                        "user": {
+                                            "type": "object"
+                                        },
+                                        "role": {
+                                            "type": "string",
+                                            "example": "admin or user"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid credentials"
+                    }
+                }
+            }
+        },
+        "/user/register": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Register a new user",
+                "description": "Create a new user account",
+                "operationId": "e04d3c5636fe9882bc97e12815024c59",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "phone",
+                                    "password",
+                                    "password_confirmation",
+                                    "role"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "user22@gmail.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "password123"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "example": "password123"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "01654263557"
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "example": "user"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "User registered successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User created successfully"
+                                        },
+                                        "user": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Invalid input"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/get_machine_codes": {
+            "get": {
+                "tags": [
+                    "Machine Management"
+                ],
+                "summary": "Retrieve machine codes based on search criteria",
+                "description": "Fetch machine codes that match a search term and filter by location status 'Sewing Line'. Supports grouping by unique machine codes and limiting results.",
+                "operationId": "ed626d83e479bba3f63ae82571ae4723",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Partial or full machine code to filter results. This field is optional and editable.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "MC123"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Maximum number of results to return. Default is 5.",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "description": "Unique ID of the record",
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "machine_code": {
+                                                "description": "Unique code of the machine",
+                                                "type": "string",
+                                                "example": "MC123"
+                                            },
+                                            "location_status": {
+                                                "description": "Current status of the machine's location",
+                                                "type": "string",
+                                                "example": "Sewing Line"
+                                            },
+                                            "created_at": {
+                                                "description": "Timestamp of the machine record creation",
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2024-01-01T12:00:00Z"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request due to invalid input.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Invalid search parameter."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized access."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "An unexpected error occurred."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/get-machine-code-ways/details/{machine_code}": {
+            "get": {
+                "tags": [
+                    "MachineCodes"
+                ],
+                "summary": "Retrieve machine details by machine code",
+                "description": "Fetch machine data based on the provided machine code.",
+                "operationId": "d1e00e6fadd2e11b2f8ae5454409fa22",
+                "parameters": [
+                    {
+                        "name": "machine_code",
+                        "in": "path",
+                        "description": "Machine code to fetch details",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "OZ-00000006"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Machine data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "machine_code": {
+                                            "type": "string",
+                                            "example": "OZ-00000006"
+                                        },
+                                        "unit_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "floor_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "line_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "location": {
+                                            "type": "string",
+                                            "example": "Sewing Line"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2024-01-01T12:00:00Z"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Machine not found or not assigned to the sewing line"
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid or missing API token"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/machine/details/{machine_code}": {
+            "get": {
+                "tags": [
+                    "MachineCodes"
+                ],
+                "summary": "Retrieve machine details by machine code",
+                "description": "Fetch machine data based on the provided machine code.",
+                "operationId": "06dec2d152c4c60651b3407b669470a4",
+                "parameters": [
+                    {
+                        "name": "machine_code",
+                        "in": "path",
+                        "description": "Machine code to fetch details",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "MC123"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Machine data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "machine_code": {
+                                            "type": "string",
+                                            "example": "MC123"
+                                        },
+                                        "location_status": {
+                                            "type": "string",
+                                            "example": "Sewing Line"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2024-01-01T12:00:00Z"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Machine not found or not assigned to the sewing line"
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid or missing API token"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/technician": {
+            "get": {
+                "tags": [
+                    "Technicians"
+                ],
+                "summary": "Retrieve a list of technicians",
+                "description": "Returns a paginated list of technicians.",
+                "operationId": "a37df631531d5e24b26c84d583242f0a",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "itemsPerPage",
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "object"
+                                        },
+                                        "meta": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Technicians"
+                ],
+                "summary": "Create a new technician",
+                "description": "Adds a new technician to the system. The request requires authentication and certain fields to be validated before creating the technician.Technician types can be 'General', 'Special', or 'Manager'.",
+                "operationId": "e0793e79e270ffd2ef1ab422c16f0da5",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "company_id",
+                                    "factory_id",
+                                    "group_id",
+                                    "name",
+                                    "type"
+                                ],
+                                "properties": {
+                                    "company_id": {
+                                        "description": "ID of the company",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "factory_id": {
+                                        "description": "ID of the factory",
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "group_id": {
+                                        "description": "ID of the group",
+                                        "type": "integer",
+                                        "example": 3
+                                    },
+                                    "name": {
+                                        "description": "Name of the technician",
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "type": {
+                                        "description": "Type of the technician",
+                                        "type": "string",
+                                        "enum": [
+                                            "General",
+                                            "Special",
+                                            "Manager"
+                                        ],
+                                        "example": "General"
+                                    },
+                                    "email": {
+                                        "description": "Technician's email address",
+                                        "type": "string",
+                                        "example": "johndoe@example.com"
+                                    },
+                                    "phone": {
+                                        "description": "Technician's phone number",
+                                        "type": "string",
+                                        "example": "1234567890"
+                                    },
+                                    "photo": {
+                                        "description": "Photo URL of the technician",
+                                        "type": "string",
+                                        "example": "photo-url.jpg"
+                                    },
+                                    "address": {
+                                        "description": "Technician's address",
+                                        "type": "string",
+                                        "example": "123 Street, City"
+                                    },
+                                    "description": {
+                                        "description": "Brief description",
+                                        "type": "string",
+                                        "example": "A skilled technician"
+                                    },
+                                    "status": {
+                                        "description": "Status of the technician",
+                                        "type": "string",
+                                        "example": "Available"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Technician created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Technician created successfully."
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "uuid": {
+                                                    "type": "string",
+                                                    "example": "123e4567-e89b-12d3-a456-426614174000"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "John Doe"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation errors."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Internal server error."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/technician/{uuid}/edit": {
+            "get": {
+                "tags": [
+                    "Technicians"
+                ],
+                "summary": "Get a technician for editing",
+                "description": "Retrieve a technician's details by UUID to edit. Only authorized users can access this endpoint. Super admins can edit any technician.",
+                "operationId": "fec018547905205262ca16bac12dbc90",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "description": "The UUID of the technician to edit",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "cbc2fea1-2ede-4285-82bb-ec4004073344"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Technician data retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "technician": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "uuid": {
+                                                    "type": "string",
+                                                    "example": "cbc2fea1-2ede-4285-82bb-ec4004073344"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Jane Doe"
+                                                },
+                                                "type": {
+                                                    "type": "string",
+                                                    "example": "General"
+                                                },
+                                                "creator_type": {
+                                                    "type": "string",
+                                                    "example": "Admin"
+                                                },
+                                                "creator_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "active"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2024-01-01T12:00:00Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2024-01-02T15:30:00Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Unauthorized or Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Technician not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Technician not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/technician/{id}": {
+            "delete": {
+                "tags": [
+                    "Technicians"
+                ],
+                "summary": "Delete a technician",
+                "description": "Delete a technician by ID. Superadmins can delete any technician. Regular admins and users can only delete technicians they created.",
+                "operationId": "efa380e54ecd9cb1d4fe5fb358686d14",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The ID of the technician to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Technician deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Technician deleted successfully."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Unauthorized or Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Forbidden: You are not authorized to delete this technician."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Technician not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Technician not found."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/technician/trashed": {
+            "get": {
+                "tags": [
+                    "Technicians"
+                ],
+                "summary": "List trashed (soft-deleted) technicians",
+                "description": "Retrieve a list of soft-deleted technicians. Superadmins can view all trashed technicians, while regular admins and users can only view the ones they created.",
+                "operationId": "09856bcee0af8c858e4011afd6f519ee",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "itemsPerPage",
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        }
+                    },
+                    {
+                        "name": "sortBy",
+                        "in": "query",
+                        "description": "Column to sort by (default: created_at)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "name"
+                        }
+                    },
+                    {
+                        "name": "sortOrder",
+                        "in": "query",
+                        "description": "Sort order (asc or desc)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "desc"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search term",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "John"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of trashed technicians",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "items": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "example": 50
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/technicians/trashed/{id}": {
+            "delete": {
+                "tags": [
+                    "Technicians"
+                ],
+                "summary": "Permanently delete a trashed technician",
+                "description": "Permanently delete a soft-deleted technician by ID. Superadmins can delete any trashed technician. Regular admins and users can only delete technicians they created.",
+                "operationId": "77c32f3fda1ceedd4606a3d6e36473e7",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The ID of the trashed technician to permanently delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Technician permanently deleted",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Technician permanently deleted"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Unauthorized or Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Forbidden: You are not authorized to delete this technician."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Technician not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Technician not found."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Use a Bearer Token to authenticate.",
+                "name": "Authorization",
+                "in": "header",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Technicians",
+            "description": "API Endpoints for managing technicians"
+        },
+        {
+            "name": "Authentication",
+            "description": "Authentication"
+        },
+        {
+            "name": "Machine Management",
+            "description": "Machine Management"
+        },
+        {
+            "name": "MachineCodes",
+            "description": "MachineCodes"
+        }
+    ]
+}

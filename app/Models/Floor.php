@@ -26,6 +26,12 @@ class Floor extends Model
     ];
     protected $casts = [
         'factory_id' => 'integer', // Casts factory_id to an integer
+        'uuid'       => 'string',
+        'id'         => 'integer',
+        'creator_id' => 'integer',
+        'updater_id' => 'integer',
+        'created_at' => 'datetime', // Automatically cast 'created_at' to a Carbon instance
+        'updated_at' => 'datetime', // Automatically cast 'updated_at' to a Carbon instance
     ];
     // Polymorphic relationships
     public function creator()
@@ -45,6 +51,14 @@ class Floor extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'company_id');
+    }
+    public function units()
+    {
+        return $this->hasMany(Unit::class);
+    }
+    public function factory()
+    {
+        return $this->belongsTo(Factory::class, 'factory_id');
     }
 
 }

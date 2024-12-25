@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\HelperController;
+use App\Http\Requests\MachineAssignStoreRequest;
 use App\Http\Requests\MechineTransferStore;
 use App\Models\Admin;
 use App\Models\MechineAssing;
@@ -43,35 +44,51 @@ class MechineAssingController extends Controller
             // Check if the admin is a super admin
             if ($currentUser->role === 'superadmin') {
                 // If superadmin, retrieve all technicians
-                $mechineAssingQuery = MechineAssing::query(); // No filters applied
+                $machineAssignQuery = MechineAssing::query(); // No filters applied
             } else {
                 // If not superadmin, filter by creator type and id
-                $mechineAssingQuery = MechineAssing::where('creator_type', $creatorType)
+                $machineAssignQuery = MechineAssing::where('creator_type', $creatorType)
                     ->where('creator_id', $currentUser->id);
             }
         } elseif (Auth::guard('user')->check()) {
             $currentUser = Auth::guard('user')->user();
             $creatorType = User::class;
             // For regular users, filter by creator type and id
-            $mechineAssingQuery = MechineAssing::where('creator_type', $creatorType)
+            $machineAssignQuery = MechineAssing::where('creator_type', $creatorType)
                 ->where('creator_id', $currentUser->id);
         } else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
         // Apply search if the search term is not empty
         if (!empty($search)) {
-            $mechineAssingQuery->where('name', 'LIKE', '%' . $search . '%');
+            $machineAssignQuery->where('name', 'LIKE', '%' . $search . '%');
         }
         // Apply sorting
-        $mechineAssingQuery->orderBy($sortBy, $sortOrder);
+        $machineAssignQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $mechineAssing = $mechineAssingQuery->where('status','Assign')->with('creator:id,name','factory:id,name','machineStatus:id,name','productModel:id,name','mechineType:id,name')->paginate($itemsPerPage);
+        $machineAssign = $machineAssignQuery->where('status', '!=', 'History')
+                          ->with([
+                            'creator:id,name',                          // Creator of the machine assignment
+                            'factory:id,name,company_id',
+                            'factory.user:id,name',                           // Direct factory relationship
+                            // 'factory.floors:id,name,factory_id',        // Floors within the factory
+                            // 'factory.floors.units:id,name,floor_id',    // Units within the floors
+                            // 'factory.floors.units.lines:id,name,unit_id', // Lines within the units
+                            'machineStatus:id,name',                   // Machine status
+                            'line.unit.floor.factory.user:id,name',
+                            'machineStatus:id,name',                   // Machine status
+                            'productModel:id,name',                    // Product model
+                            'mechineType:id,name'                      // Machine type
+                        ])
+                        ->paginate($itemsPerPage);
         // Return the response as JSON
         return response()->json([
-            'items' => $mechineAssing->items(), // Current page items
-            'total' => $mechineAssing->total(), // Total number of records
+            'items' => $machineAssign->items(), // Current page items
+            'total' => $machineAssign->total(), // Total number of records
         ]);
     }
+
+
 
       /**
      * Display a listing of the resource.
@@ -123,7 +140,7 @@ class MechineAssingController extends Controller
       /**
      * Display a listing of the resource.
      */
-    public function mechineHistoryList(Request $request)
+    public function machineHistoryList(Request $request)
     {
         $page         = $request->input('page', 1);
         $itemsPerPage = $request->input('itemsPerPage', 5);
@@ -137,33 +154,42 @@ class MechineAssingController extends Controller
             // Check if the admin is a super admin
             if ($currentUser->role === 'superadmin') {
                 // If superadmin, retrieve all technicians
-                $mechineAssingQuery = MechineAssing::query(); // No filters applied
+                $machineAssignQuery = MechineAssing::query(); // No filters applied
             } else {
                 // If not superadmin, filter by creator type and id
-                $mechineAssingQuery = MechineAssing::where('creator_type', $creatorType)
+                $machineAssignQuery = MechineAssing::where('creator_type', $creatorType)
                     ->where('creator_id', $currentUser->id);
             }
         } elseif (Auth::guard('user')->check()) {
             $currentUser = Auth::guard('user')->user();
             $creatorType = User::class;
             // For regular users, filter by creator type and id
-            $mechineAssingQuery = MechineAssing::where('creator_type', $creatorType)
+            $machineAssignQuery = MechineAssing::where('creator_type', $creatorType)
                 ->where('creator_id', $currentUser->id);
         } else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
         // Apply search if the search term is not empty
         if (!empty($search)) {
-            $mechineAssingQuery->where('name', 'LIKE', '%' . $search . '%');
+            $machineAssignQuery->where('name', 'LIKE', '%' . $search . '%');
         }
         // Apply sorting
-        $mechineAssingQuery->orderBy($sortBy, $sortOrder);
+        $machineAssignQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $mechineAssing = $mechineAssingQuery->where('mechine_status','History')->with('creator:id,name','user:id,name','factory:id,name')->paginate($itemsPerPage);
+        $machineAssign = $machineAssignQuery->where('status','History')->with([
+          'creator:id,name',                          // Creator of the machine assignment
+          'factory:id,name,company_id',
+          'factory.user:id,name',                           // Direct factory relationship
+          'machineStatus:id,name',                   // Machine status
+          'line.unit.floor.factory.user:id,name',
+          'machineStatus:id,name',                   // Machine status
+          'productModel:id,name',                    // Product model
+          'mechineType:id,name'                      // Machine type
+        ])->paginate($itemsPerPage);
         // Return the response as JSON
         return response()->json([
-            'items' => $mechineAssing->items(), // Current page items
-            'total' => $mechineAssing->total(), // Total number of records
+            'items' => $machineAssign->items(), // Current page items
+            'total' => $machineAssign->total(), // Total number of records
         ]);
     }
 
@@ -179,7 +205,7 @@ class MechineAssingController extends Controller
      * Store a newly created resource in storage.
      */
 
-    public function store(Request $request)
+    public function store(MachineAssignStoreRequest $request)
     {
 
         // dd($request->all());
@@ -193,28 +219,7 @@ class MechineAssingController extends Controller
         }
 
         // Validate the incoming request data
-        $validatedData = $request->validate([
-            'name'                    => 'required|string|max:255',
-            'factory_id'              => 'required|integer',
-            'brand_id'                => 'required|integer',
-            'model_id'                => 'required|integer',
-            'machine_type_id'         => 'required|integer',
-            'machine_source_id'       => 'nullable',
-            'supplier_id'             => 'nullable',
-            'rent_date'               => 'nullable',
-            'rent_name'               => 'nullable|string|max:255',
-            'rent_note'               => 'nullable|string',
-            'rent_amount_type'        => 'nullable|string',
-            'machine_code'            => 'required|string|max:255',
-            'partial_maintenance_day' => 'nullable',
-            'full_maintenance_day'    => 'nullable',
-            'purchase_price'          => 'nullable',
-            'purchase_date'           => 'nullable',
-            'status'                  => 'nullable',  // Example: assumes "status" has specific values
-            'note'                    => 'nullable|string',
-            'machine_status_id'       => 'required',
-            'qr_code_path'            => 'nullable'
-        ]);
+        $validatedData = $request->validated();
         // dd($request->all());
         // Process dates to handle timezone issues and format them properly
         if (!empty($request->purchase_date) && $request->purchase_date !== 'null') {
@@ -235,9 +240,30 @@ class MechineAssingController extends Controller
             $validatedData['rent_date'] = null; // Set to null if no valid date is provided
         }
 
+        if (!empty($request->commission_date) && $request->commission_date !== 'null') {
+            // Remove extra characters like "(timezone)" if any and parse the date
+            $validatedData['commission_date'] = Carbon::parse(
+                preg_replace('/\s*\(.*\)$/', '', $request->commission_date)
+            )->format('Y-m-d');
+        } else {
+            $validatedData['commission_date'] = null; // Set to null if no valid date is provided
+        }
+
+        if (!empty($request->warranty_period) && $request->warranty_period !== 'null') {
+            // Remove extra characters like "(timezone)" if any and parse the date
+            $validatedData['warranty_period'] = Carbon::parse(
+                preg_replace('/\s*\(.*\)$/', '', $request->warranty_period)
+            )->format('Y-m-d');
+        } else {
+            $validatedData['warranty_period'] = null; // Set to null if no valid date is provided
+        }
+
         // Create the new MachineAssing instance with validated data
-        $mechineAssing                    = new MechineAssing($validatedData);
-        $mechineAssing->machine_source_id = ($request->machine_source_id && $request->machine_source_id !== 'null') ? $request->machine_source_id : 0;
+        $mechineAssing                      = new MechineAssing($validatedData);
+        $mechineAssing->machine_source_id   = ($request->machine_source_id && $request->machine_source_id !== 'null') ? $request->machine_source_id : 0;
+        $mechineAssing->line_id             = ($request->line_id && $request->line_id !== 'null') ? $request->line_id : 0;
+        $mechineAssing->show_basic_details  = $request->show_basic_details == "true" ? true : false;
+        $mechineAssing->show_specifications = $request->show_specifications == "true" ? true : false;
         // Associate the creator and updater polymorphically
         $mechineAssing->uuid              = HelperController::generateUuid();
         $mechineAssing->status            = "Assign";
@@ -279,10 +305,176 @@ class MechineAssingController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(MechineAssing $mechineAssing)
+    public function show(Request $request,$uuid)
     {
-        //
+        $machineAssign = MechineAssing::with([
+          'creator:id,name',                          // Creator of the machine assignment
+          'factory:id,name,company_id',
+          'factory.user:id,name',                           // Direct factory relationship
+          'machineStatus:id,name',                   // Machine status
+          'line.unit.floor.factory.user:id,name',
+          'machineStatus:id,name',
+          'brand:id,name',                 // Machine status
+          'productModel:id,name',                    // Product model
+          'mechineType:id,name',
+          'source:id,name',
+          'supplier:id,name',                      // Machine type
+        ])->where('uuid', $uuid)->firstOrFail();
+
+        $page         = $request->input('page', 1);
+        $itemsPerPage = $request->input('itemsPerPage', 5);
+        $sortBy       = $request->input('sortBy', 'created_at'); // Default sort by created_at
+        $sortOrder    = $request->input('sortOrder', 'desc');    // Default sort order is descending
+        $search       = $request->input('search', '');           // Search term, default is empty
+
+      // If superadmin, retrieve all technicians
+      // $machineAssignQuery = MechineAssing::query(); // No filters applied
+
+
+      //   // Apply search if the search term is not empty
+      //   if (!empty($search)) {
+      //       $machineAssignQuery->where('name', 'LIKE', '%' . $search . '%');
+      //   }
+      //   // Apply sorting
+      //   $machineAssignQuery->orderBy($sortBy, $sortOrder);
+      //   // Paginate results
+      //   $history = $machineAssignQuery->where('status','History')
+      //   ->where('machine_id',$machineAssign->machine_id)
+      //   ->with([
+      //     'creator:id,name',                          // Creator of the machine assignment
+      //     'factory:id,name,company_id',
+      //     'factory.user:id,name',                           // Direct factory relationship
+      //     'machineStatus:id,name',                   // Machine status
+      //     'line.unit.floor.factory.user:id,name',
+      //     'machineStatus:id,name',                   // Machine status
+      //     'productModel:id,name',                    // Product model
+      //     'mechineType:id,name'                      // Machine type
+      //   ])->paginate($itemsPerPage);
+
+        $history = MechineAssing::where('status', 'History')->where('machine_id',$machineAssign->machine_id)->with([
+              'creator:id,name',                          // Creator of the machine assignment
+              'factory:id,name,company_id',
+              'factory.user:id,name',                           // Direct factory relationship
+              'machineStatus:id,name',                   // Machine status
+              'line.unit.floor.factory.user:id,name',
+              'machineStatus:id,name',                   // Machine status
+              'productModel:id,name',                    // Product model
+              'mechineType:id,name'                      // Machine type
+            ])->get();
+
+        if (Auth::guard('admin')->check()) {
+          $currentUser = Auth::guard('admin')->user();
+          $creatorType = Admin::class;
+          // Check if the admin is a super admin
+          if ($currentUser->role === 'superadmin') {
+              // Super admins can edit any mechineAssing
+              return response()->json([
+                  'success'          => true,
+                  'machineAssign'    => $machineAssign,
+                  'items' =>  $history,
+              ], Response::HTTP_OK);
+          }
+      } elseif (Auth::guard('user')->check()) {
+          $currentUser = Auth::guard('user')->user();
+          $creatorType = User::class;
+      } else {
+          return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+      }
+      // Check if the machineAssign belongs to the current user or admin
+      if ($machineAssign->creator_type !== $creatorType || $machineAssign->creator_id !== $currentUser->id) {
+          return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to edit this machineAssign.'], 403);
+      }
+
+      //  // Return the machineAssign data if authorized
+      //  return response()->json([
+      //   'success'       => true,
+      //   'machineAssign' => $machineAssign,
+      //   // 'items'         => $machineAssignHistory, // Current page items
+      //   // 'total'         => $machineAssignHistory->total(),
+      // ], Response::HTTP_OK);
+
+      // $page         = $request->input('page', 1);
+      //   $itemsPerPage = $request->input('itemsPerPage', 5);
+      //   $sortBy       = $request->input('sortBy', 'created_at'); // Default sort by created_at
+      //   $sortOrder    = $request->input('sortOrder', 'desc');    // Default sort order is descending
+      //   $search       = $request->input('search', '');           // Search term, default is empty
+      //   // Determine the authenticated user (either from 'admin' or 'user' guard)
+      //   if (Auth::guard('admin')->check()) {
+      //       $currentUser = Auth::guard('admin')->user();
+      //       $creatorType = Admin::class;
+      //       // Check if the admin is a super admin
+      //       if ($currentUser->role === 'superadmin') {
+      //           // If superadmin, retrieve all technicians
+      //           $machineAssignQuery = MechineAssing::query(); // No filters applied
+      //       } else {
+      //           // If not superadmin, filter by creator type and id
+      //           $machineAssignQuery = MechineAssing::where('creator_type', $creatorType)
+      //               ->where('creator_id', $currentUser->id);
+      //       }
+      //   } elseif (Auth::guard('user')->check()) {
+      //       $currentUser = Auth::guard('user')->user();
+      //       $creatorType = User::class;
+      //       // For regular users, filter by creator type and id
+      //       $machineAssignQuery = MechineAssing::where('creator_type', $creatorType)
+      //           ->where('creator_id', $currentUser->id);
+      //   } else {
+      //       return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+      //   }
+      //   // Apply search if the search term is not empty
+      //   if (!empty($search)) {
+      //       $machineAssignQuery->where('name', 'LIKE', '%' . $search . '%');
+      //   }
+      //   // Apply sorting
+      //   $machineAssignQuery->orderBy($sortBy, $sortOrder);
+      //   // Paginate results
+      //   $history = $machineAssignQuery->where('status','History')->with([
+      //     'creator:id,name',                          // Creator of the machine assignment
+      //     'factory:id,name,company_id',
+      //     'factory.user:id,name',                           // Direct factory relationship
+      //     'machineStatus:id,name',                   // Machine status
+      //     'line.unit.floor.factory.user:id,name',
+      //     'machineStatus:id,name',                   // Machine status
+      //     'productModel:id,name',                    // Product model
+      //     'mechineType:id,name'                      // Machine type
+      //   ])->paginate($itemsPerPage);
+      //   // Return the response as JSON
+      //   return response()->json([
+      //       'success'       => true,
+      //       'machineAssign' => $machineAssign,
+      //       'items'         => $history->isEmpty() ? [] : $history->items(), // Current page items
+      //       'total' => $history->total(), // Total number of records
+      //   ]);
+      // $history = MechineAssing::where('machine_id', $machineAssign->id)
+      //   ->paginate(10); // Adjust pagination limit as needed
+
+    // return response()->json([
+    //     'success' => true,
+    //     'machineAssign' => $machineAssign,
+    //     'items' => $history->items(), // Current page items
+    //     'total' => $history->total(), // Total number of records
+    // ]);
+
     }
+//     public function show($uuid)
+// {
+//     $machineAssign = MechineAssing::where('uuid', $uuid)
+//         ->first();
+
+//     if (!$machineAssign) {
+//         return response()->json(['success' => false, 'message' => 'Machine assignment not found.'], 404);
+//     }
+
+//     $history = MechineAssing::where('machine_id', $machineAssign->id)
+//         ->paginate(10); // Adjust pagination limit as needed
+
+//     return response()->json([
+//         'success' => true,
+//         'machineAssign' => $machineAssign,
+//         'items' => $history->items(), // Current page items
+//         'total' => $history->total(), // Total number of records
+//     ]);
+// }
+
 
     /**
      * Show the form for editing the specified resource.
@@ -317,13 +509,15 @@ class MechineAssingController extends Controller
             'mechineAssing' => $mechineAssing
         ], Response::HTTP_OK);
     }
-    public function mechineTransfer($uuid){
-
+    public function mechineTransfer(Request $request, $uuid)
+    {
         $mechineTransfer = MechineAssing::where('uuid', $uuid)->firstOrFail();
+
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('admin')->user();
             $creatorType = Admin::class;
+
             // Check if the admin is a super admin
             if ($currentUser->role === 'superadmin') {
                 // Super admins can edit any mechineTransfer
@@ -338,21 +532,44 @@ class MechineAssingController extends Controller
         } else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
+
         // Check if the mechineTransfer belongs to the current user or admin
         if ($mechineTransfer->creator_type !== $creatorType || $mechineTransfer->creator_id !== $currentUser->id) {
             return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to edit this mechineTransfer.'], 403);
         }
-        // Return the mechineTransfer data if authorized
+
+        // Validate the location and status settings
+        if ($mechineTransfer->location_status == 'Sewing Line' && !$mechineTransfer->line_id) {
+            return response()->json(['success' => false, 'message' => 'Line must be selected for Sewing Line location.'], 400);
+        }
+
+        // Optionally, you can validate machine status if needed
+        if (!$mechineTransfer->machine_status_id) {
+            return response()->json(['success' => false, 'message' => 'Machine status is required.'], 400);
+        }
+
+        // Transfer machine logic (save updated details)
+        // $mechineTransfer->update([
+        //     'location_status' => $request->machine['location_status'],
+        //     'machine_status_id' => $request->machine['machine_status_id'],
+        //     'line_id' => $request->machine['line_id'],
+        // ]);
+
         return response()->json([
             'success' => true,
             'mechineTransfer' => $mechineTransfer
         ], Response::HTTP_OK);
+
+
     }
 
-    public function mechineTransferStore(MechineTransferStore $request,$uuid){
+    public function mechineTransferUpdate(MachineAssignStoreRequest $request,$uuid){
         // dd($request->all());
-        $mechine = MechineAssing::where('uuid', $uuid)->firstOrFail();
-        // dd($mechine);
+        $machine = MechineAssing::where('uuid', $uuid)->firstOrFail();
+        $machineCode = $machine->machine_code;
+        $machineCodeData = MechineAssing::where('machine_code', $machine->machine_code)->first();
+        $machineId = $machineCodeData->id;
+        // dd($machineId);
         // Check which authentication guard is in use and set the creator
         if (Auth::guard('admin')->check()) {
             $creator = Auth::guard('admin')->user();
@@ -362,7 +579,7 @@ class MechineAssingController extends Controller
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
 
-        // validataion
+        // validation
         $validatedData = $request->validated();
         if (!empty($request->purchase_date) && $request->purchase_date !== 'null') {
             // Remove extra characters like "(timezone)" if any and parse the date
@@ -381,34 +598,61 @@ class MechineAssingController extends Controller
         } else {
             $validatedData['rent_date'] = null; // Set to null if no valid date is provided
         }
+
+        if (!empty($request->commission_date) && $request->commission_date !== 'null') {
+          // Remove extra characters like "(timezone)" if any and parse the date
+          $validatedData['commission_date'] = Carbon::parse(
+              preg_replace('/\s*\(.*\)$/', '', $request->commission_date)
+          )->format('Y-m-d');
+        } else {
+          $validatedData['commission_date'] = null; // Set to null if no valid date is provided
+        }
+
+        if (!empty($request->warranty_period) && $request->warranty_period !== 'null') {
+            // Remove extra characters like "(timezone)" if any and parse the date
+            $validatedData['warranty_period'] = Carbon::parse(
+                preg_replace('/\s*\(.*\)$/', '', $request->warranty_period)
+            )->format('Y-m-d');
+        } else {
+            $validatedData['warranty_period'] = null; // Set to null if no valid date is provided
+        }
+
          // Update the original machine status to "history"
 
 
-        $mechineTransfer                            = new MechineAssing();
-        $mechineTransfer->uuid                      = HelperController::generateUuid();
-        $mechineTransfer->factory_id                = $request->factory_id;
-        $mechineTransfer->brand_id                  = $request->brand_id;
-        $mechineTransfer->model_id                  = $request->model_id;
-        $mechineTransfer->mechine_type_id           = $request->mechine_type_id;
-        $mechineTransfer->mechine_source_id         = $request->mechine_source_id;
-        $mechineTransfer->supplier_id               = ($request->supplier_id && $request->supplier_id !== 'null') ? $request->supplier_id : 0;
-        $mechineTransfer->rent_id                   = ($request->rent_id && $request->rent_id !== 'null') ? $request->rent_id : 0;
-        $mechineTransfer->rent_date                 = $request->rent_date;
-        $mechineTransfer->name                      = $request->name;
-        $mechineTransfer->mechine_code              = $request->mechine_code;
-        $mechineTransfer->preventive_service_days   = $request->preventive_service_days;
-        $mechineTransfer->purchace_price            = $request->purchace_price;
-        $mechineTransfer->purchase_date             = $request->purchase_date;
-        $mechineTransfer->status                    = $request->status;
-        $mechineTransfer->note                      = $request->note;
-        $mechineTransfer->mechine_transfer_id       = $mechine->id;
-        $mechineTransfer->mechine_status            = "Transferred";
+        $mechineTransfer                      = new MechineAssing( $validatedData);
+        $mechineTransfer->machine_id          = $machineId;
+        $mechineTransfer->uuid                = HelperController::generateUuid();
+        $mechineTransfer->machine_source_id   = ($request->machine_source_id && $request->machine_source_id !== 'null') ? $request->machine_source_id : 0;
+        $mechineTransfer->line_id             = ($request->line_id && $request->line_id !== 'null') ? $request->line_id : 0;
+        $mechineTransfer->show_basic_details  = $request->show_basic_details == "true" ? true : false;
+        $mechineTransfer->show_specifications = $request->show_specifications == "true" ? true : false;
+
+        $mechineTransfer->status              = "Transferred";
 
         $mechineTransfer->creator()->associate($creator);
         $mechineTransfer->updater()->associate($creator);
         $mechineTransfer->save();
+        // $mechineTransfer->uuid                      = HelperController::generateUuid();
+        // $mechineTransfer->factory_id                = $request->factory_id;
+        // $mechineTransfer->brand_id                  = $request->brand_id;
+        // $mechineTransfer->model_id                  = $request->model_id;
+        // $mechineTransfer->mechine_type_id           = $request->mechine_type_id;
+        // $mechineTransfer->mechine_source_id         = $request->mechine_source_id;
+        // $mechineTransfer->supplier_id               = ($request->supplier_id && $request->supplier_id !== 'null') ? $request->supplier_id : 0;
+        // $mechineTransfer->rent_id                   = ($request->rent_id && $request->rent_id !== 'null') ? $request->rent_id : 0;
+        // $mechineTransfer->rent_date                 = $request->rent_date;
+        // $mechineTransfer->name                      = $request->name;
+        // $mechineTransfer->mechine_code              = $request->mechine_code;
+        // $mechineTransfer->preventive_service_days   = $request->preventive_service_days;
+        // $mechineTransfer->purchace_price            = $request->purchace_price;
+        // $mechineTransfer->purchase_date             = $request->purchase_date;
+        // $mechineTransfer->status                    = $request->status;
+        // $mechineTransfer->note                      = $request->note;
+        // $mechineTransfer->mechine_transfer_id       = $mechine->id;
 
-        $mechine->update(['mechine_status' => 'History']);
+
+        $machine->update(['status' => 'History']);
 
         return response()->json([
             'success' => true,

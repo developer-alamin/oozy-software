@@ -12,8 +12,7 @@
       <li class="nav-item">
         <a
           class="nav-link collapsed"
-          :class="{ show: isMachineRoute }"
-          data-bs-target="#license"
+          data-bs-target="#license-license"
           data-bs-toggle="collapse"
           href="#"
         >
@@ -22,9 +21,8 @@
           <i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul
-          id="license"
+          id="license-license"
           class="nav-content collapse"
-          :class="{ show: isMachineRoute }"
           data-bs-parent="#sidebar-nav"
         >
           <li>
@@ -71,7 +69,7 @@
               <i class="bi bi-circle"></i><span> Machine All </span>
             </router-link>
           </li>
-          <li>
+          <!-- <li>
             <router-link
               :to="{ name: 'MachineMovement' }"
               active-class="active"
@@ -79,8 +77,8 @@
             >
               <i class="bi bi-circle"></i><span> Machine Movement </span>
             </router-link>
-          </li>
-          <li>
+          </li> -->
+          <!-- <li>
             <router-link
               :to="{ name: 'MachineLocation' }"
               active-class="active"
@@ -89,18 +87,18 @@
               <i class="bi bi-circle"></i
               ><span> Machine Movement Location List </span>
             </router-link>
-          </li>
+          </li> -->
 
-          <li>
+          <!-- <li>
             <router-link
               :to="{ name: 'MechineHistoryList' }"
               active-class="active"
               :class="{ active: isMechineHistoryListRoute }"
             >
               <i class="bi bi-circle"></i
-              ><span> Machine Movement History List </span>
+              ><span> All Movement History List </span>
             </router-link>
-          </li>
+          </li> -->
         </ul>
       </li>
       <!-- End Components Nav -->
@@ -248,6 +246,7 @@
           class="nav-link collapsed"
           data-bs-target="#tables-nav-Service"
           data-bs-toggle="collapse"
+          :class="{ show: isBreakdownRouteShow }"
           href="#"
         >
           <i class="bi bi-layout-text-window-reverse"></i><span>Service</span
@@ -257,21 +256,39 @@
           id="tables-nav-Service"
           class="nav-content collapse"
           data-bs-parent="#sidebar-nav"
+          :class="{ show: isBreakdownRouteShow }"
         >
           <li>
-            <router-link :to="{ name: 'ServiceCreate' }" active-class="active">
-              <i class="bi bi-circle"></i><span>Create Service</span>
+            <router-link
+              :to="{ name: 'ServiceCreate' }"
+              :class="{ active: isBreakdownServiceRouteCreate }"
+              active-class="active"
+            >
+              <i class="bi bi-circle"></i><span>Create Breakdown Service</span>
             </router-link>
           </li>
 
-          <!-- <li>
-                        <router-link
-                            :to="{ name: 'ServiceIndex' }"
-                            active-class="active"
-                        >
-                            <i class="bi bi-circle"></i><span>All Service</span>
-                        </router-link>
-                    </li> -->
+          <li>
+            <router-link
+              :to="{ name: 'ServiceIndex' }"
+              :class="{ active: isBreakdownServiceRouteIndex }"
+              active-class="active"
+            >
+              <i class="bi bi-circle"></i><span>Breakdown Service</span>
+            </router-link>
+          </li>
+          <li>
+            <router-link
+              :to="{ name: 'BreakdownServiceHistory' }"
+              :class="{
+                active: isBreakdownServiceRouteBreakdownServiceHistory,
+              }"
+              active-class="active"
+            >
+              <i class="bi bi-circle"></i
+              ><span> Breakdown Service History</span>
+            </router-link>
+          </li>
         </ul>
       </li>
 
@@ -603,7 +620,25 @@
               active-class="active"
               :class="{ active: isOperatorRoute }"
             >
-              <i class="bi bi-circle"></i><span>Operator</span>
+              <i class="bi bi-circle"></i><span>Supervisor</span>
+            </router-link>
+          </li>
+          <li>
+            <router-link
+              :to="{ name: 'BreakDownNoteIndex' }"
+              active-class="active"
+              :class="{ active: isBreakDownNoteRoute }"
+            >
+              <i class="bi bi-circle"></i><span>Breakdown Problem Note</span>
+            </router-link>
+          </li>
+          <li>
+            <router-link
+              :to="{ name: 'TagIndex' }"
+              active-class="active"
+              :class="{ active: isTagRoute }"
+            >
+              <i class="bi bi-circle"></i><span>Machine Tags</span>
             </router-link>
           </li>
         </ul>
@@ -630,11 +665,39 @@ const isMechineRouteShow = computed(() => {
     "MachineMovement",
     "MachineLocation",
     "MechineHistoryList",
+    "MechineTransfer",
+    "MachineShow",
   ].includes(route.name);
 });
 
 const isMachineRoute = computed(() =>
-  ["MechineIndex", "MechineEdit", "MechineTrash"].includes(route.name)
+  [
+    "MechineIndex",
+    "MechineEdit",
+    "MechineTrash",
+    "MechineTransfer",
+    "MachineShow",
+  ].includes(route.name)
+);
+const isBreakdownRouteShow = computed(() => {
+  return [
+    "ServiceCreate",
+    "ServiceIndex",
+    "ServiceEdit",
+    "ServiceTrash",
+    "ServiceProcessing",
+    "BreakdownServiceHistory",
+  ].includes(route.name);
+});
+
+const isBreakdownServiceRouteIndex = computed(() =>
+  ["ServiceIndex"].includes(route.name)
+);
+const isBreakdownServiceRouteCreate = computed(() =>
+  ["ServiceCreate"].includes(route.name)
+);
+const isBreakdownServiceRouteBreakdownServiceHistory = computed(() =>
+  ["BreakdownServiceHistory"].includes(route.name)
 );
 const isMachineCreateRoute = computed(() =>
   ["MechineCreate"].includes(route.name)
@@ -699,6 +762,14 @@ const isCategoryRoute = computed(() =>
   ["CategoryIndex", "CategoryCreate", "CategoryEdit", "CategoryTrash"].includes(
     route.name
   )
+);
+const isBreakDownNoteRoute = computed(() =>
+  [
+    "BreakDownNoteIndex",
+    "BreakDownNoteCreate",
+    "BreakDownNoteEdit",
+    "BreakDownNoteTrash",
+  ].includes(route.name)
 );
 
 // const isGroupRoute = computed(() =>
@@ -817,6 +888,14 @@ const isSettingRouteShow = computed(() => {
     "OperatorCreate",
     "OperatorEdit",
     "OperatorTrash",
+    "TagIndex",
+    "TagCreate",
+    "TagEdit",
+    "TagTrash",
+    "BreakDownNoteIndex",
+    "BreakDownNoteCreate",
+    "BreakDownNoteEdit",
+    "BreakDownNoteTrash",
   ].includes(route.name);
 });
 
@@ -832,6 +911,9 @@ const isOperatorRoute = computed(() =>
   ["OperatorIndex", "OperatorCreate", "OperatorEdit", "OperatorTrash"].includes(
     route.name
   )
+);
+const isTagRoute = computed(() =>
+  ["TagIndex", "TagCreate", "TagEdit", "TagTrash"].includes(route.name)
 );
 const isParseUnitRoute = computed(() =>
   [

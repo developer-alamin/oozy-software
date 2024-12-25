@@ -13,6 +13,7 @@ class Operator extends Model
     protected $fillable = [
         'uuid',
         'company_id',
+        'factory_id',
         'name',
         'type',
         'email',
@@ -25,6 +26,16 @@ class Operator extends Model
         'creator_type',
         'updater_id',
         'updater_type',
+    ];
+    protected $casts = [
+        'uuid'       => 'string',
+        'id'         => 'integer',
+        'company_id' => 'integer',
+        'factory_id' => 'integer',
+        'creator_id' => 'integer',
+        'updater_id' => 'integer',
+        'created_at' => 'datetime', // Automatically cast 'created_at' to a Carbon instance
+        'updated_at' => 'datetime', // Automatically cast 'updated_at' to a Carbon instance
     ];
     // Polymorphic relationships
     public function creator()
@@ -39,16 +50,20 @@ class Operator extends Model
     {
         return $this->belongsTo(User::class, 'company_id');
     }
-
+    public function factory()
+    {
+        return $this->belongsTo(Factory::class, 'factory_id');
+    }
     public static function validationRules()
     {
         return [
             'uuid'          => 'nullable',
             'company_id'    => 'required',
+            'factory_id'    => 'required',
             'name'          => 'required|string|max:255',
             'type'          => 'required|string|max:255',
-            'email'         => 'required|string|max:255',
-            'phone'         => 'required|string|max:25',
+            'email'         => 'nullable',
+            'phone'         => 'nullable',
             'photo'         => 'nullable|string',
             'description'   => 'nullable|string',
             'address'       => 'nullable|string',

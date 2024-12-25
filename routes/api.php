@@ -16,6 +16,8 @@ use App\Http\Controllers\Admin\SourceController;
 
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\BrandController;
+use App\Http\Controllers\Admin\BreakDownProblemNoteController;
+use App\Http\Controllers\Admin\BreakdownServiceController;
 use App\Http\Controllers\Auth\UserAuthController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\MachineMovementController;
@@ -29,8 +31,11 @@ use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\DynamicDataController;
 use App\Http\Controllers\MachineStatusController;
+use App\Http\Controllers\MachineTagController;
 use App\Http\Controllers\OperatorController;
+use App\Models\BreakdownService;
 use App\Models\MechineAssing;
+
 
 // --------------------------------------------supplier route statr here-------------------------------------------------------------------
 Route::get('/suppliers/{uuid}/edit', [SupplierController::class, 'edit'])->name('suppliers.edit');
@@ -82,9 +87,11 @@ Route::get('/mechine/assing/trashed', [MechineAssingController::class,'mechineAs
 Route::post('/mechine/assing/{id}/restore', [MechineAssingController::class,'mechineAssingRestore'])->name('mechine.assing.restore');
 Route::delete('/mechine/assing/{id}/forceDelete', [MechineAssingController::class,'mechineAssingforceDelete'])->name('mechine.transfer.list');
 Route::get('/mechine/transfer/list', [MechineAssingController::class,'mechineTransferList'])->name('mechine.transfer.list');
-Route::get('/mechine/history/list', [MechineAssingController::class,'mechineHistoryList'])->name('mechine.assing.trashed');
+Route::get('/machine/history/list', [MechineAssingController::class,'machineHistoryList'])->name('mechine.assing.trashed');
 Route::get('/mechine/assing/{uuid}/edit', [MechineAssingController::class,'edit'])->name('mechine.assing.trashed');
+Route::post('/machine/transfer/update/{uuid}', [MechineAssingController::class,'mechineTransferUpdate'])->name('machine.transfer.update');
 Route::resource('machine-assing',MechineAssingController::class);
+
 Route::get('/machine-movement-history',[MachineMovementController::class,'historyIndex'])->name('mechine.movement.history');
 Route::resource('machine-movement',MachineMovementController::class);
 
@@ -95,6 +102,12 @@ Route::get('/get_operators', [ServiceController::class, 'getOperators']);
 Route::get('/get_technicians', [ServiceController::class, 'getTechnicians']);
 Route::get('/get_parses', [ServiceController::class, 'getParses']);
 Route::post('/service/history', [ServiceController::class, 'storeHistory']);
+Route::get('/breakdown-service/{uuid}/edit', [BreakdownServiceController::class,'edit']);
+Route::get('/breakdown-service/{uuid}/processing', [BreakdownServiceController::class,'serviceProcessing']);
+Route::put('/breakdown-service-processing/{uuid}', [BreakdownServiceController::class,'serviceProcessingUpdate']);
+Route::get('/breakdown-service-history', [BreakdownServiceController::class, 'breakDownServiceHistory']);
+Route::resource('breakdown-service',BreakdownServiceController::class);
+Route::post('/breakdown-service/technician-update-status', [BreakdownServiceController::class, 'acknowledge']);
 Route::resource('services',ServiceController::class);
 // -------------------------------------------- mechine typeroute statr here-------------------------------------------------------------------
 
@@ -288,16 +301,27 @@ Route::get('/machine/status/trashed-count', [MachineStatusController::class, 'tr
 Route::get('/machine/status/{uuid}/edit', [MachineStatusController::class, 'edit'])->name('machine.status.edit');
 Route::put('/machine/status/{uuid}', [MachineStatusController::class, 'update'])->name('machine.status.update');
 Route::resource('machine-status', MachineStatusController::class);
+Route::resource('breakdown-problem-notes', BreakDownProblemNoteController::class);
+Route::resource('machine-tag', MachineTagController::class);
 // Group Rents Controller End form here
 Route::get('/get_units', [DynamicDataController::class, 'getUnits']);
 Route::get('/get_floors', [DynamicDataController::class, 'getFloors']);
 Route::get('/get_factories', [DynamicDataController::class, 'getFactories']);
 Route::get('/get_companies', [DynamicDataController::class, 'getCompanies']);
+Route::get('/get_company_ways_factories', [DynamicDataController::class, 'getCompanyWaysFactories']);
 Route::get('/get_brand_alls', [DynamicDataController::class, 'getBrandAll']);
 Route::get('/get_brands', [DynamicDataController::class, 'getBrands']);
 Route::get('/get_models', [DynamicDataController::class, 'getModels']);
 Route::get('/get_machine_statuses', [DynamicDataController::class, 'getMachineStatus']);
 Route::get('/get_lines_by_machine', [DynamicDataController::class, 'getLinesByMachine']);
+Route::get('/get_machine_lines', [DynamicDataController::class, 'getMachineLines']);
+Route::get('/get_factory_lines', [DynamicDataController::class, 'getLinesByFactory']);
+Route::get('/get_machine_codes', [DynamicDataController::class, 'getMachineCodes']);
+Route::get('/get-machine-code-ways/details/{machine_code}', [DynamicDataController::class, 'getManuallyApiMachineDetails']);
+Route::get('/get_breakdown_problem_notes', [DynamicDataController::class, 'getBreakdownProblemNotes']);
+Route::get('/get_groups', [DynamicDataController::class, 'getGroups']);
+Route::get('/get_parts', [DynamicDataController::class, 'getParts']);
+
 
 // Admin Auth Routes
 Route::prefix('admin')->group(function () {

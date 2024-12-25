@@ -35,7 +35,25 @@ class MechineAssing extends Model
         'note',
         'status',
         'machine_status_id',
-        'qr_code_path'
+        'qr_code_path',
+        'serial_number',
+        'commission_date',
+        'warranty_period',
+        'ownership',
+        'power_requirements',
+        'capacity',
+        'dimensions',
+        'machine_weight',
+        'material_compatibility',
+        'maximum_speed',
+        'optimum_speed',
+        'operating_temperature_range',
+        'location_status',
+        'tag',
+        'line_id',
+        'show_basic_details',
+        'show_specifications',
+        'machine_id'
     ];
 
     // Optionally, cast some fields to specific types (e.g., dates)
@@ -48,6 +66,10 @@ class MechineAssing extends Model
     {
         return $this->belongsTo(User::class, 'company_id');
     }
+    public function line()
+    {
+        return $this->belongsTo(Line::class, 'line_id');
+    }
     public function machineStatus()
     {
         return $this->belongsTo(MachineStatus::class, 'machine_status_id');
@@ -56,6 +78,10 @@ class MechineAssing extends Model
     {
         return $this->belongsTo(ProductModel::class, 'model_id');
     }
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class, 'brand_id');
+    }
     public function mechineType()
     {
         return $this->belongsTo(MechineType::class, 'machine_type_id');
@@ -63,6 +89,14 @@ class MechineAssing extends Model
     public function factory()
     {
         return $this->belongsTo(Factory::class, 'factory_id');
+    }
+    public function source()
+    {
+        return $this->belongsTo(Source::class, 'machine_source_id');
+    }
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class, 'supplier_id');
     }
     public function creator()
     {

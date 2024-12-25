@@ -24,7 +24,14 @@ class Brand extends Model
         'updater_id',
         'updater_type',
     ];
-
+    protected $casts = [
+        'uuid'       => 'string',
+        'id'         => 'integer',
+        'creator_id' => 'integer',
+        'updater_id' => 'integer',
+        'created_at' => 'datetime', // Automatically cast 'created_at' to a Carbon instance
+        'updated_at' => 'datetime', // Automatically cast 'updated_at' to a Carbon instance
+    ];
     // protected static function boot()
     // {
     //     parent::boot();

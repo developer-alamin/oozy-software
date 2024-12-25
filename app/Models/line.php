@@ -30,6 +30,16 @@ class Line extends Model
         'description',
     ];
 
+    protected $casts = [
+        'unit_id'    => 'integer', // Casts factory_id to an integer
+        'uuid'       => 'string',
+        'id'         => 'integer',
+        'creator_id' => 'integer',
+        'updater_id' => 'integer',
+        'created_at' => 'datetime', // Automatically cast 'created_at' to a Carbon instance
+        'updated_at' => 'datetime', // Automatically cast 'updated_at' to a Carbon instance
+    ];
+
     public function units()
     {
         return $this->belongsTo(Unit::class,'unit_id');
@@ -48,5 +58,9 @@ class Line extends Model
     {
         return $this->belongsToMany(Line::class, 'line_unit', 'unit_id', 'line_id')
                     ->withPivot('unit_id', 'line_id');
+    }
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class,'unit_id');
     }
 }

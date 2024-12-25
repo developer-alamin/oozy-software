@@ -14,6 +14,7 @@ export { default as CompanyCreate } from "../Pages/Admin/Company/Create.vue";
 export { default as MechineIndex } from "../Pages/Admin/Mechine/Index.vue";
 export { default as MechineCreate } from "../Pages/Admin/Mechine/Create.vue";
 export { default as MechineEdit } from "../Pages/Admin/Mechine/Edit.vue";
+export { default as MachineShow } from "../Pages/Admin/Mechine/Show.vue";
 export { default as MechineTrash } from "../Pages/Admin/Mechine/Trash.vue";
 export { default as MechineTransfer } from "../Pages/Admin/Mechine/Transfer.vue";
 export { default as MechineTransferList } from "../Pages/Admin/Mechine/TransferList.vue";
@@ -31,6 +32,8 @@ export { default as FactoryTrash } from "../Pages/Admin/Factory/Trash.vue";
 // Supplier components
 export { default as ServiceIndex } from "../Pages/Admin/Service/Index.vue";
 export { default as ServiceEdit } from "../Pages/Admin/Service/Edit.vue";
+export { default as ServiceProcessing } from "../Pages/Admin/Service/ServiceProcessing.vue";
+export { default as BreakdownServiceHistory } from "../Pages/Admin/Service/BreakdownServiceHistory.vue";
 export { default as ServiceCreate } from "../Pages/Admin/Service/Create.vue";
 export { default as ServiceHistoryCreate } from "../Pages/Admin/Service/CreateServiceHistory.vue";
 
@@ -53,6 +56,12 @@ export { default as CategoryIndex } from "../Pages/Admin/Category/Index.vue";
 export { default as CategoryCreate } from "../Pages/Admin/Category/Create.vue";
 export { default as CategoryEdit } from "../Pages/Admin/Category/Edit.vue";
 export { default as CategoryTrash } from "../Pages/Admin/Category/Trash.vue";
+
+// BreakDown Note components
+export { default as BreakDownNoteIndex } from "../Pages/Admin/BreakDownProblemNote/Index.vue";
+export { default as BreakDownNoteCreate } from "../Pages/Admin/BreakDownProblemNote/Create.vue";
+export { default as BreakDownNoteEdit } from "../Pages/Admin/BreakDownProblemNote/Edit.vue";
+export { default as BreakDownNoteTrash } from "../Pages/Admin/BreakDownProblemNote/Trash.vue";
 
 // Brand components
 export { default as BrandIndex } from "../Pages/Admin/Brand/Index.vue";
@@ -113,6 +122,12 @@ export { default as FloorIndex } from "../Pages/Admin/Floor/Index.vue";
 export { default as FloorCreate } from "../Pages/Admin/Floor/Create.vue";
 export { default as FloorEdit } from "../Pages/Admin/Floor/Edit.vue";
 export { default as FloorTrash } from "../Pages/Admin/Floor/Trash.vue";
+
+//Floor Components
+export { default as TagIndex } from "../Pages/Admin/Tag/Index.vue";
+export { default as TagCreate } from "../Pages/Admin/Tag/Create.vue";
+export { default as TagEdit } from "../Pages/Admin/Tag/Edit.vue";
+export { default as TagTrash } from "../Pages/Admin/Tag/Trash.vue";
 
 //Mechine Type Components
 export { default as MechineTypeIndex } from "../Pages/Admin/Mechine/Type/Index.vue";

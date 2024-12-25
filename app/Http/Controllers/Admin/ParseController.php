@@ -61,7 +61,7 @@ class ParseController extends Controller
         // Apply sorting
         $parseQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $parse = $parseQuery->with('creator:id,name','user:id,name')->paginate($itemsPerPage);
+        $parse = $parseQuery->with('creator:id,name','user:id,name','factory:id,name')->paginate($itemsPerPage);
         // Return the response as JSON
         return response()->json([
             'items' => $parse->items(), // Current page items
@@ -423,7 +423,7 @@ class ParseController extends Controller
         // Apply sorting
         $mechinsQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $mechins = $mechinsQuery->with('creator:id,name','user:id,name')->paginate($itemsPerPage);
+        $mechins = $mechinsQuery->with('creator:id,name','user:id,name','factory:id,name')->paginate($itemsPerPage);
 
         // Return the response as JSON
         return response()->json([
