@@ -36,10 +36,9 @@ use App\Http\Controllers\OperatorController;
 use App\Models\BreakdownService;
 use App\Models\MechineAssing;
 
-
 // --------------------------------------------supplier route statr here-------------------------------------------------------------------
-Route::get('/suppliers/{uuid}/edit', [SupplierController::class, 'edit'])->name('suppliers.edit');
-Route::put('/suppliers/{uuid}', [SupplierController::class, 'update'])->name('suppliers.update');
+//Route::get('/suppliers/{uuid}/edit', [SupplierController::class, 'edit'])->name('suppliers.edit');
+//Route::put('/suppliers/{uuid}', [SupplierController::class, 'update'])->name('suppliers.update');
 // suppliers Group Controllers start form here
 Route::controller(SupplierController::class)
   ->prefix('supplier')
@@ -54,8 +53,9 @@ Route::resource('suppliers', SupplierController::class);
 
 // --------------------------------------------Floor route statr here-------------------------------------------------------------------
 
-Route::get('/floor/{uuid}/edit', [FloorController::class, 'edit'])->name('floor.edit');
-Route::put('/floor/{uuid}', [FloorController::class, 'update'])->name('floor.update');
+//Route::get('/floor/{uuid}/edit', [FloorController::class, 'edit'])->name('floor.edit');
+//Route::put('/floor/{uuid}', [FloorController::class, 'update'])->name('floor.update');
+
 Route::controller(FloorController::class)
   ->prefix("floors")
   ->as("floors")

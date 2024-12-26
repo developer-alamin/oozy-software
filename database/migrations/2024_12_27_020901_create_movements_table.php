@@ -14,14 +14,31 @@ return new class extends Migration
         Schema::create('movements', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
-            $table->bigInteger('machine_id');
-            $table->bigInteger('line_id');
             $table->text('description')->nullable();
             $table->string('status')->default('Assign');
             $table->text('meta_data')->nullable();
+            
+             // Foreign key assign
+            $table->bigInteger('machine_id');
+            $table->bigInteger('line_id');
+            $table->foreignId('company_id');
+
+            // Foreign key References
+            $table->foreign("company_id")
+            ->references('id')
+            ->on('companies')
+            ->onUpdate('cascade')
+            ->onDelete('cascade');
+
+
             $table->morphs('creator');
             $table->morphs('updater');
-            $table->timestamps();
+
+            $table->timestamp('created_at')
+            ->useCurrent();
+            $table->timestamp('updated_at')
+            ->useCurrent()
+            ->useCurrentOnUpdate();
             $table->softDeletes();
          
         });

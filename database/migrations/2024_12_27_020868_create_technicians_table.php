@@ -14,16 +14,36 @@ return new class extends Migration
         Schema::create('technicians', function (Blueprint $table) {
             $table->id();
             $table->string('uuid')->unique();
-            $table->morphs('creator');
-            $table->morphs('updater');
             $table->string('name');
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
             $table->text('photo')->nullable();
             $table->text('address')->nullable();
             $table->text('description')->nullable();
-            $table->enum('status', ['Active', 'Inactive'])->default('Inactive');
-            $table->timestamps();
+            $table->string('type')->default('General')->nullable();
+            $table->enum('status', ['Available', 'Not Available'])->default('Not Available')->change();
+            
+            // Foreign key assign
+            $table->bigInteger('factory_id');
+            $table->bigInteger('group_id');
+            $table->foreignId('company_id');
+
+            // Foreign key References
+            $table->foreign("company_id")
+            ->references('id')
+            ->on('companies')
+            ->onUpdate('cascade')
+            ->onDelete('cascade');
+
+            $table->morphs('creator');
+            $table->morphs('updater');
+
+            $table->timestamp('created_at')
+            ->useCurrent();
+            $table->timestamp('updated_at')
+            ->useCurrent()
+            ->useCurrentOnUpdate();
+            $table->softDeletes();
         });
     }
 
