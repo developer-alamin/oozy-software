@@ -24,10 +24,12 @@ return new class extends Migration
             $table->text('address')->nullable();
             $table->text('description')->nullable();
             $table->enum('status', ['pending', 'approved', 'cancel'])->default('pending');
-            $table->bigInteger('created_by');
-            $table->bigInteger('updated_by');
+            $table->morphs('creator');
+            $table->morphs('updater'); 
             $table->rememberToken();
-            $table->timestamps();
+            $table->softDeletes();
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();    
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
