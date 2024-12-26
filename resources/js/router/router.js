@@ -84,6 +84,8 @@ const routes = [
         component: adminComponents.UserCreate,
         meta: { title: "User Create" },
       },
+
+
       {
         path: "company/create", // New route for Contact
         name: "CompanyCreate",
@@ -94,8 +96,23 @@ const routes = [
         path: "company/index", // New route for Contact
         name: "AllCompanyIndex",
         component: adminComponents.AllCompanyIndex,
-        meta: { title: "All Company Index" },
+        meta: { title: "All Company" },
       },
+      {
+        path: "company/edit/:id", // Dynamic route for User Edit
+        name: "CompanyEdit",
+        component: adminComponents.CompanyEdit,
+        meta: { title: "Edit Company" },
+        props: true, // Enables passing route params as props
+      },
+      {
+        path: "company/trash", // Dynamic route for User Edit
+        name: "CompanyTrash",
+        component: adminComponents.CompanyTrash,
+        meta: { title: "View In Trash" },
+      },
+
+
       // factory
       {
         path: "factory/index", // New route for Contact

@@ -14,14 +14,16 @@ class Company extends Model
     protected $fillable = [
         'uuid',
         'name',
-        'type',
-        'description',
         'status',
-        'meta_data',
-        'creator_id',
-        'creator_type',
-        'updater_id',
-        'updater_type',
     ];
+
+    public static function validationRules()
+    {
+        return [
+            'name'         => 'required|string|max:255',
+            'status'       => 'nullable|in:Active,In-active',
+        ];
+    }
+
    
 }

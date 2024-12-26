@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\RentController;
-use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\FactoryController;
 use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\Admin\UnitController;
@@ -280,6 +280,10 @@ Route::put('/operator/{uuid}', [OperatorController::class, 'update'])->name('ope
 Route::resource('operator', OperatorController::class);
 
 // --------------------------------------------Company route statr here-------------------------------------------------------------------
+Route::get('company/trash', [CompanyController::class, 'trash'])->name('trash');
+Route::get('company/trashed-count', [CompanyController::class, 'trashed_count'])->name('trashed-count');
+Route::post('company/{id}/restore', [CompanyController::class, 'restore'])->name('restore');
+Route::delete('company/{id}/forceDelete', [CompanyController::class, 'forceDelete'])->name('forceDelete');
 Route::resource('company', CompanyController::class);
 
 // --------------------------------------------Factory route statr here-------------------------------------------------------------------
