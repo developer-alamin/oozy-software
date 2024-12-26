@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('factories', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
-            $table->bigInteger('company_id');
+        
             $table->string('name'); // Name of the factory
             $table->string('factory_code')->nullable();
             $table->string('factory_owner')->nullable();
@@ -25,11 +25,28 @@ return new class extends Migration
             $table->string('location')->nullable();
             $table->text('note')->nullable(); // Total number of machines
             $table->text('meta_data')->nullable();
+            $table->enum('status', ['Active', 'Inactive'])->default('Inactive');
+            
+            // Foreign key assign
+            $table->foreignId('company_id');
+
+             // Foreign key References
+            $table->foreign("company_id")
+            ->references('id')
+            ->on('companies')
+            ->onUpdate('cascade')
+            ->onDelete('cascade');
+
+
             $table->morphs('creator'); // Polymorphic relationship for creator
             $table->morphs('updater'); // Polymorphic relationship for updater
-            $table->enum('status', ['Active', 'Inactive'])->default('Inactive');
+            
+            $table->timestamp('created_at')
+            ->useCurrent();
+            $table->timestamp('updated_at')
+            ->useCurrent()
+            ->useCurrentOnUpdate();
             $table->softDeletes();
-            $table->timestamps();
         });
     }
 

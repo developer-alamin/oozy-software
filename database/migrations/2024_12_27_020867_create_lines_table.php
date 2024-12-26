@@ -16,13 +16,32 @@ return new class extends Migration
             // No auto-increment here
             $table->string('uuid')->unique();
             //$table->bigInteger('line_id')->default(0)->unique();
-            $table->morphs('creator');
-            $table->morphs('updater');
+          
             $table->string('name')->nullable();
             $table->string('number')->nullable();
             $table->string('description')->nullable();
-            $table->timestamp("created_at")->useCurrent();
-            $table->timestamp("updated_at")->useCurrent()->useCurrentOnUpdate();
+            $table->enum('status', ['Active', 'Inactive', 'Pending'])->default('Inactive');
+            
+           // Foreign key assign
+            $table->bigInteger('unit_id');
+            $table->foreignId('company_id');
+
+            
+            // Foreign key References
+            $table->foreign("company_id")
+            ->references('id')
+            ->on('companies')
+            ->onUpdate('cascade')
+            ->onDelete('cascade');
+
+            $table->morphs('creator');
+            $table->morphs('updater');
+
+            $table->timestamp('created_at')
+            ->useCurrent();
+            $table->timestamp('updated_at')
+            ->useCurrent()
+            ->useCurrentOnUpdate();
             $table->softDeletes();
         });
     }

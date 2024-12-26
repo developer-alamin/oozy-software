@@ -14,13 +14,35 @@ return new class extends Migration
         Schema::create('brands', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
-            $table->morphs('creator');
-            $table->morphs('updater'); 
             $table->string('name');
             $table->text('description')->nullable();
             $table->enum('status', ['Active', 'Inactive', 'Pending'])->default('Inactive');
             $table->text('meta_data')->nullable();
-            $table->timestamps();
+            $table->enum('type', ['Mechine', 'Parse'])->default('Mechine');
+            
+             // Foreign key assign
+            $table->foreignId('company_id');
+
+            // Foreign key References
+            $table->foreign("company_id")
+            ->references('id')
+            ->on('companies')
+            ->onUpdate('cascade')
+            ->onDelete('cascade');
+
+
+            $table->morphs('creator');
+            $table->morphs('updater');
+
+
+            $table->timestamp('created_at')
+            ->useCurrent();
+            $table->timestamp('updated_at')
+            ->useCurrent()
+            ->useCurrentOnUpdate();
+            
+            $table->softDeletes();
+
         });
     }
 

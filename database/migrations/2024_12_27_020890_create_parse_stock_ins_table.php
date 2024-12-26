@@ -13,12 +13,31 @@ return new class extends Migration
     {
         Schema::create('parse_stock_ins', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('parse_id');
+          
             $table->decimal('quantity_in')->default(0);
             $table->string('type')->default('Parse');
+            
+             // Foreign key assign
+            $table->bigInteger('parse_id');
+            $table->foreignId('company_id');
+
+            // Foreign key References
+            $table->foreign("company_id")
+            ->references('id')
+            ->on('companies')
+            ->onUpdate('cascade')
+            ->onDelete('cascade');
+
+
             $table->morphs('creator');
             $table->morphs('updater');
-            $table->timestamps();
+
+            $table->timestamp('created_at')
+            ->useCurrent();
+            $table->timestamp('updated_at')
+            ->useCurrent()
+            ->useCurrentOnUpdate();
+
         });
     }
 

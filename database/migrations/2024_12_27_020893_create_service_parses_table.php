@@ -13,12 +13,29 @@ return new class extends Migration
     {
         Schema::create('service_parses', function (Blueprint $table) {
             $table->id();
+            
+            $table->decimal('use_qty')->default(0);
+           
+            // Foreign key assign
             $table->bigInteger('service_id');
             $table->bigInteger('parse_id');
-            $table->decimal('use_qty')->default(0);
+            $table->foreignId('company_id');
+
+            // Foreign key References
+            $table->foreign("company_id")
+            ->references('id')
+            ->on('companies')
+            ->onUpdate('cascade')
+            ->onDelete('cascade');
+
             $table->morphs('creator');
             $table->morphs('updater');
-            $table->timestamps();
+
+            $table->timestamp('created_at')
+            ->useCurrent();
+            $table->timestamp('updated_at')
+            ->useCurrent()
+            ->useCurrentOnUpdate();
         });
     }
 
