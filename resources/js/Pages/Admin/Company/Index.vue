@@ -30,7 +30,7 @@
                                     >mdi-plus</v-icon
                                 >
                             </template>
-                            <span>Add a new user</span>
+                            <span>Add New</span>
                         </v-tooltip>
                     </v-btn>
 
@@ -51,7 +51,7 @@
                                         mdi-trash-can-outline
                                     </v-icon>
                                 </template>
-                                <span>View trashed Users</span>
+                                <span>View In Trash</span>
                             </v-tooltip>
                         </v-btn>
                     </v-badge>
@@ -81,14 +81,14 @@
                 </v-chip>
             </template>
 
-            <!-- <template v-slot:item.actions="{ item }">
-                <v-icon @click="editUser(item.id)" class="mr-2"
+            <template v-slot:item.actions="{ item }">
+                <v-icon @click="editCompany(item.id)" class="mr-2"
                     >mdi-pencil</v-icon
                 >
                 <v-icon @click="showConfirmDialog(item.id)" color="red"
                     >mdi-delete</v-icon
                 >
-            </template> -->
+            </template>
         </v-data-table-server>
 
         <ConfirmDialog
@@ -117,21 +117,19 @@ export default {
             itemsPerPage: 15,
             headers: [
                 { title: "Name", key: "name", sortable: true },
-                { title: "Email", key: "email", sortable: true },
-                { title: "Phone", key: "phone", sortable: true },
                 {
                     title: "Status",
                     key: "status",
                     value: "status",
                     sortable: true,
                 },
-                // { title: "Actions", key: "actions", sortable: false },
+                { title: "Actions", key: "actions", sortable: false },
             ],
             serverItems: [],
             loading: true,
             totalItems: 0,
             dialog: false,
-            selectedUserId: null,
+            selectedCompanyId: null,
             trashedCount: 0,
             user: {},
         };
@@ -155,7 +153,7 @@ export default {
             const sortKey = sortBy.length ? sortBy[0].key : "created_at";
             try {
                 const response = await this.$axios.get(
-                    "/admin/company/user/all",
+                    "/company",
                     {
                         params: {
                             page,
@@ -166,12 +164,9 @@ export default {
                         },
                     }
                 );
-                console.log(response.data.items);
                 this.serverItems = response.data.items || [];
-                // console.log(this.serverItems);
-
                 this.totalItems = response.data.total || 0;
-                this.fetchTrashedUsersCount();
+                this.fetchTrashedCompanyCount();
             } catch (error) {
                 console.error("Error loading items:", error);
             } finally {
@@ -179,36 +174,36 @@ export default {
             }
         },
         createUser() {
-            this.$router.push({ name: "UserCreate" });
+            this.$router.push({ name: "CompanyCreate" });
         },
         viewTrash() {
-            this.$router.push({ name: "AdminUserTrash" });
+            this.$router.push({ name: "CompanyTrash" });
         },
-        editUser(id) {
-            this.$router.push({ name: "AdminUserEdit", params: { id } });
+        editCompany(id) {
+            this.$router.push({ name: "CompanyEdit", params: { id } });
         },
         showConfirmDialog(id) {
-            this.selectedUserId = id;
+            this.selectedCompanyId = id;
             this.dialog = true;
         },
         async confirmDelete() {
             this.dialog = false; // Close the dialog
             try {
-                await this.$axios.delete(`/user/${this.selectedUserId}`);
+                await this.$axios.delete(`/company/${this.selectedCompanyId}`);
                 this.loadItems({
                     page: 1,
                     itemsPerPage: this.itemsPerPage,
                     sortBy: [],
                 });
-                toast.success("User deleted successfully!");
+                toast.success("Company deleted successfully!");
             } catch (error) {
                 console.error("Error deleting user:", error);
                 toast.error("Failed to delete user.");
             }
         },
-        async fetchTrashedUsersCount() {
+        async fetchTrashedCompanyCount() {
             try {
-                const response = await this.$axios.get("/user/trashed-count");
+                const response = await this.$axios.get("/company/trashed-count");
                 this.trashedCount = response.data.trashedCount
                     ? response.data.trashedCount
                     : 0;
@@ -218,8 +213,8 @@ export default {
         },
         async fetchUserInfo() {
             try {
-                const response = await this.$axios.get("/user/role/auth"); // Adjust to your API
-                this.user = response.data; // Ensure you set user role data here
+                const response = await this.$axios.get("/user/role/auth");
+                this.user = response.data;
             } catch (error) {
                 console.error("Error fetching user info:", error);
             }
@@ -233,7 +228,7 @@ export default {
             sortBy: [],
         });
         this.fetchUserInfo();
-        this.fetchTrashedUsersCount();
+        this.fetchTrashedCompanyCount();
     },
 };
 </script>
