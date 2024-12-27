@@ -29,7 +29,7 @@ class FactoryUpdateRequest extends FormRequest
                 })->ignore($factoryId, 'uuid'),
             ],
             'email'            => 'nullable|email',
-            'phone'            => 'nullable|string|max:15',
+            'phone'            => 'nullable|string',
             'location'         => 'nullable|string',
             'factory_code'     => 'nullable|string|max:50',
             'factory_owner'    => 'nullable|string',

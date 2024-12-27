@@ -11,26 +11,29 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('lines', function (Blueprint $table) {
+        Schema::create('units', function (Blueprint $table) {
             $table->id();
-            // No auto-increment here
-            $table->string('uuid')->unique();
-            //$table->bigInteger('line_id')->default(0)->unique();
-          
-            $table->string('name')->nullable();
-            $table->string('number')->nullable();
-            $table->string('description')->nullable();
+            $table->uuid('uuid')->unique();
+            $table->string('name');
+            $table->text('description')->nullable();
             $table->enum('status', ['Active', 'Inactive', 'Pending'])->default('Inactive');
-            
-           // Foreign key assign
-            $table->bigInteger('unit_id');
+            $table->text('meta_data')->nullable();
+           
+             // Foreign key assign
             $table->foreignId('company_id');
+            $table->foreignId('floor_id');
 
-            
+
             // Foreign key References
             $table->foreign("company_id")
             ->references('id')
             ->on('companies')
+            ->onUpdate('cascade')
+            ->onDelete('cascade');
+
+            $table->foreign("floor_id")
+            ->references('id')
+            ->on('floors')
             ->onUpdate('cascade')
             ->onDelete('cascade');
 
@@ -42,6 +45,7 @@ return new class extends Migration
             $table->timestamp('updated_at')
             ->useCurrent()
             ->useCurrentOnUpdate();
+
             $table->softDeletes();
         });
     }
@@ -51,6 +55,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('lines');
+        Schema::dropIfExists('units');
     }
 };

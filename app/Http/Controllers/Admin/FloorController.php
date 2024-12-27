@@ -76,7 +76,9 @@ class FloorController extends Controller
      */
     public function store(FloorRequest $request)
     {
+
         $validatedData = $request->validated();
+
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
              $creator = Auth::guard('admin')->user();
@@ -96,6 +98,7 @@ class FloorController extends Controller
          // Create the technician and associate it with the creator
          $floor = new Floor($validatedData);
          $floor->uuid = HelperController::generateUuid();
+         $floor->company_id = $request->company_id;
          $floor->creator()->associate($creator);  // Assign creator polymorphically
          $floor->updater()->associate($creator);  // Associate the updater
          $floor->save(); // Save the technician to the database

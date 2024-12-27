@@ -11,21 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('operators', function (Blueprint $table) {
+        Schema::create('mechine_stocks', function (Blueprint $table) {
             $table->id();
-            $table->string('uuid')->unique();           
-            $table->string('name');
-            $table->string('type')->default('General')->nullable();
-            $table->string('email')->nullable();
-            $table->string('phone')->nullable();
-            $table->text('photo')->nullable();
-            $table->text('address')->nullable();
-            $table->text('description')->nullable();
-            $table->enum('status', ['Active', 'Inactive'])->default('Inactive');
-           
-           // Foreign key assign
-            $table->bigInteger('factory_id');
+            $table->integer('quantity');
+            $table->string('type');
+            $table->string('status')->default('in_stock');
+            
+             // Foreign key assign
             $table->foreignId('company_id');
+            $table->foreignId('mechine_assing_id');
 
             // Foreign key References
             $table->foreign("company_id")
@@ -34,6 +28,11 @@ return new class extends Migration
             ->onUpdate('cascade')
             ->onDelete('cascade');
 
+            $table->foreign("mechine_assing_id")
+            ->references('id')
+            ->on('mechine_assings')
+            ->onUpdate('cascade')
+            ->onDelete('cascade');
 
             $table->morphs('creator');
             $table->morphs('updater');
@@ -43,8 +42,6 @@ return new class extends Migration
             $table->timestamp('updated_at')
             ->useCurrent()
             ->useCurrentOnUpdate();
-            $table->softDeletes();
-
         });
     }
 
@@ -53,6 +50,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('operators');
+        Schema::dropIfExists('mechine_stocks');
     }
 };

@@ -9,10 +9,9 @@
               v-model="factory.company_id"
               :items="companies"
               item-value="id"
-              :item-title="formatFloor"
+              :item-title="formatCompany"
               outlined
               clearable
-              chips
               density="comfortable"
               :rules="[rules.required]"
               :error-messages="errors.company_id ? errors.company_id : ''"
@@ -116,7 +115,7 @@
                     </v-col> -->
         </v-row>
         <v-row>
-          <v-col cols="6">
+          <v-col cols="4">
             <v-text-field
               v-model="factory.factory_code"
               :rules="[rules.factory_code]"
@@ -128,7 +127,7 @@
               <template v-slot:label> Factory Code </template>
             </v-text-field>
           </v-col>
-          <v-col cols="6">
+          <v-col cols="4">
             <v-select
               v-model="factory.status"
               :items="statusItems"
@@ -137,14 +136,18 @@
               density="comfortable"
             ></v-select>
           </v-col>
+          <v-col cols="4">
+            <v-text-field
+              v-model="factory.location"
+              label="Location"
+              outlined
+              density="comfortable"
+              :error-messages="errors.location ? errors.location : ''"
+            >
+              <template v-slot:label> Location </template>
+            </v-text-field>
+          </v-col>
         </v-row>
-
-        <v-textarea
-          v-model="factory.location"
-          label="Location"
-          density="comfortable"
-          :error-messages="errors.location ? errors.location : ''"
-        />
         <v-textarea
           v-model="factory.note"
           label="Note"
@@ -156,15 +159,7 @@
         <v-row class="mt-4">
           <!-- Submit Button -->
           <v-col cols="12" class="text-right">
-            <v-btn
-              type="button"
-              color="secondary"
-              @click="resetForm"
-              class="mr-3"
-            >
-              Reset Form
-            </v-btn>
-
+            
             <v-btn
               type="submit"
               color="primary"
@@ -271,7 +266,7 @@ export default {
       }, 1000);
     },
 
-    formatFloor(floor) {
+    formatCompany(floor) {
       if (floor) {
         if (typeof floor == "number") {
           floor = this.companies.find((item) => (item.id = floor));
@@ -280,56 +275,6 @@ export default {
       }
       return "No Floor Data";
     },
-    // async submit() {
-    //     this.errors = {};
-    //     this.serverError = null;
-    //     this.loading = true;
-
-    //     const formData = new FormData();
-    //     Object.entries(this.factory).forEach(([key, value]) => {
-    //         if (Array.isArray(value)) {
-    //             value.forEach((val) => formData.append(`${key}[]`, val));
-    //         } else {
-    //             formData.append(key, value);
-    //         }
-    //     });
-
-    //     try {
-    //         const response = await this.$axios.put(
-    //             `/factory/${this.factory.id}`,
-    //             formData
-    //         );
-    //         if (response.data.success) {
-    //             toast.success("Factory updated successfully!");
-    //             this.resetForm();
-    //         }
-    //     } catch (error) {
-    //         if (error.response && error.response.status === 422) {
-    //             this.errors = error.response.data.errors;
-    //         } else {
-    //             this.serverError = "An unexpected error occurred.";
-    //         }
-    //     } finally {
-    //         this.loading = false;
-    //     }
-    // },
-    resetForm() {
-      this.factory = {
-        company_id: null,
-        name: "",
-        email: "",
-        phone: "",
-        location: "",
-        factory_code: "",
-        status: false,
-      };
-      this.errors = {};
-      this.serverError = null;
-      if (this.$refs.form) {
-        this.$refs.form.reset();
-      }
-    },
-
     // Fetch companies, floors, units, and lines as needed
     async fetchCompanies(search) {
       try {

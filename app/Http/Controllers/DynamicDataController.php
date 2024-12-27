@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Brand;
 use App\Models\BreakDownProblemNote;
+use App\Models\Company;
 use App\Models\Factory;
 use App\Models\Floor;
 use App\Models\Group;
@@ -15,20 +16,29 @@ use App\Models\ProductModel;
 use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class DynamicDataController extends Controller
 {
     public function getCompanies(Request $request){
 
-        // Get search term and limit from the request, with defaults
-        $search = $request->query('search', '');
-        $limit  = $request->query('limit', 5); // Default limit of 10
-        // Query to search for users by name with a limit
-        $users = User::where('name', 'like', '%' . $search . '%')
-                     ->limit($limit)
-                     ->get();
-        // Return the users as JSON
-        return response()->json($users);
+       // Get the search term and limit from the request, with defaults
+        $search = $request->query('search', ''); // Default search is an empty string
+        $limit = (int) $request->query('limit', 5); // Default limit is 5
+
+        // Validate the limit to ensure it's a positive integer
+        if ($limit <= 0) {
+            $limit = 5; // Fallback to default if invalid
+        }
+
+        // Query the Company model to search for records by name with a limit
+        $companies = Company::where('name', 'like', '%' . $search . '%')
+                    ->limit($limit)
+                    ->get();
+
+        // Return the results as a JSON response
+        return response()->json($companies,Response::HTTP_OK);
+
     }
     public function getCompanyWaysFactories(Request $request)
     {
@@ -51,7 +61,7 @@ class DynamicDataController extends Controller
         $search = $request->query('search', '');
         $limit  = $request->query('limit', 5); // Default limit of 10
         // Query to search for factories by name with a limit
-        $factories = Factory::with('user:id,name')->where('name', 'like', '%' . $search . '%')
+        $factories = Factory::with('company:id,name')->where('name', 'like', '%' . $search . '%')
                     //  ->limit($limit)
                      ->get();
         // Return the factories as JSON
