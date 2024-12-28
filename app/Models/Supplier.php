@@ -48,7 +48,6 @@ class Supplier extends Model
     public static function rules()
     {   
        
-
         return [
             'company_id'   => 'required|exists:companies,id',
             'name'           => 'required|string|max:255',

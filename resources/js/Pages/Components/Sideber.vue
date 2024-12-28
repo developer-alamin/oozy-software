@@ -2,6 +2,7 @@
   <!-- ======= Sidebar ======= -->
   <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
+      <!-- Start Dashboard Nav -->
       <li class="nav-item">
         <router-link class="nav-link" :to="{ name: 'AdminDashboard' }">
           <i class="bi bi-grid"></i>
@@ -9,6 +10,7 @@
         </router-link>
       </li>
       <!-- End Dashboard Nav -->
+      <!-- Start License Nav -->
       <li class="nav-item">
         <a
           class="nav-link collapsed"
@@ -33,7 +35,8 @@
           </li>
         </ul>
       </li>
-
+      <!-- End License Nav -->
+      <!-- Start Machines Nav -->
       <li class="nav-item">
         <a
           class="nav-link collapsed"
@@ -101,7 +104,8 @@
           </li> -->
         </ul>
       </li>
-      <!-- End Components Nav -->
+      <!-- End Machines Nav -->
+      <!-- Start Organization Nav -->
       <li class="nav-item">
         <a
           class="nav-link collapsed"
@@ -167,39 +171,8 @@
           </li>
         </ul>
       </li>
-
-      <!-- <li class="nav-item">
-                <a
-                    class="nav-link collapsed"
-                    data-bs-target="#forms-nav"
-                    data-bs-toggle="collapse"
-                    :class="{ show: isFactoryRouteShow }"
-                >
-                    <i class="bi bi-journal-text"></i><span>Factory</span
-                    ><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul
-                    id="forms-nav"
-                    class="nav-content collapse"
-                    data-bs-parent="#sidebar-nav"
-                    :class="{ show: isFactoryRouteShow }"
-                >
-                    <li>
-                        <router-link
-                            :to="{ name: 'FactoryCreate' }"
-                            active-class="active"
-                            :class="{ active: isFactoryCreateActive }"
-                        >
-                            <i class="bi bi-circle"></i
-                            ><span>Create Factory</span>
-                        </router-link>
-                    </li>
-                </ul>
-            </li> -->
-      <!-- End Forms Nav -->
-
-      <!-- parse -->
-
+       <!-- End Organization Nav -->
+      <!-- Start parse Nav-->
       <li class="nav-item">
         <a
           class="nav-link collapsed"
@@ -260,7 +233,8 @@
           </li>
         </ul>
       </li>
-
+       <!-- End parse Nav-->
+      <!-- Start Service Nav -->
       <li class="nav-item">
         <a
           class="nav-link collapsed"
@@ -311,36 +285,8 @@
           </li>
         </ul>
       </li>
-
-      <li class="nav-item">
-        <a
-          class="nav-link collapsed"
-          data-bs-target="#tables-nav"
-          data-bs-toggle="collapse"
-          href="#"
-        >
-          <i class="bi bi-layout-text-window-reverse"></i><span>Stock</span
-          ><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul
-          id="tables-nav"
-          class="nav-content collapse"
-          data-bs-parent="#sidebar-nav"
-        >
-          <li>
-            <a href="tables-general.html">
-              <i class="bi bi-circle"></i><span>Stock List </span>
-            </a>
-          </li>
-          <li>
-            <a href="tables-data.html">
-              <i class="bi bi-circle"></i><span>Stock Alert </span>
-            </a>
-          </li>
-        </ul>
-      </li>
-      <!-- End Tables Nav -->
-
+      <!-- End Service Nav -->
+      <!-- Start Reports Nav -->
       <li class="nav-item">
         <a
           class="nav-link collapsed"
@@ -373,8 +319,8 @@
           </li>
         </ul>
       </li>
-      <!-- End Charts Nav -->
-
+      <!-- End Reports Nav -->
+      <!-- Start User & Permissions Nav -->
       <li class="nav-item">
         <a
           class="nav-link collapsed"
@@ -440,7 +386,8 @@
           </li>
         </ul>
       </li>
-
+      <!-- End User & Permissions Nav -->
+      <!-- Start Technician Groups Nav -->
       <li class="nav-item">
         <a
           class="nav-link collapsed"
@@ -478,6 +425,8 @@
           </li>
         </ul>
       </li>
+      <!-- End Technician Groups Nav -->
+      <!-- Start Machine Settings Nav -->
       <li class="nav-item">
         <a
           class="nav-link collapsed"
@@ -552,42 +501,8 @@
           </li>
         </ul>
       </li>
-      <!-- <li class="nav-item">
-                <a
-                    class="nav-link collapsed"
-                    data-bs-target="#rant-nav"
-                    data-bs-toggle="collapse"
-                    href="#"
-                >
-                    <i class="bi bi-layout-text-window-reverse"></i
-                    ><span>Rant</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul
-                    id="rant-nav"
-                    class="nav-content collapse"
-                    data-bs-parent="#sidebar-nav"
-                >
-                    <li>
-                        <router-link
-                            :to="{ name: 'RentIndex' }"
-                            active-class="active"
-                            :class="{ active: isRentIndex }"
-                        >
-                            <i class="bi bi-circle"></i><span>All Rent </span>
-                        </router-link>
-                    </li>
-                    <li>
-                        <router-link
-                            :to="{ name: 'RentCreate' }"
-                            active-class="active"
-                            :class="{ active: isRentCreate }"
-                        >
-                            <i class="bi bi-circle"></i><span>Create Rent</span>
-                        </router-link>
-                    </li>
-                </ul>
-            </li> -->
-
+      <!-- End Machine Settings Nav -->
+  
       <!-- Start Settings Nav -->
       <li class="nav-item">
         <a
