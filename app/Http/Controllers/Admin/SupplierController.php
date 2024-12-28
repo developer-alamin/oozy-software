@@ -135,7 +135,7 @@ class SupplierController extends Controller
         $supplier->creator()->associate($creator);  // Assign creator polymorphically
         $supplier->updater()->associate($creator);  // Associate the updater
         $supplier->save();
-         //return response()->json(['success' => true, 'supplier' => $supplier], 201);
+        return response()->json(['success' => true, 'supplier' => $supplier], 201);
     }
 
     /**

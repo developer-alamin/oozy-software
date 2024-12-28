@@ -99,7 +99,7 @@ export default {
       search: "",
       itemsPerPage: 15,
       headers: [
-        { title: "Company ", key: "user.name", sortable: false },
+        { title: "Company ", key: "company.name", sortable: false },
         { title: "Factory ", key: "factory.name", sortable: false },
         { title: "Parse Name", key: "name", sortable: true },
         {

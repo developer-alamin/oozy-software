@@ -337,7 +337,7 @@ export default {
             `parse/${parseId}`,
             this.parse
           );
-          // console.log(response.data);
+          console.log(response.data);
           if (response.data.success) {
             toast.success("parse update successfully!");
             this.$router.push({ name: "ParseIndex" }); // Redirect to type list page
