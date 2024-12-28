@@ -23,48 +23,75 @@
                     v-model="valid"
                     @submit.prevent="updateSupplier"
                 >
-                    <!-- <v-select
-                        v-model="supplier.type"
-                        :rules="[rules.required]"
-                        :items="statusTypeItems"
-                        label="Supplier Type"
-                        density="comfortable"
-                        clearable
-                    >
-                        <template v-slot:label>
-                            Supplier Type <span style="color: red">*</span>
-                        </template>
-                    </v-select> -->
 
-                    <v-text-field
-                        label="Name"
-                        v-model="supplier.name"
-                        :rules="[rules.required]"
-                        :error-messages="errors.name ? errors.name : ''"
-                        required
-                    ></v-text-field>
-
-                    <v-text-field
-                        label="Email"
-                        v-model="supplier.email"
-                        :rules="[rules.required, rules.email]"
-                        :error-messages="errors.email ? errors.email : ''"
-                        required
-                    ></v-text-field>
-
-                    <v-text-field
-                        label="Phone"
-                        v-model="supplier.phone"
-                        :rules="[rules.required]"
-                        :error-messages="errors.phone ? errors.phone : ''"
-                        required
-                    ></v-text-field>
-
-                    <v-text-field
-                        label="Contact Person"
-                        v-model="supplier.contact_person"
-                    ></v-text-field>
-
+                <v-row>
+                    <v-col col="12" md="6">
+                        <v-autocomplete
+                            v-model="supplier.company_id"
+                            :items="companies"
+                            item-value="id"
+                            :item-title="formatCompany"
+                            outlined
+                            clearable
+                            density="comfortable"
+                            :rules="[rules.required]"
+                            :error-messages="errors.company_id ? errors.company_id : ''"
+                            @update:search="fetchCompanies"
+                            >
+                            <template v-slot:label>
+                                Select Company <span style="color: red">*</span>
+                            </template>
+                        </v-autocomplete>
+                    </v-col>
+                    <v-col col="12" md="6">
+                        <v-text-field
+                            label="Name"
+                            v-model="supplier.name"
+                            :rules="[rules.required]"
+                            :error-messages="errors.name ? errors.name : ''"
+                            required
+                        ></v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col col="12" md="6">
+                        <v-text-field
+                            label="Email"
+                            v-model="supplier.email"
+                            :rules="[rules.required, rules.email]"
+                            :error-messages="errors.email ? errors.email : ''"
+                            required
+                        ></v-text-field>
+                    </v-col>
+                    <v-col col="12" md="6">
+                        <v-text-field
+                            label="Phone"
+                            v-model="supplier.phone"
+                            :rules="[rules.required]"
+                            :error-messages="errors.phone ? errors.phone : ''"
+                            required
+                        ></v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col col="12" md="6">
+                        <v-text-field
+                            label="Contact Person"
+                            v-model="supplier.contact_person"
+                        ></v-text-field>
+                    </v-col>
+                    <v-col col="12" md="6">
+                        <v-file-input
+                            accept="image/png, image/jpeg, image/bmp"
+                            label="Photo"
+                            placeholder="Pick an avatar"
+                            prepend-icon="mdi-camera"
+                            @change="onFilePicked($event)"
+                        >
+                        </v-file-input>
+                    </v-col>
+                </v-row>   
+                
                     <v-textarea
                         label="Address"
                         v-model="supplier.address"
@@ -74,15 +101,6 @@
                         label="Description"
                         v-model="supplier.description"
                     ></v-textarea>
-                    <v-file-input
-                        accept="image/png, image/jpeg, image/bmp"
-                        label="Photo"
-                        placeholder="Pick an avatar"
-                        prepend-icon="mdi-camera"
-                        @change="onFilePicked($event)"
-                    >
-                    </v-file-input>
-
                     <v-alert v-if="serverError" type="error" class="mt-4">
                         {{ serverError }}
                     </v-alert>
@@ -132,7 +150,8 @@ export default {
             newImg: "",
             statusTypeItems: ["Mechine", "Parse"],
             supplier: {
-                type: false,
+                company_id:null,
+                type: "Mechine",
                 name: "",
                 email: "",
                 phone: "",
@@ -142,6 +161,9 @@ export default {
                 description: "",
                 imageFile: "",
             },
+            limit: 5,
+            companies:[],
+            selectedCompany: null,
             valid: false,
             loading: false,
             errors: {}, // Initialize errors as an empty object
@@ -153,7 +175,6 @@ export default {
             },
         };
     },
-
     methods: {
         async onFilePicked(e) {
             const files = e.target.files;
@@ -218,9 +239,44 @@ export default {
                 }, 1000);
             }
         },
+        formatCompany(company) {
+        if (company) {
+            console.log(company)
+            if (typeof company === "number") {
+                // Use strict equality (===) and ensure proper assignment in the find function
+                company = this.companies.find((item) => item.id === company);
+            }
+            // Safely return the company name or a fallback if the name is missing
+            return company && company.name ? company.name : "No Company Name";
+            }
+            // Fallback if no company data is provided
+            return "No Company Data";
+        },
+        async fetchCompanies(search) {
+            try {
+                // Make a GET request to the '/get_companies' endpoint with query parameters
+                const response = await this.$axios.get('/get_companies', {
+                    params: {
+                    search: this.search || '', // Use `this.search` or fallback to an empty string
+                    limit: this.limit || 5,   // Use `this.limit` or fallback to default value (5)
+                    },
+                });
+                // Update the companies array with the fetched data
+                this.companies = response.data;
+                } catch (error) {
+                // Log any errors that occur during the request
+                console.error('Error fetching companies:', error);
+                // Optionally, handle the error (e.g., show an error message to the user)
+                this.$toast.error('Failed to fetch companies. Please try again later.');
+                }
+
+        },
     },
     created() {
-        this.loadSupplier();
+        this.fetchCompanies().then(() => {
+            this.loadSupplier();
+        });
+       
     },
 };
 </script>

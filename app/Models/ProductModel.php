@@ -41,6 +41,7 @@ class ProductModel extends Model
     {
         return [
             'brand_id'     => 'required',
+            'company_id'   => 'required|exists:companies,id',
             'name'         => 'required|string|max:255',
             'type'         => 'nullable|string|max:255|',
             'description'  => 'nullable|string',
@@ -49,6 +50,9 @@ class ProductModel extends Model
     }
     public function brand(){
         return $this->belongsTo(Brand::class,'brand_id');
+    }
+    public function company(){
+        return $this->belongsTo(Company::class,'company_id');
     }
     public function creator()
     {

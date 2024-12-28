@@ -72,11 +72,11 @@
                 <span>{{ item.creator ? item.creator : "Unknown" }}</span>
             </template>
             <template v-slot:item.photo="{ item }">
-                <img class="rentsImg" :src="item.photo" alt="" />
+                <img class="rentsImg" :src="(item.photo) ? item.photo :'http://[::1]:5173/resources/img/login_page_img.png'" alt="" />
             </template>
 
             <template v-slot:item.actions="{ item }">
-                <v-icon @click="editSupplier(item.uuid)" class="mr-2"
+                <v-icon @click="editSupplier(item.uuid)" color="green" class="mr-2"
                     >mdi-pencil</v-icon
                 >
                 <v-icon @click="showConfirmDialog(item.id)" color="red"
@@ -119,7 +119,12 @@ export default {
             sortDesc: false, // Default sort direction
             trashedCount: 0,
             headers: [
-                // { title: "Type", key: "type", sortable: false },
+                {
+                    title: "Company",
+                    value: "company.name",
+                    sortable: false, // Enable sorting
+                    align: "start",
+                },
                 {
                     title: "Name",
                     value: "name",
@@ -138,12 +143,7 @@ export default {
                     sortable: true, // Enable sorting
                     align: "start",
                 },
-                {
-                    title: "Contact Person",
-                    value: "contact_person",
-                    sortable: true, // Enable sorting
-                    align: "start",
-                },
+                
                 { title: "Creator", key: "creator.name", sortable: false },
                 { title: "Photo", key: "photo", sortable: false },
                 { title: "Actions", value: "actions", sortable: false },

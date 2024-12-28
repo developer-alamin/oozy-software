@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Supplier extends Model
 {
     use HasFactory,SoftDeletes;
-
+    
     // Specify the fillable attributes
     protected $fillable = [
         'uuid',
@@ -46,8 +46,11 @@ class Supplier extends Model
 
     // Optionally, you can define validation rules for creating/updating a Supplier
     public static function rules()
-    {
+    {   
+       
+
         return [
+            'company_id'   => 'required|exists:companies,id',
             'name'           => 'required|string|max:255',
             'type'           => 'nullable',
             'email'          => 'required|email|max:255|unique:suppliers,email',
@@ -63,6 +66,10 @@ class Supplier extends Model
     public function creator()
     {
         return $this->morphTo();
+    }
+    public function company()
+    {
+        return $this->belongsTo(Company::class, 'company_id');
     }
 
     public function updater()

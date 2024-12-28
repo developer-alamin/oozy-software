@@ -52,7 +52,7 @@ class ParseUnitController extends Controller
         // Apply sorting
         $unitsQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $units = $unitsQuery->with('creator:id,name')->paginate($itemsPerPage);
+        $units = $unitsQuery->with(['creator:id,name','company'])->paginate($itemsPerPage);
         // Return the response as JSON
         return response()->json([
             'items' => $units->items(), // Current page items
@@ -93,6 +93,7 @@ class ParseUnitController extends Controller
          // Create the technician and associate it with the creator
          $unit       = new ParseUnit($validatedData);
          $unit->uuid = HelperController::generateUuid();
+         $unit->company_id = $validatedData['company_id'];
          $unit->creator()->associate($creator);  // Assign creator polymorphically
          $unit->updater()->associate($creator);  // Associate the updater
          $unit->save(); // Save the technician to the database
@@ -182,6 +183,7 @@ class ParseUnitController extends Controller
          }
          // Update the unit's details
          $unit->fill($validatedData);
+         $unit->company_id = $validatedData['company_id'];
          $unit->updater()->associate($currentUser); // Associate the updater
          $unit->save();
 
