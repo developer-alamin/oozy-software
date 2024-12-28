@@ -84,7 +84,7 @@
                     class="mr-2"
                     >mdi-transfer</v-icon
                 > -->
-        <v-icon @click="editParse(item.uuid)" class="mr-2">mdi-pencil</v-icon>
+        <v-icon @click="editParse(item.uuid)" color="green" class="mr-2">mdi-pencil</v-icon>
         <v-icon @click="showConfirmDialog(item.id)" color="red"
           >mdi-delete</v-icon
         >
@@ -119,7 +119,7 @@ export default {
       search: "",
       itemsPerPage: 10,
       headers: [
-        { title: "Company ", key: "user.name", sortable: false },
+        { title: "Company ", key: "company.name", sortable: false },
         { title: "Factory ", key: "factory.name", sortable: false },
         { title: "Parse Name", key: "name", sortable: true },
         {
