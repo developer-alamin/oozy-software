@@ -15,7 +15,35 @@
                         Name <span style="color: red">*</span>
                     </template>
                 </v-text-field>
-
+            <v-row>
+                <v-col col="12" md="6">
+                    <v-autocomplete
+                            v-model="machine_status.company_id"
+                            :items="companies"
+                            item-value="id"
+                            :item-title="formatCompany"
+                            outlined
+                            clearable
+                            density="comfortable"
+                            :rules="[rules.required]"
+                            :error-messages="errors.company_id ? errors.company_id : ''"
+                            @update:search="fetchCompanies"
+                            >
+                            <template v-slot:label>
+                                Select Company <span style="color: red">*</span>
+                            </template>
+                        </v-autocomplete>
+                </v-col>
+                <v-col col="12" md="6">
+                    <!-- Status Field (Checkbox) -->
+                    <v-select
+                        v-model="machine_status.status"
+                        :items="statusItems"
+                        label="Status"
+                        clearable
+                    ></v-select>
+                </v-col>
+            </v-row>
                 <!-- Description Field -->
                 <v-textarea
                     v-model="machine_status.description"
@@ -25,13 +53,7 @@
                         errors.description ? errors.description : ''
                     "
                 />
-                <!-- Status Field (Checkbox) -->
-                <v-select
-                    v-model="machine_status.status"
-                    :items="statusItems"
-                    label="Status"
-                    clearable
-                ></v-select>
+                
 
                 <!-- Action Buttons -->
 
@@ -75,9 +97,13 @@ export default {
             statusItems: ["Active", "Inactive"],
             machine_status: {
                 name: "",
+                company_id:null,
                 description: "",
                 status: "", // Default to false (inactive)
             },
+            limit: 5,
+            companies:[],
+            selectedCompany: null,
             errors: {},
             serverError: null,
             rules: {
@@ -86,7 +112,10 @@ export default {
         };
     },
     created() {
-        this.fetchMachineStatus();
+        this.fetchCompanies().then(() => {
+            this.fetchMachineStatus();
+        });
+        
     },
     methods: {
         async fetchMachineStatus() {
@@ -138,6 +167,38 @@ export default {
                     this.loading = false;
                 }
             }, 1000);
+        },
+        formatCompany(company) {
+        if (company) {
+            console.log(company)
+            if (typeof company === "number") {
+                // Use strict equality (===) and ensure proper assignment in the find function
+                company = this.companies.find((item) => item.id === company);
+            }
+            // Safely return the company name or a fallback if the name is missing
+            return company && company.name ? company.name : "No Company Name";
+            }
+            // Fallback if no company data is provided
+            return "No Company Data";
+        },
+        async fetchCompanies(search) {
+            try {
+                // Make a GET request to the '/get_companies' endpoint with query parameters
+                const response = await this.$axios.get('/get_companies', {
+                    params: {
+                    search: this.search || '', // Use `this.search` or fallback to an empty string
+                    limit: this.limit || 5,   // Use `this.limit` or fallback to default value (5)
+                    },
+                });
+                // Update the companies array with the fetched data
+                this.companies = response.data;
+                } catch (error) {
+                // Log any errors that occur during the request
+                console.error('Error fetching companies:', error);
+                // Optionally, handle the error (e.g., show an error message to the user)
+                this.$toast.error('Failed to fetch companies. Please try again later.');
+                }
+
         },
         resetForm() {
             this.fetchMachineStatus(); // Reset the form with existing machine_status data

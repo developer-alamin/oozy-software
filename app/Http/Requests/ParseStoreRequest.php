@@ -22,13 +22,13 @@ class ParseStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'company_id'              => 'required|integer',
-            'factory_id'              => 'required|integer',
-            'category_id'             => 'required|integer',
+            'company_id'              => 'required|exists:companies,id',
+            'factory_id'              => 'required|exists:factories,id',
+            'category_id'             => 'required|exists:categories,id',
             'supplier_name'           => 'required',
             'brand_name'              => 'required',
             'model_name'              => 'required',
-            'parse_unit_id'           => 'required|integer',
+            'parse_unit_id'           => 'required|exists:parse_units,id',
             'name'                    => 'required|string|max:255',
             'quantity'                => 'nullable|numeric',
             'purchase_price'          => 'nullable|numeric',

@@ -215,6 +215,7 @@
           class="nav-content collapse"
           data-bs-parent="#sidebar-nav"
         >
+        
           <li>
             <router-link
               :to="{ name: 'ParseCreate' }"
@@ -236,6 +237,25 @@
               }"
             >
               <i class="bi bi-circle"></i><span>All Parse</span>
+            </router-link>
+          </li>
+          <li>
+            <router-link
+              :to="{ name: 'CategoryIndex' }"
+              active-class="active"
+              :class="{ active: isCategoryRoute }"
+            >
+              <i class="bi bi-circle"></i><span>Parse Category</span>
+            </router-link>
+          </li>
+
+          <li>
+            <router-link
+              :to="{ name: 'ParseUnitIndex' }"
+              active-class="active"
+              :class="{ active: isParseUnitRoute }"
+            >
+              <i class="bi bi-circle"></i><span>Parse Unit</span>
             </router-link>
           </li>
         </ul>
@@ -429,7 +449,7 @@
           href="#"
           :class="{ show: isGroupRouteShow }"
         >
-          <i class="bi bi-layout-text-window-reverse"></i><span>Groups</span
+          <i class="bi bi-layout-text-window-reverse"></i><span>Technician Groups</span
           ><i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul
@@ -586,26 +606,8 @@
           data-bs-parent="#sidebar-nav"
           :class="{ show: isSettingRouteShow }"
         >
-          <li>
-            <router-link
-              :to="{ name: 'CategoryIndex' }"
-              active-class="active"
-              :class="{ active: isCategoryRoute }"
-            >
-              <i class="bi bi-circle"></i><span>Parse Category</span>
-            </router-link>
-          </li>
-
-          <li>
-            <router-link
-              :to="{ name: 'ParseUnitIndex' }"
-              active-class="active"
-              :class="{ active: isParseUnitRoute }"
-            >
-              <i class="bi bi-circle"></i><span>Parse Unit</span>
-            </router-link>
-          </li>
-          <li>
+          
+          <!-- <li>
             <router-link
               :to="{ name: 'TechnicianIndex' }"
               active-class="active"
@@ -622,7 +624,7 @@
             >
               <i class="bi bi-circle"></i><span>Supervisor</span>
             </router-link>
-          </li>
+          </li> -->
           <li>
             <router-link
               :to="{ name: 'BreakDownNoteIndex' }"

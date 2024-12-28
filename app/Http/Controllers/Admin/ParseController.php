@@ -130,7 +130,9 @@ class ParseController extends Controller
 
     public function store(ParseStoreRequest $request)
     {
-        // Determine the creator based on the authentication guard
+
+      
+         // Determine the creator based on the authentication guard
         if (Auth::guard('admin')->check()) {
             $creator = Auth::guard('admin')->user();
         } elseif (Auth::guard('user')->check()) {
@@ -138,23 +140,36 @@ class ParseController extends Controller
         } else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
+
+
         // Validate the incoming request data
         $validatedData = $request->validated();
+
         // Process dates for timezone and format issues
         if (isset($validatedData['purchase_date'])) {
             $validatedData['purchase_date'] = Carbon::parse(
                 preg_replace('/\s*\(.*\)$/', '', $validatedData['purchase_date'])
             )->format('Y-m-d');
         }
+
         // Wrap the creation in a transaction to ensure atomicity
         DB::beginTransaction();
         try {
-            // Create the new parse instance with validated data
+             // Create the new parse instance with validated data
             $parse = new Parse($validatedData);
+
+
+            
             $parse->uuid = HelperController::generateUuid();
+            $parse->purchase_date = $validatedData['purchase_date'];
+            $parse->company_id = $validatedData['company_id'];
+            $parse->factory_id = $validatedData['factory_id'];
+            $parse->category_id = $validatedData['category_id'];
+            $parse->parse_unit_id  = $validatedData['parse_unit_id'];
             $parse->creator()->associate($creator);
             $parse->updater()->associate($creator);
             $parse->save();
+            
             // Save data to the Stock table
             $stockIn = new ParseStockIn([
                 'parse_id'    => $parse->id,
