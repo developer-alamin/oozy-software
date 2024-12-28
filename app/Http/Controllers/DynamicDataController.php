@@ -24,7 +24,9 @@ class DynamicDataController extends Controller
 
        // Get the search term and limit from the request, with defaults
         $search = $request->query('search', ''); // Default search is an empty string
-        $limit = (int) $request->query('limit', 5); // Default limit is 5
+        
+        
+        $limit = (int) $request->query( 'limit', 5); // Default limit is 5
 
         // Validate the limit to ensure it's a positive integer
         if ($limit <= 0) {
@@ -74,7 +76,7 @@ class DynamicDataController extends Controller
         $search = $request->query('search', '');
         $limit  = $request->query('limit', 5); // Default limit of 10
         // Query to search for factories by name with a limit
-        $factories = Floor::with(['factories.user:id,name'])->where('name', 'like', '%' . $search . '%')
+        $factories = Floor::with(['factories.company:id,name'])->where('name', 'like', '%' . $search . '%')
                     //  ->limit($limit)
                      ->get();
         // Return the factories as JSON
@@ -86,7 +88,7 @@ class DynamicDataController extends Controller
         $search = $request->query('search', '');
         $limit  = $request->query('limit', 5); // Default limit of 10
         // Query to search for factories by name with a limit
-        $factories = Unit::with(['floors.factories.user'])->where('name', 'like', '%' . $search . '%')
+        $factories = Unit::with(['floors.factories.company'])->where('name', 'like', '%' . $search . '%')
                     //  ->limit($limit)
                      ->get();
         // Return the factories as JSON

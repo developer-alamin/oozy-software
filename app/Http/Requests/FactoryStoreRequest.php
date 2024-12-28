@@ -24,17 +24,8 @@ class FactoryStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'company_id'   => 'required', // Ensure company_id is present
-            'name'         => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('factories', 'name')->where(function ($query) {
-                    // Use company_id from the request or fallback to Auth::user()->id
-                    $companyId = request('company_id') ?? Auth::id();
-                    return $query->where('company_id', $companyId);
-                }),
-            ],
+            'company_id'       => 'required|exists:companies,id', // Ensure company_id is present
+            'name'             => "required|string|max:255",
             'email'            => 'nullable|email',
             'phone'            => 'nullable|string|max:15',
             'location'         => 'nullable|string',

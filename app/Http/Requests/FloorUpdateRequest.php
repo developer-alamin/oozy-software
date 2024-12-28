@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
-
+use App\Models\Floor;
 
 class FloorUpdateRequest extends FormRequest
 {
@@ -22,28 +22,20 @@ class FloorUpdateRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
+    public function rules()
     {
-        $floorUuid = $this->route('uuid'); // Fetch the UUID from the route
-        $floor = \App\Models\Floor::where('uuid', $floorUuid)->firstOrFail(); // Retrieve the current record by UUID
-    
+        // $floorUuid = $this->route('uuid') ?? $this->route()->parameter('uuid') ?? request()->route('uuid');
+        // return response()->json($floorUuid,200);
+        // // Ensure the Floor exists
+        // $floor = Floor::where('uuid', $floorUuid)->first();
+
         return [
             'factory_id' => 'required|exists:factories,id', // Ensure factory_id exists in the factories table
-            'name' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('floors', 'name')
-                    ->ignore($floor->id) // Ignore the current record by its primary key
-                    ->where(function ($query) use ($floor) {
-                        $factoryId = $this->input('factory_id');
-                        // Apply the uniqueness rule only if the `factory_id` matches
-                        return $query->where('factory_id', $factoryId ?? $floor->factory_id);
-                    }),
-            ],
+            'name' => 'required|string|max:255', // Remove the unique constraint
             'description' => 'nullable|string',
             'status' => 'nullable|in:Active,Inactive', // Ensure the status is within allowed values
         ];
+
     }
     
 }

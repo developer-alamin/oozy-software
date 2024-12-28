@@ -17,6 +17,37 @@
                         </template>
                     </v-text-field>
                 </v-col>
+
+                <v-row>
+                    <v-col col="6">
+                        <v-autocomplete
+                        v-model="type.company_id"
+                        :items="companies"
+                        item-value="id"
+                        :item-title="formatCompany"
+                        outlined
+                        clearable
+                        density="comfortable"
+                        :rules="[rules.required]"
+                        :error-messages="errors.company_id ? errors.company_id : ''"
+                        @update:search="fetchCompanies"
+                        >
+                        <template v-slot:label>
+                            Select Company <span style="color: red">*</span>
+                        </template>
+                        </v-autocomplete>
+                    </v-col>
+                    <v-col col="6">
+                        <v-select
+                            v-model="type.status"
+                            :items="statusItems"
+                            label="Type Status"
+                            clearable
+                        ></v-select>
+                    </v-col>
+                </v-row>
+
+
                 <v-row>
                     <v-col cols="12" md="6">
                         <v-tooltip location="top" activator="parent">
@@ -54,15 +85,6 @@
                         errors.description ? errors.description : ''
                     "
                 />
-
-                <v-select
-                    v-model="type.status"
-                    :items="statusItems"
-                    label="Type Status"
-                    clearable
-                    :error-messages="errors.status ? errors.status : ''"
-                ></v-select>
-
                 <!-- Action Buttons -->
 
                 <v-row class="mt-4">
@@ -105,11 +127,15 @@ export default {
             statusItems: ["Active", "Inactive"],
             type: {
                 name: "",
+                company_id:null,
                 partial_maintenance_day: "",
                 full_maintenance_day: "",
                 description: "",
                 status: false, // Default to false (inactive)
             },
+            limit: 5,
+            companies:[],
+            selectedCompany: null,
             errors: {},
             serverError: null,
             rules: {
@@ -118,6 +144,9 @@ export default {
         };
     },
     created() {
+        this.fetchCompanies().then(() => {
+            this.fetchtype();
+        });
         this.fetchtype();
     },
     methods: {
@@ -164,6 +193,38 @@ export default {
                     this.loading = false;
                 }
             }, 1000);
+        },
+        formatCompany(company) {
+        if (company) {
+            console.log(company)
+            if (typeof company === "number") {
+                // Use strict equality (===) and ensure proper assignment in the find function
+                company = this.companies.find((item) => item.id === company);
+            }
+            // Safely return the company name or a fallback if the name is missing
+            return company && company.name ? company.name : "No Company Name";
+            }
+            // Fallback if no company data is provided
+            return "No Company Data";
+        },
+        async fetchCompanies(search) {
+            try {
+                // Make a GET request to the '/get_companies' endpoint with query parameters
+                const response = await this.$axios.get('/get_companies', {
+                    params: {
+                    search: this.search || '', // Use `this.search` or fallback to an empty string
+                    limit: this.limit || 5,   // Use `this.limit` or fallback to default value (5)
+                    },
+                });
+                // Update the companies array with the fetched data
+                this.companies = response.data;
+                } catch (error) {
+                // Log any errors that occur during the request
+                console.error('Error fetching companies:', error);
+                // Optionally, handle the error (e.g., show an error message to the user)
+                this.$toast.error('Failed to fetch companies. Please try again later.');
+                }
+
         },
         resetForm() {
             this.fetchtype(); // Reset the form with existing type data

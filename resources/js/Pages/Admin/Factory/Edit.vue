@@ -207,7 +207,7 @@ export default {
       limit: 5,
       companies: [],
       rules: {
-        required: (value) => !!value || "Required.",
+        required: (value) => !! value || "Required.",
       },
     };
   },

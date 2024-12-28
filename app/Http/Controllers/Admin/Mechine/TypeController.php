@@ -52,7 +52,7 @@ class TypeController extends Controller
         // Apply sorting
         $MechineTypesQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $MechineTypes = $MechineTypesQuery->with('creator:id,name')->paginate($itemsPerPage);
+        $MechineTypes = $MechineTypesQuery->with(['creator:id,name','company'])->paginate($itemsPerPage);
         // Return the response as JSON
         return response()->json([
             'items' => $MechineTypes->items(), // Current page items
@@ -75,6 +75,9 @@ class TypeController extends Controller
     {
 
        $validatedData = $request->validate(MechineType::validationRules());
+
+       // return response()->json($validatedData['company_id'],200);
+
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
              $creator = Auth::guard('admin')->user();
@@ -94,6 +97,7 @@ class TypeController extends Controller
          // Create the technician and associate it with the creator
          $MechineType       = new MechineType($validatedData);
          $MechineType->uuid = HelperController::generateUuid();
+         $MechineType->company_id = $validatedData['company_id'];
          $MechineType->creator()->associate($creator);  // Assign creator polymorphically
          $MechineType->updater()->associate($creator);  // Associate the updater
          $MechineType->save(); // Save the technician to the database
@@ -181,6 +185,7 @@ class TypeController extends Controller
          }
          // Update the mechinetype's details
          $mechinetype->fill($validatedData);
+         $mechinetype->company_id = $validatedData['company_id'];
          $mechinetype->updater()->associate($currentUser); // Associate the updater
          $mechinetype->save();
 

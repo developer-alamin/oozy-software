@@ -19,6 +19,36 @@
                         </v-text-field>
                     </v-col>
                 </v-row>
+                <v-row>
+                    <v-col col="12" md="6">
+                        <v-select
+                            v-model="source.status"
+                            :items="statusItems"
+                            label="source Status"
+                            @change="updateStatus"
+                            clearable
+                        ></v-select>
+                    </v-col>
+                    <v-col col="12" md="6">
+                        <v-autocomplete
+                            v-model="source.company_id"
+                            :items="companies"
+                            item-value="id"
+                            item-title="name"
+                            outlined
+                            clearable
+                            density="comfortable"
+                            :rules="[rules.required]"
+                            :error-messages="errors.company_id || ''"
+                            @update:search="fetchCompanies"
+                            no-filter
+                            >
+                            <template v-slot:label>
+                                Select Company <span style="color: red">*</span>
+                            </template>
+                        </v-autocomplete>
+                    </v-col>
+                </v-row>
                 <!-- Description Field -->
                 <v-textarea
                     v-model="source.description"
@@ -27,13 +57,6 @@
                         errors.description ? errors.description : ''
                     "
                 />
-                <v-select
-                    v-model="source.status"
-                    :items="statusItems"
-                    label="source Status"
-                    @change="updateStatus"
-                    clearable
-                ></v-select>
                 <v-checkbox
                     v-model="source.rate_applicable"
                     label="Rate Applicable"
@@ -87,10 +110,14 @@ export default {
             statusItems: ["Active", "Inactive"],
             source: {
                 name: "",
+                company_id:null,
                 description: "",
                 status: "Active", // New property for checkbox
                 rate_applicable: false,
             },
+            limit: 5,
+            companies:[],
+            selectedCompany: null,
             errors: {}, // Stores validation errors
             serverError: null, // Stores server-side error messages
             rules: {
@@ -140,6 +167,38 @@ export default {
                     this.loading = false;
                 }
             }, 1000); // Simulates a 3-second loading duration
+        },
+        formatCompany(company) {
+        if (company) {
+            console.log(company)
+            if (typeof company === "number") {
+                // Use strict equality (===) and ensure proper assignment in the find function
+                company = this.companies.find((item) => item.id === company);
+            }
+            // Safely return the company name or a fallback if the name is missing
+            return company && company.name ? company.name : "No Company Name";
+            }
+            // Fallback if no company data is provided
+            return "No Company Data";
+        },
+        async fetchCompanies(search) {
+            try {
+                // Make a GET request to the '/get_companies' endpoint with query parameters
+                const response = await this.$axios.get('/get_companies', {
+                    params: {
+                    search: this.search || '', // Use `this.search` or fallback to an empty string
+                    limit: this.limit || 5,   // Use `this.limit` or fallback to default value (5)
+                    },
+                });
+                // Update the companies array with the fetched data
+                this.companies = response.data;
+                } catch (error) {
+                // Log any errors that occur during the request
+                console.error('Error fetching companies:', error);
+                // Optionally, handle the error (e.g., show an error message to the user)
+                this.$toast.error('Failed to fetch companies. Please try again later.');
+                }
+
         },
         resetForm() {
             this.source = {

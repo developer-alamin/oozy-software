@@ -32,6 +32,7 @@ class MechineType extends Model
     public static function validationRules()
     {
         return [
+            'company_id'               => 'required|exists:companies,id',
             'name'                     => 'required|max:255',
             'day'                      => 'nullable',
             'partial_maintenance_day'  => 'nullable',
@@ -46,7 +47,10 @@ class MechineType extends Model
     {
         return $this->morphTo();
     }
-
+    public function company()
+    {
+        return $this->belongsTo(Company::class, 'company_id');
+    }
     public function updater()
     {
         return $this->morphTo();

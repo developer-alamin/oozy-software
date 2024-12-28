@@ -77,7 +77,7 @@ class FloorController extends Controller
     public function store(FloorRequest $request)
     {
 
-        $validatedData = $request->validated();
+       $validatedData = $request->validated();
 
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
@@ -103,7 +103,7 @@ class FloorController extends Controller
          $floor->updater()->associate($creator);  // Associate the updater
          $floor->save(); // Save the technician to the database
          // Return a success response
-         return response()->json(['success' => true, 'message' => 'Floor created successfully.'], 201);
+        return response()->json(['success' => true, 'message' => 'Floor created successfully.'], 201);
     }
 
     /**
@@ -153,26 +153,28 @@ class FloorController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(FloorUpdateRequest $request,$uuid)
-    {
-        $floor = Floor::where('uuid', $uuid)->firstOrFail();
-         // Validate the incoming request data
-         $validatedData = $request->validated();
+    public function update(FloorUpdateRequest $request)
+    {   
 
-         // Determine the authenticated user (either from 'admin' or 'user' guard)
-         if (Auth::guard('admin')->check()) {
-             $currentUser = Auth::guard('admin')->user();
-             $creatorType = Admin::class;
+        $validatedData = $request->validated();
+        $floor = Floor::where('uuid', $request->uuid)->firstOrFail();
+    // Validate the incoming request data
+    //$validatedData = $request->validated();
 
-             // Check if the admin is a superadmin
-             if ($currentUser->role === 'superadmin') {
-                 // Superadmin can update without additional checks
-             } else {
-                 // Regular admin authorization check
-                 if ($floor->creator_type !== $creatorType || $floor->creator_id !== $currentUser->id) {
-                     return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to update this floor.'], 403);
-                 }
-             }
+// Determine the authenticated user (either from 'admin' or 'user' guard)
+if (Auth::guard('admin')->check()) {
+        $currentUser = Auth::guard('admin')->user();
+        $creatorType = Admin::class;
+
+        // Check if the admin is a superadmin
+        if ($currentUser->role === 'superadmin') {
+            // Superadmin can update without additional checks
+        } else {
+            // Regular admin authorization check
+            if ($floor->creator_type !== $creatorType || $floor->creator_id !== $currentUser->id) {
+                return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to update this floor.'], 403);
+            }
+        }
 
          } elseif (Auth::guard('user')->check()) {
              $currentUser = Auth::guard('user')->user();
@@ -187,6 +189,7 @@ class FloorController extends Controller
          }
          // Update the floor's details
          $floor->fill($validatedData);
+         $floor->company_id = $request->company_id;
          $floor->updater()->associate($currentUser); // Associate the updater
          $floor->save();
 

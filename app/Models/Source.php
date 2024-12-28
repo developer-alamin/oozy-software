@@ -38,6 +38,7 @@ class Source extends Model
     public static function validationRules()
     {
         return [
+            'company_id'      => 'required|exists:companies,id',
             'name'            => 'required|max:255',
             'description'     => 'nullable',
             'status'          => 'nullable|in:Active,Inactive',
@@ -54,6 +55,10 @@ class Source extends Model
     public function updater()
     {
         return $this->morphTo();
+    }
+    public function company()
+    {
+        return $this->belongsTo(Company::class, 'company_id');
     }
 
     public static function restoreBrand($id)

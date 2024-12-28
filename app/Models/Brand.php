@@ -46,14 +46,19 @@ class Brand extends Model
     public static function validationRules()
     {
         return [
+            'company_id'   => 'required|exists:companies,id',
             'name'         => 'required|string|max:255',
-            'type'         => 'required|in:Mechine,Parse',
             'description'  => 'nullable|string',
             'status'       => 'nullable|in:Active,Inactive',
             'meta_data'    => 'nullable',
 
         ];
     }
+
+    public function company()
+    {
+        return $this->belongsTo( Company::class, 'company_id');
+    } 
 
     // Polymorphic relationships
     public function creator()

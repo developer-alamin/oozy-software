@@ -18,16 +18,8 @@ class FactoryUpdateRequest extends FormRequest
         $factoryId = $this->route('uuid');
 
         return [
-            'company_id'   => 'required',
-            'name'         => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('factories', 'name')->where(function ($query) {
-                    $companyId = request('company_id') ?? Auth::id();
-                    return $query->where('company_id', $companyId);
-                })->ignore($factoryId, 'uuid'),
-            ],
+            'company_id'        => 'required|exists:companies,id',
+            'name'              => "required|string|max:255",
             'email'            => 'nullable|email',
             'phone'            => 'nullable|string',
             'location'         => 'nullable|string',
