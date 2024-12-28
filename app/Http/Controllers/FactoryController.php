@@ -70,7 +70,7 @@ class FactoryController extends Controller
         $factoriesQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
         $factories = $factoriesQuery
-        ->with(['creator:id,name','user:id,name']) // Eager load relationships and creator's name
+        ->with(['creator:id,name','company:id,name']) // Eager load relationships and creator's name
         ->paginate($itemsPerPage, ['*'], 'page', $page);
         // Return the response as JSON
         return response()->json([
@@ -102,6 +102,10 @@ class FactoryController extends Controller
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
         try {
+
+
+        
+
             DB::beginTransaction();
             $validated = $request->validated();
             // $factory         = Factory::create($factoryData);
@@ -331,7 +335,7 @@ class FactoryController extends Controller
         $factorysQuery->orderBy($sortBy, $sortOrder);
 
         // Paginate results
-        $factorys = $factorysQuery->with('creator:id,name','user:id,name')->paginate($itemsPerPage);
+        $factorys = $factorysQuery->with('creator:id,name','company:id,name')->paginate($itemsPerPage);
 
         // Return the response as JSON
         return response()->json([

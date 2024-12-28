@@ -3,6 +3,8 @@
         <v-card-title>Create Machine Type</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="submit">
+               
+               
                 <!-- Name Field -->
                 <v-col cols="12" md="12">
                     <v-text-field
@@ -17,6 +19,35 @@
                         </template>
                     </v-text-field>
                 </v-col>
+                <v-row>
+                    <v-col col="6">
+                        <v-autocomplete
+                            v-model="type.company_id"
+                            :items="companies"
+                            item-value="id"
+                            item-title="name"
+                            outlined
+                            clearable
+                            density="comfortable"
+                            :rules="[rules.required]"
+                            :error-messages="errors.company_id || ''"
+                            @update:search="fetchCompanies"
+                            no-filter
+                            >
+                            <template v-slot:label>
+                                Select Company <span style="color: red">*</span>
+                            </template>
+                            </v-autocomplete>
+                    </v-col>
+                    <v-col col="6">
+                        <v-select
+                            v-model="type.status"
+                            :items="statusItems"
+                            label="Type Status"
+                            clearable
+                        ></v-select>
+                    </v-col>
+                </v-row>
                 <v-row>
                     <v-col cols="12" md="6">
                         <v-tooltip location="top" activator="parent">
@@ -44,6 +75,7 @@
                             <span>Enter the full maintenance days here ??</span>
                         </v-tooltip>
                     </v-col>
+                
                 </v-row>
 
                 <!-- Description Field -->
@@ -54,13 +86,6 @@
                         errors.description ? errors.description : ''
                     "
                 />
-                <v-select
-                    v-model="type.status"
-                    :items="statusItems"
-                    label="Type Status"
-                    clearable
-                ></v-select>
-
                 <!-- Action Buttons -->
                 <v-row class="mt-4">
                     <!-- Submit Button -->
@@ -106,11 +131,15 @@ export default {
             statusItems: ["Active", "Inactive"],
             type: {
                 name: "",
+                company_id:null,
                 partial_maintenance_day: "",
                 full_maintenance_day: "",
                 description: "",
                 status: "Active", // New property for checkbox
             },
+            limit: 5,
+            companies:[],
+            selectedCompany: null,
             errors: {}, // Stores validation errors
             serverError: null, // Stores server-side error messages
             rules: {
@@ -138,7 +167,6 @@ export default {
                         "mechine/type",
                         formData
                     );
-                    console.log(response.data);
                     if (response.data.success) {
                         toast.success("type create successfully!");
                         this.resetForm();
@@ -160,6 +188,38 @@ export default {
                     this.loading = false;
                 }
             }, 1000); // Simulates a 3-second loading duration
+        },
+        formatCompany(company) {
+        if (company) {
+            console.log(company)
+            if (typeof company === "number") {
+                // Use strict equality (===) and ensure proper assignment in the find function
+                company = this.companies.find((item) => item.id === company);
+            }
+            // Safely return the company name or a fallback if the name is missing
+            return company && company.name ? company.name : "No Company Name";
+            }
+            // Fallback if no company data is provided
+            return "No Company Data";
+        },
+        async fetchCompanies(search) {
+            try {
+                // Make a GET request to the '/get_companies' endpoint with query parameters
+                const response = await this.$axios.get('/get_companies', {
+                    params: {
+                    search: this.search || '', // Use `this.search` or fallback to an empty string
+                    limit: this.limit || 5,   // Use `this.limit` or fallback to default value (5)
+                    },
+                });
+                // Update the companies array with the fetched data
+                this.companies = response.data;
+                } catch (error) {
+                // Log any errors that occur during the request
+                console.error('Error fetching companies:', error);
+                // Optionally, handle the error (e.g., show an error message to the user)
+                this.$toast.error('Failed to fetch companies. Please try again later.');
+                }
+
         },
         resetForm() {
             this.type = {

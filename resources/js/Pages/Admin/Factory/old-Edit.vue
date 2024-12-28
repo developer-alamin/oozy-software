@@ -237,6 +237,39 @@ export default {
         this.loading = false;
       }
     },
+    // async submit() {
+    //     this.errors = {};
+    //     this.serverError = null;
+    //     this.loading = true;
+
+    //     const formData = new FormData();
+    //     Object.entries(this.factory).forEach(([key, value]) => {
+    //         if (Array.isArray(value)) {
+    //             value.forEach((val) => formData.append(`${key}[]`, val));
+    //         } else {
+    //             formData.append(key, value);
+    //         }
+    //     });
+
+    //     try {
+    //         const response = await this.$axios.put(
+    //             `/factory/${this.factory.id}`,
+    //             formData
+    //         );
+    //         if (response.data.success) {
+    //             toast.success("Factory updated successfully!");
+    //             this.resetForm();
+    //         }
+    //     } catch (error) {
+    //         if (error.response && error.response.status === 422) {
+    //             this.errors = error.response.data.errors;
+    //         } else {
+    //             this.serverError = "An unexpected error occurred.";
+    //         }
+    //     } finally {
+    //         this.loading = false;
+    //     }
+    // },
     resetForm() {
       this.factory = {
         company_id: null,

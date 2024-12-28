@@ -85,7 +85,7 @@
             </template>
 
             <template v-slot:item.actions="{ item }">
-                <v-icon @click="editBrand(item.uuid)" class="mr-2"
+                <v-icon @click="editBrand(item.uuid)" color="green" class="mr-2"
                     >mdi-pencil</v-icon
                 >
                 <v-icon @click="showConfirmDialog(item.id)" color="red"
@@ -121,6 +121,7 @@ export default {
             search: "",
             itemsPerPage: 15,
             headers: [
+            { title: "Company Name", key: "company.name", sortable: false },
                 { title: "Brand Name", key: "name", sortable: true },
                 // { title: "Brand Type", key: "type", sortable: false },
                 { title: "Description", key: "description", sortable: false },

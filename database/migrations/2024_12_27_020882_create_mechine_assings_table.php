@@ -49,24 +49,73 @@ return new class extends Migration
 
 
              // Foreign key assign
-            $table->bigInteger('line_id')->nullable();
-            $table->bigInteger('machine_id')->default(0);
-            $table->bigInteger('supplier_id')->nullable();
-            $table->bigInteger('machine_status_id');
-            $table->bigInteger('factory_id');
-            $table->bigInteger('brand_id');
-            $table->bigInteger('model_id');
-            $table->bigInteger('machine_type_id');
-            $table->bigInteger('machine_source_id');
             $table->foreignId('company_id');
-
+            $table->foreignId('factory_id');
+            $table->foreignId('line_id')->nullable();
+            //$table->big('machine_id')->default(0);
+            $table->foreignId('supplier_id')->nullable();
+            $table->foreignId('machine_status_id');
+            $table->foreignId('brand_id');
+            $table->foreignId('product_model_id');
+            $table->foreignId('machine_type_id');
+            $table->foreignId('source_id');
+           
 
             // Foreign key References
+
             $table->foreign("company_id")
             ->references('id')
             ->on('companies')
             ->onUpdate('cascade')
             ->onDelete('cascade');
+
+            $table->foreign("factory_id")
+            ->references('id')
+            ->on('factories')
+            ->onUpdate('cascade')
+            ->onDelete('cascade');
+
+            $table->foreign("line_id")
+            ->references('id')
+            ->on('lines')
+            ->onUpdate('restrict')
+            ->onDelete('restrict');
+
+            $table->foreign("supplier_id")
+            ->references('id')
+            ->on('lines')
+            ->onUpdate('restrict')
+            ->onDelete('restrict');
+
+            $table->foreign("machine_status_id")
+            ->references('id')
+            ->on('machine_statuses')
+            ->onUpdate('restrict')
+            ->onDelete('restrict');
+
+            $table->foreign("brand_id")
+            ->references('id')
+            ->on('brands')
+            ->onUpdate('restrict')
+            ->onDelete('restrict');
+            
+            $table->foreign("product_model_id")
+            ->references('id')
+            ->on('product_models')
+            ->onUpdate('restrict')
+            ->onDelete('restrict');
+
+            $table->foreign("machine_type_id")
+            ->references('id')
+            ->on('mechine_types')
+            ->onUpdate('restrict')
+            ->onDelete('restrict');
+
+            $table->foreign("source_id")
+            ->references('id')
+            ->on('sources')
+            ->onUpdate('restrict')
+            ->onDelete('restrict');
 
 
             $table->morphs('creator');

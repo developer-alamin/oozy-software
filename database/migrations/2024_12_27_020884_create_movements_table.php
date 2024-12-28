@@ -19,9 +19,10 @@ return new class extends Migration
             $table->text('meta_data')->nullable();
             
              // Foreign key assign
-            $table->bigInteger('machine_id');
-            $table->bigInteger('line_id');
             $table->foreignId('company_id');
+            $table->foreignId('mechine_assing_id');
+            $table->foreignId('line_id');
+            
 
             // Foreign key References
             $table->foreign("company_id")
@@ -29,6 +30,18 @@ return new class extends Migration
             ->on('companies')
             ->onUpdate('cascade')
             ->onDelete('cascade');
+
+            $table->foreign("mechine_assing_id")
+            ->references('id')
+            ->on('mechine_assings')
+            ->onUpdate('cascade')
+            ->onDelete('cascade');
+
+            $table->foreign("line_id")
+            ->references('id')
+            ->on('lines')
+            ->onUpdate('restrict')
+            ->onDelete('restrict');
 
 
             $table->morphs('creator');

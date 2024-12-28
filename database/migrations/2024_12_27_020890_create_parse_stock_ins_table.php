@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('type')->default('Parse');
             
              // Foreign key assign
-            $table->bigInteger('parse_id');
             $table->foreignId('company_id');
+            $table->foreignId('parse_id');
 
             // Foreign key References
             $table->foreign("company_id")
@@ -28,6 +28,11 @@ return new class extends Migration
             ->onUpdate('cascade')
             ->onDelete('cascade');
 
+            $table->foreign("parse_id")
+            ->references('id')
+            ->on('parses')
+            ->onUpdate('cascade')
+            ->onDelete('cascade');
 
             $table->morphs('creator');
             $table->morphs('updater');

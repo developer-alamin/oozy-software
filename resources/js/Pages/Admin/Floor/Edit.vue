@@ -10,7 +10,6 @@
           :item-title="formatFactory"
           outlined
           clearable
-          chips
           density="comfortable"
           :rules="[rules.required]"
           :error-messages="errors.factory_id ? errors.factory_id : ''"
@@ -32,7 +31,7 @@
           :error-messages="errors.name ? errors.name : ''"
         >
           <template v-slot:label>
-            Number <span style="color: red">*</span>
+            Name <span style="color: red">*</span>
           </template>
         </v-text-field>
 
@@ -139,38 +138,36 @@ export default {
     // Format factory name with user name
     formatFactory(factory) {
       if (factory) {
-        return `${factory.name} -- ${factory.user?.name || "No User"}`;
+        return `${factory.name} -- ${factory.company?.name || "No Company"}`;
       }
     },
     async update() {
       this.errors = {}; // Reset errors before submission
       this.serverError = null;
       this.loading = true;
-      const floorId = this.$route.params.uuid; // Assuming floor ID is in route params
-      setTimeout(async () => {
-        try {
-          const response = await this.$axios.put(
-            `/floor/${floorId}`,
-            this.floor
-          );
 
-          if (response.data.success) {
-            toast.success("floor update successfully!");
-            this.$router.push({ name: "FloorIndex" }); // Redirect to floor list page
-          }
-        } catch (error) {
-          if (error.response && error.response.status === 422) {
-            toast.error("Failed to update floor.");
-            this.errors = error.response.data.errors || {};
-          } else {
-            toast.error("Error updating floor. Please try again.");
-            this.serverError = "Error updating floor.";
-          }
-        } finally {
-          // Stop loading after the request (or simulated time) is done
-          this.loading = false;
+      try {
+        const floorId = this.$route.params.uuid; // Assuming floor ID is in route params
+        const response = await this.$axios.put(`/floor/${floorId}`, this.floor);
+      
+        if (response.data.success) {
+          toast.success("Floor updated successfully!");
+          this.$router.push({ name: "FloorIndex" }); // Redirect to the floor list page
         }
-      }, 1000);
+      } catch (error) {
+        if (error.response && error.response.status === 422) {
+          // Handle validation errors
+          toast.error("Failed to update floor.");
+          this.errors = error.response.data.errors || {};
+        } else {
+          // Handle general server errors
+          toast.error("Error updating floor. Please try again.");
+          this.serverError = "Error updating floor.";
+        }
+      } finally {
+        // Stop the loading indicator regardless of success or failure
+        this.loading = false;
+      }
     },
     resetForm() {
       // Reset the form with existing floor data

@@ -19,16 +19,7 @@
                         Select Floor <span style="color: red">*</span>
                     </template>
                 </v-autocomplete>
-                <!-- Display factory name -->
-                <!-- <div v-if="selectedFactoryName" style="margin-top: 10px">
-                    <strong>Factory Name:</strong> {{ selectedFactoryName }}
-                </div> -->
-
-                <!-- Display user name -->
-                <!-- <div v-if="selectedUserName" style="margin-top: 10px">
-                    <strong>Company Name:</strong> {{ selectedUserName }}
-                </div> -->
-
+               
                 <!-- Name Field -->
                 <v-text-field
                     v-model="unit.name"
@@ -150,7 +141,7 @@ export default {
         formatFloor(floor) {
             if (floor) {
                 return `${floor.name} -- ${floor.factories?.name}-- ${
-                    floor.factories?.user?.name || "No User"
+                    floor.factories?.company?.name || "No User"
                 }`;
             }
         },

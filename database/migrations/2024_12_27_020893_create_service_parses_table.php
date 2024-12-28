@@ -17,9 +17,10 @@ return new class extends Migration
             $table->decimal('use_qty')->default(0);
            
             // Foreign key assign
-            $table->bigInteger('service_id');
-            $table->bigInteger('parse_id');
             $table->foreignId('company_id');
+            $table->foreignId('service_id');
+            $table->foreignId('parse_id');
+            
 
             // Foreign key References
             $table->foreign("company_id")
@@ -27,6 +28,19 @@ return new class extends Migration
             ->on('companies')
             ->onUpdate('cascade')
             ->onDelete('cascade');
+
+            $table->foreign("service_id")
+            ->references('id')
+            ->on('services')
+            ->onUpdate('cascade')
+            ->onDelete('cascade');
+
+            $table->foreign("parse_id")
+            ->references('id')
+            ->on('parses')
+            ->onUpdate('cascade')
+            ->onDelete('cascade');
+
 
             $table->morphs('creator');
             $table->morphs('updater');

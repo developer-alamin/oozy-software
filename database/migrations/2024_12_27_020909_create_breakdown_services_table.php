@@ -28,12 +28,13 @@ return new class extends Migration
             
 
              // Foreign key assign
-            $table->bigInteger('parts_id')->default(0);
-            $table->bigInteger('line_id');
-            $table->bigInteger('breakdown_problem_note_id')->default(0);
-            $table->bigInteger('machine_id');
-            $table->bigInteger('technician_id');
             $table->foreignId('company_id');
+            $table->foreignId('mechine_assing_id');
+            //$table->foreignId('parts_id')->default(0);
+            $table->foreignId('line_id');
+            $table->foreignId('breakdown_problem_note_id')->default(0);
+            $table->foreignId('technician_id');
+           
 
             // Foreign key References
             $table->foreign("company_id")
@@ -41,6 +42,31 @@ return new class extends Migration
             ->on('companies')
             ->onUpdate('cascade')
             ->onDelete('cascade');
+
+            $table->foreign("mechine_assing_id")
+            ->references('id')
+            ->on('mechine_assings')
+            ->onUpdate('cascade')
+            ->onDelete('cascade');
+
+            $table->foreign("line_id")
+            ->references('id')
+            ->on('lines')
+            ->onUpdate('restrict')
+            ->onDelete('restrict');
+
+            $table->foreign("breakdown_problem_note_id")
+            ->references('id')
+            ->on('break_down_problem_notes')
+            ->onUpdate('restrict')
+            ->onDelete('restrict');
+
+            $table->foreign("technician_id")
+            ->references('id')
+            ->on('users')
+            ->onUpdate('restrict')
+            ->onDelete('restrict');
+
 
 
             $table->morphs('creator');

@@ -19,8 +19,8 @@ return new class extends Migration
             $table->enum('status', ['Active', 'Inactive', 'Pending'])->default('Inactive');
             
              // Foreign key assign
-            $table->bigInteger('technician_id')->default(0);
             $table->foreignId('company_id');
+            $table->foreignId('technician_id')->default(0);
 
            
              // Foreign key References
@@ -29,6 +29,13 @@ return new class extends Migration
             ->on('companies')
             ->onUpdate('cascade')
             ->onDelete('cascade');
+
+
+            $table->foreign("technician_id")
+            ->references('id')
+            ->on('users')
+            ->onUpdate('restrict')
+            ->onDelete('restrict');
 
 
             $table->morphs('creator');

@@ -14,8 +14,6 @@ return new class extends Migration
         Schema::create('service_histories', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
-            
-            
             $table->text('operator_mechine_problem_note');
             $table->time('operator_call_time');
             $table->text('technician_note')->nullable();
@@ -26,10 +24,20 @@ return new class extends Migration
            
 
             // Foreign key assign
-            $table->bigInteger('service_id');
-            $table->bigInteger('operator_id');
+
             $table->foreignId('company_id');
-            $table->bigInteger('technician_id');
+            $table->foreignId('service_id');
+
+
+
+           // $table->bigInteger('service_id');
+            // $table->foreignId('service_id')
+            // ->constrained('services')
+            // ->cascadeOnUpdate()
+            // ->cascadeOnDelete();
+
+            $table->foreignId('operator_id');
+            $table->foreignId('technician_id');
 
 
             // Foreign key References
@@ -38,6 +46,25 @@ return new class extends Migration
             ->on('companies')
             ->onUpdate('cascade')
             ->onDelete('cascade');
+
+            $table->foreign("service_id")
+            ->references('id')
+            ->on('services')
+            ->onUpdate('cascade')
+            ->onDelete('cascade');
+
+            $table->foreign("operator_id")
+            ->references('id')
+            ->on('users')
+            ->onUpdate('restrict')
+            ->onDelete('restrict');
+
+            $table->foreign("technician_id")
+            ->references('id')
+            ->on('users')
+            ->onUpdate('restrict')
+            ->onDelete('restrict');
+
 
 
             $table->morphs('creator');

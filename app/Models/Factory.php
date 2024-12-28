@@ -37,9 +37,9 @@ class Factory extends Model
         'updated_at' => 'datetime', // Automatically cast 'updated_at' to a Carbon instance
     ];
 
-    public function user()
+    public function company()
     {
-        return $this->belongsTo(User::class, 'company_id');
+        return $this->belongsTo(Company::class, 'company_id');
     }
     public function floors()
     {
