@@ -29,7 +29,7 @@ class Group extends Model
     public static function validationRules()
     {
         return [
-            'technician_id' => 'required',
+            'company_id'   => 'required|exists:companies,id',
             'name'          => 'required|string|max:255',
             'status'        => 'nullable|string',
             'description'   => 'nullable|string',
