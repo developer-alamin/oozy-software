@@ -27,10 +27,11 @@ return new class extends Migration
             
 
              // Foreign key assign
-            $table->bigInteger('parse_unit_id')->nullable();
-            $table->bigInteger('factory_id');
-            $table->bigInteger('category_id');
             $table->foreignId('company_id');
+            $table->foreignId('factory_id');
+            $table->foreignId('category_id');
+            $table->foreignId('parse_unit_id')->nullable();
+        
 
             // Foreign key References
             $table->foreign("company_id")
@@ -38,6 +39,25 @@ return new class extends Migration
             ->on('companies')
             ->onUpdate('cascade')
             ->onDelete('cascade');
+
+            $table->foreign("factory_id")
+            ->references('id')
+            ->on('factories')
+            ->onUpdate('cascade')
+            ->onDelete('cascade');
+
+
+            $table->foreign("category_id")
+            ->references('id')
+            ->on('categories')
+            ->onUpdate('restrict')
+            ->onDelete('restrict');
+
+            $table->foreign("parse_unit_id")
+            ->references('id')
+            ->on('parse_units')
+            ->onUpdate('restrict')
+            ->onDelete('restrict');
 
             
             $table->morphs('creator');

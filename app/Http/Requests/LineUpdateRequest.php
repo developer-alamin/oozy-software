@@ -28,18 +28,7 @@ class LineUpdateRequest extends FormRequest
        
         return [
             'unit_id' => 'required|exists:units,id',
-            'name' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('lines', 'name')
-                    ->ignore($line->id) // Ignore the current record by its primary key
-                    ->where(function ($query) use ($line) {
-                        $unitId = $this->input('unit_id');
-                        // Apply the uniqueness only if the `unit_id` matches
-                        return $query->where('unit_id', $unitId ?? $line->unit_id);
-                    }),
-            ],
+            'name' =>   "required|string|max:155",
             'status' => 'nullable|string',
             'description' => 'nullable|string',
         ];

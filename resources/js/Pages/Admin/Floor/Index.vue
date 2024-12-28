@@ -83,9 +83,9 @@
       </template>
 
       <template v-slot:item.actions="{ item }">
-        <!-- <v-icon @click="editFloor(item.uuid)" class="mr-2"
+        <v-icon @click="editFloor(item.uuid)" color="green" class="mr-2"
                     >mdi-pencil</v-icon
-                > -->
+                >
         <v-icon @click="showConfirmDialog(item.id)" color="red"
           >mdi-delete</v-icon
         >

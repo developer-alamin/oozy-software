@@ -11,21 +11,30 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('mechine_stocks', function (Blueprint $table) {
+        Schema::create('services', function (Blueprint $table) {
             $table->id();
-            $table->integer('quantity');
-            $table->string('type');
-            $table->string('status')->default('in_stock');
-            
-
-             // Foreign key assign
+            $table->uuid('uuid')->unique();
+            $table->time('service_time');
+            $table->date('service_date');
+            $table->enum('service_type_status', ['Preventive', 'Breakdown'])->default('Preventive');
+            $table->text('description')->nullable();
+            $table->text('meta_data')->nullable();
+           
+           // Foreign key assign
             $table->foreignId('company_id');
-            $table->bigInteger('mechine_assing_id');
+            $table->foreignId('mechine_assing_id');
+            
 
             // Foreign key References
             $table->foreign("company_id")
             ->references('id')
             ->on('companies')
+            ->onUpdate('cascade')
+            ->onDelete('cascade');
+
+            $table->foreign("mechine_assing_id")
+            ->references('id')
+            ->on('mechine_assings')
             ->onUpdate('cascade')
             ->onDelete('cascade');
 
@@ -38,6 +47,8 @@ return new class extends Migration
             $table->timestamp('updated_at')
             ->useCurrent()
             ->useCurrentOnUpdate();
+
+            $table->softDeletes();
         });
     }
 
@@ -46,6 +57,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('mechine_stocks');
+        Schema::dropIfExists('services');
     }
 };

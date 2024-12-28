@@ -87,11 +87,8 @@
         </span>
       </template>
       <template v-slot:item.actions="{ item }">
-        <!-- <v-icon @click="editFactory(item.uuid)" class="mr-2"
-                    >mdi-pencil</v-icon
-                > -->
-        <v-icon @click="showConfirmDialog(item.id)" color="red"
-          >mdi-delete</v-icon
+        <v-icon @click="editFactory(item.uuid)" color="green" class="pr-1">mdi-pencil</v-icon>
+        <v-icon @click="showConfirmDialog(item.id)" color="red">mdi-delete</v-icon
         >
       </template>
     </v-data-table-server>
@@ -131,9 +128,9 @@ export default {
       factoryCode: "",
       itemsPerPage: 15,
       headers: [
-        { title: "Company Name", key: "user.name", sortable: true },
-        { title: "Factory Name", key: "name", sortable: true },
-        { title: "Factory Code", key: "factory_code", sortable: true },
+        { title: "Company Name", key: "company.name", sortable: true },
+        { title: "Name", key: "name", sortable: true },
+        { title: "Code", key: "factory_code", sortable: true },
         { title: "Email", key: "email", sortable: true },
         { title: "Phone", key: "phone", sortable: false },
         { title: "Creator", key: "creator.name", sortable: false },

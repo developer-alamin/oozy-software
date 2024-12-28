@@ -85,12 +85,11 @@
             </template>
 
             <template v-slot:item.actions="{ item }">
-                <v-icon @click="editMechineType(item.uuid)" class="mr-2"
-                    >mdi-pencil</v-icon
-                >
+                <v-icon @click="editMechineType(item.uuid)" color="green" class="mr-2"
+                >mdi-pencil</v-icon>
                 <v-icon @click="showConfirmDialog(item.id)" color="red"
-                    >mdi-delete</v-icon
-                >
+                >mdi-delete</v-icon>
+
             </template>
         </v-data-table-server>
 
@@ -122,8 +121,8 @@ export default {
             search: "",
             itemsPerPage: 15,
             headers: [
+            { title: "Comapny Name", key: "company.name", sortable: true },
                 { title: "Name", key: "name", sortable: true },
-
                 {
                     title: "Partial Maintenance Day",
                     key: "partial_maintenance_day",
@@ -134,7 +133,6 @@ export default {
                     key: "full_maintenance_day",
                     sortable: false,
                 },
-                { title: "Description", key: "description", sortable: false },
                 {
                     title: "Status",
                     key: "status",

@@ -20,24 +20,10 @@
                     </template>
                 </v-autocomplete>
 
-                <!-- Display factory name -->
-                <!-- <div v-if="selectedFloorName" style="margin-top: 10px">
-                    <strong>Floor Name:</strong> {{ selectedFloorName }}
-                </div> -->
-                <!-- Display factory name -->
-                <!-- <div v-if="selectedFactoryName" style="margin-top: 10px">
-                    <strong>Factory Name:</strong> {{ selectedFactoryName }}
-                </div> -->
-
-                <!-- Display user name -->
-                <!-- <div v-if="selectedUserName" style="margin-top: 10px">
-                    <strong>Company Name:</strong> {{ selectedUserName }}
-                </div> -->
-
                 <!-- Name Field -->
                 <v-text-field v-model="line.name" label="Line Number">
                     <template v-slot:label>
-                        Line Number <span style="color: red">*</span>
+                        Line Name <span style="color: red">*</span>
                     </template>
                 </v-text-field>
                 <!-- Description Field -->
@@ -145,7 +131,7 @@ export default {
             if (line) {
                 return `${line.name} -- ${line.floors?.name || "No Floor"} -- ${
                     line.floors?.factories?.name || "No Factory"
-                } -- ${line.floors?.factories?.user?.name || "No Company"}`;
+                } -- ${line.floors?.factories?.company?.name || "No Company"}`;
             }
         },
         async update() {

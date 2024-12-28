@@ -11,19 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('services', function (Blueprint $table) {
+        Schema::create('product_models', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
-            $table->time('service_time');
-            $table->date('service_date');
-            $table->enum('service_type_status', ['Preventive', 'Breakdown'])->default('Preventive');
+            $table->string('name');
             $table->text('description')->nullable();
+            $table->enum('status', ['Active', 'Inactive', 'Pending'])->default('Inactive');
             $table->text('meta_data')->nullable();
-           
-           // Foreign key assign
+            $table->enum('type', ['Mechine', 'Parse'])->default('Mechine');
+            
+            
+             // Foreign key assign
             $table->foreignId('company_id');
-            $table->bigInteger('mechine_id');
-
+            $table->foreignId('brand_id');
 
             // Foreign key References
             $table->foreign("company_id")
@@ -31,6 +31,12 @@ return new class extends Migration
             ->on('companies')
             ->onUpdate('cascade')
             ->onDelete('cascade');
+
+            $table->foreign("brand_id")
+            ->references('id')
+            ->on('brands')
+            ->onUpdate('restrict')
+            ->onDelete('restrict');
 
             $table->morphs('creator');
             $table->morphs('updater');
@@ -40,7 +46,6 @@ return new class extends Migration
             $table->timestamp('updated_at')
             ->useCurrent()
             ->useCurrentOnUpdate();
-
             $table->softDeletes();
         });
     }
@@ -50,6 +55,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('services');
+        Schema::dropIfExists('product_models');
     }
 };

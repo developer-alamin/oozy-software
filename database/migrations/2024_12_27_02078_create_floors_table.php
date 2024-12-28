@@ -20,13 +20,19 @@ return new class extends Migration
            
 
              // Foreign key assign
-            $table->bigInteger('factory_id');
             $table->foreignId('company_id');
+            $table->foreignId('factory_id');
 
             // Foreign key References
             $table->foreign("company_id")
             ->references('id')
             ->on('companies')
+            ->onUpdate('cascade')
+            ->onDelete('cascade');
+            
+            $table->foreign("factory_id")
+            ->references('id')
+            ->on('factories')
             ->onUpdate('cascade')
             ->onDelete('cascade');
 

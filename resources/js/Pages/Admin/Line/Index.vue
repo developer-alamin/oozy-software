@@ -78,9 +78,9 @@
         <span>{{ item.creator ? item.creator.name : "Unknown" }}</span>
       </template>
       <template v-slot:item.actions="{ item }">
-        <!-- <v-icon @click="editLine(item.uuid)" class="mr-2"
+        <v-icon @click="editLine(item.uuid)" color="green" class="mr-2"
                     >mdi-pencil</v-icon
-                > -->
+                >
         <v-icon @click="showConfirmDialog(item.id)" color="red"
           >mdi-delete</v-icon
         >
@@ -116,7 +116,7 @@ export default {
       itemsPerPage: 10,
       headers: [
         { title: "Unit", key: "units.name", sortable: false },
-        { title: "Number", key: "name", sortable: true },
+        { title: "Name", key: "name", sortable: true },
         { title: "Description", key: "description", sortable: false },
         { title: "status", key: "status", sortable: false },
         { title: "Creator", key: "creator.name", sortable: false },

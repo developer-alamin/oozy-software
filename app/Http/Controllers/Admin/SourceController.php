@@ -51,7 +51,7 @@ class SourceController extends Controller
         // Apply sorting
         $sourcesQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $sources = $sourcesQuery->with('creator:id,name')->paginate($itemsPerPage);
+        $sources = $sourcesQuery->with(['creator:id,name','company'])->paginate($itemsPerPage);
         // Return the response as JSON
         return response()->json([
             'items' => $sources->items(), // Current page items
@@ -91,6 +91,7 @@ class SourceController extends Controller
          }
          // Create the technician and associate it with the creator
          $source = new Source($validatedData);
+         $source->company_id = $validatedData['company_id'];
          $source->creator()->associate($creator);  // Assign creator polymorphically
          $source->updater()->associate($creator);  // Associate the updater
          $source->save(); // Save the technician to the database
@@ -176,6 +177,7 @@ class SourceController extends Controller
          }
          // Update the source's details
          $source->fill($validatedData);
+         $source->company_id = $validatedData['company_id'];
          $source->updater()->associate($currentUser); // Associate the updater
          $source->save();
 

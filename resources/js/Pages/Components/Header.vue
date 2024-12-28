@@ -230,7 +230,6 @@ const toggleSidebar = () => {
 const user = ref(null);
 const testData = async () => {
   const api = await useAxios("get", "/admin/user/all", {}, true);
-  console.log(api);
 };
 testData();
 // Fetch user info when component mounts

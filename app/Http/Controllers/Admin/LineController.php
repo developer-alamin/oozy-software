@@ -78,7 +78,6 @@ class LineController extends Controller
     public function store(LineRequest $request)
     {
 
-
         $validatedData = $request->validated();
         // dd( $validatedData);
         // Determine the authenticated user (either from 'admin' or 'user' guard)
@@ -99,10 +98,11 @@ class LineController extends Controller
          }
          $line       = new Line($validatedData);
          $line->uuid = HelperController::generateUuid();
+         $line->company_id = $request->company_id;
          $line->creator()->associate($creator);  // Assign creator polymorphically
          $line->updater()->associate($creator);  // Associate the updater
          $line->save(); // Save the technician to the database
-        return response()->json(['success' => true,'message' => 'Line created successfully.'], 200);
+       return response()->json(['success' => true,'message' => 'Line created successfully.'], 200);
     }
 
     /**
