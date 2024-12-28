@@ -14,15 +14,40 @@ return new class extends Migration
         Schema::create('groups', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
-            $table->bigInteger('technician_id')->default(0);
             $table->string('name')->nullable();
             $table->string('description')->nullable();
             $table->enum('status', ['Active', 'Inactive', 'Pending'])->default('Inactive');
+            
+             // Foreign key assign
+            $table->foreignId('company_id');
+            $table->foreignId('technician_id')->default(0);
+
+           
+             // Foreign key References
+            $table->foreign("company_id")
+            ->references('id')
+            ->on('companies')
+            ->onUpdate('cascade')
+            ->onDelete('cascade');
+
+
+            $table->foreign("technician_id")
+            ->references('id')
+            ->on('users')
+            ->onUpdate('restrict')
+            ->onDelete('restrict');
+
+
             $table->morphs('creator');
             $table->morphs('updater');
-            $table->timestamp("created_at")->useCurrent();
-            $table->timestamp("updated_at")->useCurrent()->useCurrentOnUpdate();
+
+            $table->timestamp('created_at')
+            ->useCurrent();
+            $table->timestamp('updated_at')
+            ->useCurrent()
+            ->useCurrentOnUpdate();
             $table->softDeletes();
+
         });
     }
 

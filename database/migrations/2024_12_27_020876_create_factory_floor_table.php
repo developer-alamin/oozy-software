@@ -15,7 +15,13 @@ return new class extends Migration
             $table->id();
             $table->uuid('factory_uuid');
             $table->uuid('floor_uuid');
-            $table->timestamps();
+        
+
+            $table->timestamp('created_at')
+            ->useCurrent();
+            $table->timestamp('updated_at')
+            ->useCurrent()
+            ->useCurrentOnUpdate();
         });
     }
 

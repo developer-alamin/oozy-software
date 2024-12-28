@@ -24,16 +24,8 @@ class FloorRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'factory_id'   => 'required|integer',
-            'name'         => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('floors', 'name')->where(function ($query) {
-                    $factoryId = request('factory_id') ?? Auth::id(); // Use factory_id from request, fallback to Auth::id
-                    return $query->where('factory_id', $factoryId);
-                }),
-            ],
+            'factory_id'   => 'required|exists:factories,id',
+            'name'         => 'required|string',
             'description'  => 'nullable',
             'status'       => 'nullable',
         ];

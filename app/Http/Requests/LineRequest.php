@@ -24,16 +24,8 @@ class LineRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'unit_id'      => 'required',
-            'name'         => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('lines', 'name')->where(function ($query) {
-                    $unitId = request('unit_id') ?? Auth::id(); // Use unit_id from request, fallback to Auth::id
-                    return $query->where('unit_id', $unitId);
-                }),
-            ],
+            'unit_id'      => 'required|exists:units,id',
+            'name'         => "required|string|max:155",
             'status'       => 'nullable|string',
             'description'  => 'nullable|string',
         ];

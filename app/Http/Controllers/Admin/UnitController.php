@@ -74,7 +74,11 @@ class UnitController extends Controller
      */
     public function store(UnitRequest $request)
     {
+
+
+       // return response()->json($request->company_id,200);
         $validatedData = $request->validated();
+        
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
              $creator = Auth::guard('admin')->user();
@@ -94,6 +98,7 @@ class UnitController extends Controller
          // Create the technician and associate it with the creator
          $unit = new Unit($validatedData);
          $unit->uuid = HelperController::generateUuid();
+         $unit->company_id = $request->company_id;
          $unit->creator()->associate($creator);  // Assign creator polymorphically
          $unit->updater()->associate($creator);  // Associate the updater
          $unit->save(); // Save the technician to the database

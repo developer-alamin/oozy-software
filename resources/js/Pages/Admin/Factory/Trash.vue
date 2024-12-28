@@ -88,9 +88,9 @@ export default {
             search: "",
             itemsPerPage: 15,
             headers: [
-                { title: "Company Name", key: "user.name", sortable: true },
-                { title: "Factory Name", key: "name", sortable: true },
-                { title: "Factory Code", key: "factory_code", sortable: true },
+                { title: "Company Name", key: "company.name", sortable: true },
+                { title: "Name", key: "name", sortable: true },
+                { title: "Code", key: "factory_code", sortable: true },
                 { title: "Email", key: "email", sortable: true },
                 { title: "Phone", key: "phone", sortable: false },
                 { title: "Creator", key: "creator.name", sortable: false },

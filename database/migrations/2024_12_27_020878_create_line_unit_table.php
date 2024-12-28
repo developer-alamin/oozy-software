@@ -17,7 +17,11 @@ return new class extends Migration
             $table->foreignId('line_id');
             
           
-            $table->timestamps();
+            $table->timestamp('created_at')
+            ->useCurrent();
+            $table->timestamp('updated_at')
+            ->useCurrent()
+            ->useCurrentOnUpdate();
         });
     }
 

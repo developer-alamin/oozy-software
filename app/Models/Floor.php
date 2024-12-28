@@ -48,9 +48,9 @@ class Floor extends Model
     {
         return $this->belongsTo(Factory::class, 'factory_id');
     }
-    public function user()
+    public function company()
     {
-        return $this->belongsTo(User::class, 'company_id');
+        return $this->belongsTo(Company::class, 'company_id');
     }
     public function units()
     {

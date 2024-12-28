@@ -9,6 +9,8 @@ export { default as UserCreate } from "../Pages/Admin/User/UserCreate.vue";
 // Company components
 export { default as AllCompanyIndex } from "../Pages/Admin/Company/Index.vue";
 export { default as CompanyCreate } from "../Pages/Admin/Company/Create.vue";
+export { default as CompanyEdit } from "../Pages/Admin/Company/Edit.vue";
+export { default as CompanyTrash } from "../Pages/Admin/Company/Trash.vue";
 
 // Mechine components
 export { default as MechineIndex } from "../Pages/Admin/Mechine/Index.vue";

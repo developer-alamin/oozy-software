@@ -13,7 +13,12 @@ return new class extends Migration
     {
         Schema::create('parse_details', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+
+            $table->timestamp('created_at')
+            ->useCurrent();
+            $table->timestamp('updated_at')
+            ->useCurrent()
+            ->useCurrentOnUpdate();
         });
     }
 

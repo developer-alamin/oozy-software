@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\RentController;
-use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\FactoryController;
 use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\Admin\UnitController;
@@ -36,10 +36,9 @@ use App\Http\Controllers\OperatorController;
 use App\Models\BreakdownService;
 use App\Models\MechineAssing;
 
-
 // --------------------------------------------supplier route statr here-------------------------------------------------------------------
-Route::get('/suppliers/{uuid}/edit', [SupplierController::class, 'edit'])->name('suppliers.edit');
-Route::put('/suppliers/{uuid}', [SupplierController::class, 'update'])->name('suppliers.update');
+//Route::get('/suppliers/{uuid}/edit', [SupplierController::class, 'edit'])->name('suppliers.edit');
+//Route::put('/suppliers/{uuid}', [SupplierController::class, 'update'])->name('suppliers.update');
 // suppliers Group Controllers start form here
 Route::controller(SupplierController::class)
   ->prefix('supplier')
@@ -54,8 +53,9 @@ Route::resource('suppliers', SupplierController::class);
 
 // --------------------------------------------Floor route statr here-------------------------------------------------------------------
 
-Route::get('/floor/{uuid}/edit', [FloorController::class, 'edit'])->name('floor.edit');
-Route::put('/floor/{uuid}', [FloorController::class, 'update'])->name('floor.update');
+//Route::get('/floor/{uuid}/edit', [FloorController::class, 'edit'])->name('floor.edit');
+//Route::put('/floor/{uuid}', [FloorController::class, 'update'])->name('floor.update');
+
 Route::controller(FloorController::class)
   ->prefix("floors")
   ->as("floors")
@@ -280,6 +280,10 @@ Route::put('/operator/{uuid}', [OperatorController::class, 'update'])->name('ope
 Route::resource('operator', OperatorController::class);
 
 // --------------------------------------------Company route statr here-------------------------------------------------------------------
+Route::get('company/trash', [CompanyController::class, 'trash'])->name('trash');
+Route::get('company/trashed-count', [CompanyController::class, 'trashed_count'])->name('trashed-count');
+Route::post('company/{id}/restore', [CompanyController::class, 'restore'])->name('restore');
+Route::delete('company/{id}/forceDelete', [CompanyController::class, 'forceDelete'])->name('forceDelete');
 Route::resource('company', CompanyController::class);
 
 // --------------------------------------------Factory route statr here-------------------------------------------------------------------

@@ -3,7 +3,9 @@
     <v-card-title>Create Floor</v-card-title>
     <v-card-text>
       <v-form ref="form" v-model="valid" @submit.prevent="submit">
-        <v-autocomplete
+       <v-row>
+        <v-col cols="12">
+          <v-autocomplete
           v-model="floor.factory_id"
           :items="factories"
           item-value="id"
@@ -19,12 +21,12 @@
             Select Factory <span style="color: red">*</span>
           </template>
         </v-autocomplete>
-        <!-- Display the selected user's name -->
-        <!-- <div v-if="selectedUserName" style="margin-top: 2px">
-                    <strong>Company Name:</strong> {{ selectedUserName }}
-                </div> -->
-        <!-- Name Field -->
-        <v-text-field
+        </v-col>
+       
+       </v-row>
+       <v-row>
+        <v-col cols="6">
+          <v-text-field
           v-model="floor.name"
           :rules="[rules.required]"
           label="Name"
@@ -35,28 +37,22 @@
             Floor <span style="color: red">*</span>
           </template>
         </v-text-field>
-
+        </v-col>
+        <v-col cols="6">
+          <v-select
+          v-model="floor.status"
+          :items="statusItems"
+          label="Floor Status"
+          clearable
+        ></v-select>
+        </v-col>
+       </v-row>
         <!-- Description Field -->
         <v-textarea
           v-model="floor.description"
           label="Description"
           :error-messages="errors.description ? errors.description : ''"
         />
-
-        <!-- Featured Checkbox -->
-        <!-- <v-checkbox
-                    v-model="brand.status"
-                    label="Status"
-                    :error-messages="errors.status ? errors.status : ''"
-                >
-                </v-checkbox> -->
-        <v-select
-          v-model="floor.status"
-          :items="statusItems"
-          label="Floor Status"
-          clearable
-        ></v-select>
-
         <!-- Action Buttons -->
         <v-row class="mt-4">
           <!-- Submit Button -->
@@ -99,9 +95,10 @@ export default {
     return {
       valid: false,
       loading: false, // Controls loading state of the button
-      statusItems: ["Active", "Inactive"],
+      statusItems: ["Active", "Inactive","Pending"],
       floor: {
         factory_id: "",
+        campany_id:'',
         name: "",
         description: "",
         status: "Active", // New property for checkbox
@@ -133,7 +130,6 @@ export default {
         try {
           // Assuming the actual API call here
           const response = await this.$axios.post("/floor", formData);
-
           if (response.data.success) {
             toast.success("Floor create successfully!");
             this.resetForm();
@@ -175,7 +171,6 @@ export default {
             limit: this.limit,
           },
         });
-        // console.log(response.data);
         this.factories = response.data;
       } catch (error) {
         console.error("Error fetching factories:", error);
@@ -183,15 +178,18 @@ export default {
     },
     formatFactory(factory) {
       if (factory) {
-        if (typeof factory == "number") {
-          factory = this.factories.find((item) => (item.id = factory));
+          if (typeof factory === "number") {
+            factory = this.factories.find((item) => item.id === factory);
+          }
+          if (factory) {
+            const factoryName = factory.name || "No Factory Name";
+            const userName = factory.company?.name || "No Company";
+            this.floor.company_id = factory.company_id;
+            return `${factoryName} -- ${userName}`;
+          }
         }
-        // console.log(typeof floor);
-        const factoryName = factory?.name || "No Factory Name";
-        const userName = factory?.user?.name || "No Company";
-        return `${factoryName} -- ${userName}`;
-      }
-      // return "No Factory Data";
+        return "No Factory Data";
+
     },
   },
 };

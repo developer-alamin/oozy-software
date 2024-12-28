@@ -19,17 +19,7 @@
             Select Floor <span style="color: red">*</span>
           </template>
         </v-autocomplete>
-        <!-- Display factory name -->
-        <!-- <div v-if="selectedFactoryName" style="margin-top: 10px">
-                    <strong>Factory Name:</strong> {{ selectedFactoryName }}
-                </div>
-
-                <!-- Display user name -->
-        <!-- <div v-if="selectedUserName" style="margin-top: 10px">
-                    <strong>Company Name:</strong> {{ selectedUserName }}
-                </div>  -->
-
-        <!-- Name Field -->
+       
         <v-text-field
           v-model="unit.name"
           :rules="[rules.required]"
@@ -104,6 +94,7 @@ export default {
       unit: {
         floor_id: null,
         selected_floor: null,
+        company_id:'',
         name: "",
         description: "",
         status: "Active", // New property for checkbox
@@ -132,8 +123,7 @@ export default {
         try {
           // Assuming the actual API call here
           const response = await this.$axios.post("/units", formData);
-          console.log(response.data);
-
+        
           if (response.data.success) {
             toast.success("Unit create successfully!");
             this.resetForm();
@@ -162,26 +152,28 @@ export default {
             limit: this.limit,
           },
         });
-
         this.floors = response.data;
-        console.log(response.data);
       } catch (error) {
         console.error("Error fetching floors:", error);
       }
     },
 
     formatFloor(floor) {
+
       if (floor) {
-        // if (typeof floor == "number") {
-        //   floor = this.floors.find((item) => (item.id = floor));
-        // }
+      if (typeof floor === "number") {
+        floor = this.floors.find((item) => item.id === floor);
+      }
+      if (floor) {
         const factoryName = floor.factories?.name || "No Factory Name";
-        const userName = floor.factories?.user?.name || "No Company";
+        const companyName = floor.factories?.company?.name || "No Company";
+        this.unit.company_id = floor.company_id;
         return `${
           floor.name || "No Floor Name"
-        } -- ${factoryName} -- ${userName}`;
+        } -- ${factoryName} -- ${companyName}`;
       }
-      return "No Floor Data";
+    }
+    return "No Floor Data";
     },
 
     resetForm() {

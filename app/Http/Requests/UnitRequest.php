@@ -24,16 +24,8 @@ class UnitRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'floor_id'     => 'required',
-            'name'         => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('units', 'name')->where(function ($query) {
-                    $floorId = request('floor_id') ?? Auth::id(); // Use floor_id from request, fallback to Auth::id
-                    return $query->where('floor_id', $floorId);
-                }),
-            ],
+            'floor_id'     => 'required|exists:floors,id',
+            'name'         => 'required|string|max:255',
             'description'  => 'nullable|string',
             'status'       => 'nullable|in:Active,Inactive',
             'meta_data'    => 'nullable',

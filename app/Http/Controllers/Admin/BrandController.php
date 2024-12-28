@@ -52,7 +52,7 @@ class BrandController extends Controller
         // Apply sorting
         $brandsQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $brands = $brandsQuery->with('creator:id,name')->paginate($itemsPerPage);
+        $brands = $brandsQuery->with(['creator:id,name','company'])->paginate($itemsPerPage);
         // Return the response as JSON
         return response()->json([
             'items' => $brands->items(), // Current page items
@@ -93,6 +93,7 @@ class BrandController extends Controller
          // Create the technician and associate it with the creator
          $brand       = new Brand($validatedData);
          $brand->uuid = HelperController::generateUuid();
+         $brand->company_id = $validatedData['company_id'];
          $brand->creator()->associate($creator);  // Assign creator polymorphically
          $brand->updater()->associate($creator);  // Associate the updater
          $brand->save(); // Save the technician to the database
@@ -147,8 +148,9 @@ class BrandController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $uuid)
+    public function update(Request $request,$uuid)
     {
+    
         $brand = Brand::where('uuid', $uuid)->firstOrFail();
          // Validate the incoming request data
          $validatedData = $request->validate(Brand::validationRules());
@@ -179,8 +181,13 @@ class BrandController extends Controller
          } else {
              return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
          }
+
+
          // Update the brand's details
          $brand->fill($validatedData);
+         //return response()->json($validatedData,200);    
+
+         $brand->company_id = $validatedData['company_id'];
          $brand->updater()->associate($currentUser); // Associate the updater
          $brand->save();
 

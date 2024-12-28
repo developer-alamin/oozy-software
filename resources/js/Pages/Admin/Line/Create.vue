@@ -42,7 +42,7 @@
           :error-messages="errors.name ? errors.name : ''"
         >
           <template v-slot:label>
-            Line <span style="color: red">*</span>
+            Line Name<span style="color: red">*</span>
           </template>
         </v-text-field>
 
@@ -100,6 +100,7 @@ export default {
       line: {
         name: "",
         description: "",
+        company_id:'',
         status: "Active",
       },
       errors: {}, // Stores validation errors
@@ -127,7 +128,6 @@ export default {
         try {
           // Assuming the actual API call here
           const response = await this.$axios.post("/line", formData);
-
           if (response.data.success) {
             this.resetForm();
             toast.success("Line Created successfully!");
@@ -162,30 +162,27 @@ export default {
       }
     },
     // Format factory name with user name
-    formatUnit(line) {
-      if (line) {
-        return `${line.name} -- ${line.floors?.name || "No Floor"} -- ${
-          line.floors?.factories?.name || "No Factory"
-        } -- ${line.floors?.factories?.user?.name || "No Company"}`;
+    formatUnit(unit) {
+      if (unit) {
+        // Check if `unit` is a number, and find the corresponding object
+        if (typeof unit === "number") {
+          unit = this.units.find((item) => item.id === unit);
+        }
+        // If the unit is found, process further
+        if (unit) {
+          const lineName = unit.name || "No Unit Name";
+          const floorName = unit.floors?.name || "No Floor";
+          const factoryName = unit.floors?.factories?.name || "No Factory";
+          const companyName = unit.floors?.factories?.company?.name || "No Company";
+
+          // Set company_id for the line
+          this.line.company_id = unit.company_id || null;
+          // Return the formatted string
+          return `${lineName} -- ${floorName} -- ${factoryName} -- ${companyName}`;
+        }
       }
+      return "No Unit Data";
     },
-
-    // formatUnit(line) {
-    //   if (line) {
-    //     if (typeof line == "number") {
-    //       line = this.units.find((item) => (item.id = line));
-    //     }
-
-    //     const factoryName = line.floors?.factories?.name || "No Factory Name";
-    //     const floorName = line.floors?.name || "No Floor";
-    //     const userName = line.floors?.factories?.user?.name || "No Company";
-    //     return `${
-    //       line.name || "No Line Name"
-    //     } -- ${factoryName} -- ${floorName} -- ${userName}`;
-    //   }
-    //   return "No Floor Data";
-    // },
-
     resetForm() {
       this.line = {
         name: "",
