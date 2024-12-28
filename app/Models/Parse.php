@@ -33,9 +33,19 @@ class Parse extends Model
     //     'purchase_date' => 'datetime',
     // ];
 
-    public function user()
+
+    // public function stock()  {
+    //     return $this->belongsTo(ParseStockIn::class,"parse_id");
+    // }
+    // Define the hasOne relationship
+    public function parseStockIn()
     {
-        return $this->belongsTo(User::class, 'company_id');
+        return $this->hasOne(ParseStockIn::class, 'parse_id', 'id');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class, 'company_id');
     }
     public function factory()
     {
