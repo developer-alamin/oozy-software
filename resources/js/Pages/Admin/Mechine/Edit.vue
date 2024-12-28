@@ -75,7 +75,7 @@
           </v-col>
           <v-col cols="6">
             <v-autocomplete
-              v-model="machine.model_id"
+              v-model="machine.product_model_id"
               :items="models"
               item-value="id"
               item-title="name"
@@ -83,7 +83,7 @@
               density="comfortable"
               clearable
               :rules="[rules.required]"
-              :error-messages="errors.model_id ? errors.model_id : ''"
+              :error-messages="errors.product_model_id ? errors.product_model_id : ''"
               @update:search="fetchModels"
               :disabled="!machine.brand_id"
             >
@@ -281,11 +281,11 @@ export default {
         company_id: null,
         factory_id: null,
         brand_id: null,
-        model_id: null,
+        product_model_id: null,
         machine_type_id: null,
         partial_maintenance_day: "",
         full_maintenance_day: "",
-        machine_source_id: null,
+        source_id: null,
         supplier_id: null,
         rent_id: null,
         machine_code: "",
@@ -368,15 +368,15 @@ export default {
 
         // Set the selected company based on the company_id
         const selectedModel = this.models.find(
-          (c) => c.id === this.machine.model_id
+          (c) => c.id === this.machine.product_model_id
         );
 
         if (selectedModel) {
-          this.machine.model_id = selectedModel.id; // Set the company_id for v-autocomplete
+          this.machine.product_model_id = selectedModel.id; // Set the company_id for v-autocomplete
         }
         // models
         const selectedFactory = this.models.find(
-          (c) => c.id === this.machine.model_id
+          (c) => c.id === this.machine.product_model_id
         );
         if (selectedFactory) {
           this.machine.factory_id = selectedFactory.id; // Set the company_id for v-autocomplete
@@ -494,7 +494,7 @@ export default {
     // },
     // async fetchBrands(search) {
     //   try {
-    //     if (!this.machine.model_id) {
+    //     if (!this.machine.product_model_id) {
     //       this.brands = [];
     //       return;
     //     }
@@ -503,7 +503,7 @@ export default {
     //     const response = await this.$axios.get("/get_brands", {
     //       params: {
     //         search,
-    //         model_id: this.machine.model_id,
+    //         product_model_id: this.machine.product_model_id,
     //         limit: 5,
     //       },
     //     });
@@ -546,7 +546,7 @@ export default {
     },
 
     async onBrandChange() {
-      this.machine.model_id = null;
+      this.machine.product_model_id = null;
       if (!this.machine.brand_id) {
         this.models = []; // Clear models if no brand is selected
         return;

@@ -100,7 +100,7 @@
             </v-autocomplete>
 
             <!-- <v-autocomplete
-              v-model="machine.model_id"
+              v-model="machine.product_model_id"
               :items="models"
               item-value="id"
               item-title="name"
@@ -110,7 +110,7 @@
               density="comfortable"
               :loading="loadingModels"
               :rules="[rules.required]"
-              :error-messages="errors.model_id ? errors.model_id : ''"
+              :error-messages="errors.product_model_id ? errors.product_model_id : ''"
               @update:search="fetchModels"
               @update:model-value="onModelChange"
             >
@@ -142,7 +142,7 @@
 
             <!-- Model Selection -->
             <v-autocomplete
-              v-model="machine.model_id"
+              v-model="machine.product_model_id"
               :items="models"
               item-value="id"
               item-title="name"
@@ -150,7 +150,7 @@
               density="comfortable"
               clearable
               :rules="[rules.required]"
-              :error-messages="errors.model_id ? errors.model_id : ''"
+              :error-messages="errors.product_model_id ? errors.product_model_id : ''"
               @update:search="fetchModels"
               :disabled="!machine.brand_id"
             >
@@ -227,7 +227,7 @@
         <v-row>
           <v-col cols="12">
             <v-autocomplete
-              v-model="machine.machine_source_id"
+              v-model="machine.source_id"
               :items="sources"
               item-value="id"
               item-title="name"
@@ -235,7 +235,7 @@
               density="comfortable"
               clearable
               :error-messages="
-                errors.machine_source_id ? errors.machine_source_id : ''
+                errors.source_id ? errors.source_id : ''
               "
               @update:model-value="checkRateApplicable"
               @update:search="fetchSources"
@@ -706,11 +706,11 @@ export default {
         company_id: null,
         factory_id: null,
         brand_id: null,
-        model_id: null,
+        product_model_id: null,
         machine_type_id: null,
         partial_maintenance_day: "",
         full_maintenance_day: "",
-        machine_source_id: null,
+        source_id: null,
         supplier_id: null,
         rent_id: null,
         machine_code: "",
@@ -986,7 +986,7 @@ export default {
 
     // Handle brand change, fetch models based on selected brand
     async onBrandChange() {
-      this.machine.model_id = null;
+      this.machine.product_model_id = null;
       if (!this.machine.brand_id) {
         this.models = []; // Clear models if no brand is selected
         return;
@@ -1030,7 +1030,7 @@ export default {
     // },
     // async fetchBrands(search) {
     //   try {
-    //     if (!this.machine.model_id) {
+    //     if (!this.machine.product_model_id) {
     //       this.brands = [];
     //       return;
     //     }
@@ -1039,7 +1039,7 @@ export default {
     //     const response = await this.$axios.get("/get_brands", {
     //       params: {
     //         search,
-    //         model_id: this.machine.model_id,
+    //         product_model_id: this.machine.product_model_id,
     //         limit: 5,
     //       },
     //     });
