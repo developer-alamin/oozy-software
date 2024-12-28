@@ -10,6 +10,8 @@ use App\Models\Admin;
 use App\Models\MechineAssing;
 use App\Models\Brand;
 use App\Models\Factory;
+use App\Models\Line;
+use App\Models\Supplier;
 use App\Models\GeneralSetting;
 use App\Models\MechineStock;
 use App\Models\MechineType;
@@ -45,6 +47,7 @@ class MechineAssingController extends Controller
             if ($currentUser->role === 'superadmin') {
                 // If superadmin, retrieve all technicians
                 $machineAssignQuery = MechineAssing::query(); // No filters applied
+
             } else {
                 // If not superadmin, filter by creator type and id
                 $machineAssignQuery = MechineAssing::where('creator_type', $creatorType)
@@ -70,12 +73,12 @@ class MechineAssingController extends Controller
                           ->with([
                             'creator:id,name',                          // Creator of the machine assignment
                             'factory:id,name,company_id',
-                            'factory.user:id,name',                           // Direct factory relationship
+                            //'factory.user:id,name',                           // Direct factory relationship
                             // 'factory.floors:id,name,factory_id',        // Floors within the factory
                             // 'factory.floors.units:id,name,floor_id',    // Units within the floors
                             // 'factory.floors.units.lines:id,name,unit_id', // Lines within the units
                             'machineStatus:id,name',                   // Machine status
-                            'line.unit.floor.factory.user:id,name',
+                            'line.unit.floor.factory:id,name',
                             'machineStatus:id,name',                   // Machine status
                             'productModel:id,name',                    // Product model
                             'mechineType:id,name'                      // Machine type
@@ -258,17 +261,21 @@ class MechineAssingController extends Controller
             $validatedData['warranty_period'] = null; // Set to null if no valid date is provided
         }
 
+        $lineExists = Line::where('id', $request->line_id)->exists();
+        $supplierExists = Supplier::where('id', $request->supplier_id)->exists();
+
         // Create the new MachineAssing instance with validated data
         $mechineAssing                      = new MechineAssing($validatedData);
-        $mechineAssing->machine_source_id   = ($request->machine_source_id && $request->machine_source_id !== 'null') ? $request->machine_source_id : 0;
-        $mechineAssing->line_id             = ($request->line_id && $request->line_id !== 'null') ? $request->line_id : 0;
+        $mechineAssing->source_id           = ($request->source_id && $request->source_id !== 'null') ? $request->source_id : 0;
+        $mechineAssing->company_id          = Factory::where('id', $request->factory_id)->first()?->company_id ?? 0;
+        $mechineAssing->line_id             = ($lineExists && $request->line_id && $request->line_id !== 'null') ? $request->line_id : null;
         $mechineAssing->show_basic_details  = $request->show_basic_details == "true" ? true : false;
         $mechineAssing->show_specifications = $request->show_specifications == "true" ? true : false;
         // Associate the creator and updater polymorphically
         $mechineAssing->uuid              = HelperController::generateUuid();
         $mechineAssing->status            = "Assign";
         // Similarly handle supplier_id
-        $mechineAssing->supplier_id       = ($request->supplier_id && $request->supplier_id !== 'null') ? $request->supplier_id : 0;
+        $mechineAssing->supplier_id       = ($supplierExists && $request->supplier_id && $request->supplier_id !== 'null') ? $request->supplier_id : null;
         $mechineAssing->creator()->associate($creator);
         $mechineAssing->updater()->associate($creator);
 
@@ -623,7 +630,7 @@ class MechineAssingController extends Controller
         $mechineTransfer                      = new MechineAssing( $validatedData);
         $mechineTransfer->machine_id          = $machineId;
         $mechineTransfer->uuid                = HelperController::generateUuid();
-        $mechineTransfer->machine_source_id   = ($request->machine_source_id && $request->machine_source_id !== 'null') ? $request->machine_source_id : 0;
+        $mechineTransfer->source_id           = ($request->source_id && $request->source_id !== 'null') ? $request->source_id : 0;
         $mechineTransfer->line_id             = ($request->line_id && $request->line_id !== 'null') ? $request->line_id : 0;
         $mechineTransfer->show_basic_details  = $request->show_basic_details == "true" ? true : false;
         $mechineTransfer->show_specifications = $request->show_specifications == "true" ? true : false;
@@ -677,7 +684,7 @@ class MechineAssingController extends Controller
 
         // Validate the incoming request data
         $validatedData = $request->validate([
-            'company_id'              => 'required|integer',
+            //'company_id'              => 'required|integer',
             'factory_id'              => 'required|integer',
             'brand_id'                => 'required|integer',
             'model_id'                => 'required|integer',
