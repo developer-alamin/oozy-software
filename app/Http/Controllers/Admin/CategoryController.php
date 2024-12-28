@@ -52,7 +52,7 @@ class CategoryController extends Controller
         // Apply sorting
         $categorysQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $categorys = $categorysQuery->with('creator:id,name')->paginate($itemsPerPage);
+        $categorys = $categorysQuery->with(['creator:id,name','company'])->paginate($itemsPerPage);
         // Return the response as JSON
         return response()->json([
             'items' => $categorys->items(), // Current page items
@@ -93,6 +93,7 @@ class CategoryController extends Controller
          // Create the technician and associate it with the creator
          $category       = new Category($validatedData);
          $category->uuid = HelperController::generateUuid();
+         $category->company_id = $validatedData['company_id'];
          $category->creator()->associate($creator);  // Assign creator polymorphically
          $category->updater()->associate($creator);  // Associate the updater
          $category->save(); // Save the technician to the database
@@ -180,6 +181,7 @@ class CategoryController extends Controller
          }
          // Update the category's details
          $category->fill($validatedData);
+         $category->company_id = $validatedData['company_id'];
          $category->updater()->associate($currentUser); // Associate the updater
          $category->save();
 

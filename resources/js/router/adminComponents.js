@@ -44,7 +44,7 @@ export { default as ServiceTrash } from "../Pages/Admin/Service/Trash.vue";
 // Supplier components
 export { default as SupplierIndex } from "../Pages/Admin/Supplier/Index.vue";
 export { default as SupplierEdit } from "../Pages/Admin/Supplier/Edit.vue";
-export { default as SupplierCreate } from "../Pages/Components/Admin/Supplier/SupplierCreateFrom.vue";
+export { default as SupplierCreate } from "../Pages/Admin/Supplier/Create.vue";
 export { default as SupplierTrash } from "../Pages/Admin/Supplier/Trash.vue";
 
 // Model components

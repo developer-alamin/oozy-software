@@ -11,22 +11,30 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('parse_stock_ins', function (Blueprint $table) {
+        Schema::create('preventive_services', function (Blueprint $table) {
             $table->id();
-          
-            $table->decimal('quantity_in')->default(0);
-            $table->string('type')->default('Parse');
-            
-             // Foreign key assign
-            $table->foreignId('parse_id');
+            $table->dateTime('date_time');
+            $table->enum('service_status',['Pending','Processing','Done','Cancel'])->default("Pending");
+           
+
+            // Foreign key assign
+            $table->foreignId('company_id');
+            $table->foreignId('mechine_assing_id');
 
             // Foreign key References
-
-            $table->foreign("parse_id")
+            $table->foreign("company_id")
             ->references('id')
-            ->on('parses')
+            ->on('companies')
             ->onUpdate('cascade')
             ->onDelete('cascade');
+
+            $table->foreign("mechine_assing_id")
+            ->references('id')
+            ->on('mechine_assings')
+            ->onUpdate('cascade')
+            ->onDelete('cascade');
+
+           
 
             $table->morphs('creator');
             $table->morphs('updater');
@@ -36,7 +44,7 @@ return new class extends Migration
             $table->timestamp('updated_at')
             ->useCurrent()
             ->useCurrentOnUpdate();
-
+            $table->softDeletes();
         });
     }
 
@@ -45,6 +53,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('parse_stock_ins');
+        Schema::dropIfExists('preventive_services');
     }
 };

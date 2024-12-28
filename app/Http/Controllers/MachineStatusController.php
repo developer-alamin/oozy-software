@@ -52,7 +52,7 @@ class MachineStatusController extends Controller
         // Apply sorting
         $machinesQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $machines = $machinesQuery->with('creator:id,name')->paginate($itemsPerPage);
+        $machines = $machinesQuery->with(['creator:id,name','company'])->paginate($itemsPerPage);
         // Return the response as JSON
         return response()->json([
             'items' => $machines->items(), // Current page items
@@ -93,7 +93,9 @@ class MachineStatusController extends Controller
          }
          // Create the technician and associate it with the creator
          $machine       = new MachineStatus($validatedData);
+
          $machine->uuid = HelperController::generateUuid();
+         $machine->company_id = $validatedData['company_id'];
          $machine->creator()->associate($creator);  // Assign creator polymorphically
          $machine->updater()->associate($creator);  // Associate the updater
          $machine->save(); // Save the technician to the database
@@ -182,6 +184,7 @@ class MachineStatusController extends Controller
          }
          // Update the machine's details
          $machine->fill($validatedData);
+         $machine->company_id = $validatedData['company_id'];
          $machine->updater()->associate($currentUser); // Associate the updater
          $machine->save();
 

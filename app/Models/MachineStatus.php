@@ -28,6 +28,7 @@ class MachineStatus extends Model
     public static function validationRules()
     {
         return [
+            'company_id'   => 'required|exists:companies,id',
             'name'         => 'required|string|max:255',
             'description'  => 'nullable|string',
             'status'       => 'nullable|in:Active,Inactive',
@@ -39,6 +40,10 @@ class MachineStatus extends Model
 
         ];
     }
+    public function company()
+    {
+        return $this->belongsTo( Company::class, 'company_id');
+    } 
     public function creator()
     {
         return $this->morphTo();

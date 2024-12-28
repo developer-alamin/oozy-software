@@ -33,7 +33,7 @@
             @update:options="loadItems"
         >
             <template v-slot:item.photo="{ item }">
-                <img class="rentsImg" :src="item.photo" alt="" />
+                <img class="rentsImg" :src="(item.photo) ? item.photo :'http://[::1]:5173/resources/img/login_page_img.png'" alt="" />
             </template>
 
             <template v-slot:item.actions="{ item }">

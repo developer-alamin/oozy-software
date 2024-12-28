@@ -50,7 +50,7 @@ class ProductModelController extends Controller
         // Apply sorting
         $modelsQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $models = $modelsQuery->with('creator:id,name','brand:id,name')->paginate($itemsPerPage);
+        $models = $modelsQuery->with(['creator:id,name','brand:id,name','company'])->paginate($itemsPerPage);
         // Return the response as JSON
         return response()->json([
             'items' => $models->items(), // Current page items
@@ -93,6 +93,7 @@ class ProductModelController extends Controller
          $model       = new ProductModel($validatedData);
          $model->uuid = HelperController::generateUuid();
          $model->type = "Parse";
+         $model->company_id = $validatedData['company_id'];
          $model->creator()->associate($creator);  // Assign creator polymorphically
          $model->updater()->associate($creator);  // Associate the updater
          $model->save(); // Save the technician to the database
@@ -181,6 +182,7 @@ class ProductModelController extends Controller
          }
          // Update the model's details
          $model->fill($validatedData);
+         $model->company_id = $validatedData['company_id'];
          $model->updater()->associate($currentUser); // Associate the updater
          $model->save();
 
