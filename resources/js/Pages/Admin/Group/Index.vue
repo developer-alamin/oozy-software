@@ -84,7 +84,7 @@
                 <span>{{ item.creator ? item.creator : "Unknown" }}</span>
             </template>
             <template v-slot:item.actions="{ item }">
-                <v-icon @click="editGroup(item.uuid)" class="mr-2"
+                <v-icon @click="editGroup(item.uuid)" color="green" class="mr-2"
                     >mdi-pencil</v-icon
                 >
                 <v-icon @click="showConfirmDialog(item.id)" color="red"
@@ -121,17 +121,9 @@ export default {
             search: "",
             itemsPerPage: 15,
             headers: [
+                { title: "Comapny", key: "company.name", sortable: false },
                 { title: "Group", key: "name", sortable: true },
-                {
-                    title: "Technician Name",
-                    key: "technicians.name",
-                    sortable: false,
-                },
-                {
-                    title: "Technician Type",
-                    key: "technicians.type",
-                    sortable: false,
-                },
+                
                 { title: "Description", key: "description", sortable: false },
                 {
                     title: "Status",

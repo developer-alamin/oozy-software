@@ -1,13 +1,15 @@
 <template>
-  <v-card outlined class="mx-auto my-5" max-width="">
+  <v-card outlined class="mx-auto my-5">
     <v-card-title>Create Tag</v-card-title>
     <v-card-text>
       <v-form ref="form" v-model="valid" @submit.prevent="submit">
+        <!-- Tag Name -->
         <v-text-field
           v-model="tag.name"
           :rules="[rules.required]"
-          label="Name"
+          label="Tag Name"
           outlined
+          density="comfortable"
           :error-messages="errors.name ? errors.name : ''"
         >
           <template v-slot:label>
@@ -15,21 +17,49 @@
           </template>
         </v-text-field>
 
-        <!-- Description Field -->
-        <v-textarea v-model="tag.note" label="Description" />
-        <v-select
-          v-model="tag.status"
-          :items="statusItems"
-          label="Status"
-          @change="updateStatus"
-          clearable
-        ></v-select>
+        <v-row>
+          <!-- Company Selection -->
+          <v-col cols="12" md="6">
+            <v-autocomplete
+              v-model="tag.company_id"
+              :items="companies"
+              item-value="id"
+              item-title="name"
+              outlined
+              clearable
+              density="comfortable"
+              :rules="[rules.required]"
+              :error-messages="errors.company_id || ''"
+              @update:search="fetchCompanies"
+              no-filter
+            >
+              <template v-slot:label>
+                Select Company <span style="color: red">*</span>
+              </template>
+            </v-autocomplete>
+          </v-col>
+
+          <!-- Status Selection -->
+          <v-col cols="12" md="6">
+            <v-select
+              v-model="tag.status"
+              :items="statusItems"
+              label="Status"
+              outlined
+              clearable
+            ></v-select>
+          </v-col>
+        </v-row>
+
+        <!-- Description -->
+        <v-textarea
+          v-model="tag.note"
+          label="Description"
+          outlined
+        ></v-textarea>
 
         <!-- Action Buttons -->
         <v-row class="mt-4">
-          <!-- Submit Button -->
-
-          <!-- Reset Button -->
           <v-col cols="12" class="text-right">
             <v-btn
               type="button"
@@ -54,73 +84,96 @@
     </v-card-text>
   </v-card>
 </template>
+
 <script>
-import { ref } from "vue";
 import { toast } from "vue3-toastify";
+
 export default {
   data() {
     return {
       valid: false,
-      loading: false, // Controls loading state of the button
-      statusItems: ["Active", "Inactive"],
+      loading: false, // Loading state for submit button
+      statusItems: ["Active", "Inactive"], // Status dropdown options
       tag: {
         name: "",
         note: "",
-        status: "Active",
+        status: "Active", // Default status
+        company_id: null, // Default company
       },
-      errors: {}, // Stores validation errors
-      serverError: null, // Stores server-side error messages
+      companies: [], // Company options
+      limit: 5, // Number of companies fetched
+      errors: {}, // Validation errors
       rules: {
-        required: (value) => !!value || "Required.",
+        required: (value) => !!value || "Required.", // Basic required rule
       },
     };
   },
   methods: {
     async submit() {
-      // Reset errors and loading state before submission
-      this.errors = {};
-      this.serverError = null;
-      this.loading = true; // Start loading when submit is clicked
+      this.errors = {}; // Reset errors
+      this.loading = true; // Set loading state
+
+      // Manually validate the form before proceeding
+      const isValid = await this.$refs.form.validate(); // Use form validation
+      if (!isValid) {
+        this.loading = false;
+        return; // Stop if validation fails
+      }
 
       const formData = new FormData();
       Object.entries(this.tag).forEach(([key, value]) => {
         formData.append(key, value);
       });
 
-      // Simulate a 3-second loading time (e.g., for an API call)
-      setTimeout(async () => {
-        try {
-          // Assuming the actual API call here
-          const response = await this.$axios.post("/machine-tag", formData);
+      try {
+        // API call to submit the form data
+        const response = await this.$axios.post("/machine-tag", formData);
 
-          if (response.data.success) {
-            this.resetForm();
-            toast.success("Tag created successfully!");
-          }
-        } catch (error) {
-          if (error.response && error.response.status === 422) {
-            // Handle validation errors from the server
-            this.errors = error.response.data.errors || {};
-          } else {
-            // Handle other server errors
-            this.serverError = "An error occurred. Please try again.";
-          }
-        } finally {
-          // Stop loading after the request (or simulated time) is done
-          this.loading = false;
+        if (response.data && response.data.success) {
+          this.resetForm();
+          toast.success("Tag created successfully!");
+        } else {
+          toast.error("Failed to create tag. Please try again.");
         }
-      }, 1000); // Simulates a 3-second loading duration
+      } catch (error) {
+        // Handle validation and other server errors
+        if (error.response && error.response.status === 422) {
+          this.errors = error.response.data.errors || {};
+        } else {
+          console.error("Error creating tag:", error);
+          toast.error("An unexpected error occurred. Please try again.");
+        }
+      } finally {
+        this.loading = false; // Reset loading state
+      }
+    },
+
+    async fetchCompanies(search) {
+      try {
+        // API call to fetch companies based on search term
+        const response = await this.$axios.get("/get_companies", {
+          params: { search: search || "", limit: this.limit },
+        });
+        this.companies = response.data || [];
+      } catch (error) {
+        console.error("Error fetching companies:", error);
+        toast.error("Failed to fetch companies. Please try again.");
+      }
     },
 
     resetForm() {
+      // Reset form fields and validation
       this.tag = {
         name: "",
-        status: "Active",
         note: "",
+        status: "Active",
+        company_id: null,
       };
-      this.errors = {}; // Reset errors on form reset
+      this.errors = {}; // Clear errors
+      this.valid = false; // Reset the valid state explicitly
       if (this.$refs.form) {
-        this.$refs.form.reset(); // Reset the form via its ref if necessary
+        this.$refs.form.reset(); // Reset form itself (clear all inputs)
+        this.$refs.form.resetValidation(); // Reset validation
       }
     },
   },

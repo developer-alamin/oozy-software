@@ -78,10 +78,10 @@
         <span>{{ item.creator ? item.creator.name : "Unknown" }}</span>
       </template>
       <template v-slot:item.actions="{ item }">
-        <!-- <v-icon @click="editLine(item.uuid)" class="mr-2"
+        <v-icon @click="editLine(item.uuid)" color="green" class="mr-2"
                     >mdi-pencil</v-icon
-                > -->
-        <v-icon @click="showConfirmDialog(item.id)" color="red"
+                >
+        <v-icon @click="showConfirmDialog(item.uuid)" color="red"
           >mdi-delete</v-icon
         >
       </template>
@@ -115,6 +115,7 @@ export default {
       search: "",
       itemsPerPage: 10,
       headers: [
+      { title: "Company", key: "company.name", sortable: false },
         { title: "Tag Name", key: "name", sortable: true },
         { title: "Note", key: "note", sortable: false },
         { title: "status", key: "status", sortable: false },
@@ -146,7 +147,7 @@ export default {
         });
         this.serverItems = response.data.items || [];
         this.totalItems = response.data.total || 0;
-        this.fetchTrashedLinesCount();
+        this.fetchTrashedCount();
       } catch (error) {
         console.error("Error loading items:", error);
       } finally {
@@ -162,15 +163,15 @@ export default {
     editLine(uuid) {
       this.$router.push({ name: "TagEdit", params: { uuid } });
     },
-    showConfirmDialog(id) {
-      this.selectedlineId = id;
+    showConfirmDialog(uuid) {
+      this.selectedlineId = uuid;
       this.dialog = true;
     },
     async confirmDelete() {
       this.dialog = false; // Close the dialog
       try {
         const response = await this.$axios.delete(
-          `/line/${this.selectedlineId}`
+          `/machine-tag/${this.selectedlineId}`
         );
         this.loadItems({
           page: 1,
@@ -184,9 +185,9 @@ export default {
         toast.error("Failed to delete tag.");
       }
     },
-    async fetchTrashedLinesCount() {
+    async fetchTrashedCount() {
       try {
-        const response = await this.$axios.get("lines/trashed-count");
+        const response = await this.$axios.get("machine-tag/trashed-count");
         this.trashedCount = response.data.trashedCount;
       } catch (error) {
         console.error("Error fetching trashed tag count:", error);
@@ -200,7 +201,7 @@ export default {
       itemsPerPage: this.itemsPerPage,
       sortBy: [],
     });
-    this.fetchTrashedLinesCount();
+    this.fetchTrashedCount();
   },
 };
 </script>
