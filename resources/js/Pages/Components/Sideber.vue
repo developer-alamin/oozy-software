@@ -234,6 +234,7 @@
         </ul>
       </li>
        <!-- End parse Nav-->
+
       <!-- Start Service Nav -->
       <li class="nav-item">
         <a
@@ -286,6 +287,49 @@
         </ul>
       </li>
       <!-- End Service Nav -->
+
+      <!-- Start Preventive Service Nav -->
+      <li class="nav-item">
+        <a
+          class="nav-link collapsed"
+          data-bs-target="#tables-nav-preventive-service"
+          data-bs-toggle="collapse"
+          :class="{ show: isPreventiveServiceRouteShow }"
+          href="#"
+        >
+          <i class="bi bi-layout-text-window-reverse"></i><span>Preventive Service</span
+          ><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul
+          id="tables-nav-preventive-service"
+          class="nav-content collapse"
+          data-bs-parent="#sidebar-nav"
+          :class="{ show: isPreventiveServiceRouteShow }"
+        >
+          <li>
+            <router-link
+              :to="{ name: 'PreventiveServiceCreate' }"
+              :class="{ active: isPreventiveServiceRouteCreate }"
+              active-class="active"
+            >
+              <i class="bi bi-circle"></i><span>Manual Service Create</span>
+            </router-link>
+          </li>
+
+          <li>
+            <router-link
+              :to="{ name: 'PreventiveServiceIndex' }"
+              :class="{ active: isPreventiveServiceRouteIndex }"
+              active-class="active"
+            >
+              <i class="bi bi-circle"></i><span>All Preventive Services</span>
+            </router-link>
+          </li>
+        </ul>
+      </li>
+      <!-- End Service Nav -->
+
+
       <!-- Start Reports Nav -->
       <li class="nav-item">
         <a
@@ -613,6 +657,7 @@ const isBreakdownServiceRouteIndex = computed(() =>
 const isBreakdownServiceRouteCreate = computed(() =>
   ["ServiceCreate"].includes(route.name)
 );
+
 const isBreakdownServiceRouteBreakdownServiceHistory = computed(() =>
   ["BreakdownServiceHistory"].includes(route.name)
 );
@@ -627,6 +672,23 @@ const isMachineLocationRoute = computed(() =>
 );
 const isMechineHistoryListRoute = computed(() =>
   ["MechineHistoryList"].includes(route.name)
+);
+
+//preventive service 
+const isPreventiveServiceRouteShow = computed(() => {
+  return [
+    "PreventiveServiceCreate",
+    "PreventiveServiceIndex",
+    "PreventiveServiceEdit",
+    "PreventiveServiceTrash",
+  ].includes(route.name);
+});
+
+const isPreventiveServiceRouteIndex = computed(() =>
+  ["PreventiveServiceIndex"].includes(route.name)
+);
+const isPreventiveServiceRouteCreate = computed(() =>
+  ["PreventiveServiceCreate"].includes(route.name)
 );
 
 // organization

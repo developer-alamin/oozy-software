@@ -28,6 +28,7 @@ use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\Admin\ProductModelController;
 use App\Http\Controllers\Admin\ServiceController;
+use App\Http\Controllers\Admin\PreventiveServiceController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\DynamicDataController;
 use App\Http\Controllers\MachineStatusController;
@@ -109,6 +110,23 @@ Route::get('/breakdown-service-history', [BreakdownServiceController::class, 'br
 Route::resource('breakdown-service',BreakdownServiceController::class);
 Route::post('/breakdown-service/technician-update-status', [BreakdownServiceController::class, 'acknowledge']);
 Route::resource('services',ServiceController::class);
+
+
+// ----------- Preventive Service Route--------------------------
+Route::get('preventive-service/trashed-count', [PreventiveServiceController::class, 'trashed_count'])->name('preventive-service.trashed-count');
+Route::get('preventive-service/{uuid}/edit', [PreventiveServiceController::class, 'edit'])->name('preventive-service.edit');
+Route::get('preventive-service/{uuid}/get-assign-to-technician', [PreventiveServiceController::class, 'get_assign_to_technician'])->name('preventive-service.get-assign-to-technician');
+Route::put('preventive-service/{uuid}/save-assign-to-technician', [PreventiveServiceController::class, 'save_assign_to_technician'])->name('preventive-service.save-assign-to-technician');
+Route::put('preventive-service/{detail_id}/technician-preventive-service-acknowledge', [PreventiveServiceController::class, 'technician_preventive_service_acknowledge'])->name('technician-preventive-service-acknowledge');
+
+Route::put('preventive-service/{detail_id}/preventive-service-start', [PreventiveServiceController::class, 'preventive_service_start'])->name('preventive-service-start');
+
+Route::resource('preventive-service',PreventiveServiceController::class);
+
+
+
+
+
 // -------------------------------------------- mechine typeroute statr here-------------------------------------------------------------------
 
 Route::prefix("/mechine")->group(function () {
@@ -321,6 +339,8 @@ Route::get('/get_lines_by_machine', [DynamicDataController::class, 'getLinesByMa
 Route::get('/get_machine_lines', [DynamicDataController::class, 'getMachineLines']);
 Route::get('/get_factory_lines', [DynamicDataController::class, 'getLinesByFactory']);
 Route::get('/get_machine_codes', [DynamicDataController::class, 'getMachineCodes']);
+Route::get('/search_machine/{id?}', [DynamicDataController::class, 'searchMachine']);
+Route::get('/search_user/{id?}', [DynamicDataController::class, 'searchUser']);
 Route::get('/get-machine-code-ways/details/{machine_code}', [DynamicDataController::class, 'getManuallyApiMachineDetails']);
 Route::get('/get_breakdown_problem_notes', [DynamicDataController::class, 'getBreakdownProblemNotes']);
 Route::get('/get_groups', [DynamicDataController::class, 'getGroups']);

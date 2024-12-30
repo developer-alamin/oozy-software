@@ -113,5 +113,10 @@ class MechineAssing extends Model
         return $this->hasMany(Movement::class, 'machine_id', 'id');
     }
 
+    public function preventive_services()
+    {
+        return $this->hasMany(PreventiveService::class, 'mechine_assing_id', 'id');
+    }
+
 
 }

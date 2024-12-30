@@ -31,15 +31,22 @@ export { default as FactoryCreate } from "../Pages/Admin/Factory/Create.vue";
 export { default as FactoryEdit } from "../Pages/Admin/Factory/Edit.vue";
 export { default as FactoryTrash } from "../Pages/Admin/Factory/Trash.vue";
 
-// Supplier components
+// Service components
 export { default as ServiceIndex } from "../Pages/Admin/Service/Index.vue";
 export { default as ServiceEdit } from "../Pages/Admin/Service/Edit.vue";
 export { default as ServiceProcessing } from "../Pages/Admin/Service/ServiceProcessing.vue";
 export { default as BreakdownServiceHistory } from "../Pages/Admin/Service/BreakdownServiceHistory.vue";
 export { default as ServiceCreate } from "../Pages/Admin/Service/Create.vue";
 export { default as ServiceHistoryCreate } from "../Pages/Admin/Service/CreateServiceHistory.vue";
-
 export { default as ServiceTrash } from "../Pages/Admin/Service/Trash.vue";
+
+// Preventive Service components
+export { default as PreventiveServiceCreate } from "../Pages/Admin/PreventiveService/Create.vue";
+export { default as PreventiveServiceIndex } from "../Pages/Admin/PreventiveService/Index.vue";
+export { default as PreventiveServiceEdit } from "../Pages/Admin/PreventiveService/Edit.vue";
+export { default as PreventiveServiceTrash } from "../Pages/Admin/PreventiveService/Trash.vue";
+export { default as AssignToTechnicianPreventiveService } from "../Pages/Admin/PreventiveService/AssignToTechnician.vue";
+export { default as PreventiveServiceStart } from "../Pages/Admin/PreventiveService/PreventiveServiceStart.vue";
 
 // Supplier components
 export { default as SupplierIndex } from "../Pages/Admin/Supplier/Index.vue";

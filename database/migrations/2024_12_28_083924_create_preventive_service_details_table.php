@@ -18,7 +18,7 @@ return new class extends Migration
             $table->enum('technician_status',['Acknowledge','Acknowledged','Start Service'])->nullable();
             $table->dateTime("acknowledge_date_time")->nullable();
 
-            $table->dateTime('service_start_date_time');
+            $table->dateTime('service_start_date_time')->nullable();
             $table->dateTime('service_end_date_time')->nullable();
             $table->string("problem_note_id")->nullable()->comment('for multiple id'); 
             $table->string('note')->nullable();

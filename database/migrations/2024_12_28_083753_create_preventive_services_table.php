@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('preventive_services', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid')->unique();
             $table->dateTime('date_time');
             $table->enum('service_status',['Pending','Processing','Done','Cancel'])->default("Pending");
            

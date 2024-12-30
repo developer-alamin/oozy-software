@@ -9,4 +9,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class PreventiveServiceDetail extends Model
 {
     use HasFactory,SoftDeletes;
+
+    public function creator()
+    {
+        return $this->morphTo();
+    }
+
+    public function updater()
+    {
+        return $this->morphTo();
+    }
 }

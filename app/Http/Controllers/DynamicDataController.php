@@ -359,6 +359,45 @@ class DynamicDataController extends Controller
         return response()->json($machineCodes);
     }
 
+
+    public function searchMachine(Request $request, $id = 0)
+    {
+        $search      = $request->query('search', '');
+        $limit       = $request->query('limit', 1);
+
+        //when edit
+        if($id){
+            $machine = MechineAssing::where('id', $id)
+                ->limit($limit)
+                ->get();
+            }else{
+                $machine = MechineAssing::where('machine_code', 'like', '%' . $search . '%')
+                ->limit($limit)
+                ->get();
+            }
+        
+        return response()->json($machine);
+    }
+
+    public function searchUser(Request $request, $id = 0)
+    {
+        $search      = $request->query('search', '');
+        $limit       = $request->query('limit', 1);
+
+        //when edit
+        if($id){
+            $user = User::where('id', $id)
+                ->limit($limit)
+                ->get();
+            }else{
+                $user = User::where('name', 'like', '%' . $search . '%')
+                ->limit($limit)
+                ->get();
+            }
+        
+        return response()->json($user);
+    }
+
     /**
      * @OA\Get(
      *     path="/get-machine-code-ways/details/{machine_code}",
