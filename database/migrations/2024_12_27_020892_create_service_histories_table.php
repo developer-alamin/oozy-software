@@ -36,8 +36,8 @@ return new class extends Migration
             // ->cascadeOnUpdate()
             // ->cascadeOnDelete();
 
-            $table->foreignId('operator_id');
-            $table->foreignId('technician_id');
+            $table->foreignId('operator_id')->nullable();
+            $table->foreignId('technician_id')->nullable();
 
 
             // Foreign key References
@@ -56,14 +56,14 @@ return new class extends Migration
             $table->foreign("operator_id")
             ->references('id')
             ->on('users')
-            ->onUpdate('restrict')
-            ->onDelete('restrict');
+            ->onUpdate('cascade')
+            ->onDelete('set null');
 
             $table->foreign("technician_id")
             ->references('id')
             ->on('users')
-            ->onUpdate('restrict')
-            ->onDelete('restrict');
+            ->onUpdate('cascade')
+            ->onDelete('set null');
 
 
 

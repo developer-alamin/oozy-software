@@ -35,26 +35,6 @@
         </v-row>
 
         <v-row>
-          <!-- <v-col cols="6">
-                        <v-autocomplete
-                            v-model="machine.company_id"
-                            :items="companys"
-                            item-value="id"
-                            item-title="name"
-                            outlined
-                            clearable
-                            density="comfortable"
-                            :rules="[rules.required]"
-                            :error-messages="
-                                errors.company_id ? errors.company_id : ''
-                            "
-                            @update:search="fetchCompanys"
-                        >
-                            <template v-slot:label>
-                                Select Company <span style="color: red">*</span>
-                            </template>
-                        </v-autocomplete>
-                    </v-col> -->
           <v-col cols="12">
             <v-autocomplete
               v-model="machine.factory_id"
@@ -98,48 +78,10 @@
                 <span style="color: red">*</span>
               </template>
             </v-autocomplete>
-
-            <!-- <v-autocomplete
-              v-model="machine.product_model_id"
-              :items="models"
-              item-value="id"
-              item-title="name"
-              label="Select Machine Model"
-              outlined
-              clearable
-              density="comfortable"
-              :loading="loadingModels"
-              :rules="[rules.required]"
-              :error-messages="errors.product_model_id ? errors.product_model_id : ''"
-              @update:search="fetchModels"
-              @update:model-value="onModelChange"
-            >
-              <template v-slot:label>
-                Select Machine Model
-                <span style="color: red">*</span>
-              </template>
-            </v-autocomplete> -->
+           
           </v-col>
           <v-col cols="6">
-            <!-- <v-autocomplete
-              v-model="machine.brand_id"
-              :items="brands"
-              item-value="id"
-              item-title="name"
-              label="Select Machine Brand"
-              outlined
-              clearable
-              density="comfortable"
-              :loading="loadingBrands"
-              :rules="[rules.required]"
-              :error-messages="errors.brand_id ? errors.brand_id : ''"
-            >
-              <template v-slot:label>
-                Select Machine Brand
-                <span style="color: red">*</span>
-              </template>
-            </v-autocomplete> -->
-
+          
             <!-- Model Selection -->
             <v-autocomplete
               v-model="machine.product_model_id"
@@ -240,30 +182,13 @@
               @update:model-value="checkRateApplicable"
               @update:search="fetchSources"
             >
-              <!-- <template v-slot:label>
-                                Select Machine Source
-                                <span style="color: red">*</span>
-                            </template> -->
+             
             </v-autocomplete>
           </v-col>
         </v-row>
 
         <v-row v-if="isRateApplicable == true || isRateApplicable == 'true'">
-          <!-- <v-autocomplete
-                            v-model="machine.rent_id"
-                            :items="rents"
-                            item-value="id"
-                            item-title="name"
-                            label="Select Rent"
-                            density="comfortable"
-                            clearable
-                            :error-messages="
-                                errors.rent_id ? errors.rent_id : ''
-                            "
-                            @update:search="fetchRents"
-                        >
-
-                        </v-autocomplete> -->
+          
           <v-col cols="3">
             <v-date-input
               v-model="machine.rent_date"
@@ -315,35 +240,6 @@
         </v-row>
 
         <!-- Name Field -->
-
-        <!-- <v-text-field
-                    v-model="machine.purchase_date"
-                    label="Purchase Date"
-                    type="date"
-                    outlined
-                    density="comfortable"
-                    :rules="[rules.required]"
-                    :error-messages="
-                        errors.purchase_date ? errors.purchase_date : ''
-                    "
-                >
-                    <template v-slot:label>
-                        Purchase Date <span style="color: red">*</span>
-                    </template>
-                </v-text-field>
-                <v-text-field
-                    v-model="machine.rent_date"
-                    label="Rent Date"
-                    type="date"
-                    outlined
-                    density="comfortable"
-                    :rules="[rules.required]"
-                    :error-messages="errors.rent_date ? errors.rent_date : ''"
-                >
-                    <template v-slot:label>
-                        Rent Date <span style="color: red">*</span>
-                    </template>
-                </v-text-field> -->
         <v-row>
           <v-col cols="4">
             <v-autocomplete
@@ -357,10 +253,7 @@
               :error-messages="errors.supplier_id ? errors.supplier_id : ''"
               @update:search="fetchSuppliers"
             >
-              <!-- <template v-slot:label>
-                        Select Supplier
-                        <span style="color: red">*</span>
-                    </template> -->
+              
             </v-autocomplete>
           </v-col>
           <v-col cols="4">
@@ -547,43 +440,7 @@
               :error-messages="errors.tag ? errors.tag : ''"
             >
             </v-text-field>
-            <!-- <v-text-field
-              v-model="currentTag"
-              label="Add Tags"
-              outlined
-              density="comfortable"
-              @keydown.enter.prevent="addTag"
-              placeholder="Type a tag and press Enter"
-              :error-messages="errors.tag ? errors.tag : ''"
-              append-outer-icon="mdi-tag"
-              append-outer
-            >
-
-              <template v-slot:append>
-                <v-chip
-                  v-for="(tag, index) in machine.tag"
-                  :key="index"
-                  small
-                  pill
-                  class="ma-1"
-                  close
-                  @click:close="removeTag(index)"
-                >
-                  {{ tag }}
-                </v-chip>
-              </template>
-            </v-text-field>
-
-            <v-chip-group v-model="machine.tag" multiple class="mt-3">
-              <v-chip
-                v-for="(tag, index) in machine.tag"
-                :key="index"
-                close
-                @click:close="removeTag(index)"
-              >
-                {{ tag }}
-              </v-chip>
-            </v-chip-group> -->
+           
           </v-col>
         </v-row>
 
@@ -816,14 +673,7 @@ export default {
       Object.entries(this.machine).forEach(([key, value]) => {
         formData.append(key, value);
       });
-      // const formData = new FormData();
-      // Object.entries(this.factory).forEach(([key, value]) => {
-      //     if (Array.isArray(value)) {
-      //         value.forEach((val) => formData.append(`${key}[]`, val));
-      //     } else {
-      //         formData.append(key, value);
-      //     }
-      // });
+    
       // Simulate a 3-second loading time (e.g., for an API call)
       setTimeout(async () => {
         try {
@@ -837,6 +687,8 @@ export default {
             this.resetForm();
           }
         } catch (error) {
+          console.log(error);
+          
           if (error.response && error.response.status === 422) {
             toast.error("Failed to create machine assing.");
             // Handle validation errors from the server
@@ -864,6 +716,9 @@ export default {
             factory_id: this.machine.factory_id,
           },
         });
+
+        console.log(response);
+        
         this.lines = response.data;
       } catch (error) {
         console.error("Error fetching lines:", error);
@@ -1014,46 +869,6 @@ export default {
       }
     },
 
-    // async fetchModels(search) {
-    //   try {
-    //     this.loadingModels = true;
-    //     const response = await this.$axios.get("/get_models", {
-    //       params: { search, limit: 5 },
-    //     });
-    //     this.models = response.data;
-    //     console.log(response.data);
-    //   } catch (error) {
-    //     console.error("Error fetching models:", error);
-    //   } finally {
-    //     this.loadingModels = false;
-    //   }
-    // },
-    // async fetchBrands(search) {
-    //   try {
-    //     if (!this.machine.product_model_id) {
-    //       this.brands = [];
-    //       return;
-    //     }
-
-    //     this.loadingBrands = true;
-    //     const response = await this.$axios.get("/get_brands", {
-    //       params: {
-    //         search,
-    //         product_model_id: this.machine.product_model_id,
-    //         limit: 5,
-    //       },
-    //     });
-    //     this.brands = response.data;
-    //   } catch (error) {
-    //     console.error("Error fetching brands:", error);
-    //   } finally {
-    //     this.loadingBrands = false;
-    //   }
-    // },
-    // onModelChange() {
-    //   this.machine.brand_id = null; // Reset brand selection when model changes
-    //   this.fetchBrands("");
-    // },
     async generateMachineCode() {
       try {
         const response = await this.$axios.get("/generate-machine-code");
@@ -1066,7 +881,7 @@ export default {
     },
     formatFactory(factory) {
       if (factory) {
-        return `${factory.name} -- ${factory.user?.name || "No User"}`;
+        return `${factory.name} -- ${factory.company?.name || "No User"}`;
       }
     },
     async fetchTypes(search) {

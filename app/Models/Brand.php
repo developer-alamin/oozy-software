@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 class Brand extends Model
 {
     use HasFactory,SoftDeletes;
-    protected $table = "break_down_problem_notes";
+    protected $table = "brands";
     protected $primaryKey = 'id'; // Assuming you want the uuid as the primary key
     protected $fillable = [
         'uuid',

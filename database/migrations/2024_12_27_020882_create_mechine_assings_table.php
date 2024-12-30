@@ -54,11 +54,11 @@ return new class extends Migration
             $table->foreignId('line_id')->nullable();
             //$table->big('machine_id')->default(0);
             $table->foreignId('supplier_id')->nullable();
-            $table->foreignId('machine_status_id');
-            $table->foreignId('brand_id');
-            $table->foreignId('product_model_id');
-            $table->foreignId('machine_type_id');
-            $table->foreignId('source_id');
+            $table->foreignId('machine_status_id')->nullable();
+            $table->foreignId('brand_id')->nullable();
+            $table->foreignId('product_model_id')->nullable();
+            $table->foreignId('machine_type_id')->nullable();
+            $table->foreignId('source_id')->nullable();
            
 
             // Foreign key References
@@ -78,44 +78,44 @@ return new class extends Migration
             $table->foreign("line_id")
             ->references('id')
             ->on('lines')
-            ->onUpdate('restrict')
-            ->onDelete('restrict');
+            ->onUpdate('cascade')
+            ->onDelete('set null');
 
             $table->foreign("supplier_id")
             ->references('id')
             ->on('lines')
-            ->onUpdate('restrict')
-            ->onDelete('restrict');
+            ->onUpdate('cascade')
+            ->onDelete('set null');
 
             $table->foreign("machine_status_id")
             ->references('id')
             ->on('machine_statuses')
-            ->onUpdate('restrict')
-            ->onDelete('restrict');
+            ->onUpdate('cascade')
+            ->onDelete('set null');
 
             $table->foreign("brand_id")
             ->references('id')
             ->on('brands')
-            ->onUpdate('restrict')
-            ->onDelete('restrict');
+            ->onUpdate('cascade')
+            ->onDelete('set null');
             
             $table->foreign("product_model_id")
             ->references('id')
             ->on('product_models')
-            ->onUpdate('restrict')
-            ->onDelete('restrict');
+            ->onUpdate('cascade')
+            ->onDelete('set null');
 
             $table->foreign("machine_type_id")
             ->references('id')
             ->on('mechine_types')
-            ->onUpdate('restrict')
-            ->onDelete('restrict');
+            ->onUpdate('cascade')
+            ->onDelete('set null');
 
             $table->foreign("source_id")
             ->references('id')
             ->on('sources')
-            ->onUpdate('restrict')
-            ->onDelete('restrict');
+            ->onUpdate('cascade')
+            ->onDelete('set null');
 
 
             $table->morphs('creator');

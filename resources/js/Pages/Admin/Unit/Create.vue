@@ -3,7 +3,9 @@
     <v-card-title>Create unit</v-card-title>
     <v-card-text>
       <v-form ref="form" v-model="valid" @submit.prevent="submit">
-        <v-autocomplete
+       <v-row>
+        <v-col cols="12">
+          <v-autocomplete
           v-model="unit.floor_id"
           :items="floors"
           item-value="id"
@@ -19,34 +21,40 @@
             Select Floor <span style="color: red">*</span>
           </template>
         </v-autocomplete>
-       
-        <v-text-field
-          v-model="unit.name"
-          :rules="[rules.required]"
-          label="Name"
-          outlined
-          :error-messages="errors.name ? errors.name : ''"
-        >
-          <template v-slot:label>
-            Name <span style="color: red">*</span>
-          </template>
-        </v-text-field>
-
-        <!-- Description Field -->
-        <v-textarea
-          v-model="unit.description"
-          label="Description"
-          :error-messages="errors.description ? errors.description : ''"
-        />
-
-        <!-- Featured Checkbox -->
-        <v-select
-          v-model="unit.status"
-          :items="statusItems"
-          label="Unit Status"
-          clearable
-        ></v-select>
-
+        </v-col>
+        <v-col cols="12" md="6">
+          <v-text-field
+            v-model="unit.name"
+            :rules="[rules.required]"
+            label="Name"
+            outlined
+            :error-messages="errors.name ? errors.name : ''"
+          >
+            <template v-slot:label>
+              Name <span style="color: red">*</span>
+            </template>
+          </v-text-field>
+        </v-col>
+        <v-col cols="12" md="6">
+          <!-- Featured Checkbox -->
+          <v-select
+            v-model="unit.status"
+            :items="statusItems"
+            label="Unit Status"
+            clearable
+          ></v-select>
+        </v-col>
+        <v-col cols="12">
+          <!-- Description Field -->
+          <v-textarea
+            v-model="unit.description"
+            label="Description"
+            :error-messages="errors.description ? errors.description : ''"
+          />
+        </v-col>
+        
+       </v-row>
+        
         <!-- Action Buttons -->
         <v-row class="mt-4">
           <!-- Submit Button -->
