@@ -17,23 +17,7 @@
             single-line
             clearable
           ></v-text-field>
-          <!-- <v-btn
-            @click="createMachineMovement"
-            color="success"
-            class="mr-2"
-            icon
-            style="width: 40px; height: 40px"
-          >
-            <v-tooltip location="top" activator="parent">
-              <template v-slot:activator="{ props }">
-                <v-icon v-bind="props" style="font-size: 20px">
-                  mdi-swap-horizontal
-                </v-icon>
-              </template>
-              <span>Add Machine Movement</span>
-            </v-tooltip>
-          </v-btn> -->
-
+          
           <v-btn
             @click="createMechine"
             color="primary"
@@ -81,10 +65,6 @@
       loading-text="Loading... Please wait"
       @update:options="loadItems"
     >
-      <!-- Custom slot for displaying line -->
-      <!-- <template v-slot:item["factory.floors.0.units.0.lines"]="{ item }">
-      <span>{{ item.factory.floors[0].units[0].lines.map(line => line.name).join(", ") }}</span>
-    </template> -->
       <template v-slot:item.name="{ item }">
         <span
           class="text-decoration-none text-primary cursor-pointer"
@@ -108,14 +88,17 @@
         <span>{{ item.creator ? item.creator.name : "Unknown" }}</span>
       </template>
       <template v-slot:item.actions="{ item }">
-        <v-icon @click="transferMachine(item.uuid)" color="blue" class="mr-2"
-          >mdi-swap-horizontal</v-icon
-        >
-
-        <!-- <v-icon @click="editMechine(item.uuid)" class="mr-2">mdi-pencil</v-icon> -->
-        <v-icon @click="showConfirmDialog(item.id)" color="red"
-          >mdi-delete</v-icon
-        >
+        <div class="action-icons" style="display: flex; align-items: center;">
+          <v-icon @click="editMechine(item.uuid)" color="green" class="mr-2">
+            mdi-pencil
+          </v-icon>
+          <v-icon @click="transferMachine(item.uuid)" color="blue" class="mr-2">
+            mdi-swap-horizontal
+          </v-icon>
+          <v-icon @click="showConfirmDialog(item.uuid)" color="red">
+            mdi-delete
+          </v-icon>
+        </div>
       </template>
     </v-data-table-server>
 
@@ -123,11 +106,7 @@
       :dialogName="dialogName"
       v-model:modelValue="dialog"
       :onConfirm="confirmDelete"
-      :onCancel="
-        () => {
-          dialog = false;
-        }
-      "
+      :onCancel="() => { dialog = false; }"
     />
   </v-card>
 </template>
@@ -143,43 +122,17 @@ export default {
   data() {
     return {
       dialogName: "Are you sure you want to delete this Machine ?",
-
       search: "",
       itemsPerPage: 10,
       headers: [
         { title: "Machine", key: "name", sortable: true },
-        { title: "Company", key: "factory.user.name", sortable: false },
+        { title: "Company", key: "factory.company.name", sortable: false },
         { title: "Factory", key: "factory.name", sortable: false },
-        {
-          title: "Floor",
-          key: "line.unit.floor.name", // Corresponds to the nested "floors" data
-          sortable: false,
-        },
-        {
-          title: "Unit",
-          key: "line.unit.name", // Corresponds to the nested "floors" data
-          sortable: false,
-        },
-        {
-          title: "Line",
-          key: "line.name", // Corresponds to the nested "floors" data
-          sortable: false,
-        },
-        // { title: "Machine Code", key: "machine_code", sortable: false },
-        // { title: "Model", key: "product_model.name", sortable: false },
-        // { title: "Type", key: "mechine_type.name", sortable: false },
-        {
-          title: "Location",
-          key: "location_status",
-          sortable: false,
-        },
-
-        {
-          title: "Status",
-          key: "machine_status.name",
-          sortable: false,
-        },
-        // { title: "Creator", key: "creator.name", sortable: false },
+        { title: "Floor", key: "line.unit.floor.name", sortable: false },
+        { title: "Unit", key: "line.unit.name", sortable: false },
+        { title: "Line", key: "line.name", sortable: false },
+        { title: "Location", key: "location_status", sortable: false },
+        { title: "Status", key: "machine_status.name", sortable: false },
         { title: "Actions", key: "actions", sortable: false },
       ],
       serverItems: [],
@@ -205,13 +158,11 @@ export default {
             search: this.search,
           },
         });
-        console.log(response.data.items);
-
         this.serverItems = response.data.items || [];
         this.totalItems = response.data.total || 0;
         this.fetchTrashedMechinesCount();
       } catch (error) {
-        console.error("Error loading items:", error);
+        toast.error("Failed to load machines.");
       } finally {
         this.loading = false;
       }
@@ -219,10 +170,6 @@ export default {
     createMechine() {
       this.$router.push({ name: "MechineCreate" });
     },
-    createMachineMovement() {
-      this.$router.push({ name: "MachineMovement" });
-    },
-
     viewTrash() {
       this.$router.push({ name: "MechineTrash" });
     },
@@ -235,22 +182,19 @@ export default {
     transferMachine(uuid) {
       this.$router.push({ name: "MechineTransfer", params: { uuid } });
     },
-    showConfirmDialog(id) {
-      this.selectedMechineId = id;
+    showConfirmDialog(uuid) {
+      this.selectedMechineId = uuid;
       this.dialog = true;
     },
     async confirmDelete() {
-      this.dialog = false; // Close the dialog
+      this.dialog = false;
       try {
-        const response = await this.$axios.delete(
-          `/machine-assing/${this.selectedMechineId}`
-        );
+        const response = await this.$axios.delete(`/machine-assing/${this.selectedMechineId}`);
         this.loadItems({
           page: 1,
           itemsPerPage: this.itemsPerPage,
           sortBy: [],
         });
-        // console.log(response.data);
         toast.success("Machine deleted successfully!");
       } catch (error) {
         console.error("Error deleting Machine:", error);
@@ -260,35 +204,23 @@ export default {
     async fetchTrashedMechinesCount() {
       try {
         const response = await this.$axios.get("mechine/assing/trashed-count");
-        this.trashedCount = response.data.trashedCount
-          ? response.data.trashedCount
-          : 0;
+        this.trashedCount = response.data.trashedCount || 0;
       } catch (error) {
         console.error("Error fetching trashed Machine count:", error);
       }
     },
-
     getStatusColor(status) {
-      switch (status) {
-        case "Preventive":
-          return "blue";
-        case "Production":
-          return "green";
-        case "Breakdown":
-          return "red";
-        case "Under Maintenance":
-          return "orange";
-        case "Loan":
-          return "purple";
-        case "Idol":
-          return "grey";
-        case "AsFactory":
-          return "cyan";
-        case "Scraped":
-          return "brown";
-        default:
-          return "black"; // Default color if status doesn't match
-      }
+      const statusColors = {
+        Preventive: "blue",
+        Production: "green",
+        Breakdown: "red",
+        "Under Maintenance": "orange",
+        Loan: "purple",
+        Idol: "grey",
+        AsFactory: "cyan",
+        Scraped: "brown",
+      };
+      return statusColors[status] || "black";
     },
   },
 
@@ -304,5 +236,5 @@ export default {
 </script>
 
 <style scoped>
-/* Optional: Add styles for the main component */
+/* Add any custom styles if necessary */
 </style>

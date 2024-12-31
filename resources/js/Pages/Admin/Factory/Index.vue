@@ -128,7 +128,7 @@ export default {
       factoryCode: "",
       itemsPerPage: 15,
       headers: [
-        { title: "Company Name", key: "company.name", sortable: true },
+        { title: "Company", key: "company.name", sortable: true },
         { title: "Name", key: "name", sortable: true },
         { title: "Code", key: "factory_code", sortable: true },
         { title: "Email", key: "email", sortable: true },
@@ -199,13 +199,16 @@ export default {
     async confirmDelete() {
       this.dialog = false; // Close the dialog
       try {
-        await this.$axios.delete(`/factory/${this.selectedFactoryId}`);
+       const response = await this.$axios.delete(`/factory/${this.selectedFactoryId}`);
         this.loadItems({
           page: 1,
           itemsPerPage: this.itemsPerPage,
           sortBy: [],
         });
-        toast.success("Factory deleted successfully!");
+        if (response.success) {
+          toast.success("Factory deleted successfully!");
+
+        }
       } catch (error) {
         console.error("Error deleting factory:", error);
         toast.error("Failed to delete factory.");

@@ -18,6 +18,7 @@ class MechineAssing extends Model
     protected $fillable = [
         'name',
         'factory_id',
+        'company_id',
         'brand_id',
         'product_model_id',
         'machine_type_id',

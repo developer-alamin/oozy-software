@@ -35,6 +35,11 @@ class Group extends Model
             'description'   => 'nullable|string',
         ];
     }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
     // Polymorphic relationships
     public function creator()
     {

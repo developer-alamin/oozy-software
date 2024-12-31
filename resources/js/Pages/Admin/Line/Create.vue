@@ -3,7 +3,9 @@
     <v-card-title>Create Line</v-card-title>
     <v-card-text>
       <v-form ref="form" v-model="valid" @submit.prevent="submit">
-        <v-autocomplete
+       <v-row>
+        <v-col cols="12" >
+          <v-autocomplete
           v-model="line.unit_id"
           :items="units"
           item-value="id"
@@ -19,42 +21,36 @@
             Select Unit <span style="color: red">*</span>
           </template>
         </v-autocomplete>
-
-        <!-- Display factory name -->
-        <!-- <div v-if="selectedFloorName" style="margin-top: 10px">
-                    <strong>Floor Name:</strong> {{ selectedFloorName }}
-                </div> -->
-        <!-- Display factory name -->
-        <!-- <div v-if="selectedFactoryName" style="margin-top: 10px">
-                    <strong>Factory Name:</strong> {{ selectedFactoryName }}
-                </div> -->
-
-        <!-- Display user name -->
-        <!-- <div v-if="selectedUserName" style="margin-top: 10px">
-                    <strong>Company Name:</strong> {{ selectedUserName }}
-                </div> -->
-        <!-- Name Field -->
-        <v-text-field
-          v-model="line.name"
-          :rules="[rules.required]"
-          label="Name Number"
-          outlined
-          :error-messages="errors.name ? errors.name : ''"
-        >
-          <template v-slot:label>
-            Line Name<span style="color: red">*</span>
-          </template>
-        </v-text-field>
-
-        <!-- Description Field -->
-        <v-textarea v-model="line.description" label="Description" />
-        <v-select
-          v-model="line.status"
-          :items="statusItems"
-          label="Line Status"
-          @change="updateStatus"
-          clearable
-        ></v-select>
+        </v-col>
+        <v-col cols="12" md="6">
+          <!-- Name Field -->
+          <v-text-field
+            v-model="line.name"
+            :rules="[rules.required]"
+            label="Name Number"
+            outlined
+            :error-messages="errors.name ? errors.name : ''"
+          >
+            <template v-slot:label>
+              Line Name<span style="color: red">*</span>
+            </template>
+          </v-text-field>
+        </v-col>
+        <v-col cols="12" md="6">
+          <v-select
+            v-model="line.status"
+            :items="statusItems"
+            label="Line Status"
+            @change="updateStatus"
+            clearable
+          ></v-select>
+        </v-col>
+        <v-col cols="12">
+           <!-- Description Field -->
+          <v-textarea v-model="line.description" label="Description" />
+        </v-col>
+       </v-row>
+       
 
         <!-- Action Buttons -->
         <v-row class="mt-4">

@@ -4,7 +4,7 @@
     <v-card-text>
       <v-form ref="form" v-model="valid" @submit.prevent="submit">
         <v-row>
-          <v-col cols="6">
+          <v-col cols="6" md="6">
             <v-text-field
               v-model="machine.machine_code"
               label="Machine Code"
@@ -14,7 +14,7 @@
             >
             </v-text-field>
           </v-col>
-          <v-col cols="6">
+          <v-col cols="6" md="6">
             <v-text-field
               v-model="machine.name"
               :rules="[rules.required]"
@@ -28,10 +28,7 @@
               </template>
             </v-text-field>
           </v-col>
-        </v-row>
-
-        <v-row>
-          <v-col cols="12">
+          <v-col cols="12" md="6"> 
             <v-autocomplete
               v-model="machine.factory_id"
               :items="factories"
@@ -50,9 +47,7 @@
               </template>
             </v-autocomplete>
           </v-col>
-        </v-row>
-        <v-row>
-          <v-col cols="6">
+          <v-col cols="12" md="6">
             <v-autocomplete
               v-model="machine.brand_id"
               :items="brands"
@@ -73,7 +68,7 @@
               </template>
             </v-autocomplete>
           </v-col>
-          <v-col cols="6">
+          <v-col cols="12" md="6">
             <v-autocomplete
               v-model="machine.product_model_id"
               :items="models"
@@ -93,41 +88,37 @@
               </template>
             </v-autocomplete>
           </v-col>
-        </v-row>
-
-        <v-row>
-          <v-col cols="6">
+          <v-col cols="12" md="6">
             <v-autocomplete
-              v-model="machine.mechine_type_id"
-              :items="types"
-              item-value="id"
-              item-title="name"
-              label="Select Mechine Type"
-              density="comfortable"
-              clearable
-              :rules="[rules.required]"
-              :error-messages="
-                errors.mechine_type_id ? errors.mechine_type_id : ''
-              "
-              @update:search="fetchTypes"
-              @update:model-value="updatePreventiveServiceDays"
-            >
-              <template v-slot:label>
-                Select Mechine Type
-                <span style="color: red">*</span>
-              </template>
-            </v-autocomplete>
+                v-model="machine.machine_type_id"
+                :items="types"
+                item-value="id"
+                item-title="name"
+                label="Select Mechine Type"
+                density="comfortable"
+                clearable
+                :rules="[rules.required]"
+                :error-messages="errors.mechine_type_id ? errors.mechine_type_id : ''"
+                @update:search="fetchTypes"
+                @update:model-value="updatePreventiveServiceDays"
+              >
+                <template v-slot:label>
+                  Select Mechine Type
+                  <span style="color: red">*</span>
+                </template>
+              </v-autocomplete>
+
           </v-col>
-          <v-col cols="6">
+          <v-col cols="12" md="6">
             <v-text-field
-              v-model="machine.preventive_service_days"
+              v-model="machine.partial_maintenance_day"
               :rules="[rules.required]"
               label="Mechine Preventive Service Days"
               outlined
               density="comfortable"
               :error-messages="
-                errors.preventive_service_days
-                  ? errors.preventive_service_days
+                errors.partial_maintenance_day
+                  ? errors.partial_maintenance_day
                   : ''
               "
             >
@@ -137,12 +128,9 @@
               </template>
             </v-text-field>
           </v-col>
-        </v-row>
-
-        <v-row>
-          <v-col cols="6">
+          <v-col cols="12" md="6">
             <v-autocomplete
-              v-model="machine.mechine_source_id"
+              v-model="machine.source_id"
               :items="sources"
               item-value="id"
               item-title="name"
@@ -161,10 +149,7 @@
               </template>
             </v-autocomplete>
           </v-col>
-        </v-row>
-
-        <v-row>
-          <v-col cols="4">
+          <v-col cols="12" md="6">
             <v-autocomplete
               v-model="machine.supplier_id"
               :items="suppliers"
@@ -178,7 +163,7 @@
             >
             </v-autocomplete>
           </v-col>
-          <v-col cols="4">
+          <v-col cols="12" md="6">
             <v-date-input
               v-model="machine.purchase_date"
               label="Purchase Date"
@@ -186,9 +171,9 @@
               :error-messages="errors.purchase_date ? errors.purchase_date : ''"
             />
           </v-col>
-          <v-col cols="4">
+          <v-col cols="12" md="6">
             <v-text-field
-              v-model="machine.purchace_price"
+              v-model="machine.purchase_price"
               label="Purchase Price"
               outlined
               density="comfortable"
@@ -199,21 +184,33 @@
               <template v-slot:label> Purchase Price </template>
             </v-text-field>
           </v-col>
+          <v-col cols="12" md="6">
+            <v-autocomplete
+                v-model="machine.machine_status_id"
+                :items="MachineStatus"
+                item-value="id"
+                item-title="name"
+                outlined
+                clearable
+                density="comfortable"
+                :rules="[rules.required]"
+                :error-messages="errors.machine_status_id ? errors.machine_status_id : ''"
+                @update:search="fetchStatus"
+                >
+                <template v-slot:label>
+                    Select Status <span style="color: red">*</span>
+                </template>
+            </v-autocomplete>
+          </v-col>
+          <v-col cols="12">
+            <v-textarea
+            v-model="machine.rent_note"
+            label="Note"
+            density="comfortable"
+            :error-messages="errors.rent_note ? errors.rent_note : ''"
+          />
+          </v-col>
         </v-row>
-        <v-textarea
-          v-model="machine.note"
-          label="Note"
-          density="comfortable"
-          :error-messages="errors.note ? errors.note : ''"
-        />
-        <v-select
-          v-model="machine.status"
-          :items="statusItems"
-          label="Machine Status"
-          clearable
-          density="comfortable"
-        ></v-select>
-
         <!-- Action Buttons -->
         <v-row class="mt-4">
           <!-- Submit Button -->
@@ -270,6 +267,7 @@ export default {
         "Idol",
         "AsFactory",
         "Scraped",
+        "Assign"
       ],
 
       machine: {
@@ -281,7 +279,7 @@ export default {
         company_id: null,
         factory_id: null,
         brand_id: null,
-        product_model_id: null,
+        product_model_id: '',
         machine_type_id: null,
         partial_maintenance_day: "",
         full_maintenance_day: "",
@@ -289,7 +287,7 @@ export default {
         supplier_id: null,
         rent_id: null,
         machine_code: "",
-        note: "",
+        rent_note: "",
         machine_status_id: null, // New property for checkbox
         rent_note: "",
         rent_amount_type: null,
@@ -307,8 +305,8 @@ export default {
       sources: [], // Array to store sources data
       suppliers: [], // Array to store suppliers data
       rents: [], // Array to store rents data
+      MachineStatus:[],
       selectedCompany: null, // Bound to selected Company in v-autocomplete
-
       rules: {
         required: (value) => !!value || "Required.",
         email: (value) => /.+@.+\..+/.test(value) || "E-mail must be valid.",
@@ -333,9 +331,9 @@ export default {
     this.fetchFactories().then(() => {
       this.fetchMechine();
     });
-    // this.fetchModels().then(() => {
-    //   this.fetchMechine();
-    // });
+    this.fetchModels().then(() => {
+      this.fetchMechine();
+    });
     this.fetchTypes().then(() => {
       this.fetchMechine();
     });
@@ -345,7 +343,12 @@ export default {
     this.fetchSuppliers().then(() => {
       this.fetchMechine();
     });
-    this.fetchBrands();
+    this.fetchBrands().then(() => {
+      this.fetchMechine();
+    });
+    this.fetchStatus().then(() => {
+      this.fetchMechine();
+    });
   },
   methods: {
     async fetchMechine() {
@@ -354,68 +357,15 @@ export default {
         const response = await this.$axios.get(
           `/mechine/assing/${mecineAssingId}/edit`
         );
+
         this.machine = response.data.mechineAssing;
-        await this.fetchModels();
-
-        // Ensure models and brands are loaded before assigning
-        // await this.fetchBrands();
-        // await this.fetchModels();
-        // Match brand_id with the brands list
-
-        this.machine.status = this.statusItems.includes(this.machine.status)
-          ? this.machine.status
-          : "";
-
-        // Set the selected company based on the company_id
-        const selectedModel = this.models.find(
-          (c) => c.id === this.machine.product_model_id
-        );
-
-        if (selectedModel) {
-          this.machine.product_model_id = selectedModel.id; // Set the company_id for v-autocomplete
-        }
-        // models
-        const selectedFactory = this.models.find(
-          (c) => c.id === this.machine.product_model_id
-        );
-        if (selectedFactory) {
-          this.machine.factory_id = selectedFactory.id; // Set the company_id for v-autocomplete
-        }
-        console.log(selectedFactory);
-        // Type
-        const selectedType = this.factories.find(
-          (c) => c.id === this.machine.mechine_type_id
-        );
-        if (selectedType) {
-          this.machine.mechine_type_id = selectedType.id; // Set the company_id for v-autocomplete
-        }
-
-        // Source
-        const selectedSource = this.factories.find(
-          (c) => c.id === this.machine.mechine_source_id
-        );
-        if (selectedSource) {
-          this.machine.mechine_source_id = selectedSource.id; // Set the company_id for v-autocomplete
-        }
-        // Supplier
-        const selectedSupplier = this.factories.find(
-          (c) => c.id === this.machine.supplier_id
-        );
-        if (selectedSupplier) {
-          this.machine.supplier_id = selectedSupplier.id; // Set the company_id for v-autocomplete
-        }
-        // Rent
-        const selectedRent = this.factories.find(
-          (c) => c.id === this.machine.rent_id
-        );
-        if (selectedRent) {
-          this.machine.rent_id = selectedRent.id; // Set the company_id for v-autocomplete
-        }
+      
       } catch (error) {
+        console.log(error);
+        
         this.serverError = "Error fetching technician data.";
       }
     },
-
     async submit() {
       this.errors = {}; // Reset errors before submission
       this.serverError = null;
@@ -423,16 +373,15 @@ export default {
       const mechineId = this.$route.params.uuid; // Assuming type ID is in route params
       setTimeout(async () => {
         try {
-          const response = await this.$axios.post(
-            `/mechine-assing`,
-            this.machine
-          );
-          // console.log(response.data);
+          const response = await this.$axios.put(
+            `/machine-assing/${mechineId}`,this.machine);
+
           if (response.data.success) {
             toast.success("mechine transfer successfully!");
             this.$router.push({ name: "MechineIndex" }); // Redirect to type list page
           }
         } catch (error) {
+          console.log(error);
           if (error.response && error.response.status === 422) {
             toast.error("Failed to update mechine transfer .");
             this.errors = error.response.data.errors || {};
@@ -462,6 +411,25 @@ export default {
         this.$refs.form.reset(); // Reset the form via its ref if necessary
       }
     },
+    async fetchStatus(search) {
+        try {
+            // Make a GET request to the '/get_companies' endpoint with query parameters
+            const response = await this.$axios.get('/machine/get_status', {
+                params: {
+                search: this.search || '', // Use `this.search` or fallback to an empty string
+                limit: this.limit || 5,   // Use `this.limit` or fallback to default value (5)
+                },
+            });
+            // Update the companies array with the fetched data
+            this.MachineStatus = response.data;
+            } catch (error) {
+            // Log any errors that occur during the request
+            console.error('Error fetching companies:', error);
+            // Optionally, handle the error (e.g., show an error message to the user)
+            this.$toast.error('Failed to fetch companies. Please try again later.');
+            }
+
+    },
 
     async fetchFactories(search) {
       try {
@@ -477,48 +445,6 @@ export default {
         console.error("Error fetching factories:", error);
       }
     },
-
-    // async fetchModels(search) {
-    //   try {
-    //     this.loadingModels = true;
-    //     const response = await this.$axios.get("/get_models", {
-    //       params: { search, limit: 5 },
-    //     });
-    //     this.models = response.data;
-    //     // console.log(response.data);
-    //   } catch (error) {
-    //     console.error("Error fetching models:", error);
-    //   } finally {
-    //     this.loadingModels = false;
-    //   }
-    // },
-    // async fetchBrands(search) {
-    //   try {
-    //     if (!this.machine.product_model_id) {
-    //       this.brands = [];
-    //       return;
-    //     }
-
-    //     this.loadingBrands = true;
-    //     const response = await this.$axios.get("/get_brands", {
-    //       params: {
-    //         search,
-    //         product_model_id: this.machine.product_model_id,
-    //         limit: 5,
-    //       },
-    //     });
-    //     this.brands = response.data;
-    //   } catch (error) {
-    //     console.error("Error fetching brands:", error);
-    //   } finally {
-    //     this.loadingBrands = false;
-    //   }
-    // },
-    // onModelChange() {
-    //   this.machine.brand_id = null; // Reset brand selection when model changes
-    //   this.fetchBrands("");
-    // },
-
     async fetchBrands(search) {
       try {
         const response = await this.$axios.get("/get_brands", {
@@ -529,12 +455,11 @@ export default {
         console.error("Error fetching brands:", error);
       }
     },
-
     // Handle brand change, fetch models based on selected brand
 
-    // Fetch models based on search term (for model autocomplete)
-    async fetchModels(search) {
-      if (!this.machine.brand_id) return;
+   // Fetch models based on search term (for model autocomplete)
+    async fetchModels(search = "") {
+      if (!this.machine.brand_id) return; // Ensure brand_id is available
       try {
         const response = await this.$axios.get("/get_models", {
           params: { search, brand_id: this.machine.brand_id },
@@ -544,38 +469,40 @@ export default {
         console.error("Error fetching models:", error);
       }
     },
-
+    // Handle brand change
     async onBrandChange() {
-      this.machine.product_model_id = null;
+      this.machine.product_model_id = null; // Reset product model selection
       if (!this.machine.brand_id) {
         this.models = []; // Clear models if no brand is selected
         return;
       }
       try {
-        const response = await this.$axios.get("/get_models", {
-          params: { brand_id: this.machine.brand_id },
-        });
-        this.models = response.data;
-        await this.fetchModels();
+        // Fetch models for the selected brand
+        await this.fetchModels(); // This will handle fetching based on brand_id
       } catch (error) {
         console.error("Error fetching models:", error);
       }
     },
-
     async fetchTypes(search) {
       try {
-        const response = await this.$axios.get(`/get_types`, {
+        // Fetch types based on search term and limit
+        const response = await this.$axios.get('/get_types', {
           params: {
-            search: search,
-            limit: this.limit,
-          },
+            search: search,  // Pass the search term
+            limit: this.limit // Apply limit
+          }
         });
-        // console.log(response.data);
+        
+        // Update the types list with the response data
         this.types = response.data;
+        console.log(this.types); // Log the fetched types
       } catch (error) {
+        // Error handling
         console.error("Error fetching types:", error);
+        // Optionally, you can set an error message for the UI
       }
     },
+
     updatePreventiveServiceDays() {
       const selectedType = this.types.find(
         (type) => type.id === this.machine.mechine_type_id

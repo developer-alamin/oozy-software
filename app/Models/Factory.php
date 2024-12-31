@@ -39,12 +39,13 @@ class Factory extends Model
 
     public function company()
     {
-        return $this->belongsTo(Company::class, 'company_id');
+        return $this->belongsTo(Company::class);
     }
     public function floors()
     {
         return $this->hasMany(Floor::class);
     }
+
     public function creator()
     {
         return $this->morphTo();

@@ -27,7 +27,7 @@ return new class extends Migration
 
             // Foreign key assign
             $table->foreignId('preventive_service_id');
-            $table->foreignId('technician_id');
+            $table->foreignId('technician_id')->nullable();
 
             // Foreign key References
             $table->foreign("preventive_service_id")
@@ -39,8 +39,8 @@ return new class extends Migration
             $table->foreign("technician_id")
             ->references('id')
             ->on('users')
-            ->onUpdate('restrict')
-            ->onDelete('restrict');
+            ->onUpdate('cascade')
+            ->onDelete('set null');
 
             $table->morphs('creator');
             $table->morphs('updater');
