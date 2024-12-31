@@ -75,6 +75,19 @@
                 >mdi-clock-start</v-icon
             >
           </template>
+          <template v-else-if="item.technician_status && item.technician_status == 'Start Service'">
+              <v-icon @click="PreventiveServiceStartDetails(item.detail_id)" class="mr-2"
+                >mdi-note-text-outline</v-icon
+            >
+          </template>
+          <template v-else-if="item.technician_status && item.technician_status == 'Done'">
+              <v-icon class="mr-2">empty</v-icon>
+          </template>
+          <template v-else-if="item.technician_status && item.technician_status == 'Cancel'">
+            <v-icon @click="AssignToTechnicianPreventiveService(item.uuid)" class="mr-2"
+                >mdi-account-outline</v-icon
+            >
+          </template>
           <template v-else>
             <v-icon @click="AssignToTechnicianPreventiveService(item.uuid)" class="mr-2"
                 >mdi-account-outline</v-icon
@@ -206,6 +219,9 @@ export default {
     },
     PreventiveServiceStart(detail_id) {
         this.$router.push({ name: "PreventiveServiceStart", params: { detail_id } });
+    },
+    PreventiveServiceStartDetails(detail_id) {
+        this.$router.push({ name: "PreventiveServiceStartDetails", params: { detail_id } });
     },
     showConfirmDialog(id) {
       this.selectedId = id;

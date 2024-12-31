@@ -415,6 +415,14 @@ class PreventiveServiceController extends Controller
 
         try {
             $PreventiveServiceDetail->save();
+
+            //update PreventiveService service_status
+            $PreventiveService = PreventiveService::where('id', $PreventiveServiceDetail->preventive_service_id)->firstOrFail(); 
+            $PreventiveService->service_status = 'Processing';
+            $PreventiveService->updater()->associate($creator);
+            $PreventiveService->save();
+
+
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Failed to save.'], 500);
         }
@@ -427,6 +435,90 @@ class PreventiveServiceController extends Controller
         ], 200);
     }
 
+
+    public function preventive_service_start_get_details($detail_id){
+        $PreventiveServiceDetail = PreventiveServiceDetail::where('id', $detail_id)->firstOrFail();
+        $PreventiveService = PreventiveService::where('id', $PreventiveServiceDetail->preventive_service_id)->first();
+
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
+
+            // Check if the admin is a super admin
+            if ($currentUser->role === 'superadmin') {
+                // Super admins can edit any PreventiveServiceDetail
+                return response()->json([
+                    'success'     => true,
+                    'PreventiveServiceDetail' => $PreventiveServiceDetail,
+                    'PreventiveService' => $PreventiveService
+                ], Response::HTTP_OK);
+            }
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+        // Check if the PreventiveServiceDetail belongs to the current user or admin
+        if ($PreventiveServiceDetail->creator_type !== $creatorType || $PreventiveServiceDetail->creator_id !== $currentUser->id) {
+            return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to edit this PreventiveServiceDetail.'], 403);
+        }
+        // Return the PreventiveServiceDetail data if authorized
+        return response()->json([
+            'success' => true,
+            'PreventiveServiceDetail' => $PreventiveServiceDetail,
+            'PreventiveService' => $PreventiveService
+        ], Response::HTTP_OK);
+    }
+
+    public function preventive_service_start_save_details(Request $request, $detail_id){
+        $PreventiveServiceDetail = PreventiveServiceDetail::where('id', $detail_id)->firstOrFail();
+
+        // Check which authentication guard is in use and set the creator
+        $creator = null;
+        if (Auth::guard('admin')->check()) {
+            $creator = Auth::guard('admin')->user();
+        } elseif (Auth::guard('user')->check()) {
+            $creator = Auth::guard('user')->user();
+        }
+
+        // If no creator (user/admin) is found, return Unauthorized response
+        if (!$creator) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        // Update the status and acknowledge date time
+        $PreventiveServiceDetail->technician_status = $request->technician_status;
+        $PreventiveServiceDetail->status = ($request->technician_status == 'Failed') ? 'Cancel' : $request->technician_status;
+        $PreventiveServiceDetail->service_end_date_time = now();
+        $PreventiveServiceDetail->problem_note_id = $request->problem_note_id ? json_encode($request->problem_note_id) : NULL;
+        $PreventiveServiceDetail->note = $request->note;
+        $PreventiveServiceDetail->parts_info = $request->parts_info ? json_encode($request->parts_info) : NULL;
+        $PreventiveServiceDetail->updater()->associate($creator);
+
+        try {
+            $PreventiveServiceDetail->save();
+
+
+            //update PreventiveService service_status
+            $PreventiveService = PreventiveService::where('id', $PreventiveServiceDetail->preventive_service_id)->firstOrFail(); 
+            $PreventiveService->service_status = ($request->technician_status == 'Failed') ? 'Cancel' : $request->technician_status;
+            $PreventiveService->updater()->associate($creator);
+            $PreventiveService->save();
+
+
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Failed to save.'], 500);
+        }
+
+        // Return a success response
+        return response()->json([
+            'success' => true,
+            'message' => 'Data has been saved.',
+            'service' => $PreventiveServiceDetail
+        ], 200);
+    }
 
 
     public function trashed_count(){

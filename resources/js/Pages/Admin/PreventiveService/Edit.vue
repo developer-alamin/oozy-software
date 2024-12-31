@@ -33,7 +33,6 @@
 		              label="Service Date"
 		              density="comfortable"
 		              :error-messages="errors.service_date ? errors.service_date : ''"
-		              readonly
 		            />
 		          </v-col>
 		          <v-col cols="6">
@@ -43,7 +42,6 @@
 		              type="time"
 		              density="comfortable"
 		              :error-messages="errors.service_time ? errors.service_time : ''"
-		              readonly
 		            />
 		          </v-col>
 		        </v-row>

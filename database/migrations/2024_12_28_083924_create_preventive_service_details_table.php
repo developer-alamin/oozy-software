@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             
             $table->enum('status',["Processing","Done","Cancel"])->default('Processing');
-            $table->enum('technician_status',['Acknowledge','Acknowledged','Start Service'])->nullable();
+            $table->enum('technician_status',['Acknowledge','Acknowledged','Start Service','Done', 'Failed'])->nullable();
             $table->dateTime("acknowledge_date_time")->nullable();
 
             $table->dateTime('service_start_date_time')->nullable();

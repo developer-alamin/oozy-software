@@ -288,6 +288,13 @@ const routes = [
         meta: { title: "Preventive Service Start" },
         props: true,
       },
+      {
+        path: "preventive-service/:detail_id/preventive-service-start-details",
+        name: "PreventiveServiceStartDetails",
+        component: adminComponents.PreventiveServiceStartDetails,
+        meta: { title: "Preventive Service Start Details" },
+        props: true,
+      },
 
       //supplier
       {
