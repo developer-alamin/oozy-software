@@ -716,9 +716,6 @@ export default {
             factory_id: this.machine.factory_id,
           },
         });
-
-        console.log(response);
-        
         this.lines = response.data;
       } catch (error) {
         console.error("Error fetching lines:", error);
