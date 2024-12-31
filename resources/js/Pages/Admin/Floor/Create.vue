@@ -22,10 +22,7 @@
           </template>
         </v-autocomplete>
         </v-col>
-       
-       </v-row>
-       <v-row>
-        <v-col cols="6">
+        <v-col cols="12" md="6">
           <v-text-field
           v-model="floor.name"
           :rules="[rules.required]"
@@ -38,7 +35,7 @@
           </template>
         </v-text-field>
         </v-col>
-        <v-col cols="6">
+        <v-col cols="12" md="6">
           <v-select
           v-model="floor.status"
           :items="statusItems"
@@ -46,13 +43,15 @@
           clearable
         ></v-select>
         </v-col>
+        <v-col cols="12" md="12">
+           <!-- Description Field -->
+          <v-textarea
+            v-model="floor.description"
+            label="Description"
+            :error-messages="errors.description ? errors.description : ''"
+          />
+        </v-col>
        </v-row>
-        <!-- Description Field -->
-        <v-textarea
-          v-model="floor.description"
-          label="Description"
-          :error-messages="errors.description ? errors.description : ''"
-        />
         <!-- Action Buttons -->
         <v-row class="mt-4">
           <!-- Submit Button -->

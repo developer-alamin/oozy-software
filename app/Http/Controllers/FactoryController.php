@@ -70,7 +70,7 @@ class FactoryController extends Controller
         $factoriesQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
         $factories = $factoriesQuery
-        ->with(['creator:id,name','company:id,name']) // Eager load relationships and creator's name
+        ->with(['creator','company']) // Eager load relationships and creator's name
         ->paginate($itemsPerPage, ['*'], 'page', $page);
         // Return the response as JSON
         return response()->json([

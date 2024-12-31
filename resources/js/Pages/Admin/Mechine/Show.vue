@@ -31,7 +31,8 @@
         </v-card>
       </v-col>
     </v-row>
-    <v-card class="mt-5">
+
+    <!-- <v-card class="mt-5">
       <v-card-title class="pt-5">
         <v-row>
           <v-col cols="4"><span>Machine History </span></v-col>
@@ -49,21 +50,21 @@
               single-line
               clearable
             ></v-text-field>
-            <!-- <v-btn
-                        @click="createMechine"
-                        color="primary"
-                        icon
-                        style="width: 40px; height: 40px"
-                    >
-                        <v-tooltip location="top" activator="parent">
-                            <template v-slot:activator="{ props }">
-                                <v-icon v-bind="props" style="font-size: 20px"
-                                    >mdi-plus</v-icon
-                                >
-                            </template>
-                            <span>Add New a Mechine</span>
-                        </v-tooltip>
-                    </v-btn> -->
+            <v-btn
+              @click="createMechine"
+              color="primary"
+              icon
+              style="width: 40px; height: 40px"
+            >
+              <v-tooltip location="top" activator="parent">
+                  <template v-slot:activator="{ props }">
+                      <v-icon v-bind="props" style="font-size: 20px"
+                          >mdi-plus</v-icon
+                      >
+                  </template>
+                  <span>Add New a Mechine</span>
+              </v-tooltip>
+          </v-btn>
 
             <v-badge :content="trashedCount" color="red" overlap>
               <v-btn
@@ -111,18 +112,18 @@
           <span>{{ item.creator ? item.creator.name : "Unknown" }}</span>
         </template>
         <template v-slot:item.actions="{ item }">
-          <!-- <v-icon
+         <v-icon
                     @click="transferMachine(item.uuid)"
                     color="blue"
                     class="mr-2"
                     >mdi-transfer</v-icon
-                > -->
-          <!-- <v-icon @click="editMechine(item.uuid)" class="mr-2"
+                > 
+           <v-icon @click="editMechine(item.uuid)" class="mr-2"
                     >mdi-pencil</v-icon
-                > -->
-          <!-- <v-icon @click="showConfirmDialog(item.id)" color="red"
+                > 
+          <v-icon @click="showConfirmDialog(item.id)" color="red"
                     >mdi-delete</v-icon
-                > -->
+                > 
         </template>
       </v-data-table-server>
 
@@ -136,7 +137,7 @@
           }
         "
       />
-    </v-card>
+    </v-card> -->
   </v-container>
 </template>
 
@@ -149,136 +150,49 @@ export default {
   },
   data() {
     return {
-      levels: [
+       levels :[
+        // Basic Machine Details
         { title: "Machine Code", key: "machine_code", sortable: true },
         { title: "Machine Name", key: "name", sortable: true },
-        { title: "Company", key: "factory.user.name", sortable: false },
+        { title: "Machine Brand", key: "brand.name", sortable: false },
+        { title: "Machine Model", key: "product_model.name", sortable: false },
+        { title: "Machine Type", key: "mechine_type.name", sortable: false },
+        // Maintenance Details
+        { title: "Partial Maintenance", key: "partial_maintenance_day", sortable: false },
+        { title: "Full Maintenance", key: "full_maintenance_day", sortable: false },
+        // Purchase and Rent Details
+        { title: "Supplier", key: "supplier.name", sortable: false },
+        { title: "Purchase Date", key: "purchase_date", sortable: false },
+        { title: "Purchase Price", key: "purchase_price", sortable: false },
+        { title: "Rent Date", key: "rent_date", sortable: false },
+        { title: "Rent Name", key: "rent_name", sortable: false },
+        { title: "Rent Price", key: "rent_price", sortable: false },
+        { title: "Rent Amount Type", key: "rent_amount_type", sortable: false },
+
+        // Ownership and Warranty
+        { title: "Serial Number", key: "serial_number", sortable: false },
+        { title: "Commission Date", key: "commission_date", sortable: false },
+        { title: "Warranty Period", key: "warranty_period", sortable: false },
+        { title: "Ownership", key: "ownership", sortable: false },
+
+        // Technical Specifications
+        { title: "Power Requirements", key: "power_requirements", sortable: false },
+        { title: "Capacity", key: "capacity", sortable: false },
+        { title: "Dimensions", key: "dimensions", sortable: false },
+        { title: "Machine Weight", key: "machine_weight", sortable: false },
+        { title: "Material Compatibility", key: "material_compatibility", sortable: false },
+        { title: "Maximum Speed", key: "maximum_speed", sortable: false },
+        { title: "Optimum Speed", key: "optimum_speed", sortable: false },
+        { title: "Operating Temperature Range", key: "operating_temperature_range", sortable: false },
+        // Location Details
+        { title: "Company", key: "factory.comapny.name", sortable: false },
         { title: "Factory", key: "factory.name", sortable: false },
         { title: "Floor", key: "line.unit.floor.name", sortable: false },
         { title: "Unit", key: "line.unit.name", sortable: false },
         { title: "Line", key: "line.name", sortable: false },
-        { title: "Machine Brand", key: "brand.name", sortable: false },
-        { title: "Machine Model", key: "product_model.name", sortable: false },
-        {
-          title: "Machine Type",
-          key: "mechine_type.name",
-          sortable: false,
-        },
-        {
-          title: "Partial Maintenance",
-          key: "partial_maintenance_day",
-          sortable: false,
-        },
-        {
-          title: "Full Maintenance",
-          key: "full_maintenance_day",
-          sortable: false,
-        },
-        {
-          title: "Supplier",
-          key: "supplier.name",
-          sortable: false,
-        },
-        {
-          title: "Purchase Date",
-          key: "purchase_date",
-          sortable: false,
-        },
-        {
-          title: "Purchase Price",
-          key: "purchase_price",
-          sortable: false,
-        },
-        {
-          title: "Rent Date",
-          key: "rent_date",
-          sortable: false,
-        },
-        {
-          title: "Rent Name",
-          key: "rent_name",
-          sortable: false,
-        },
-        {
-          title: "Rent Price",
-          key: "rent_price",
-          sortable: false,
-        },
-        {
-          title: "Rent Amount Type",
-          key: "rent_amount_type",
-          sortable: false,
-        },
-
-        {
-          title: "Serial Number",
-          key: "serial_number",
-          sortable: false,
-        },
-        {
-          title: "Commission Date",
-          key: "commission_date",
-          sortable: false,
-        },
-        {
-          title: "Warranty Period",
-          key: "warranty_period",
-          sortable: false,
-        },
-        {
-          title: "Ownership",
-          key: "ownership",
-          sortable: false,
-        },
-
-        {
-          title: "Power Requirements",
-          key: "power_requirements",
-          sortable: false,
-        },
-        {
-          title: "Capacity",
-          key: "capacity",
-          sortable: false,
-        },
-        {
-          title: "Dimensions",
-          key: "dimensions",
-          sortable: false,
-        },
-        {
-          title: "Machine Weight",
-          key: "machine_weight",
-          sortable: false,
-        },
-
-        {
-          title: "Material Compatibility",
-          key: "material_compatibility",
-          sortable: false,
-        },
-        {
-          title: "Maximum Speed",
-          key: "maximum_speed",
-          sortable: false,
-        },
-        {
-          title: "Optimum Speed",
-          key: "optimum_speed",
-          sortable: false,
-        },
-        {
-          title: "Operating Temperature Range",
-          key: "operating_temperature_range",
-          sortable: false,
-        },
-        {
-          title: "Tags",
-          key: "tag",
-          sortable: false,
-        },
-
         { title: "Location", key: "location_status", sortable: false },
+        // Additional Information
+        { title: "Tags", key: "tag", sortable: false },
         { title: "Status", key: "machine_status.name", sortable: false },
       ],
       machine: {}, // This will hold the fetched machine data
@@ -288,40 +202,23 @@ export default {
 
       search: "",
       itemsPerPage: 10,
-      headers: [
+      headers : [
+        // Primary Information
         { title: "Machine", key: "name", sortable: true },
-        { title: "Company", key: "factory.user.name", sortable: false },
+        // Company and Location Details
+        { title: "Company", key: "factory.company.name", sortable: false },
         { title: "Factory", key: "factory.name", sortable: false },
-        {
-          title: "Floor",
-          key: "line.unit.floor.name", // Corresponds to the nested "floors" data
-          sortable: false,
-        },
-        {
-          title: "Unit",
-          key: "line.unit.name", // Corresponds to the nested "floors" data
-          sortable: false,
-        },
-        {
-          title: "Line",
-          key: "line.name", // Corresponds to the nested "floors" data
-          sortable: false,
-        },
-
-        {
-          title: "Location",
-          key: "location_status",
-          sortable: false,
-        },
-
-        {
-          title: "Status",
-          key: "machine_status.name",
-          sortable: false,
-        },
-        // { title: "Creator", key: "creator.name", sortable: false },
-        // { title: "Actions", key: "actions", sortable: false },
+        { title: "Floor", key: "line.unit.floor.name", sortable: false },
+        { title: "Unit", key: "line.unit.name", sortable: false },
+        { title: "Line", key: "line.name", sortable: false },
+        // Additional Information
+        { title: "Location", key: "location_status", sortable: false },
+        { title: "Status", key: "machine_status.name", sortable: false },
+        // Other Details
+        { title: "Creator", key: "creator.name", sortable: false },
+        { title: "Actions", key: "actions", sortable: false },
       ],
+
       serverItems: [],
       loading: true,
       totalItems: 0,
@@ -342,10 +239,11 @@ export default {
         const response = await this.$axios.get(
           `/machine-assing/${machineAssignId}`
         );
+        
         this.machine = response.data.machineAssign;
-        this.serverItems = response.data.items || [];
-        this.totalItems = response.data.total || 0;
-        console.log(response.data.items);
+
+        // this.serverItems = response.data.items || [];
+        // this.totalItems = response.data.total || 0;
       } catch (error) {
         this.serverError = "Error fetching technician data.";
         console.error(error);
@@ -355,6 +253,8 @@ export default {
     getNestedValue(key) {
       const keys = key.split(".");
       let value = this.machine;
+      console.log(keys);
+      
       keys.forEach((k) => {
         value = value ? value[k] : null;
       });

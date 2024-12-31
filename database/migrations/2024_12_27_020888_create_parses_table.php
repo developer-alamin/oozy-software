@@ -29,7 +29,7 @@ return new class extends Migration
              // Foreign key assign
             $table->foreignId('company_id');
             $table->foreignId('factory_id');
-            $table->foreignId('category_id');
+            $table->foreignId('category_id')->nullable();
             $table->foreignId('parse_unit_id')->nullable();
         
 
@@ -50,14 +50,14 @@ return new class extends Migration
             $table->foreign("category_id")
             ->references('id')
             ->on('categories')
-            ->onUpdate('restrict')
-            ->onDelete('restrict');
+            ->onUpdate('cascade')
+            ->onDelete('set null');
 
             $table->foreign("parse_unit_id")
             ->references('id')
             ->on('parse_units')
-            ->onUpdate('restrict')
-            ->onDelete('restrict');
+            ->onUpdate('cascade')
+            ->onDelete('set null');
 
             
             $table->morphs('creator');

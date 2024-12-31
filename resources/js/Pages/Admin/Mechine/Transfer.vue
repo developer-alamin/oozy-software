@@ -128,12 +128,14 @@ export default {
             `/machine/transfer/update/${machineId}`,
             this.machine
           );
-          // console.log(response.data);
+          console.log(response);
           if (response.data.success) {
             toast.success("mechine transfer successfully!");
             this.$router.push({ name: "MechineIndex" }); // Redirect to type list page
           }
         } catch (error) {
+          console.log(error);
+          
           if (error.response && error.response.status === 422) {
             toast.error("Failed to update mechine transfer .");
             this.errors = error.response.data.errors || {};

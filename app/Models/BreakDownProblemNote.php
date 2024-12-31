@@ -13,14 +13,21 @@ class BreakDownProblemNote extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'break_down_problem_note',
+        'uuid',
+        'note',
         'status',
+        'company_id',
+        'creator_type',
+        'creator_id',
+        'updater_type',
+        'updater_id',
     ];
 
     public static function validationRules()
     {
         return [
-            'break_down_problem_note' => 'required|string',
+            'company_id'              => 'required|exists:companies,id',
+            'note'                    => 'required|string',
             'status'                  => 'nullable|in:Active,Inactive',
             'creator_id'              => 'nullable',
             'creator_type'            => 'nullable',
@@ -29,7 +36,10 @@ class BreakDownProblemNote extends Model
         ];
     }
 
-
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
     public function creator()
     {
         return $this->morphTo();

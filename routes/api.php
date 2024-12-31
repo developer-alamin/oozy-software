@@ -78,15 +78,15 @@ Route::get('/get_sources', [MechineAssingController::class, 'getSources']);
 Route::get('/get_suppliers', [MechineAssingController::class, 'getSuppliers']);
 Route::get('/get_rents', [MechineAssingController::class, 'getRents']);
 Route::get('/generate-machine-code', [MechineAssingController::class, 'generateMachineCode']);
-
+Route::get('/machine/get_status',[MechineAssingController::class,"machinegetStatus"]);
 
 
 Route::get('/mechine/{uuid}/transfer', [MechineAssingController::class, 'mechineTransfer'])->name('mechine.transfer');
 Route::post('/mechine/transfer/{uuid}', [MechineAssingController::class, 'mechineTransferStore'])->name('mechine.transfer.store');
 Route::get('/mechine/assing/trashed-count', [MechineAssingController::class,'mechineTrashedCount'])->name('mechine.assing.trashed.count');
 Route::get('/mechine/assing/trashed', [MechineAssingController::class,'mechineAssingTrashed'])->name('mechine.assing.trashed');
-Route::post('/mechine/assing/{id}/restore', [MechineAssingController::class,'mechineAssingRestore'])->name('mechine.assing.restore');
-Route::delete('/mechine/assing/{id}/forceDelete', [MechineAssingController::class,'mechineAssingforceDelete'])->name('mechine.transfer.list');
+Route::post('/mechine/assing/{uuid}/restore', [MechineAssingController::class,'mechineAssingRestore'])->name('mechine.assing.restore');
+Route::delete('/mechine/assing/{uuid}/forceDelete', [MechineAssingController::class,'mechineAssingforceDelete'])->name('mechine.transfer.list');
 Route::get('/mechine/transfer/list', [MechineAssingController::class,'mechineTransferList'])->name('mechine.transfer.list');
 Route::get('/machine/history/list', [MechineAssingController::class,'machineHistoryList'])->name('mechine.assing.trashed');
 Route::get('/mechine/assing/{uuid}/edit', [MechineAssingController::class,'edit'])->name('mechine.assing.trashed');
@@ -329,8 +329,36 @@ Route::get('/machine/status/trashed-count', [MachineStatusController::class, 'tr
 Route::get('/machine/status/{uuid}/edit', [MachineStatusController::class, 'edit'])->name('machine.status.edit');
 Route::put('/machine/status/{uuid}', [MachineStatusController::class, 'update'])->name('machine.status.update');
 Route::resource('machine-status', MachineStatusController::class);
+
+
+
+Route::controller(BreakDownProblemNoteController::class)
+->prefix('breakdown-problems')
+->as("breakdown-problems.")
+->group(function(){
+  Route::get('trashed-count',"trashedProblemCount");
+  Route::get('trashed','trashed');
+  Route::post('{uuid}/restore','restoreTrashed');
+  Route::delete("{uuid}/force-delete",'forceDelete');
+});
+
+
 Route::resource('breakdown-problem-notes', BreakDownProblemNoteController::class);
+
+
+
+Route::controller(MachineTagController::class)
+->prefix('machine-tag')
+->as("machine-tag.")
+->group(function(){
+  Route::get('trashed-count',"trashedCount");
+  Route::get('trashed','trashed');
+  Route::post('{uuid}/restore','restoreTrashed');
+  Route::delete("{uuid}/force-delete",'forceDelete');
+});
+
 Route::resource('machine-tag', MachineTagController::class);
+
 // Group Rents Controller End form here
 Route::get('/get_units', [DynamicDataController::class, 'getUnits']);
 Route::get('/get_floors', [DynamicDataController::class, 'getFloors']);

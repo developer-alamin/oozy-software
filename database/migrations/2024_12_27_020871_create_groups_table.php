@@ -20,7 +20,7 @@ return new class extends Migration
             
              // Foreign key assign
             $table->foreignId('company_id');
-            $table->foreignId('technician_id')->default(0);
+            $table->foreignId('technician_id')->nullable();
 
            
              // Foreign key References
@@ -34,8 +34,8 @@ return new class extends Migration
             $table->foreign("technician_id")
             ->references('id')
             ->on('users')
-            ->onUpdate('restrict')
-            ->onDelete('restrict');
+            ->onUpdate('cascade')
+            ->onDelete('set null');
 
 
             $table->morphs('creator');

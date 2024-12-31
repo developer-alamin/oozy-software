@@ -31,9 +31,9 @@ return new class extends Migration
             $table->foreignId('company_id');
             $table->foreignId('mechine_assing_id');
             //$table->foreignId('parts_id')->default(0);
-            $table->foreignId('line_id');
-            $table->foreignId('breakdown_problem_note_id')->default(0);
-            $table->foreignId('technician_id');
+            $table->foreignId('line_id')->nullable();
+            $table->foreignId('breakdown_problem_note_id')->nullable();
+            $table->foreignId('technician_id')->nullable();
            
 
             // Foreign key References
@@ -52,20 +52,20 @@ return new class extends Migration
             $table->foreign("line_id")
             ->references('id')
             ->on('lines')
-            ->onUpdate('restrict')
-            ->onDelete('restrict');
+            ->onUpdate('cascade')
+            ->onDelete('set null');
 
             $table->foreign("breakdown_problem_note_id")
             ->references('id')
             ->on('break_down_problem_notes')
-            ->onUpdate('restrict')
-            ->onDelete('restrict');
+            ->onUpdate('cascade')
+            ->onDelete('set null');
 
             $table->foreign("technician_id")
             ->references('id')
             ->on('users')
-            ->onUpdate('restrict')
-            ->onDelete('restrict');
+            ->onUpdate('cascade')
+            ->onDelete('set null');
 
 
 
