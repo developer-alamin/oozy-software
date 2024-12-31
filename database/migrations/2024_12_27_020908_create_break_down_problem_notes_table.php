@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('break_down_problem_notes', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
-            $table->text('break_down_problem_note');
+            $table->text('note');
             $table->enum('status',['Active','Inactive'])->default("Inactive");
            
             // Foreign key assign

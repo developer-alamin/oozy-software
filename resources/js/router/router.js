@@ -254,6 +254,49 @@ const routes = [
         props: true, // Enables passing route params as props
       },
 
+    // preventive service
+      {
+        path: "preventive-service/index",
+        name: "PreventiveServiceIndex",
+        component: adminComponents.PreventiveServiceIndex,
+        meta: { title: "Preventive Service Index" },
+      },
+      {
+        path: "preventive-service/create",
+        name: "PreventiveServiceCreate",
+        component: adminComponents.PreventiveServiceCreate,
+        meta: { title: "Preventive Service Create" },
+      },
+      {
+        path: "preventive-service/:uuid/edit",
+        name: "PreventiveServiceEdit",
+        component: adminComponents.PreventiveServiceEdit,
+        meta: { title: "Edit Preventive Service" },
+        props: true,
+      },
+      {
+        path: "preventive-service/:uuid/assign-to-technician",
+        name: "AssignToTechnicianPreventiveService",
+        component: adminComponents.AssignToTechnicianPreventiveService,
+        meta: { title: "Assign to Technician" },
+        props: true,
+      },
+      {
+        path: "preventive-service/:detail_id/preventive-service-start",
+        name: "PreventiveServiceStart",
+        component: adminComponents.PreventiveServiceStart,
+        meta: { title: "Preventive Service Start" },
+        props: true,
+      },
+      {
+        path: "preventive-service/:detail_id/preventive-service-start-details",
+        name: "PreventiveServiceStartDetails",
+        component: adminComponents.PreventiveServiceStartDetails,
+        meta: { title: "Preventive Service Start Details" },
+        props: true,
+      },
+
+      //supplier
       {
         path: "supplier/index", // New route for Contact
         name: "SupplierIndex",

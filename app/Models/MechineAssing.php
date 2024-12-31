@@ -12,16 +12,17 @@ class MechineAssing extends Model
     protected $primaryKey = 'id';
 
     protected $casts = [
-        'model_id'=> 'integer'
+        'product_model_id'=> 'integer'
     ];
 
     protected $fillable = [
         'name',
         'factory_id',
+        'company_id',
         'brand_id',
-        'model_id',
+        'product_model_id',
         'machine_type_id',
-        'machine_source_id',
+        'source_id',
         'supplier_id',
         'rent_date',
         'rent_name',
@@ -76,7 +77,7 @@ class MechineAssing extends Model
     }
     public function productModel()
     {
-        return $this->belongsTo(ProductModel::class, 'model_id');
+        return $this->belongsTo(ProductModel::class, 'product_model_id');
     }
     public function brand()
     {
@@ -92,7 +93,7 @@ class MechineAssing extends Model
     }
     public function source()
     {
-        return $this->belongsTo(Source::class, 'machine_source_id');
+        return $this->belongsTo(Source::class, 'source_id');
     }
     public function supplier()
     {
@@ -111,6 +112,11 @@ class MechineAssing extends Model
     public function movements()
     {
         return $this->hasMany(Movement::class, 'machine_id', 'id');
+    }
+
+    public function preventive_services()
+    {
+        return $this->hasMany(PreventiveService::class, 'mechine_assing_id', 'id');
     }
 
 

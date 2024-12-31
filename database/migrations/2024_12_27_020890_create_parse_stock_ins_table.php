@@ -18,15 +18,9 @@ return new class extends Migration
             $table->string('type')->default('Parse');
             
              // Foreign key assign
-            $table->foreignId('company_id');
             $table->foreignId('parse_id');
 
             // Foreign key References
-            $table->foreign("company_id")
-            ->references('id')
-            ->on('companies')
-            ->onUpdate('cascade')
-            ->onDelete('cascade');
 
             $table->foreign("parse_id")
             ->references('id')

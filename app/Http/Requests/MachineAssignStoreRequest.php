@@ -23,12 +23,12 @@ class MachineAssignStoreRequest extends FormRequest
     {
         return [
             'name'                        => 'required|string|max:255',
-            'factory_id'                  => 'required|integer',
-            'brand_id'                    => 'required|integer',
-            'model_id'                    => 'required|integer',
-            'machine_type_id'             => 'required|integer',
-            'machine_source_id'           => 'nullable',
-            'supplier_id'                 => 'nullable',
+            'factory_id'                  => 'required|exists:factories,id',
+            'brand_id'                    => 'required|exists:brands,id',
+            'product_model_id'            => 'required|exists:product_models,id',
+            'machine_type_id'             => 'required|exists:product_models,id',
+            'source_id'                   => 'nullable|exists:sources,id',
+            'supplier_id'                 => 'nullable|exists:suppliers,id',
             'rent_date'                   => 'nullable',
             'rent_name'                   => 'nullable|string|max:255',
             'rent_note'                   => 'nullable|string',
@@ -40,7 +40,7 @@ class MachineAssignStoreRequest extends FormRequest
             'purchase_date'               => 'nullable',
             'status'                      => 'nullable',  // Example: assumes "status" has specific values
             'note'                        => 'nullable|string',
-            'machine_status_id'           => 'required',
+            'machine_status_id'           => 'required|exists:machine_statuses,id',
             'qr_code_path'                => 'nullable',
             'serial_number'               => 'nullable',
             'commission_date'             => 'nullable',
@@ -56,12 +56,10 @@ class MachineAssignStoreRequest extends FormRequest
             'operating_temperature_range' => 'nullable',
             'location_status'             => 'nullable',
             'tag'                         => 'nullable',
-            'line_id'                     => 'nullable',
+            'line_id'                     => 'nullable|exists:lines,id',
             'show_basic_details'          => 'nullable',
             'show_specifications'         => 'nullable',
-            'machine_id'                  => 'nullable',
             'uuid'                        => 'nullable'
-
         ];
     }
 }

@@ -22,8 +22,6 @@ class GroupController extends Controller
      */
     public function index(Request $request)
     {
-
-
         $page         = $request->input('page', 1);
         $itemsPerPage = $request->input('itemsPerPage', 5);
         $sortBy       = $request->input('sortBy', 'created_at'); // Default sort by created_at
@@ -58,7 +56,7 @@ class GroupController extends Controller
         // Apply sorting
         $groupsQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $groups = $groupsQuery->with(['creator:id,name','technicians:id,name,type'])->paginate($itemsPerPage);
+        $groups = $groupsQuery->with(['creator','technicians','company'])->paginate($itemsPerPage);
         // Return the response as JSON
         return response()->json([
             'items' => $groups->items(), // Current page items
@@ -98,6 +96,7 @@ class GroupController extends Controller
         // Create the technician and associate it with the creator
         $group       = new Group($validatedData);
         $group->uuid = HelperController::generateUuid();
+        $group->company_id = $validatedData['company_id'];
         $group->creator()->associate($creator);  // Assign creator polymorphically
         $group->updater()->associate($creator);  // Associate the updater
         $group->save(); // Save the technician to the database
@@ -183,6 +182,7 @@ class GroupController extends Controller
          }
          // Update the brand's details
          $group->fill($validatedData);
+         $group->company_id = $validatedData['company_id'];
          $group->updater()->associate($currentUser); // Associate the updater
          $group->save();
          // Return a success response

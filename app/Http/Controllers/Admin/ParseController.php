@@ -61,7 +61,7 @@ class ParseController extends Controller
         // Apply sorting
         $parseQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $parse = $parseQuery->with('creator:id,name','user:id,name','factory:id,name')->paginate($itemsPerPage);
+        $parse = $parseQuery->with('creator:id,name','company:id,name','factory:id,name')->paginate($itemsPerPage);
         // Return the response as JSON
         return response()->json([
             'items' => $parse->items(), // Current page items
@@ -77,60 +77,13 @@ class ParseController extends Controller
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    // public function store(ParseStoreRequest $request)
-    // {
-    //     // Check which authentication guard is in use and set the creator
-    //     if (Auth::guard('admin')->check()) {
-    //         $creator = Auth::guard('admin')->user();
-    //     } elseif (Auth::guard('user')->check()) {
-    //         $creator = Auth::guard('user')->user();
-    //     } else {
-    //         return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
-    //     }
 
-    //     // Validate the incoming request data
-    //     $validatedData =$request->validated();
-    //     // Process dates to handle timezone issues and format them properly
-    //     if (isset($validatedData['purchase_date'])) {
-    //         $validatedData['purchase_date'] = Carbon::parse(
-    //             preg_replace('/\s*\(.*\)$/', '', $validatedData['purchase_date'])
-    //         )->format('Y-m-d');
-    //     }
-
-    //     // Create the new parse instance with validated data
-    //     $parse       = new Parse($validatedData);
-    //     // Associate the creator and updater polymorphically
-    //     $parse->uuid = HelperController::generateUuid();
-    //     $parse->creator()->associate($creator);
-    //     $parse->updater()->associate($creator);
-    //     // Save the parse record
-    //     $parse->save();
-
-    //     // Save data to the Stock table
-    //     $stockIn = new ParseStockIn([
-    //         'parse_id'          => $parse->id,
-    //         'quantity'          => $parse->quantity,
-    //         'type'              => "parse",
-    //     ]);
-
-    //     $stockIn->creator()->associate($creator);
-    //     $stockIn->updater()->associate($creator);
-    //     $stockIn->save();
-
-    //     // Return a success response
-    //     return response()->json([
-    //         'success'        => true,
-    //         'message'        => 'parse created successfully.',
-    //         'mechine_assing' => $parse
-    //     ], 200);
-    // }
 
     public function store(ParseStoreRequest $request)
     {
-        // Determine the creator based on the authentication guard
+
+      
+         // Determine the creator based on the authentication guard
         if (Auth::guard('admin')->check()) {
             $creator = Auth::guard('admin')->user();
         } elseif (Auth::guard('user')->check()) {
@@ -138,23 +91,36 @@ class ParseController extends Controller
         } else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
+
+
         // Validate the incoming request data
         $validatedData = $request->validated();
+
         // Process dates for timezone and format issues
         if (isset($validatedData['purchase_date'])) {
             $validatedData['purchase_date'] = Carbon::parse(
                 preg_replace('/\s*\(.*\)$/', '', $validatedData['purchase_date'])
             )->format('Y-m-d');
         }
+
         // Wrap the creation in a transaction to ensure atomicity
         DB::beginTransaction();
         try {
-            // Create the new parse instance with validated data
+             // Create the new parse instance with validated data
             $parse = new Parse($validatedData);
+
+
+            
             $parse->uuid = HelperController::generateUuid();
+            $parse->purchase_date = $validatedData['purchase_date'];
+            $parse->company_id = $validatedData['company_id'];
+            $parse->factory_id = $validatedData['factory_id'];
+            $parse->category_id = $validatedData['category_id'];
+            $parse->parse_unit_id  = $validatedData['parse_unit_id'];
             $parse->creator()->associate($creator);
             $parse->updater()->associate($creator);
             $parse->save();
+            
             // Save data to the Stock table
             $stockIn = new ParseStockIn([
                 'parse_id'    => $parse->id,
@@ -223,49 +189,6 @@ class ParseController extends Controller
         ], Response::HTTP_OK);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    // public function update(ParseUpdateRequest $request,$uuid)
-    // {
-    //     // Retrieve the parse model by uuid
-    //     $parse = Parse::where('uuid', $uuid)->firstOrFail();
-    //      // Validate the incoming request data
-    //     $validatedData =$request->validated();
-
-    //      // Determine the authenticated user (either from 'admin' or 'user' guard)
-    //     if (Auth::guard('admin')->check()) {
-    //         $currentUser = Auth::guard('admin')->user();
-    //         $creatorType = Admin::class;
-
-    //         // Check if the admin is a superadmin
-    //         if ($currentUser->role === 'superadmin') {
-    //             // Superadmin can update without additional checks
-    //         } else {
-    //             // Regular admin authorization check
-    //             if ($parse->creator_type !== $creatorType || $parse->creator_id !== $currentUser->id) {
-    //                 return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to update this parse.'], 403);
-    //             }
-    //         }
-
-    //     } elseif (Auth::guard('user')->check()) {
-    //         $currentUser = Auth::guard('user')->user();
-    //         $creatorType = User::class;
-    //         // Regular user authorization check
-    //         if ($parse->creator_type !== $creatorType || $parse->creator_id !== $currentUser->id) {
-    //             return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to update this parse.'], 403);
-    //         }
-    //     } else {
-    //         return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
-    //     }
-    //     // Update the parse's details
-    //     $parse->fill($validatedData);
-    //     $parse->updater()->associate($currentUser); // Associate the updater
-    //     $parse->save();
-    //     // Return a success response
-    //     return response()->json(['success' => true, 'message' => 'parse updated successfully.', 'parse' => $parse], 200);
-    // }
-
 
     public function update(ParseUpdateRequest $request, $uuid)
     {
@@ -297,24 +220,45 @@ class ParseController extends Controller
         } else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
+
+
+         // Process dates for timezone and format issues
+         if (isset($validatedData['purchase_date'])) {
+            $validatedData['purchase_date'] = Carbon::parse(
+                preg_replace('/\s*\(.*\)$/', '', $validatedData['purchase_date'])
+            )->format('Y-m-d');
+        }
+        
+        //return response()->json($validatedData['purchase_date'],200);
+
         // Begin transaction to ensure both Parse and ParseStockIn updates are atomic
         DB::beginTransaction();
         try {
+
+
             // Update the parse's details
             $parse->fill($validatedData);
+            
+            $parse->purchase_date = $validatedData['purchase_date'];
+            $parse->company_id = $validatedData['company_id'];
+            $parse->factory_id = $validatedData['factory_id'];
+            $parse->category_id = $validatedData['category_id'];
+            $parse->parse_unit_id  = $validatedData['parse_unit_id'];
             $parse->updater()->associate($currentUser); // Associate the updater
             $parse->save();
+
+
             // Update associated stock if needed
-            $stockIn = ParseStockIn::where('parse_id', $parse->id)->first();
-            if ($stockIn) {
-                $stockIn->quantity_in = $validatedData['quantity'] ?? $stockIn->quantity; // Update quantity if provided
-                $stockIn->updater()->associate($currentUser); // Associate the updater
+            if ($parse->parseStockIn) {
+                $stockIn = $parse->parseStockIn;
+                $stockIn->quantity_in = $validatedData['quantity'] ?? $stockIn->quantity;
+                $stockIn->updater()->associate($currentUser);
                 $stockIn->save();
             }
-
+        
             DB::commit();
 
-            // Return a success response
+           // Return a success response
             return response()->json([
                 'success' => true,
                 'message' => 'Parse updated successfully.',
@@ -423,7 +367,7 @@ class ParseController extends Controller
         // Apply sorting
         $mechinsQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $mechins = $mechinsQuery->with('creator:id,name','user:id,name','factory:id,name')->paginate($itemsPerPage);
+        $mechins = $mechinsQuery->with('creator:id,name','company:id,name','factory:id,name')->paginate($itemsPerPage);
 
         // Return the response as JSON
         return response()->json([

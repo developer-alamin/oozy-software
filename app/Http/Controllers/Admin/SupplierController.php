@@ -57,7 +57,7 @@ class SupplierController extends Controller
         // Apply sorting
         $suppliersQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $suppliers = $suppliersQuery->with('creator:id,name')->paginate($itemsPerPage);
+        $suppliers = $suppliersQuery->with(['creator:id,name','company'])->paginate($itemsPerPage);
         // Return the response as JSON
         return response()->json([
             'suppliers' => $suppliers->items(), // Current page items
@@ -80,17 +80,8 @@ class SupplierController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'type'           => 'required|string|max:255',
-            'name'           => 'required|string|max:255',
-            'email'          => 'required|string|email|max:255|unique:suppliers',
-            'phone'          => 'required|string',
-            'contact_person' => 'nullable|string|max:255',
-            'address'        => 'nullable|string',
-            'description'    => 'nullable|string',
-            'imageFile'      => 'nullable|image|max:2048',
-        ]);
-
+        $validator = Validator::make($request->all(), Supplier::rules());
+       
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
@@ -132,6 +123,7 @@ class SupplierController extends Controller
         $supplier                 = new Supplier();
         $supplier->uuid           = HelperController::generateUuid();
         $supplier->type           = $request->type;
+        $supplier->company_id     = $request->company_id;
         $supplier->name           = $name;
         $supplier->email          = $request->email;
         $supplier->phone          = $request->contact_person;
@@ -201,6 +193,7 @@ class SupplierController extends Controller
         $supplier = Supplier::where('uuid', $uuid)->firstOrFail();
          //Validate the incoming data
         $validatedData = $request->validate([
+            'company_id'     => 'required|exists:companies,id',
             'type'           => 'required|string|max:255',
             'name'           => 'required|string|max:255',
             'email'          => 'required|email|unique:suppliers,email,' . $supplier->id,
@@ -267,6 +260,7 @@ class SupplierController extends Controller
         // Update the Rent Date
         $supplier->type           = $request->type;
         $supplier->name           = $name;
+        $supplier->company_id     = $validatedData['company_id'];
         $supplier->email          = $request->email;
         $supplier->phone          = $request->phone;
         $supplier->contact_person = $request->contact_person;

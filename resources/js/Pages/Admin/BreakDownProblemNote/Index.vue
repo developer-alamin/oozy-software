@@ -80,10 +80,10 @@
       </template>
 
       <template v-slot:item.actions="{ item }">
-        <v-icon @click="editCategory(item.uuid)" class="mr-2"
+        <v-icon @click="editCategory(item.uuid)" color="green" class="mr-2"
           >mdi-pencil</v-icon
         >
-        <v-icon @click="showConfirmDialog(item.id)" color="red"
+        <v-icon @click="showConfirmDialog(item.uuid)" color="red"
           >mdi-delete</v-icon
         >
       </template>
@@ -117,10 +117,10 @@ export default {
       search: "",
       itemsPerPage: 15,
       headers: [
-        // { title: "Category Name", key: "name", sortable: true },
+        { title: "Company", key: "company.name", sortable: false },
         {
-          title: "Breakdown Problem Note",
-          key: "break_down_problem_note",
+          title: "Problem Note",
+          key: "note",
           sortable: false,
         },
         {
@@ -136,7 +136,7 @@ export default {
       loading: true,
       totalItems: 0,
       dialog: false,
-      selectedCategoryId: null,
+      selectedbreakproblemd: null,
       trashedCount: 0,
     };
   },
@@ -157,7 +157,7 @@ export default {
         });
         this.serverItems = response.data.items || [];
         this.totalItems = response.data.total || 0;
-        this.fetchTrashedCategorysCount();
+        this.fetchTrashedBreakProblemsCount();
       } catch (error) {
         console.error("Error loading items:", error);
       } finally {
@@ -173,15 +173,15 @@ export default {
     editCategory(uuid) {
       this.$router.push({ name: "BreakDownNoteEdit", params: { uuid } });
     },
-    showConfirmDialog(id) {
-      this.selectedCategoryId = id;
+    showConfirmDialog(uuid) {
+      this.selectedbreakproblemd = uuid;
       this.dialog = true;
     },
     async confirmDelete() {
       this.dialog = false; // Close the dialog
       try {
-        await this.$axios.delete(
-          `/breakdown-problem-notes/${this.selectedCategoryId}`
+       const response = await this.$axios.delete(
+          `/breakdown-problem-notes/${this.selectedbreakproblemd}`
         );
         this.loadItems({
           page: 1,
@@ -194,9 +194,9 @@ export default {
         toast.error("Failed to delete Breakdown Problem Note.");
       }
     },
-    async fetchTrashedCategorysCount() {
+    async fetchTrashedBreakProblemsCount() {
       try {
-        const response = await this.$axios.get("/category/trashed-count");
+        const response = await this.$axios.get("breakdown-problems/trashed-count");
         this.trashedCount = response.data.trashedCount;
       } catch (error) {
         console.error(
@@ -213,7 +213,7 @@ export default {
       itemsPerPage: this.itemsPerPage,
       sortBy: [],
     });
-    this.fetchTrashedCategorysCount();
+    this.fetchTrashedBreakProblemsCount();
   },
 };
 </script>
