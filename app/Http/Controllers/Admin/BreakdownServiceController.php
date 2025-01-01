@@ -4,14 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\HelperController;
-use App\Models\Admin;
 use App\Models\BreakdownService;
-use App\Models\Parse;
-use App\Models\Technician;
-use App\Models\User;
+use App\Models\BreakdownServiceDetail;
+use App\Models\MechineAssing;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class BreakdownServiceController extends Controller
 {
@@ -20,11 +19,12 @@ class BreakdownServiceController extends Controller
      */
     public function index(Request $request)
     {
-        $page           = $request->input('page', 1);
+        $page         = $request->input('page', 1);
         $itemsPerPage = $request->input('itemsPerPage', 5);
-        $sortBy       = $request->input('sortBy', 'created_at'); // Default sort by created_at
-        $sortOrder    = $request->input('sortOrder', 'desc');    // Default sort order is descending
-        $search       = $request->input('search', '');           // Search term, default is empty
+        $sortBy       = $request->input('sortBy', 'created_at');
+        $sortOrder    = $request->input('sortOrder', 'desc'); 
+        $search       = $request->input('search', '');
+
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('admin')->user();
@@ -32,80 +32,48 @@ class BreakdownServiceController extends Controller
             // Check if the admin is a super admin
             if ($currentUser->role === 'superadmin') {
                 // If superadmin, retrieve all technicians
-                $breakDownProblemNotesQuery = BreakdownService::query(); // No filters applied
+                $BreakdownServiceQuery = BreakdownService::query();
+
             } else {
                 // If not superadmin, filter by creator type and id
-                $breakDownProblemNotesQuery = BreakdownService::where('creator_type', $creatorType)
+                $BreakdownServiceQuery = BreakdownService::where('creator_type', $creatorType)
                     ->where('creator_id', $currentUser->id);
             }
         } elseif (Auth::guard('user')->check()) {
             $currentUser = Auth::guard('user')->user();
             $creatorType = User::class;
             // For regular users, filter by creator type and id
-            $breakDownProblemNotesQuery = BreakdownService::where('creator_type', $creatorType)
+            $BreakdownServiceQuery = BreakdownService::where('creator_type', $creatorType)
                 ->where('creator_id', $currentUser->id);
         } else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
         // Apply search if the search term is not empty
-        if (!empty($search)) {
-            $breakDownProblemNotesQuery->where('break_down_problem_note', 'LIKE', '%' . $search . '%');
-        }
+
+        // if (!empty($search)) {
+        //     $BreakdownServiceQuery->where('name', 'LIKE', '%' . $search . '%');
+        // }
+
         // Apply sorting
-        $breakDownProblemNotesQuery->orderBy($sortBy, $sortOrder);
+        $BreakdownServiceQuery->orderBy($sortBy, $sortOrder);
+
+        $BreakdownServiceQuery->leftJoin('breakdown_service_details', function ($join) {
+            $join->on('breakdown_service_details.breakdown_service_id', '=', 'breakdown_services.id')
+                 ->whereRaw('breakdown_service_details.created_at = (SELECT MAX(created_at) FROM breakdown_service_details WHERE breakdown_service_id = breakdown_services.id)');
+        })
+        ->select('breakdown_services.*', 'breakdown_service_details.technician_status', 'breakdown_service_details.id as detail_id');
+
+
+
         // Paginate results
-        $breakDownProblemNotes = $breakDownProblemNotesQuery->with('mechineAssing:id,machine_code','creator:id,name','line:id,name','technician:id,name')
-        ->where('type','New Breakdown Service')
-        ->paginate($itemsPerPage);
+        $BreakdownService = $BreakdownServiceQuery->with(['mechine_assing:id,machine_code,name'])
+                        ->paginate($itemsPerPage);
+
+
         // Return the response as JSON
         return response()->json([
-            'items' => $breakDownProblemNotes->items(), // Current page items
-            'total' => $breakDownProblemNotes->total(), // Total number of records
-        ]);
-    }
-    public function breakDownServiceHistory(Request $request)
-    {
-        $page           = $request->input('page', 1);
-        $itemsPerPage = $request->input('itemsPerPage', 5);
-        $sortBy       = $request->input('sortBy', 'created_at'); // Default sort by created_at
-        $sortOrder    = $request->input('sortOrder', 'desc');    // Default sort order is descending
-        $search       = $request->input('search', '');           // Search term, default is empty
-        // Determine the authenticated user (either from 'admin' or 'user' guard)
-        if (Auth::guard('admin')->check()) {
-            $currentUser = Auth::guard('admin')->user();
-            $creatorType = Admin::class;
-            // Check if the admin is a super admin
-            if ($currentUser->role === 'superadmin') {
-                // If superadmin, retrieve all technicians
-                $breakDownProblemNotesQuery = BreakdownService::query(); // No filters applied
-            } else {
-                // If not superadmin, filter by creator type and id
-                $breakDownProblemNotesQuery = BreakdownService::where('creator_type', $creatorType)
-                    ->where('creator_id', $currentUser->id);
-            }
-        } elseif (Auth::guard('user')->check()) {
-            $currentUser = Auth::guard('user')->user();
-            $creatorType = User::class;
-            // For regular users, filter by creator type and id
-            $breakDownProblemNotesQuery = BreakdownService::where('creator_type', $creatorType)
-                ->where('creator_id', $currentUser->id);
-        } else {
-            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
-        }
-        // Apply search if the search term is not empty
-        if (!empty($search)) {
-            $breakDownProblemNotesQuery->where('break_down_problem_note', 'LIKE', '%' . $search . '%');
-        }
-        // Apply sorting
-        $breakDownProblemNotesQuery->orderBy($sortBy, $sortOrder);
-        // Paginate results
-        $breakDownProblemNotes = $breakDownProblemNotesQuery->with('mechineAssing:id,machine_code','creator:id,name','line:id,name','technician:id,name')
-        ->where('type','History')
-        ->paginate($itemsPerPage);
-        // Return the response as JSON
-        return response()->json([
-            'items' => $breakDownProblemNotes->items(), // Current page items
-            'total' => $breakDownProblemNotes->total(), // Total number of records
+            'items' => $BreakdownService->items(),
+            'total' => $BreakdownService->total(),
         ]);
     }
 
@@ -122,44 +90,61 @@ class BreakdownServiceController extends Controller
      */
     public function store(Request $request)
     {
-      //  dd($request->all());
-        $validatedData = $request->validate(BreakdownService::validationRules());
-        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        // Check which authentication guard is in use and set the creator
+        $creator = null;
         if (Auth::guard('admin')->check()) {
-             $creator = Auth::guard('admin')->user();
-             // Check if the admin is a superadmin
-             if ($creator->role === 'superadmin') {
-                 // Superadmin can create technician without additional checks
-             } else {
-                 // Regular admin authorization check can be implemented here if needed
-             }
+            $creator = Auth::guard('admin')->user();
+        } elseif (Auth::guard('user')->check()) {
+            $creator = Auth::guard('user')->user();
+        }
 
-         } elseif (Auth::guard('user')->check()) {
-             $creator = Auth::guard('user')->user();
-             // If you want users to have specific restrictions, implement checks here
-         } else {
-             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
-         }
+        if (!$creator) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
 
-         $technicianId = Technician::where('status','Available')->pluck('id')->first();
+        // Validate the incoming request data
+        $validatedData = $request->validate([
+            'mechine_assing_id'   => 'required',
+            'service_date' => 'required|date',
+            'service_time' => 'required|date_format:H:i',
+            'service_status'      => 'required|in:Pending,Processing,Done,Cancel',
+        ]);
 
-         // Create the technician and associate it with the creator
-         $breakDownProblem                = new BreakdownService($validatedData);
-         $breakDownProblem->technician_id = $technicianId;
-         $breakDownProblem->uuid          = HelperController::generateUuid();
-         $breakDownProblem->creator()->associate($creator);  // Assign creator polymorphically
-         $breakDownProblem->updater()->associate($creator);  // Associate the updater
-         $breakDownProblem->save(); // Save the technician to the database
-        // Update the technician's status
-        Technician::where('id', $technicianId)->update(['status' => 'Not Available']);
-         // Return a success response
-        return response()->json(['success' => true, 'message' => 'BreakDown Problem  created successfully.'], 201);
+        // Create the new service instance with validated data
+        $service = new BreakdownService();
+        $service->uuid = HelperController::generateUuid();
+        $service->mechine_assing_id = $request->mechine_assing_id;
+
+        $mechineAssing = MechineAssing::find($request->mechine_assing_id);
+        $service->company_id = $mechineAssing ? $mechineAssing->company_id : 0;
+
+        $service->date_time = $request->service_date . " " . $request->service_time;
+        $service->service_status = $validatedData['service_status'] ?? 'Pending';
+        $service->supervisor_problem_note_id = $request->supervisor_problem_note_id ? json_encode($request->supervisor_problem_note_id) : NULL;
+        $service->supervisor_note = $request->supervisor_note;
+        $service->creator()->associate($creator);
+        $service->updater()->associate($creator);
+
+        // Save the service record
+        try {
+            $service->save();
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Failed to create Breakdown Service.'], 500);
+        }
+
+        // Return a success response
+        return response()->json([
+            'success' => true,
+            'message' => 'Breakdown Service created successfully.',
+            'service' => $service
+        ], 200);
     }
 
+    
     /**
      * Display the specified resource.
      */
-    public function show(BreakdownService $breakdownService)
+    public function show(string $id)
     {
         //
     }
@@ -167,255 +152,384 @@ class BreakdownServiceController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(BreakdownService $breakdownService)
+    public function edit($uuid)
     {
-        //
-    }
-    public function serviceProcessing($uuid)
-    {
-      $breakdownService = BreakdownService::where('uuid', $uuid)->firstOrFail();
-      // Determine the authenticated user (either from 'admin' or 'user' guard)
-      if (Auth::guard('admin')->check()) {
-          $currentUser = Auth::guard('admin')->user();
-          $creatorType = Admin::class;
-          // Check if the admin is a super admin
-          if ($currentUser->role === 'superadmin') {
-              // Super admins can edit any breakdownService
-              return response()->json([
-                  'success' => true,
-                  'breakdownService' => $breakdownService
-              ], Response::HTTP_OK);
-          }
-      } elseif (Auth::guard('user')->check()) {
-          $currentUser = Auth::guard('user')->user();
-          $creatorType = User::class;
-      } else {
-          return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
-      }
-      // Check if the breakdownService belongs to the current user or admin
-      if ($breakdownService->creator_type !== $creatorType || $breakdownService->creator_id !== $currentUser->id) {
-          return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to edit this breakdownService.'], 403);
-      }
-      // Return the breakdownService data if authorized
-      return response()->json([
-          'success'          => true,
-          'breakdownService' => $breakdownService
-      ], Response::HTTP_OK);
+        $BreakdownService = BreakdownService::where('uuid', $uuid)->firstOrFail();
+
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
+
+            // Check if the admin is a super admin
+            if ($currentUser->role === 'superadmin') {
+                // Super admins can edit any BreakdownService
+                return response()->json([
+                    'success'     => true,
+                    'BreakdownService' => $BreakdownService
+                ], Response::HTTP_OK);
+            }
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+        // Check if the BreakdownService belongs to the current user or admin
+        if ($BreakdownService->creator_type !== $creatorType || $BreakdownService->creator_id !== $currentUser->id) {
+            return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to edit this BreakdownService.'], 403);
+        }
+        // Return the BreakdownService data if authorized
+        return response()->json([
+            'success' => true,
+            'BreakdownService' => $BreakdownService
+        ], Response::HTTP_OK);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    // public function update(Request $request, BreakdownService $breakdownService)
-    // {
-    //     //
-    // }
-
-    public function serviceProcessingUpdate(Request $request, $uuid)
-    {
-
-      if ($request->breakdown_service_status == "Cancel") {
-        // dd($request->all());
-        $breakdownServiceId = BreakdownService::where('id',$request->id)
-        ->where('type',"New Breakdown Service")->first();
-        // dd($breakdownServiceId);
-
-        // dd($dd);
-        $oldData = BreakdownService::where('id', $breakdownServiceId->id)
-        ->orWhere('break_down_service_id', $breakdownServiceId->break_down_service_id)
-        ->first();
-        // dd($oldData);
-        // $validatedData = $request->validate(BreakdownService::validationRules());
-        // Determine the authenticated user (either from 'admin' or 'user' guard)
-        if (Auth::guard('admin')->check()) {
-             $creator = Auth::guard('admin')->user();
-             // Check if the admin is a superadmin
-             if ($creator->role === 'superadmin') {
-                 // Superadmin can create technician without additional checks
-             } else {
-                 // Regular admin authorization check can be implemented here if needed
-             }
-         } elseif (Auth::guard('user')->check()) {
-             $creator = Auth::guard('user')->user();
-             // If you want users to have specific restrictions, implement checks here
-         } else {
-             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
-         }
-         $technicianId = Technician::where('status','Available')->pluck('id')->first();
-         // Create the technician and associate it with the creator
-         $breakDownProblem                            = new BreakdownService();
-         $breakDownProblem->uuid                      = HelperController::generateUuid();
-         $breakDownProblem->machine_id                = $oldData->machine_id;
-         $breakDownProblem->location                  = $oldData->location;
-         $breakDownProblem->line_id                   = $oldData->line_id;
-         $breakDownProblem->breakdown_problem_note_id = $oldData->breakdown_problem_note_id;
-         $breakDownProblem->breakdown_problem_note    = $oldData->breakdown_problem_note;
-         $breakDownProblem->break_down_service_id     =  $breakdownServiceId->break_down_service_id ? $breakdownServiceId->break_down_service_id : $breakdownServiceId->id;
-         $breakDownProblem->service_time              = now()->format('H:i:s');
-         $breakDownProblem->service_date              = now()->format('Y-m-d');
-         $breakDownProblem->technician_id = $technicianId;
-
-         $breakDownProblem->creator()->associate($creator);  // Assign creator polymorphically
-         $breakDownProblem->updater()->associate($creator);  // Associate the updater
-         $breakDownProblem->save(); // Save the technician to the database
-        // Update the technician's status
-        BreakdownService::where('id', $breakdownServiceId->id)->update([
-          'type'                                => 'History',
-          'break_down_service_id'               =>  $breakdownServiceId->break_down_service_id ? $breakdownServiceId->break_down_service_id : $breakdownServiceId->id,
-          'breakdown_service_technician_status' => 'Failed',
-          'breakdown_service_status'            => 'Cancel',
-          'technician_service_end_time'         => now()
-        ]);
-        Technician::where('id', $technicianId)->update(['status' => 'Not Available']);
-        Technician::where('id', $request->technician_id)->update(['status' => 'Available']);
-         // Return a success response
-        return response()->json(['success' => true, 'message' => 'Break Down Service  created successfully.'], 201);
-
-      }else{
-        $breakdownService = BreakdownService::where('uuid', $uuid)->firstOrFail();
-        // Validate only the breakdown_service_status field
-        $validatedData = $request->validate([
-            'breakdown_service_status'          => 'required|in:Done,Cancel',
-            'breakdown_problem_note_id'         => 'nullable', // Validate machine_id if provided
-            'breakdown_problem_note'            => 'nullable',
-            'breakdown_technician_problem_note' => 'nullable',
-            'parts_id'                          => 'nullable',
-            'parts_quantity'                    => 'nullable',
-        ]);
-        // Determine the authenticated user (either from 'admin' or 'user' guard)
-        if (Auth::guard('admin')->check()) {
-            $currentUser = Auth::guard('admin')->user();
-            $creatorType = Admin::class;
-
-            // Check if the admin is a superadmin
-            if ($currentUser->role !== 'superadmin') {
-                if ($breakdownService->creator_type !== $creatorType || $breakdownService->creator_id !== $currentUser->id) {
-                    return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to update this breakdownService.'], 403);
-                }
-            }
-        } elseif (Auth::guard('user')->check()) {
-            $currentUser = Auth::guard('user')->user();
-            $creatorType = User::class;
-            if ($breakdownService->creator_type !== $creatorType || $breakdownService->creator_id !== $currentUser->id) {
-                return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to update this breakdownService.'], 403);
-            }
-        } else {
-            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
-        }
-        if (!empty($validatedData['parts_id']) && !empty($validatedData['parts_quantity'])) {
-            $part = Parse::find($validatedData['parts_id']); // Assuming `Part` is the model for the parts table
-            if ($part->quantity < $validatedData['parts_quantity']) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Insufficient quantity in inventory for the selected part.',
-                ], 422);
-            }
-            // Deduct the quantity
-            $part->quantity -= $validatedData['parts_quantity'];
-            $part->save();
-        }
-        // Update only the breakdown_service_status
-        $breakdownService->breakdown_problem_note_id                = $validatedData['breakdown_problem_note_id'] ? $validatedData['breakdown_problem_note_id'] : 0;
-        $breakdownService->breakdown_service_status                 = $validatedData['breakdown_service_status'];
-        $breakdownService->breakdown_problem_note                   = $validatedData['breakdown_problem_note'];
-        $breakdownService->breakdown_technician_problem_note        = $validatedData['breakdown_technician_problem_note'];
-        $breakdownService->parts_id                                 = $validatedData['parts_id'] ? $validatedData['parts_id'] : 0;
-        $breakdownService->parts_quantity                           = $validatedData['parts_quantity'] ? $validatedData['parts_quantity'] : 0;
-        $breakdownService->breakdown_service_technician_status      = $validatedData['breakdown_service_status'] == "Done" ? "Success" : "Failed";
-        $breakdownService->technician_service_end_time              = now();
-        $breakdownService->updater()->associate($currentUser); // Associate the updater
-        $breakdownService->save();
-        Technician::where('id', $request->technician_id)->update(['status' => 'Available']);
-        // Return a success response
-        return response()->json([
-            'success'          => true,
-            'message'          => 'Breakdown Service updated successfully.',
-            'breakdownService' => $breakdownService,
-        ], 200);
-      }
-    }
     public function update(Request $request, $uuid)
     {
-      // dd($request->all());
-        $breakdownService = BreakdownService::where('uuid', $uuid)->firstOrFail();
-        // Validate only the breakdown_service_status field
+        // Fetch the BreakdownService by UUID
+        $BreakdownService = BreakdownService::where('uuid', $uuid)->firstOrFail();
+
+        // Validate the incoming request data
         $validatedData = $request->validate([
-            'breakdown_service_status' => 'required|in:Processing',
-            'machine_id'               => 'nullable|exists:mechine_assings,id', // Validate machine_id if provided
+            'mechine_assing_id' => 'required',
+            'service_date' => 'required|date',
+            'service_time' => 'required|date_format:H:i:s',
+            'service_status' => 'required|in:Pending,Processing,Done,Cancel',
         ]);
 
-        // Check if the machine_id exists in the database (if provided)
-        if (!empty($validatedData['machine_id']) && $validatedData['machine_id'] != $breakdownService->machine_id) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid Machine ID. Please provide a valid machine.',
-            ], 422);
-        }
+        // Initialize variables for the current authenticated user and creator type
+        $currentUser = null;
+        $creatorType = null;
 
-        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        // Check if the authenticated user is from the 'admin' guard
         if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('admin')->user();
             $creatorType = Admin::class;
 
-            // Check if the admin is a superadmin
-            if ($currentUser->role !== 'superadmin') {
-                if ($breakdownService->creator_type !== $creatorType || $breakdownService->creator_id !== $currentUser->id) {
-                    return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to update this breakdownService.'], 403);
+            // If the admin is a superadmin, they can update any service
+            if ($currentUser->role === 'superadmin') {
+                // No further checks needed for superadmin
+            } else {
+                // Regular admin authorization check
+                if ($BreakdownService->creator_type !== $creatorType || $BreakdownService->creator_id !== $currentUser->id) {
+                    return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to update this BreakdownService.'], 403);
                 }
             }
-        } elseif (Auth::guard('user')->check()) {
+        }
+        // Check if the authenticated user is from the 'user' guard
+        elseif (Auth::guard('user')->check()) {
             $currentUser = Auth::guard('user')->user();
             $creatorType = User::class;
 
-            if ($breakdownService->creator_type !== $creatorType || $breakdownService->creator_id !== $currentUser->id) {
-                return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to update this breakdownService.'], 403);
+            // Regular user authorization check
+            if ($BreakdownService->creator_type !== $creatorType || $BreakdownService->creator_id !== $currentUser->id) {
+                return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to update this BreakdownService.'], 403);
             }
-        } else {
+        }
+        // If no user is authenticated, return unauthorized response
+        else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
 
-        // Update only the breakdown_service_status
-        $breakdownService->breakdown_service_status      = $validatedData['breakdown_service_status'];
-        $breakdownService->breakdown_service_technician_status      = 'Service Running';
-        $breakdownService->technician_service_start_time = now();
-        $breakdownService->updater()->associate($currentUser); // Associate the updater
-        $breakdownService->save();
+        // Fetch the MechineAssing model to update company_id
+        $mechineAssing = MechineAssing::find($request->mechine_assing_id);
+        $BreakdownService->mechine_assing_id = $request->mechine_assing_id;
+        $BreakdownService->company_id = $mechineAssing ? $mechineAssing->company_id : 0;
+        $BreakdownService->date_time = $request->service_date . " " . $request->service_time;
+        $BreakdownService->service_status = $validatedData['service_status'] ?? 'Pending';
 
-        // Return a success response
+        $BreakdownService->supervisor_problem_note_id = $request->supervisor_problem_note_id ? json_encode($request->supervisor_problem_note_id) : NULL;
+        $BreakdownService->supervisor_note = $request->supervisor_note;
+
+        // Associate the current user as the updater
+        $BreakdownService->updater()->associate($currentUser);
+        $BreakdownService->save();
+
+        // Return a success response with the updated BreakdownService
         return response()->json([
             'success' => true,
             'message' => 'Breakdown Service updated successfully.',
-            'breakdownService' => $breakdownService,
+            'BreakdownService' => $BreakdownService
         ], 200);
     }
+
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(BreakdownService $breakdownService)
+    public function destroy(string $id)
     {
         //
     }
 
-     /**
-     * Acknowledge the Breakdown Service.
-     */
-    public function acknowledge(Request $request)
+    
+    public function get_assign_to_technician($uuid)
     {
-        // Update the breakdown service's technician status
-        $updated = BreakdownService::where('uuid', $request->uuid)
-            ->update(['breakdown_service_technician_status' => 'Coming',
-                    'technician_acknowledge_start_time' => now()]);
-        if ($updated) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Breakdown Technician status updated successfully!',
-            ], 200);
+        $BreakdownService = BreakdownService::where('uuid', $uuid)->firstOrFail();
+
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
+
+            // Check if the admin is a super admin
+            if ($currentUser->role === 'superadmin') {
+                // Super admins can edit any BreakdownService
+                return response()->json([
+                    'success'     => true,
+                    'BreakdownService' => $BreakdownService
+                ], Response::HTTP_OK);
+            }
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
-        // If no rows were updated, return an error response
+        // Check if the BreakdownService belongs to the current user or admin
+        if ($BreakdownService->creator_type !== $creatorType || $BreakdownService->creator_id !== $currentUser->id) {
+            return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to edit this BreakdownService.'], 403);
+        }
+        // Return the BreakdownService data if authorized
         return response()->json([
-            'success' => false,
-            'message' => 'Failed to update breakdown service status.',
-        ], 400);
+            'success' => true,
+            'BreakdownService' => $BreakdownService
+        ], Response::HTTP_OK);
+    }
+
+    public function save_assign_to_technician(Request $request, $uuid)
+    {
+        // Check which authentication guard is in use and set the creator
+        $creator = null;
+        if (Auth::guard('admin')->check()) {
+            $creator = Auth::guard('admin')->user();
+        } elseif (Auth::guard('user')->check()) {
+            $creator = Auth::guard('user')->user();
+        }
+
+        if (!$creator) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        // Validate the incoming request data
+        $validatedData = $request->validate([
+            'mechine_assing_id'     => 'required|numeric',
+            'technician_id'         => 'required|numeric',
+        ]);
+
+        // Create the new service instance with validated data
+        $service = new BreakdownServiceDetail();
+
+        $service->breakdown_service_id = BreakdownService::where('uuid', $uuid)->first()?->id??0;
+        $service->technician_id = $request->technician_id;
+        $service->status = 'Processing';
+        $service->technician_status = 'Acknowledge';
+
+        $service->creator()->associate($creator);
+        $service->updater()->associate($creator);
+
+        // Save the service record
+        try {
+            $service->save();
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Failed to save technician assign.'], 500);
+        }
+
+        // Return a success response
+        return response()->json([
+            'success' => true,
+            'message' => 'Technician assign successfully.',
+            'service' => $service
+        ], 200);
+    }
+
+
+    public function technician_breakdown_service_acknowledge($detail_id)
+    {
+        // Retrieve the BreakdownServiceDetail by its ID, or fail if not found
+        $BreakdownServiceDetail = BreakdownServiceDetail::where('id', $detail_id)->firstOrFail();
+
+        // Check which authentication guard is in use and set the creator
+        $creator = null;
+        if (Auth::guard('admin')->check()) {
+            $creator = Auth::guard('admin')->user();
+        } elseif (Auth::guard('user')->check()) {
+            $creator = Auth::guard('user')->user();
+        }
+
+        // If no creator (user/admin) is found, return Unauthorized response
+        if (!$creator) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        // Update the status and acknowledge date time
+        $BreakdownServiceDetail->technician_status = 'Acknowledged';
+        $BreakdownServiceDetail->acknowledge_date_time = now();
+        $BreakdownServiceDetail->updater()->associate($creator);
+
+        try {
+            $BreakdownServiceDetail->save();
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Failed to save.'], 500);
+        }
+
+        // Return a success response
+        return response()->json([
+            'success' => true,
+            'message' => 'I am Acknowledged.',
+            'service' => $BreakdownServiceDetail
+        ], 200);
+    }
+
+    public function breakdown_service_start(Request $request, $detail_id){
+        $BreakdownServiceDetail = BreakdownServiceDetail::where('id', $detail_id)->firstOrFail();
+
+
+        // Retrieve the machine assignment ID from the related BreakdownService
+        $mechine_assing_id = BreakdownService::where('id', $BreakdownServiceDetail->breakdown_service_id)
+            ->value('mechine_assing_id'); // Directly retrieve the value of 'mechine_assing_id'
+
+        // Check if the machine assignment exists
+        if ($mechine_assing_id != $request->mechine_assing_id) {
+            return response()->json(['success' => false, 'message' => 'You have selected the wrong machine.'], 400);
+        }
+
+
+        // Check which authentication guard is in use and set the creator
+        $creator = null;
+        if (Auth::guard('admin')->check()) {
+            $creator = Auth::guard('admin')->user();
+        } elseif (Auth::guard('user')->check()) {
+            $creator = Auth::guard('user')->user();
+        }
+
+        // If no creator (user/admin) is found, return Unauthorized response
+        if (!$creator) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        // Update the status and acknowledge date time
+        $BreakdownServiceDetail->technician_status = 'Start Service';
+        $BreakdownServiceDetail->service_start_date_time = now();
+        $BreakdownServiceDetail->updater()->associate($creator);
+
+        try {
+            $BreakdownServiceDetail->save();
+
+            //update BreakdownService service_status
+            $BreakdownService = BreakdownService::where('id', $BreakdownServiceDetail->breakdown_service_id)->firstOrFail(); 
+            $BreakdownService->service_status = 'Processing';
+            $BreakdownService->updater()->associate($creator);
+            $BreakdownService->save();
+
+
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Failed to save.'], 500);
+        }
+
+        // Return a success response
+        return response()->json([
+            'success' => true,
+            'message' => 'I am Acknowledged.',
+            'service' => $BreakdownServiceDetail
+        ], 200);
+    }
+
+
+    public function breakdown_service_start_get_details($detail_id){
+        $BreakdownServiceDetail = BreakdownServiceDetail::where('id', $detail_id)->firstOrFail();
+        $BreakdownService = BreakdownService::where('id', $BreakdownServiceDetail->breakdown_service_id)->first();
+
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
+
+            // Check if the admin is a super admin
+            if ($currentUser->role === 'superadmin') {
+                // Super admins can edit any BreakdownServiceDetail
+                return response()->json([
+                    'success'     => true,
+                    'BreakdownServiceDetail' => $BreakdownServiceDetail,
+                    'BreakdownService' => $BreakdownService
+                ], Response::HTTP_OK);
+            }
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+        // Check if the BreakdownServiceDetail belongs to the current user or admin
+        if ($BreakdownServiceDetail->creator_type !== $creatorType || $BreakdownServiceDetail->creator_id !== $currentUser->id) {
+            return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to edit this BreakdownServiceDetail.'], 403);
+        }
+        // Return the BreakdownServiceDetail data if authorized
+        return response()->json([
+            'success' => true,
+            'BreakdownServiceDetail' => $BreakdownServiceDetail,
+            'BreakdownService' => $BreakdownService
+        ], Response::HTTP_OK);
+    }
+
+    public function breakdown_service_start_save_details(Request $request, $detail_id){
+        $BreakdownServiceDetail = BreakdownServiceDetail::where('id', $detail_id)->firstOrFail();
+
+        // Check which authentication guard is in use and set the creator
+        $creator = null;
+        if (Auth::guard('admin')->check()) {
+            $creator = Auth::guard('admin')->user();
+        } elseif (Auth::guard('user')->check()) {
+            $creator = Auth::guard('user')->user();
+        }
+
+        // If no creator (user/admin) is found, return Unauthorized response
+        if (!$creator) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        // Update the status and acknowledge date time
+        $BreakdownServiceDetail->technician_status = $request->technician_status;
+        $BreakdownServiceDetail->status = ($request->technician_status == 'Failed') ? 'Cancel' : $request->technician_status;
+        $BreakdownServiceDetail->service_end_date_time = now();
+        $BreakdownServiceDetail->problem_note_id = $request->problem_note_id ? json_encode($request->problem_note_id) : NULL;
+        $BreakdownServiceDetail->note = $request->note;
+        $BreakdownServiceDetail->parts_info = $request->parts_info ? json_encode($request->parts_info) : NULL;
+        $BreakdownServiceDetail->updater()->associate($creator);
+
+        try {
+            $BreakdownServiceDetail->save();
+
+
+            //update BreakdownService service_status
+            $BreakdownService = BreakdownService::where('id', $BreakdownServiceDetail->breakdown_service_id)->firstOrFail(); 
+            $BreakdownService->service_status = ($request->technician_status == 'Failed') ? 'Cancel' : $request->technician_status;
+            $BreakdownService->updater()->associate($creator);
+            $BreakdownService->save();
+
+
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Failed to save.'], 500);
+        }
+
+        // Return a success response
+        return response()->json([
+            'success' => true,
+            'message' => 'Data has been saved.',
+            'service' => $BreakdownServiceDetail
+        ], 200);
+    }
+
+
+    public function trashed_count(){
+        $trashedCount = BreakdownService::onlyTrashed()->count();
+        return response()->json([
+            'trashedCount' => $trashedCount
+        ], Response::HTTP_OK);
     }
 }

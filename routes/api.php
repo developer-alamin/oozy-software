@@ -102,31 +102,39 @@ Route::get('/get_mechines', [ServiceController::class, 'getMechins']);
 Route::get('/get_operators', [ServiceController::class, 'getOperators']);
 Route::get('/get_technicians', [ServiceController::class, 'getTechnicians']);
 Route::get('/get_parses', [ServiceController::class, 'getParses']);
-Route::post('/service/history', [ServiceController::class, 'storeHistory']);
-Route::get('/breakdown-service/{uuid}/edit', [BreakdownServiceController::class,'edit']);
-Route::get('/breakdown-service/{uuid}/processing', [BreakdownServiceController::class,'serviceProcessing']);
-Route::put('/breakdown-service-processing/{uuid}', [BreakdownServiceController::class,'serviceProcessingUpdate']);
-Route::get('/breakdown-service-history', [BreakdownServiceController::class, 'breakDownServiceHistory']);
-Route::resource('breakdown-service',BreakdownServiceController::class);
-Route::post('/breakdown-service/technician-update-status', [BreakdownServiceController::class, 'acknowledge']);
-Route::resource('services',ServiceController::class);
 
+// Route::post('/service/history', [ServiceController::class, 'storeHistory']);
+// Route::get('/breakdown-service/{uuid}/edit', [BreakdownServiceController::class,'edit']);
+// Route::get('/breakdown-service/{uuid}/processing', [BreakdownServiceController::class,'serviceProcessing']);
+// Route::put('/breakdown-service-processing/{uuid}', [BreakdownServiceController::class,'serviceProcessingUpdate']);
+// Route::get('/breakdown-service-history', [BreakdownServiceController::class, 'breakDownServiceHistory']);
+// Route::resource('breakdown-service',BreakdownServiceController::class);
+// Route::post('/breakdown-service/technician-update-status', [BreakdownServiceController::class, 'acknowledge']);
+// Route::resource('services',ServiceController::class);
+
+
+// ----------- Breakdown Service Route--------------------------
+Route::get('breakdown-service/trashed-count', [BreakdownServiceController::class, 'trashed_count'])->name('breakdown-service.trashed-count');
+Route::get('breakdown-service/{uuid}/edit', [BreakdownServiceController::class, 'edit'])->name('breakdown-service.edit');
+Route::get('breakdown-service/{uuid}/get-assign-to-technician', [BreakdownServiceController::class, 'get_assign_to_technician'])->name('breakdown-service.get-assign-to-technician');
+Route::put('breakdown-service/{uuid}/save-assign-to-technician', [BreakdownServiceController::class, 'save_assign_to_technician'])->name('breakdown-service.save-assign-to-technician');
+Route::put('breakdown-service/{detail_id}/technician-breakdown-service-acknowledge', [BreakdownServiceController::class, 'technician_breakdown_service_acknowledge'])->name('technician-breakdown-service-acknowledge');
+Route::put('breakdown-service/{detail_id}/breakdown-service-start', [BreakdownServiceController::class, 'breakdown_service_start'])->name('breakdown-service-start');
+Route::put('breakdown-service/{detail_id}/technician-breakdown-service-acknowledge', [BreakdownServiceController::class, 'technician_breakdown_service_acknowledge'])->name('technician-breakdown-service-acknowledge');
+Route::get('breakdown-service/{detail_id}/breakdown-service-start-get-details', [BreakdownServiceController::class, 'breakdown_service_start_get_details'])->name('breakdown-service.breakdown-service-start-get-details');
+Route::put('breakdown-service/{detail_id}/breakdown-service-start-save-details', [BreakdownServiceController::class, 'breakdown_service_start_save_details'])->name('breakdown-service.breakdown-service-start-save-details');
+Route::resource('breakdown-service',BreakdownServiceController::class);
 
 // ----------- Preventive Service Route--------------------------
 Route::get('preventive-service/trashed-count', [PreventiveServiceController::class, 'trashed_count'])->name('preventive-service.trashed-count');
 Route::get('preventive-service/{uuid}/edit', [PreventiveServiceController::class, 'edit'])->name('preventive-service.edit');
 Route::get('preventive-service/{uuid}/get-assign-to-technician', [PreventiveServiceController::class, 'get_assign_to_technician'])->name('preventive-service.get-assign-to-technician');
 Route::put('preventive-service/{uuid}/save-assign-to-technician', [PreventiveServiceController::class, 'save_assign_to_technician'])->name('preventive-service.save-assign-to-technician');
-
 Route::put('preventive-service/{detail_id}/technician-preventive-service-acknowledge', [PreventiveServiceController::class, 'technician_preventive_service_acknowledge'])->name('technician-preventive-service-acknowledge');
-
 Route::put('preventive-service/{detail_id}/preventive-service-start', [PreventiveServiceController::class, 'preventive_service_start'])->name('preventive-service-start');
-
 Route::put('preventive-service/{detail_id}/technician-preventive-service-acknowledge', [PreventiveServiceController::class, 'technician_preventive_service_acknowledge'])->name('technician-preventive-service-acknowledge');
-
 Route::get('preventive-service/{detail_id}/preventive-service-start-get-details', [PreventiveServiceController::class, 'preventive_service_start_get_details'])->name('preventive-service.preventive-service-start-get-details');
 Route::put('preventive-service/{detail_id}/preventive-service-start-save-details', [PreventiveServiceController::class, 'preventive_service_start_save_details'])->name('preventive-service.preventive-service-start-save-details');
-
 Route::resource('preventive-service',PreventiveServiceController::class);
 
 
@@ -376,7 +384,7 @@ Route::get('/get_machine_codes', [DynamicDataController::class, 'getMachineCodes
 Route::get('/search_machine/{id?}', [DynamicDataController::class, 'searchMachine']);
 Route::get('/search_user/{id?}', [DynamicDataController::class, 'searchUser']);
 Route::get('/get-machine-code-ways/details/{machine_code}', [DynamicDataController::class, 'getManuallyApiMachineDetails']);
-Route::get('/get_breakdown_problem_notes', [DynamicDataController::class, 'getBreakdownProblemNotes']);
+Route::get('/get_breakdown_problem_notes/{ids?}', [DynamicDataController::class, 'getBreakdownProblemNotes']);
 Route::get('/get_groups', [DynamicDataController::class, 'getGroups']);
 Route::get('/get_parts', [DynamicDataController::class, 'getParts']);
 

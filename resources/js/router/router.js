@@ -207,30 +207,30 @@ const routes = [
       },
 
       // service
-      {
-        path: "survice/index", // New route for Contact
+      /*{
+        path: "service/index",
         name: "ServiceIndex",
         component: adminComponents.ServiceIndex,
         meta: { title: "Service Index" },
       },
       {
-        path: "survice/create", // New route for Contact
+        path: "service/create",
         name: "ServiceCreate",
         component: adminComponents.ServiceCreate,
         meta: { title: "Breakdown Service Create" },
       },
       {
-        path: "survice/history/create/:id", // New route for Contact
+        path: "service/history/create/:id",
         name: "ServiceHistoryCreate",
         component: adminComponents.ServiceHistoryCreate,
         meta: { title: "Service History Create" },
       },
       {
-        path: "survice/:uuid/edit", // Dynamic route for Survice Edit
+        path: "service/:uuid/edit",
         name: "ServiceEdit",
         component: adminComponents.ServiceEdit,
         meta: { title: "Edit Service" },
-        props: true, // Enables passing route params as props
+        props: true, 
       },
       {
         path: "service/:uuid/processing", // Dynamic route for Survice Edit
@@ -247,12 +247,56 @@ const routes = [
         props: true, // Enables passing route params as props
       },
       {
-        path: "survice/trash", // Dynamic route for Survice Edit
+        path: "service/trash", // Dynamic route for Survice Edit
         name: "ServiceTrash",
         component: adminComponents.ServiceTrash,
         meta: { title: "Trash Service" },
         props: true, // Enables passing route params as props
+      },*/
+
+
+    // breakdown service
+      {
+        path: "breakdown-service/index",
+        name: "BreakdownServiceIndex",
+        component: adminComponents.BreakdownServiceIndex,
+        meta: { title: "Breakdown Service Index" },
       },
+      {
+        path: "breakdown-service/create",
+        name: "BreakdownServiceCreate",
+        component: adminComponents.BreakdownServiceCreate,
+        meta: { title: "Breakdown Service Create" },
+      },
+      {
+        path: "breakdown-service/:uuid/edit",
+        name: "BreakdownServiceEdit",
+        component: adminComponents.BreakdownServiceEdit,
+        meta: { title: "Edit Breakdown Service" },
+        props: true,
+      },
+      {
+        path: "breakdown-service/:uuid/assign-to-technician",
+        name: "AssignToTechnicianBreakdownService",
+        component: adminComponents.AssignToTechnicianBreakdownService,
+        meta: { title: "Assign to Technician" },
+        props: true,
+      },
+      {
+        path: "breakdown-service/:detail_id/breakdown-service-start",
+        name: "BreakdownServiceStart",
+        component: adminComponents.BreakdownServiceStart,
+        meta: { title: "Breakdown Service Start" },
+        props: true,
+      },
+      {
+        path: "breakdown-service/:detail_id/breakdown-service-start-details",
+        name: "BreakdownServiceStartDetails",
+        component: adminComponents.BreakdownServiceStartDetails,
+        meta: { title: "Breakdown Service Start Details" },
+        props: true,
+      },
+      
 
     // preventive service
       {
