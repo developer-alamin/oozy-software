@@ -62,10 +62,13 @@ class MechineAssing extends Model
     //     'rent_date'     => 'datetime',
     //     'purchase_date' => 'datetime',
     // ];
-
+    public function company()
+    {
+        return $this->belongsTo(Company::class, );
+    }
     public function user()
     {
-        return $this->belongsTo(User::class, 'company_id');
+        return $this->belongsTo(User::class,'technician_id','id');
     }
     public function line()
     {

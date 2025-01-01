@@ -93,8 +93,10 @@
                 >mdi-account-outline</v-icon
             >
           </template>
-            
-            <v-icon @click="editPreventiveService(item.uuid)" class="mr-2"
+          <v-icon @click="detailsList(item.uuid)" color="blue" class="mr-2"
+                >mdi-eye</v-icon
+            >
+            <v-icon @click="editPreventiveService(item.uuid)" color="green" class="mr-2"
                 >mdi-pencil</v-icon
             >
             <v-icon @click="showConfirmDialog(item.uuid)" color="red"
@@ -175,7 +177,6 @@ export default {
       dialog: false,
       selectedId: null,
       trashedCount: 0,
-
       dialog_acknowledged: false,
       selectedDetialId: null,
     };
@@ -208,6 +209,10 @@ export default {
     createPreventiveService() {
       this.$router.push({ name: "PreventiveServiceCreate" });
     },
+    detailsList(uuid){
+
+      this.$router.push({ name: "PreventiveServiceDetailsList" ,params: { uuid }});
+    },
     viewTrash() {
       this.$router.push({ name: "PreventiveServiceTrash" });
     },
@@ -238,6 +243,7 @@ export default {
         const response = await this.$axios.delete(
           `/preventive-service/${this.selectedId}`
         );
+        
         this.loadItems({
           page: 1,
           itemsPerPage: this.itemsPerPage,

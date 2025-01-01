@@ -135,7 +135,7 @@ export default {
             } catch (error) {
                 this.serverError = "Error fetching source data.";
             }
-        },
+      },
 
 
         async fetchMachine(search = "", id = 0) {

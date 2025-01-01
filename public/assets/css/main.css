@@ -34,6 +34,9 @@ time, mark, audio, video {
 thead {
   font-weight: 600;
 }
+tr > th{
+  font-weight: 700;
+}
 
 article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {

@@ -32,7 +32,7 @@
 		              v-model="preventive_service.problem_note_id"
 		              :items="BreakdownProblemNotes"
 		              item-value="id"
-		              item-title="break_down_problem_note"
+		              item-title="note"
 		              label="Select Problem Notes"
 		              outlined
 		              clearable

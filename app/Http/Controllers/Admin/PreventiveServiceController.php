@@ -4,9 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\HelperController;
+use App\Models\Admin;
+use App\Models\BreakDownProblemNote;
 use App\Models\PreventiveService;
 use App\Models\PreventiveServiceDetail;
 use App\Models\MechineAssing;
+use App\Models\Parse;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -257,10 +261,74 @@ class PreventiveServiceController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($uuid)
     {
-        //
+        try {
+            // Find the PreventiveService record by UUID
+            $preventiveService = PreventiveService::where('uuid', $uuid)->first();
+
+            // If the record is not found, return a 404 response
+            if (!$preventiveService) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Preventive Service not found.',
+                ], 404);
+            }
+
+            // Check user authorization
+            if (Auth::guard('admin')->check()) {
+                $currentUser = Auth::guard('admin')->user();
+                
+                if ($currentUser->role === 'superadmin') {
+                    // Superadmin can delete without additional checks
+                } else {
+                    // Regular admin authorization check
+                    if (
+                        $preventiveService->creator_type !== Admin::class || 
+                        $preventiveService->creator_id !== $currentUser->id
+                    ) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Forbidden: You are not authorized to delete this Preventive Service.',
+                        ], 403);
+                    }
+                }
+            } elseif (Auth::guard('user')->check()) {
+                $currentUser = Auth::guard('user')->user();
+
+                if (
+                    $preventiveService->creator_type !== User::class || 
+                    $preventiveService->creator_id !== $currentUser->id
+                ) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Forbidden: You are not authorized to delete this Preventive Service.',
+                    ], 403);
+                }
+            } else {
+                // If no authorized user is found
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized',
+                ], 403);
+            }
+
+            // Attempt to delete the record
+            $preventiveService->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Preventive Service deleted successfully.',
+            ], 200);
+        } catch (\Exception $e) {
+            // Return an error response if something goes wrong
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting Preventive Service: ' . $e->getMessage(),
+            ], 500);
+        }
     }
+
 
     
     public function get_assign_to_technician($uuid)
@@ -319,7 +387,7 @@ class PreventiveServiceController extends Controller
 
         // Create the new service instance with validated data
         $service = new PreventiveServiceDetail();
-
+        $service->uuid = HelperController::generateUuid();
         $service->preventive_service_id = PreventiveService::where('uuid', $uuid)->first()?->id??0;
         $service->technician_id = $request->technician_id;
         $service->status = 'Processing';
@@ -527,4 +595,242 @@ class PreventiveServiceController extends Controller
             'trashedCount' => $trashedCount
         ], Response::HTTP_OK);
     }
+
+    public function preventiveservicedetailslist(Request $request, $uuid)
+    {
+        // Default pagination settings
+        $page         = $request->input('page', 1);
+        $itemsPerPage = $request->input('itemsPerPage', 5);
+        $sortBy       = $request->input('sortBy', 'created_at');
+        $sortOrder    = $request->input('sortOrder', 'desc'); 
+        $search       = $request->input('search', '');
+
+        // Fetch the PreventiveService by UUID
+        $preventiveService = PreventiveService::where('uuid', $uuid)->first();
+
+        if (!$preventiveService) {
+            return response()->json(['success' => false, 'message' => 'Preventive service not found'], 404);
+        }
+
+       // Get the preventive service by UUID
+        $preventiveService = PreventiveService::with(['serviceDetails' => function ($query) use ($sortBy, $sortOrder) {
+            // Apply sorting to service details
+            $query->orderBy($sortBy, $sortOrder);
+        }])->where('uuid', $uuid)->first();
+
+        if (!$preventiveService) {
+            return response()->json(['success' => false, 'message' => 'Preventive Service not found'], 404);
+        }
+
+        // Paginate service details
+        $serviceDetailsPaginated = $preventiveService->serviceDetails()->paginate($itemsPerPage);
+
+        return response()->json([
+            'items' => $serviceDetailsPaginated->items(),
+            'total' => $serviceDetailsPaginated->total(),
+        ]);
+    }
+    public function preventivesignleservicedetails($uuid){
+        $singleService = PreventiveServiceDetail::where('uuid',$uuid)
+        ->with(['creator','preventiveService.mechine_assing','preventiveService.company',"user"])
+        ->firstOrFail();
+
+        // Decode the parts_info if available
+        $decodedPartsInfo = [];
+        $parsedParts = []; // To store parts with name and qty
+        if (!empty($singleService->parts_info)) {
+            $decodedPartsInfo = json_decode($singleService->parts_info, true);
+    
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid JSON format in parts_info.',
+                ], 400);
+            }
+    
+            // Fetch part names from the Parse model
+            $partIds = array_column($decodedPartsInfo, 'parts_id'); // Extract parts_id from JSON
+            $parts = Parse::whereIn('id', $partIds)->pluck('name', 'id'); // Get parts name by id
+    
+            // Combine the name and qty
+            foreach ($decodedPartsInfo as $part) {
+                $parsedParts[] = [
+                    'name' => $parts[$part['parts_id']] ?? 'Unknown Part', // Part name or fallback
+                    'qty'  => $part['qty'], // Quantity from parts_info
+                ];
+            }
+        }
+         // Decode the problem_note_id if available
+        $decodedProblemNoteIds = [];
+
+
+
+        $parsedProblemNotes = []; // To store problem notes
+
+        if (!empty($singleService->problem_note_id)) {
+            $decodedProblemNoteIds = json_decode($singleService->problem_note_id, true);
+    
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid JSON format in problem_note_id.',
+                ], 400);
+            }
+    
+            // Fetch problem notes from the BreakDownProblemNote model
+            $parsedProblemNotes = BreakDownProblemNote::whereIn('id', $decodedProblemNoteIds)->get(); // Get notes by id
+    
+            
+        }
+         // Add the parsed parts info and problem notes to the response
+        $singleService->parsed_parts_info = $parsedParts;
+        $singleService->problem_notes = $parsedProblemNotes;
+
+        return response()->json($singleService,200);
+    }
+    public function preventiveservicetrashed(Request $request){
+        
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
+
+            // Superadmin check: Allow access to all soft-deleted preventive services
+            if ($currentUser->role === 'superadmin') {
+                // Fetch all trashed preventive services without additional checks
+                $preventiveServicesQuery = PreventiveService::onlyTrashed();
+            } else {
+                // Regular admin authorization check
+                $preventiveServicesQuery = PreventiveService::onlyTrashed()
+                    ->where('creator_id', $currentUser->id)
+                    ->where('creator_type', $creatorType); // Only fetch soft-deleted records created by this admin
+            }
+
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+
+            // Regular user authorization check
+            $preventiveServicesQuery = PreventiveService::onlyTrashed()
+                ->where('creator_id', $currentUser->id)
+                ->where('creator_type', $creatorType); // Only fetch soft-deleted records created by this user
+
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        // Get parameters from the request
+        $page         = $request->input('page', 1);
+        $itemsPerPage = $request->input('itemsPerPage', 5);
+        $sortBy       = $request->input('sortBy', 'created_at'); // Default sort by created_at
+        $sortOrder    = $request->input('sortOrder', 'desc'); // Default order is descending
+        $search       = $request->input('search', ''); // Search term, default is empty
+
+        // Apply search if the search term is not empty
+        if (!empty($search)) {
+            $preventiveServicesQuery->where('name', 'LIKE', '%' . $search . '%'); // Adjust as per your preventive service fields
+        }
+
+        // Apply sorting
+        $preventiveServicesQuery->orderBy($sortBy, $sortOrder);
+
+        // Paginate results
+        $preventiveServices = $preventiveServicesQuery->with(['mechine_assing'])->paginate($itemsPerPage);
+
+        // Return the response as JSON
+        return response()->json([
+            'items' => $preventiveServices->items(), // Current page items
+            'total' => $preventiveServices->total(), // Total number of trashed records
+        ]);
+    }
+    public function preventiveserviceforceDelete($uuid)
+    {
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
+
+            // Superadmin check: Allow access to all trashed preventive services
+            if ($currentUser->role === 'superadmin') {
+                $preventiveService = PreventiveService::onlyTrashed()->where('uuid', $uuid)->firstOrFail();
+            } else {
+                // Regular admin authorization check
+                $preventiveService = PreventiveService::onlyTrashed()
+                    ->where('creator_id', $currentUser->id)
+                    ->where('creator_type', $creatorType)
+                    ->where('uuid', $uuid)
+                    ->firstOrFail();
+            }
+
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+
+            // Regular user authorization check
+            $preventiveService = PreventiveService::onlyTrashed()
+                ->where('creator_id', $currentUser->id)
+                ->where('creator_type', $creatorType)
+                ->where('uuid', $uuid)
+                ->firstOrFail();
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+        
+        try {
+            // Force delete the preventive service
+            $preventiveService->forceDelete();
+            return response()->json([
+                'success' => true,
+                'message' => 'Preventive service permanently deleted successfully.'
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting preventive service: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    public function preventiveserviceRestore($uuid)
+    {
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
+    
+            // Superadmin check: Allow access to all trashed preventive services
+            if ($currentUser->role === 'superadmin') {
+                $restored = PreventiveService::onlyTrashed()->where('uuid', $uuid)->firstOrFail()->restore();
+            } else {
+                // Regular admin authorization check
+                $restored = PreventiveService::onlyTrashed()
+                    ->where('creator_id', $currentUser->id)
+                    ->where('creator_type', $creatorType)
+                    ->where('uuid', $uuid)
+                    ->firstOrFail()
+                    ->restore();
+            }
+    
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+    
+            // Regular user authorization check
+            $restored = PreventiveService::onlyTrashed()
+                ->where('creator_id', $currentUser->id)
+                ->where('creator_type', $creatorType)
+                ->where('uuid', $uuid)
+                ->firstOrFail()
+                ->restore();
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+    
+        if ($restored) {
+            return response()->json(['message' => 'Preventive service restored successfully'], Response::HTTP_OK);
+        }
+        return response()->json(['message' => 'Preventive service not found or is not trashed'], Response::HTTP_NOT_FOUND);
+    }
+    
 }
