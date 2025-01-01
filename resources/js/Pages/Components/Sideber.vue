@@ -244,7 +244,7 @@
           :class="{ show: isBreakdownRouteShow }"
           href="#"
         >
-          <i class="bi bi-layout-text-window-reverse"></i><span>Service</span
+          <i class="bi bi-layout-text-window-reverse"></i><span>Breakdown Service</span
           ><i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul
@@ -255,33 +255,21 @@
         >
           <li>
             <router-link
-              :to="{ name: 'ServiceCreate' }"
+              :to="{ name: 'BreakdownServiceCreate' }"
               :class="{ active: isBreakdownServiceRouteCreate }"
               active-class="active"
             >
-              <i class="bi bi-circle"></i><span>Create Breakdown Service</span>
+              <i class="bi bi-circle"></i><span>Add New Service</span>
             </router-link>
           </li>
 
           <li>
             <router-link
-              :to="{ name: 'ServiceIndex' }"
+              :to="{ name: 'BreakdownServiceIndex' }"
               :class="{ active: isBreakdownServiceRouteIndex }"
               active-class="active"
             >
-              <i class="bi bi-circle"></i><span>Breakdown Service</span>
-            </router-link>
-          </li>
-          <li>
-            <router-link
-              :to="{ name: 'BreakdownServiceHistory' }"
-              :class="{
-                active: isBreakdownServiceRouteBreakdownServiceHistory,
-              }"
-              active-class="active"
-            >
-              <i class="bi bi-circle"></i
-              ><span> Breakdown Service History</span>
+              <i class="bi bi-circle"></i><span>All Services</span>
             </router-link>
           </li>
         </ul>
@@ -312,7 +300,7 @@
               :class="{ active: isPreventiveServiceRouteCreate }"
               active-class="active"
             >
-              <i class="bi bi-circle"></i><span>Manual Service Create</span>
+              <i class="bi bi-circle"></i><span>Add New Service</span>
             </router-link>
           </li>
 
@@ -322,7 +310,7 @@
               :class="{ active: isPreventiveServiceRouteIndex }"
               active-class="active"
             >
-              <i class="bi bi-circle"></i><span>All Preventive Services</span>
+              <i class="bi bi-circle"></i><span>All Services</span>
             </router-link>
           </li>
         </ul>
@@ -642,12 +630,10 @@ const isMachineRoute = computed(() =>
 );
 const isBreakdownRouteShow = computed(() => {
   return [
-    "ServiceCreate",
-    "ServiceIndex",
-    "ServiceEdit",
-    "ServiceTrash",
-    "ServiceProcessing",
-    "BreakdownServiceHistory",
+    "BreakdownServiceCreate",
+    "BreakdownServiceIndex",
+    "BreakdownServiceEdit",
+    "BreakdownServiceTrash",
   ].includes(route.name);
 });
 

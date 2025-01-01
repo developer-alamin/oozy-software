@@ -551,7 +551,7 @@ class DynamicDataController extends Controller
     }
     public function getMachineLines(Request $request)
     {
-        $machineId = $request->get('machine_id');
+        $machineId = $request->get('mechine_assing_id');
         // Validate machine_id
         if (!$machineId) {
             return response()->json(['error' => 'Machine ID is required.'], 400);
@@ -564,15 +564,24 @@ class DynamicDataController extends Controller
         return response()->json($lines);
     }
 
-    public function getBreakdownProblemNotes(Request $request)
+    public function getBreakdownProblemNotes(Request $request, $ids="")
     {
         $search = $request->query('search', '');
         $limit = $request->query('limit', 5); // Default limit of 5
 
         // Query to search for brands by name with a limit
         $breakDownProblemNotes = BreakDownProblemNote::where('note', 'like', '%' . $search . '%')
+        if($ids){
+            $breakDownProblemNotes = BreakDownProblemNote::whereIn('id', explode(',', $ids))
             ->limit($limit)
             ->get();
+
+        }else{
+
+            $breakDownProblemNotes = BreakDownProblemNote::where('break_down_problem_note', 'like', '%' . $search . '%')
+            ->limit($limit)
+            ->get();
+        }
 
         // Return the BreakDownProblemNotes as JSON
         return response()->json($breakDownProblemNotes);

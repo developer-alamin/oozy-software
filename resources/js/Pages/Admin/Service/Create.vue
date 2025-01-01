@@ -1,14 +1,14 @@
 <template>
   <v-card outlined class="mx-auto my-5" max-width="">
-    <v-card-title>Create Breakdown Service</v-card-title>
+    <v-card-title>Add New Service</v-card-title>
     <v-card-text>
       <v-form ref="form" v-model="valid" @submit.prevent="submit">
         <v-row>
           <!-- Machine Code Dropdown -->
           <v-col cols="6">
             <v-autocomplete
-              v-model="breakdown_service.machine_id"
-              :items="machine_codes"
+              v-model="breakdown_service.mechine_assing_id"
+              :items="machineItems"
               item-value="id"
               item-title="machine_code"
               label="Select Machine Code"
@@ -16,9 +16,8 @@
               clearable
               density="comfortable"
               :rules="[rules.required]"
-              :error-messages="errors.machine_id ? errors.machine_id : ''"
-              @update:model-value="onMachineCodeSelected"
-              @update:search="fetchMachineCodes"
+              :error-messages="errors.mechine_assing_id ? errors.mechine_assing_id : ''"
+              @update:search="fetchMachine"
             >
               <template v-slot:label>
                 Select Machine Code <span style="color: red">*</span>
@@ -26,58 +25,31 @@
             </v-autocomplete>
           </v-col>
 
-          <!-- Location Dropdown -->
           <v-col cols="6">
-            <v-select
-              v-model="breakdown_service.location"
-              :items="statusLocation"
-              label="Location"
-              outlined
-              clearable
-              density="comfortable"
-              :disabled="!breakdown_service.machine_id"
-            ></v-select>
+            <v-autocomplete
+            v-model="breakdown_service.breakdown_problem_note_id"
+            :items="breakdown_problem_notes"
+            item-value="id"
+            item-title="break_down_problem_note"
+            label="Select Machine Code"
+            outlined
+            clearable
+            density="comfortable"
+            :error-messages="
+              errors.breakdown_problem_note_id
+                ? errors.breakdown_problem_note_id
+                : ''
+            "
+              @update:search="fetchBreakdownProblemNote"
+            >
+            <template v-slot:label> Select Breakdown Problem Note </template>
+          </v-autocomplete>
           </v-col>
+
+
         </v-row>
 
-        <!-- Line Dropdown -->
-        <v-row>
-          <v-col cols="12">
-            <v-autocomplete
-              v-model="breakdown_service.line_id"
-              :items="lines"
-              item-value="id"
-              item-title="name"
-              label="Select Line"
-              outlined
-              clearable
-              density="comfortable"
-              :disabled="!breakdown_service.machine_id"
-            >
-              <template v-slot:label>
-                Select Line <span style="color: red">*</span>
-              </template>
-            </v-autocomplete>
-          </v-col>
-        </v-row>
-        <v-autocomplete
-          v-model="breakdown_service.breakdown_problem_note_id"
-          :items="breakdown_problem_notes"
-          item-value="id"
-          item-title="break_down_problem_note"
-          label="Select Machine Code"
-          outlined
-          clearable
-          density="comfortable"
-          :error-messages="
-            errors.breakdown_problem_note_id
-              ? errors.breakdown_problem_note_id
-              : ''
-          "
-          @update:search="fetchBreakdownProblemNote"
-        >
-          <template v-slot:label> Select Breakdown Problem Note </template>
-        </v-autocomplete>
+       
         <v-textarea
           v-model="breakdown_service.breakdown_problem_note"
           label="Note"
@@ -107,32 +79,13 @@
           </v-col>
         </v-row>
         <v-row>
-          <!-- <v-col cols="6">
-            <v-select
-              v-model="breakdown_service.service_type_status"
-              :items="statusTypeItems"
-              label="Service Type"
-              clearable
-              density="comfortable"
-            ></v-select>
-          </v-col> -->
-          <v-col cols="6">
+          <v-col cols="12">
             <v-select
               v-model="breakdown_service.breakdown_service_status"
               :items="statusItems"
               label="Breakdown Service Status"
               clearable
               density="comfortable"
-            ></v-select>
-          </v-col>
-          <v-col cols="6">
-            <v-select
-              v-model="breakdown_service.breakdown_service_technician_status"
-              :items="statusTechnicianItems"
-              label="Technician Status"
-              clearable
-              density="comfortable"
-              readonly
             ></v-select>
           </v-col>
         </v-row>
@@ -191,23 +144,20 @@ export default {
       ],
       statusLocation: ["Sewing Line"],
       breakdown_service: {
-        location: null,
         service_time: this.getCurrentTime(),
         service_date: this.getCurrentDate(),
-        machine_id: null,
-        line_id: null,
+        mechine_assing_id: null,
         breakdown_problem_note_id: null,
         breakdown_problem_note: null,
         breakdown_service_status: "Pending",
-        breakdown_service_technician_status: "Pending",
         description: "",
-        status: "Pending", // New property for checkbox
+        status: "Pending",
         service_type_status: "Preventive",
       },
       errors: {}, // Stores validation errors
       serverError: null, // Stores server-side error messages
       limit: 5,
-      machine_codes: [], // Array to store machine_codes data
+      machineItems: [],
       breakdown_problem_notes: [],
       lines: [],
       selectedCompany: null, // Bound to selected Company in v-autocomplete
@@ -221,69 +171,19 @@ export default {
   },
 
   methods: {
-    async fetchMachineCodes(search = "") {
+    async fetchMachine(search = "") {
       try {
-        const response = await this.$axios.get("/get_machine_codes", {
+        const response = await this.$axios.get("/search_machine", {
           params: {
             search,
           },
         });
-        this.machine_codes = response.data; // Populate machine codes
-        console.log(response.data);
+        this.machineItems = response.data;
       } catch (error) {
         console.error("Error fetching machine codes:", error);
       }
     },
 
-    /**
-     * Fetch Lines for a given machine
-     * @param {Number} machineId - Selected machine ID
-     */
-    async fetchLines(machineId) {
-      if (!machineId) {
-        this.lines = [];
-        this.breakdown_service.line_id = null;
-        return;
-      }
-      try {
-        const response = await this.$axios.get("/get_machine_lines", {
-          params: { machine_id: machineId },
-        });
-        if (Array.isArray(response.data) && response.data.length > 0) {
-          this.lines = response.data; // Populate the lines
-          this.breakdown_service.line_id = response.data[0].id; // Automatically select the first line
-        } else {
-          this.lines = [];
-          this.breakdown_service.line_id = null;
-        }
-      } catch (error) {
-        console.error("Error fetching lines:", error);
-      }
-    },
-
-    /**
-     * Update Location and Fetch Lines when Machine Code is Selected
-     * @param {Number} machineId - Selected machine ID
-     */
-    async onMachineCodeSelected(machineId) {
-      // Reset dependent fields
-      this.breakdown_service.location = null;
-      this.breakdown_service.line_id = null;
-      this.lines = [];
-
-      if (!machineId) return;
-
-      // Update location
-      const selectedMachine = this.machine_codes.find(
-        (machine) => machine.id === machineId
-      );
-      this.breakdown_service.location = selectedMachine
-        ? selectedMachine.location_status
-        : null;
-
-      // Fetch lines
-      await this.fetchLines(machineId);
-    },
     async submit() {
       // Reset errors and loading state before submission
       this.errors = {};
@@ -366,28 +266,7 @@ export default {
         console.error("Error fetching companys:", error);
       }
     },
-    // async fetchMachineCodes(search) {
-    //   try {
-    //     const response = await this.$axios.get(`/get_machine_codes`, {
-    //       params: {
-    //         search: search,
-    //         limit: this.limit,
-    //       },
-    //     });
-    //     // console.log(response.data);
-    //     this.machine_codes = response.data;
-    //   } catch (error) {
-    //     console.error("Error fetching machine codes:", error);
-    //   }
-    // },
-    // updateLocationStatus(machineId) {
-    //   const selectedMachine = this.machine_codes.find(
-    //     (machine) => machine.id === machineId
-    //   );
-    //   this.breakdown_service.location = selectedMachine
-    //     ? selectedMachine.location
-    //     : null;
-    // },
+
     async fetchOperator(search) {
       try {
         const response = await this.$axios.get(`/get_operators`, {
@@ -456,7 +335,7 @@ export default {
   mounted() {
     this.breakdown_service.service_date = this.getCurrentDate();
     this.breakdown_service.service_time = this.getCurrentTime();
-    this.fetchMachineCodes();
+    this.fetchMachine();
   },
 };
 </script>
