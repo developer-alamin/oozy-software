@@ -295,7 +295,28 @@ const routes = [
         meta: { title: "Preventive Service Start Details" },
         props: true,
       },
-
+      {
+        path: "preventive-service/:uuid/details-list",
+        name: "PreventiveServiceDetailsList",
+        component: adminComponents.PreventiveServiceDetailsList,
+        meta: { title: "Preventive Service Details List" },
+        props: true,
+      },
+      {
+        path: "signle-preventive-service/:uuid/details",
+        name: "SignleServiceDetails",
+        component: adminComponents.SignleServiceDetails,
+        meta: { title: "Signle Service Details" },
+        props: true,
+      },
+      {
+        path: "preventive-service/trash", // Dynamic route for Survice Edit
+        name: "PreventiveServiceTrash",
+        component: adminComponents.PreventiveServiceTrash,
+        meta: { title: "preventive-service Trash" },
+        props: true, // Enables passing route params as props
+      },  
+        
       //supplier
       {
         path: "supplier/index", // New route for Contact
