@@ -127,6 +127,11 @@ Route::resource('breakdown-service',BreakdownServiceController::class);
 
 // ----------- Preventive Service Route--------------------------
 Route::get('preventive-service/trashed-count', [PreventiveServiceController::class, 'trashed_count'])->name('preventive-service.trashed-count');
+Route::get('preventive-service/trashed', [PreventiveServiceController::class,'preventiveservicetrashed']);
+
+Route::post('/preventive-service/{uuid}/restore', [PreventiveServiceController::class,'preventiveserviceRestore']);
+Route::delete('preventive-service/{uuid}/force-delete', [PreventiveServiceController::class,'preventiveserviceforceDelete']);
+
 Route::get('preventive-service/{uuid}/edit', [PreventiveServiceController::class, 'edit'])->name('preventive-service.edit');
 Route::get('preventive-service/{uuid}/get-assign-to-technician', [PreventiveServiceController::class, 'get_assign_to_technician'])->name('preventive-service.get-assign-to-technician');
 Route::put('preventive-service/{uuid}/save-assign-to-technician', [PreventiveServiceController::class, 'save_assign_to_technician'])->name('preventive-service.save-assign-to-technician');
@@ -135,6 +140,8 @@ Route::put('preventive-service/{detail_id}/preventive-service-start', [Preventiv
 Route::put('preventive-service/{detail_id}/technician-preventive-service-acknowledge', [PreventiveServiceController::class, 'technician_preventive_service_acknowledge'])->name('technician-preventive-service-acknowledge');
 Route::get('preventive-service/{detail_id}/preventive-service-start-get-details', [PreventiveServiceController::class, 'preventive_service_start_get_details'])->name('preventive-service.preventive-service-start-get-details');
 Route::put('preventive-service/{detail_id}/preventive-service-start-save-details', [PreventiveServiceController::class, 'preventive_service_start_save_details'])->name('preventive-service.preventive-service-start-save-details');
+Route::get("preventive-service/{uuid}/details-list",[PreventiveServiceController::class,"preventiveservicedetailslist"]);
+Route::get("/preventive-signle-service/{uuid}/details",[PreventiveServiceController::class,"preventivesignleservicedetails"]);
 Route::resource('preventive-service',PreventiveServiceController::class);
 
 

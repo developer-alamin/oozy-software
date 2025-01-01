@@ -570,8 +570,8 @@ class DynamicDataController extends Controller
         $limit = $request->query('limit', 5); // Default limit of 5
 
         // Query to search for brands by name with a limit
+        $breakDownProblemNotes = BreakDownProblemNote::where('note', 'like', '%' . $search . '%')
         if($ids){
-            
             $breakDownProblemNotes = BreakDownProblemNote::whereIn('id', explode(',', $ids))
             ->limit($limit)
             ->get();

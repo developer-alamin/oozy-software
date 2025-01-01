@@ -3,3 +3,8 @@ img.rentsImg{
 	border-radius: 100%;
 	height: 50px;
 }
+
+tr > th{
+	font-weight: 700 !important
+	;
+}

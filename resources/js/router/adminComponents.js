@@ -57,6 +57,12 @@ export { default as PreventiveServiceTrash } from "../Pages/Admin/PreventiveServ
 export { default as AssignToTechnicianPreventiveService } from "../Pages/Admin/PreventiveService/AssignToTechnician.vue";
 export { default as PreventiveServiceStart } from "../Pages/Admin/PreventiveService/PreventiveServiceStart.vue";
 export { default as PreventiveServiceStartDetails } from "../Pages/Admin/PreventiveService/PreventiveServiceStartDetails.vue";
+export { default as PreventiveServiceDetailsList } from "../Pages/Admin/PreventiveService/DetailsList.vue";
+export { default as SignleServiceDetails } from "../Pages/Admin/PreventiveService/SignleServiceDetails.vue";
+
+
+
+
 
 // Supplier components
 export { default as SupplierIndex } from "../Pages/Admin/Supplier/Index.vue";

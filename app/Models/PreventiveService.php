@@ -19,11 +19,18 @@ class PreventiveService extends Model
     {
         return $this->morphTo();
     }
-
+    public function company()
+    {
+        return $this->belongsTo(Company::class, );
+    }
     public function mechine_assing()
     {
         return $this->belongsTo(MechineAssing::class, 'mechine_assing_id');
     }
-    
+    // Define the relationship
+    public function serviceDetails()
+    {
+        return $this->hasMany(PreventiveServiceDetail::class, 'preventive_service_id', 'id'); // 'prevent_service_id' is the foreign key, 'id' is the local key
+    }
 
 }
