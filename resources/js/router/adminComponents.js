@@ -32,13 +32,22 @@ export { default as FactoryEdit } from "../Pages/Admin/Factory/Edit.vue";
 export { default as FactoryTrash } from "../Pages/Admin/Factory/Trash.vue";
 
 // Service components
-export { default as ServiceIndex } from "../Pages/Admin/Service/Index.vue";
-export { default as ServiceEdit } from "../Pages/Admin/Service/Edit.vue";
-export { default as ServiceProcessing } from "../Pages/Admin/Service/ServiceProcessing.vue";
-export { default as BreakdownServiceHistory } from "../Pages/Admin/Service/BreakdownServiceHistory.vue";
-export { default as ServiceCreate } from "../Pages/Admin/Service/Create.vue";
-export { default as ServiceHistoryCreate } from "../Pages/Admin/Service/CreateServiceHistory.vue";
-export { default as ServiceTrash } from "../Pages/Admin/Service/Trash.vue";
+// export { default as ServiceIndex } from "../Pages/Admin/Service/Index.vue";
+// export { default as ServiceEdit } from "../Pages/Admin/Service/Edit.vue";
+// export { default as ServiceProcessing } from "../Pages/Admin/Service/ServiceProcessing.vue";
+// export { default as BreakdownServiceHistory } from "../Pages/Admin/Service/BreakdownServiceHistory.vue";
+// export { default as ServiceCreate } from "../Pages/Admin/Service/Create.vue";
+// export { default as ServiceHistoryCreate } from "../Pages/Admin/Service/CreateServiceHistory.vue";
+// export { default as ServiceTrash } from "../Pages/Admin/Service/Trash.vue";
+
+// Breakdown Service components
+export { default as BreakdownServiceCreate } from "../Pages/Admin/BreakdownService/Create.vue";
+export { default as BreakdownServiceIndex } from "../Pages/Admin/BreakdownService/Index.vue";
+export { default as BreakdownServiceEdit } from "../Pages/Admin/BreakdownService/Edit.vue";
+export { default as BreakdownServiceTrash } from "../Pages/Admin/BreakdownService/Trash.vue";
+export { default as AssignToTechnicianBreakdownService } from "../Pages/Admin/BreakdownService/AssignToTechnician.vue";
+export { default as BreakdownServiceStart } from "../Pages/Admin/BreakdownService/BreakdownServiceStart.vue";
+export { default as BreakdownServiceStartDetails } from "../Pages/Admin/BreakdownService/BreakdownServiceStartDetails.vue";
 
 // Preventive Service components
 export { default as PreventiveServiceCreate } from "../Pages/Admin/PreventiveService/Create.vue";
@@ -48,6 +57,12 @@ export { default as PreventiveServiceTrash } from "../Pages/Admin/PreventiveServ
 export { default as AssignToTechnicianPreventiveService } from "../Pages/Admin/PreventiveService/AssignToTechnician.vue";
 export { default as PreventiveServiceStart } from "../Pages/Admin/PreventiveService/PreventiveServiceStart.vue";
 export { default as PreventiveServiceStartDetails } from "../Pages/Admin/PreventiveService/PreventiveServiceStartDetails.vue";
+export { default as PreventiveServiceDetailsList } from "../Pages/Admin/PreventiveService/DetailsList.vue";
+export { default as SignleServiceDetails } from "../Pages/Admin/PreventiveService/SignleServiceDetails.vue";
+
+
+
+
 
 // Supplier components
 export { default as SupplierIndex } from "../Pages/Admin/Supplier/Index.vue";

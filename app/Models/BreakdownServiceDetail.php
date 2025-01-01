@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class BreakdownService extends Model
+class BreakdownServiceDetail extends Model
 {
     use HasFactory,SoftDeletes;
 
@@ -19,11 +19,4 @@ class BreakdownService extends Model
     {
         return $this->morphTo();
     }
-
-    public function mechine_assing()
-    {
-        return $this->belongsTo(MechineAssing::class, 'mechine_assing_id');
-    }
-    
-
 }

@@ -1,13 +1,13 @@
 <template>
     <v-card outlined class="mx-auto my-5" max-width="900">
-        <v-card-title>Edit Preventive Service</v-card-title>
+        <v-card-title>Edit Breakdown Service</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="update">
                
                 <v-row>
-		          <v-col cols="12">
+		          <v-col cols="6">
 		            <v-autocomplete
-		              v-model="preventive_service.mechine_assing_id"
+		              v-model="breakdown_service.mechine_assing_id"
 		              :items="machineItems"
 		              item-value="id"
 		              item-title="machine_code"
@@ -24,12 +24,45 @@
 		              </template>
 		            </v-autocomplete>
 		          </v-col>
+                    <v-col cols="6">
+                      <v-autocomplete
+                        v-model="breakdown_service.supervisor_problem_note_id"
+                        :items="BreakdownProblemNotes"
+                        item-value="id"
+                        item-title="break_down_problem_note"
+                        label="Select Problem Notes"
+                        outlined
+                        clearable
+                        multiple
+                        small-chips
+                        density="comfortable"
+                    :rules="[rules.required]"
+                        :error-messages="errors.supervisor_problem_note_id ? errors.supervisor_problem_note_id : ''"
+                        @update:search="fetchBreakdownProblemNote"
+                      >
+                        <template v-slot:label> Select Problem Notes <span style="color: red">*</span> </template>
+                      </v-autocomplete>
+                    </v-col>
 		        </v-row>
+
+
+                <v-row>
+                  <v-col cols="12">
+                    <v-textarea
+                      v-model="breakdown_service.supervisor_note"
+                      :error-messages="errors.note || ''"
+                    >
+                        <template v-slot:label>
+                         Note
+                        </template>
+                    </v-textarea>
+                  </v-col>
+                </v-row>
 
 		         <v-row>
 		          <v-col cols="6">
 		            <v-date-input
-		              v-model="preventive_service.service_date"
+		              v-model="breakdown_service.service_date"
 		              label="Service Date"
 		              density="comfortable"
 		              :error-messages="errors.service_date ? errors.service_date : ''"
@@ -37,7 +70,7 @@
 		          </v-col>
 		          <v-col cols="6">
 		            <v-text-field
-		              v-model="preventive_service.service_time"
+		              v-model="breakdown_service.service_time"
 		              label="Service Time"
 		              type="time"
 		              density="comfortable"
@@ -49,13 +82,13 @@
 		        <v-row>
 		            <v-col cols="12">
 			            <v-select
-			              v-model="preventive_service.service_status"
+			              v-model="breakdown_service.service_status"
 			              :items="statusItems"
 			              label="Service Status"
 			              outlined
 			              clearable
 			              density="comfortable"
-			              :disabled="!preventive_service.mechine_assing_id"
+			              :disabled="!breakdown_service.mechine_assing_id"
 			            ></v-select>
 		          </v-col>
 		        </v-row>
@@ -98,13 +131,16 @@ export default {
             valid: false,
             loading: false,
             statusItems: ["Pending", "Processing", "Done", "Cancel"],
-		    preventive_service: {
+		    breakdown_service: {
 		        mechine_assing_id: null,
 		        service_date: null,
 		        service_time: null,
+                supervisor_problem_note_id: null,
+                supervisor_note: null,
 		        service_status: "Pending",
 		    },
       		machineItems: [],
+            BreakdownProblemNotes: [],
             errors: {},
             serverError: null,
             rules: {
@@ -113,28 +149,57 @@ export default {
         };
     },
     created() {
-        this.fetchPreventiveService();
+        this.fetchBreakdownService();
         //this.fetchMachine();
     },
     methods: {
 
-    	async fetchPreventiveService() {
-            const preventiveServiceId = this.$route.params.uuid;
+    	async fetchBreakdownService() {
+            const breakdownServiceId = this.$route.params.uuid;
             try {
                 const response = await this.$axios.get(
-                    `/preventive-service/${preventiveServiceId}/edit`
+                    `/breakdown-service/${breakdownServiceId}/edit`
                 );
-                let service = response.data.PreventiveService
+                let service = response.data.BreakdownService
                 let [service_date, service_time] = service.date_time.split(' ');
 
-                this.preventive_service.mechine_assing_id = service.mechine_assing_id
-                this.preventive_service.service_date = service_date
-                this.preventive_service.service_time = service_time
-                this.preventive_service.service_status = service.service_status
+                this.breakdown_service.mechine_assing_id = service.mechine_assing_id
+                this.breakdown_service.service_date = service_date
+                this.breakdown_service.service_time = service_time
+                this.breakdown_service.service_status = service.service_status
+                this.breakdown_service.supervisor_note = service.supervisor_note
+                //this.breakdown_service.supervisor_problem_note_id = [1,2]
+
+                this.fetchBreakdownProblemNote("", service.supervisor_problem_note_id)
+
                 this.fetchMachine("", service.mechine_assing_id);
             } catch (error) {
                 this.serverError = "Error fetching source data.";
             }
+        },
+
+        async fetchBreakdownProblemNote(search, ids="") {
+
+        try {
+            var new_ids = ids
+            if(new_ids){
+                new_ids = JSON.parse(new_ids);
+            }
+          const response = await this.$axios.get(`/get_breakdown_problem_notes/${new_ids}`, {
+            params: {
+              search: search,
+              limit: this.limit,
+            },
+          });
+          this.BreakdownProblemNotes = response.data;
+
+          if(new_ids){
+            this.breakdown_service.supervisor_problem_note_id = (typeof(new_ids) == 'string') ? new_ids.split(',').map(Number) : new_ids;
+          }
+        
+        } catch (error) {
+          console.error("Error fetching problem notes:", error);
+        }
       },
 
 
@@ -159,20 +224,20 @@ export default {
             setTimeout(async () => {
                 try {
                     const response = await this.$axios.put(
-                        `preventive-service/${serviceId}`,
-                        this.preventive_service
+                        `breakdown-service/${serviceId}`,
+                        this.breakdown_service
                     );
                     if (response.data.success) {
-                        toast.success("Preventive Service update successfully!");
-                        this.$router.push({ name: "PreventiveServiceIndex" });
+                        toast.success("Breakdown Service update successfully!");
+                        this.$router.push({ name: "BreakdownServiceIndex" });
                     }
                 } catch (error) {
                     if (error.response && error.response.status === 422) {
-                        toast.error("Failed to update Preventive Service.");
+                        toast.error("Failed to update Breakdown Service.");
                         this.errors = error.response.data.errors || {};
                     } else {
-                        toast.error("Error updating Preventive Service. Please try again.");
-                        this.serverError = "Error updating Preventive Service.";
+                        toast.error("Error updating Breakdown Service. Please try again.");
+                        this.serverError = "Error updating Breakdown Service.";
                     }
                 } finally {
                     // Stop loading after the request (or simulated time) is done

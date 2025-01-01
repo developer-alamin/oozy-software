@@ -7,7 +7,7 @@
                 <v-row>
 		          <v-col cols="12">
 		            <v-autocomplete
-		              v-model="preventive_service.mechine_assing_id"
+		              v-model="breakdown_service.mechine_assing_id"
 		              :items="machineItems"
 		              item-value="id"
 		              item-title="machine_code"
@@ -29,10 +29,10 @@
                 <v-row>
 		          <v-col cols="12">
 		            <v-autocomplete
-		              v-model="preventive_service.problem_note_id"
+		              v-model="breakdown_service.problem_note_id"
 		              :items="BreakdownProblemNotes"
 		              item-value="id"
-		              item-title="note"
+		              item-title="break_down_problem_note"
 		              label="Select Problem Notes"
 		              outlined
 		              clearable
@@ -51,7 +51,7 @@
                 <v-row>
 		          <v-col cols="12">
 			        	<v-textarea
-				          v-model="preventive_service.note"
+				          v-model="breakdown_service.note"
 				          :error-messages="errors.note || ''"
 				        >
 					          <template v-slot:label>
@@ -73,7 +73,7 @@
 					    </tr>
 					  </thead>
 					  <tbody>
-					    <tr v-for="(part, index) in preventive_service.parts_info" :key="index">
+					    <tr v-for="(part, index) in breakdown_service.parts_info" :key="index">
 					      <td>
 					        <v-autocomplete
 					          v-model="part.parts_id"
@@ -115,7 +115,7 @@
 		        <v-row>
 		            <v-col cols="12">
 			            <v-select
-			              v-model="preventive_service.technician_status"
+			              v-model="breakdown_service.technician_status"
 			              :items="statusItems"
 			              label="Technician Status"
 			              outlined
@@ -164,7 +164,7 @@ export default {
             valid: false,
             loading: false,
       		statusItems: ["Done", "Failed"],
-		    preventive_service: {
+		    breakdown_service: {
 		        mechine_assing_id: null,
 		        problem_note_id: null,
 		        technician_status: null,
@@ -177,8 +177,8 @@ export default {
 		    	],
 		    },
       		machineItems: [],
-      		PreventiveServiceDetailData: [],
-      		PreventiveServiceData: [],
+      		BreakdownServiceDetailData: [],
+      		BreakdownServiceData: [],
       		BreakdownProblemNotes: [],
       		parts: [],
             errors: {},
@@ -189,14 +189,14 @@ export default {
         };
     },
     created() {
-    	this.PreventiveServiceDetail()
+    	this.BreakdownServiceDetail()
     	this.fetchParts();
     },
     methods: {
 
     	 // Add a new part entry
 	  	addNewPart() {
-		    this.preventive_service.parts_info.push({
+		    this.breakdown_service.parts_info.push({
 		      parts_id: null,
 		      qty: null
 		    });
@@ -204,19 +204,19 @@ export default {
 	  
 	  	// Remove a part entry by its index
 	  	removePart(index) {
-	    	this.preventive_service.parts_info.splice(index, 1);
+	    	this.breakdown_service.parts_info.splice(index, 1);
 	  	},
 
-        async PreventiveServiceDetail() {
+        async BreakdownServiceDetail() {
 	      try {
 	      	const response = await this.$axios.get(
-                `preventive-service/${this.$route.params.detail_id}/preventive-service-start-get-details`
+                `breakdown-service/${this.$route.params.detail_id}/breakdown-service-start-get-details`
             );
 
-	        this.PreventiveServiceDetailData = response.data.PreventiveServiceDetail;
-	        this.PreventiveServiceData = response.data.PreventiveService;
-	        this.fetchMachine("", this.PreventiveServiceData.mechine_assing_id)
-	        this.preventive_service.mechine_assing_id = this.PreventiveServiceData.mechine_assing_id
+	        this.BreakdownServiceDetailData = response.data.BreakdownServiceDetail;
+	        this.BreakdownServiceData = response.data.BreakdownService;
+	        this.fetchMachine("", this.BreakdownServiceData.mechine_assing_id)
+	        this.breakdown_service.mechine_assing_id = this.BreakdownServiceData.mechine_assing_id
 
 	      } catch (error) {
 	        console.error("Error fetching machine codes:", error);
@@ -267,12 +267,12 @@ export default {
             setTimeout(async () => {
                 try {
                     const response = await this.$axios.put(
-                        `preventive-service/${detailId}/preventive-service-start-save-details`,
-                        this.preventive_service
+                        `breakdown-service/${detailId}/breakdown-service-start-save-details`,
+                        this.breakdown_service
                     );
                     if (response.data.success) {
                         toast.success("Data has been saved!");
-                        this.$router.push({ name: "PreventiveServiceIndex" });
+                        this.$router.push({ name: "BreakdownServiceIndex" });
                     }
                 } catch (error) {
                     if (error.response && error.response.status === 422) {
