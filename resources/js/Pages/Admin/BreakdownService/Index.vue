@@ -4,19 +4,13 @@
       <v-row>
         <v-col cols="4"><span>Breakdown Service List</span></v-col>
         <v-col cols="8" class="d-flex justify-end">
-          <v-text-field
-            v-model="search"
-            density="compact"
-            label="Search"
-            prepend-inner-icon="mdi-magnify"
-            variant="solo-filled"
-            class="mx-4"
-            flat
-            hide-details
-            solo
-            single-line
-            clearable
-          ></v-text-field>
+          <v-date-input
+            v-model="dateRange"
+            label="Select Date range"
+            multiple="range"
+            prepend-icon=""
+            style="padding-right: 10px;"
+          ></v-date-input>
           <v-btn
             @click="createBreakdownService"
             color="primary"
@@ -56,7 +50,7 @@
     <v-data-table-server
       v-model:items-per-page="itemsPerPage"
       :headers="headers"
-      :search="search"
+      :dateRange="formattedDateRangeString"
       :items="serverItems"
       :items-length="totalItems"
       :loading="loading"
@@ -64,67 +58,24 @@
       loading-text="Loading... Please wait"
       @update:options="loadItems"
     >
-        <template v-slot:item.actions="{ item }">
-          <template v-if="item.technician_status && item.technician_status == 'Acknowledge'">
-              <v-icon @click="showConfirmDTechnicianBreakdownServiceAcknowledge(item.detail_id)" class="mr-2"
-                >mdi-check-outline</v-icon
-            >
-          </template>
-          <template v-else-if="item.technician_status && item.technician_status == 'Acknowledged'">
-              <v-icon @click="BreakdownServiceStart(item.detail_id)" class="mr-2"
-                >mdi-clock-start</v-icon
-            >
-          </template>
-          <template v-else-if="item.technician_status && item.technician_status == 'Start Service'">
-              <v-icon @click="BreakdownServiceStartDetails(item.detail_id)" class="mr-2"
-                >mdi-note-text-outline</v-icon
-            >
-          </template>
-          <template v-else-if="item.technician_status && item.technician_status == 'Done'">
-              <v-icon class="mr-2">empty</v-icon>
-          </template>
-          <template v-else-if="item.technician_status && item.technician_status == 'Cancel'">
-            <v-icon @click="AssignToTechnicianBreakdownService(item.uuid)" class="mr-2"
-                >mdi-account-outline</v-icon
-            >
-          </template>
-          <template v-else>
-            <v-icon @click="AssignToTechnicianBreakdownService(item.uuid)" class="mr-2"
-                >mdi-account-outline</v-icon
-            >
-          </template>
-            
-            <v-icon @click="editBreakdownService(item.uuid)" class="mr-2"
-                >mdi-pencil</v-icon
-            >
-            <v-icon @click="showConfirmDialog(item.uuid)" color="red"
-                >mdi-delete</v-icon
-            >
-        </template>
+      <template v-slot:item.actions="{ item }">
+        <!-- Actions here -->
+      </template>
     </v-data-table-server>
 
     <ConfirmDialog
       :dialogName="dialogName"
       v-model:modelValue="dialog"
       :onConfirm="confirmDelete"
-      :onCancel="
-        () => {
-          dialog = false;
-        }
-      "
+      :onCancel="() => { dialog = false; }"
     />
 
     <ConfirmDialogAcknowledged
       :dialogName="dialogNameAcknowledged"
       v-model:modelValue="dialog_acknowledged"
       :onConfirm="TechnicianBreakdownServiceAcknowledge"
-      :onCancel="
-        () => {
-          dialog_acknowledged = false;
-        }
-      "
+      :onCancel="() => { dialog_acknowledged = false; }"
     />
-
   </v-card>
 </template>
 
@@ -140,33 +91,15 @@ export default {
   },
   data() {
     return {
-      dialogName: "Are you sure you want to delete this Service ?",
+      dialogName: "Are you sure you want to delete this Service?",
       dialogNameAcknowledged: "Are you sure you want to Acknowledge?",
-
-      search: "",
+      dateRange: null,
       itemsPerPage: 10,
       headers: [
-        {
-          title: "DateTime",
-          key: "date_time",
-          sortable: true,
-        },
-        {
-          title: "Mechine Name",
-          key: "mechine_assing.name",
-          sortable: false,
-        },
-        {
-          title: "Mechine Code",
-          key: "mechine_assing.machine_code",
-          sortable: false,
-        },
-
-        {
-          title: "Service Status",
-          key: "service_status",
-          sortable: true,
-        },
+        { title: "DateTime", key: "date_time", sortable: true },
+        { title: "Machine Name", key: "mechine_assing.name", sortable: false },
+        { title: "Machine Code", key: "mechine_assing.machine_code", sortable: false },
+        { title: "Service Status", key: "service_status", sortable: true },
         { title: "Actions", key: "actions", sortable: false },
       ],
       serverItems: [],
@@ -175,16 +108,28 @@ export default {
       dialog: false,
       selectedId: null,
       trashedCount: 0,
-
       dialog_acknowledged: false,
       selectedDetialId: null,
     };
+  },
+  computed: {
+    formattedDateRangeString() {
+      if (Array.isArray(this.dateRange) && this.dateRange.length > 0) {
+        // Loop through the date range array and format each date
+        const formattedDates = this.dateRange.map(date => new Date(date).toISOString());
+        
+        // Join the dates into a comma-separated string
+        return formattedDates.join(',');
+      }
+      return ""; // Return an empty string if no date range is selected
+    },
   },
   methods: {
     async loadItems({ page, itemsPerPage, sortBy }) {
       this.loading = true;
       const sortOrder = sortBy.length ? sortBy[0].order : "desc";
       const sortKey = sortBy.length ? sortBy[0].key : "created_at";
+
       try {
         const response = await this.$axios.get("/breakdown-service", {
           params: {
@@ -192,19 +137,20 @@ export default {
             itemsPerPage,
             sortBy: sortKey,
             sortOrder,
-            search: this.search,
+            dateRange: this.formattedDateRangeString, // Pass formatted date range as search parameter
           },
         });
+        console.log(response)
+        
         this.serverItems = response.data.items || [];
         this.totalItems = response.data.total || 0;
         this.fetchTrashedBreakdownServiceCount();
       } catch (error) {
-        console.error("Error loading items:", error);
+        console.error("Error loading items:", error.response?.data || error.message);
       } finally {
         this.loading = false;
       }
     },
-
     createBreakdownService() {
       this.$router.push({ name: "BreakdownServiceCreate" });
     },
@@ -212,16 +158,16 @@ export default {
       this.$router.push({ name: "BreakdownServiceTrash" });
     },
     editBreakdownService(uuid) {
-        this.$router.push({ name: "BreakdownServiceEdit", params: { uuid } });
+      this.$router.push({ name: "BreakdownServiceEdit", params: { uuid } });
     },
     AssignToTechnicianBreakdownService(uuid) {
-        this.$router.push({ name: "AssignToTechnicianBreakdownService", params: { uuid } });
+      this.$router.push({ name: "AssignToTechnicianBreakdownService", params: { uuid } });
     },
     BreakdownServiceStart(detail_id) {
-        this.$router.push({ name: "BreakdownServiceStart", params: { detail_id } });
+      this.$router.push({ name: "BreakdownServiceStart", params: { detail_id } });
     },
     BreakdownServiceStartDetails(detail_id) {
-        this.$router.push({ name: "BreakdownServiceStartDetails", params: { detail_id } });
+      this.$router.push({ name: "BreakdownServiceStartDetails", params: { detail_id } });
     },
     showConfirmDialog(id) {
       this.selectedId = id;
@@ -231,65 +177,50 @@ export default {
       this.selectedDetialId = id;
       this.dialog_acknowledged = true;
     },
-
     async confirmDelete() {
-      this.dialog = false; // Close the dialog
+      this.dialog = false;
       try {
-        const response = await this.$axios.delete(
-          `/breakdown-service/${this.selectedId}`
-        );
-        this.loadItems({
-          page: 1,
-          itemsPerPage: this.itemsPerPage,
-          sortBy: [],
-        });
+        await this.$axios.delete(`/breakdown-service/${this.selectedId}`);
+        this.loadItems({ page: 1, itemsPerPage: this.itemsPerPage, sortBy: [] });
         toast.success("Breakdown Service deleted successfully!");
       } catch (error) {
-        console.error("Error deleting Breakdown Service:", error);
         toast.error("Failed to delete Breakdown Service.");
       }
     },
     async TechnicianBreakdownServiceAcknowledge() {
-      this.dialog_acknowledged = false; // Close the dialog
+      this.dialog_acknowledged = false;
       try {
-        const response = await this.$axios.put(
-          `/breakdown-service/${this.selectedDetialId}/technician-breakdown-service-acknowledge`
-        );
-        this.loadItems({
-          page: 1,
-          itemsPerPage: this.itemsPerPage,
-          sortBy: [],
-        });
-        toast.success("I am Acknowledged!");
+        await this.$axios.put(`/breakdown-service/${this.selectedDetialId}/technician-breakdown-service-acknowledge`);
+        this.loadItems({ page: 1, itemsPerPage: this.itemsPerPage, sortBy: [] });
+        toast.success("Acknowledged successfully!");
       } catch (error) {
-        console.error("Error:", error);
-        toast.error("Failed to Acknowledged.");
+        toast.error("Failed to acknowledge.");
       }
     },
     async fetchTrashedBreakdownServiceCount() {
       try {
-        const response = await this.$axios.get("breakdown-service/trashed-count");
-        this.trashedCount = response.data.trashedCount
-          ? response.data.trashedCount
-          : 0;
+        const response = await this.$axios.get("/breakdown-service/trashed-count");
+        this.trashedCount = response.data.trashedCount || 0;
       } catch (error) {
-        console.error("Error fetching trashed Breakdown Service count:", error);
+        console.error("Error fetching trashed count:", error.response?.data || error.message);
       }
     },
-
   },
-
+  watch: {
+    dateRange: {
+      handler() {
+        this.loadItems({ page: 1, itemsPerPage: this.itemsPerPage, sortBy: [] });
+      },
+      deep: true,
+    },
+  },
   created() {
-    this.loadItems({
-      page: 1,
-      itemsPerPage: this.itemsPerPage,
-      sortBy: [],
-    });
+    this.loadItems({ page: 1, itemsPerPage: this.itemsPerPage, sortBy: [] });
     this.fetchTrashedBreakdownServiceCount();
   },
 };
 </script>
 
 <style scoped>
-/* Optional: Add styles for the main component */
+/* Optional styles */
 </style>

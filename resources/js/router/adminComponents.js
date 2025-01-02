@@ -49,6 +49,7 @@ export { default as AssignToTechnicianBreakdownService } from "../Pages/Admin/Br
 export { default as BreakdownServiceStart } from "../Pages/Admin/BreakdownService/BreakdownServiceStart.vue";
 export { default as BreakdownServiceStartDetails } from "../Pages/Admin/BreakdownService/BreakdownServiceStartDetails.vue";
 
+
 // Preventive Service components
 export { default as PreventiveServiceCreate } from "../Pages/Admin/PreventiveService/Create.vue";
 export { default as PreventiveServiceIndex } from "../Pages/Admin/PreventiveService/Index.vue";

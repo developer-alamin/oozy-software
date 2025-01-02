@@ -29,7 +29,7 @@
                 v-model="breakdown_service.supervisor_problem_note_id"
                 :items="BreakdownProblemNotes"
                 item-value="id"
-                item-title="break_down_problem_note"
+                item-title="note"
                 label="Select Problem Notes"
                 outlined
                 clearable
@@ -159,13 +159,14 @@ export default {
   },
 
   methods: {
-    async fetchMachine(search = "") {
+    async fetchMachine(search) {
       try {
         const response = await this.$axios.get("/search_machine", {
           params: {
-            search,
+           search: this.search || '',
           },
         });
+        
         this.machineItems = response.data;
       } catch (error) {
         console.error("Error fetching machine codes:", error);
@@ -176,10 +177,11 @@ export default {
         try {
           const response = await this.$axios.get(`/get_breakdown_problem_notes`, {
             params: {
-              search: search,
+              search: this.search || '',
               limit: this.limit,
             },
           });
+
           this.BreakdownProblemNotes = response.data;
         } catch (error) {
           console.error("Error fetching problem notes:", error);
@@ -195,7 +197,7 @@ export default {
       Object.entries(this.breakdown_service).forEach(([key, value]) => {
         formData.append(key, value);
       });
-
+       
       setTimeout(async () => {
         try {
           const response = await this.$axios.post(

@@ -17,6 +17,21 @@
 			  single-line
 			  clearable
 			></v-text-field>
+			<v-btn
+				@click="PreventiveServiceIndex"
+				color="primary"
+				icon
+				style="width: 40px; height: 40px"
+			>
+				<v-tooltip location="top" activator="parent">
+					<template v-slot:activator="{ props }">
+						<v-icon v-bind="props" style="font-size: 20px"
+							>mdi-home</v-icon
+						>
+					</template>
+					<span>Mechine List</span>
+				</v-tooltip>
+			</v-btn>
 		  </v-col>
 		</v-row>
 	  </v-card-title>
@@ -179,18 +194,22 @@
 		  toast.error("Failed to delete Preventive Service.");
 		}
 	  },
-	getStatusColor(status) {
-		switch (status) {
-			case 'Processing':
-			return 'orange'; // Color for Processing status
-			case 'Done':
-			return 'green'; // Color for Done status
-			case 'Cancel':
-			return 'red'; // Color for Cancel status
-			default:
-			return 'grey'; // Default color for unknown status
-		}
-	},
+	  getStatusColor(status) {
+			switch (status) {
+				case 'Processing':
+				return 'orange'; // Color for Processing status
+				case 'Done':
+				return 'green'; // Color for Done status
+				case 'Cancel':
+				return 'red'; // Color for Cancel status
+				default:
+				return 'grey'; // Default color for unknown status
+			}
+	  },
+	  PreventiveServiceIndex(){
+		this.$router.push({ name: "PreventiveServiceIndex" });
+
+	  }
 	},
 	created() {
 	  this.loadItems({

@@ -3,8 +3,11 @@
 namespace Database\Seeders;
 
 use App\Models\Admin;
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Company;
+use App\Models\Factory;
+use App\Models\Floor;
+use App\Models\Line;
+use App\Models\Unit;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -14,8 +17,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call([
-            AdminSeeder::class
-        ]);
+        // Call AdminSeeder first (if needed)
+        $this->call([AdminSeeder::class]);
+
     }
 }
