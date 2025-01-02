@@ -5,7 +5,7 @@
       <!-- Start Dashboard Nav -->
       <li class="nav-item">
         <router-link class="nav-link" :to="{ name: 'AdminDashboard' }">
-          <i class="bi bi-grid"></i>
+          <i class="bi bi-house-door"></i>
           <span>Dashboard</span>
         </router-link>
       </li>
@@ -18,7 +18,7 @@
           data-bs-toggle="collapse"
           href="#"
         >
-          <i class="bi bi-menu-button-wide"></i>
+          <i class="bi bi-shield-lock"></i>
           <span>License</span>
           <i class="bi bi-chevron-down ms-auto"></i>
         </a>
@@ -45,7 +45,7 @@
           data-bs-toggle="collapse"
           href="#"
         >
-          <i class="bi bi-menu-button-wide"></i><span>Machines</span
+          <i class="bi bi-gear"></i><span>Machines</span
           ><i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul
@@ -114,7 +114,7 @@
           href="#"
           :class="{ show: isOrganizationRouteShow }"
         >
-          <i class="bi bi-journal-text"></i><span>Organization</span
+          <i class="bi bi-building"></i><span>Organization</span
           ><i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul
@@ -180,7 +180,7 @@
           data-bs-toggle="collapse"
           href="#"
         >
-          <i class="bi bi-layout-text-window-reverse"></i><span>Parse</span
+          <i class="bi bi-funnel"></i><span>Parse</span
           ><i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul
@@ -244,7 +244,7 @@
           :class="{ show: isBreakdownRouteShow }"
           href="#"
         >
-          <i class="bi bi-layout-text-window-reverse"></i><span>Breakdown Service</span
+          <i class="bi bi-truck"></i><span>Breakdown Service</span
           ><i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul
@@ -285,7 +285,7 @@
           :class="{ show: isPreventiveServiceRouteShow }"
           href="#"
         >
-          <i class="bi bi-layout-text-window-reverse"></i><span>Preventive Service</span
+          <i class="bi bi-wrench"></i><span>Preventive Service</span
           ><i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul
@@ -326,7 +326,7 @@
           data-bs-toggle="collapse"
           href="#"
         >
-          <i class="bi bi-bar-chart"></i><span>Reports</span
+          <i class="bi bi-graph-up"></i><span>Reports</span
           ><i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul
@@ -361,7 +361,7 @@
           href="#"
           :class="{ show: isAdminUserRouteShow }"
         >
-          <i class="bi bi-gem"></i><span>User & Permissions</span
+          <i class="bi bi-people"></i><span>User & Permissions</span
           ><i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul
@@ -428,7 +428,7 @@
           href="#"
           :class="{ show: isGroupRouteShow }"
         >
-          <i class="bi bi-layout-text-window-reverse"></i><span>Technician Groups</span
+          <i class="bi bi-person-gear"></i><span>Technician Groups</span
           ><i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul
@@ -467,7 +467,7 @@
           href="#"
           :class="{ show: isMachineManageSettingsRouteShow }"
         >
-          <i class="bi bi-layout-text-window-reverse"></i
+          <i class="bi bi-tools"></i
           ><span>Machine Settings</span
           ><i class="bi bi-chevron-down ms-auto"></i>
         </a>
@@ -544,7 +544,7 @@
           href="#"
           :class="{ show: isSettingRouteShow }"
         >
-          <i class="bi bi-layout-text-window-reverse"></i><span>Settings</span
+          <i class="bi bi-sliders"></i><span>Settings</span
           ><i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul

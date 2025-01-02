@@ -49,6 +49,49 @@
 
         </v-row>
 
+<<<<<<< Updated upstream
+=======
+        <!-- Line Dropdown -->
+        <v-row>
+          <v-col cols="12" md="6">
+            <v-autocomplete
+              v-model="breakdown_service.line_id"
+              :items="lines"
+              item-value="id"
+              item-title="name"
+              label="Select Line"
+              outlined
+              clearable
+              density="comfortable"
+              :disabled="!breakdown_service.machine_id"
+            >
+              <template v-slot:label>
+                Select Line <span style="color: red">*</span>
+              </template>
+            </v-autocomplete>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-autocomplete
+              v-model="breakdown_service.breakdown_problem_note_id"
+              :items="breakdown_problem_notes"
+              item-value="id"
+              item-title="note"
+              label="Select Machine Code"
+              outlined
+              clearable
+              density="comfortable"
+              :error-messages="
+                errors.breakdown_problem_note_id
+                  ? errors.breakdown_problem_note_id
+                  : ''
+              "
+              @update:search="fetchBreakdownProblemNote"
+            >
+              <template v-slot:label> Select Breakdown Problem Note </template>
+            </v-autocomplete>
+          </v-col>
+        </v-row>
+>>>>>>> Stashed changes
        
         <v-textarea
           v-model="breakdown_service.breakdown_problem_note"
@@ -203,6 +246,9 @@ export default {
             formData
           );
 
+          console.log(response);
+          
+
           if (response.data.success) {
             toast.success("breakdown service create successfully!");
             // console.log(response.data.service.id);
@@ -213,6 +259,8 @@ export default {
             this.resetForm();
           }
         } catch (error) {
+          console.log(error);
+          
           if (error.response && error.response.status === 422) {
             toast.error("Failed to create breakdown service.");
             // Handle validation errors from the server
@@ -289,7 +337,7 @@ export default {
             limit: this.limit,
           },
         });
-        // console.log(response.data);
+        console.log(response.data);
         this.breakdown_problem_notes = response.data;
       } catch (error) {
         console.error("Error fetching breakdown problem notes:", error);

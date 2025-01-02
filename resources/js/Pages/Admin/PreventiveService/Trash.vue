@@ -4,19 +4,28 @@
 		<v-row>
 		  <v-col cols="6"><span>Preventive Service Trash List</span></v-col>
 		  <v-col cols="6" class="d-flex justify-end">
-			<v-text-field
-			  v-model="search"
-			  density="compact"
-			  label="Search"
-			  prepend-inner-icon="mdi-magnify"
-			  variant="solo-filled"
-			  class="mx-4"
-			  flat
-			  hide-details
-			  solo
-			  single-line
-			  clearable
-			></v-text-field>
+			<v-date-input
+				v-model="dateRange"
+				label="Select Date range"
+				multiple="range"
+				prepend-icon=""
+				style="padding-right: 10px;"
+			></v-date-input>
+			<v-btn
+				@click="PreventiveServiceIndex"
+				color="primary"
+				icon
+				style="width: 40px; height: 40px"
+			>
+				<v-tooltip location="top" activator="parent">
+					<template v-slot:activator="{ props }">
+						<v-icon v-bind="props" style="font-size: 20px"
+							>mdi-home</v-icon
+						>
+					</template>
+					<span>Mechine List</span>
+				</v-tooltip>
+			</v-btn>
 		  </v-col>
 		</v-row>
 	  </v-card-title>
@@ -24,7 +33,7 @@
 	  <v-data-table-server
 		v-model:items-per-page="itemsPerPage"
 		:headers="headers"
-		:search="search"
+		 :dateRange="formattedDateRangeString"
 		:items="serverItems"
 		:items-length="totalItems"
 		:loading="loading"
@@ -85,7 +94,7 @@
 		restoreDialogName: "Are you sure you want to restore this Preventive Service?",
 		dialogName: "Are you sure you want to permanently delete this Preventive Service?",
   
-		search: "",
+		dateRange: null,
 		itemsPerPage: 10,
 		headers: [
 		  {
@@ -118,6 +127,18 @@
 		selectedUuid: null,
 	  };
 	},
+	computed: {
+		formattedDateRangeString() {
+		if (Array.isArray(this.dateRange) && this.dateRange.length > 0) {
+			// Loop through the date range array and format each date
+			const formattedDates = this.dateRange.map(date => new Date(date).toISOString());
+			
+			// Join the dates into a comma-separated string
+			return formattedDates.join(',');
+		}
+		return ""; // Return an empty string if no date range is selected
+		},
+	},
 	methods: {
 	  async loadItems({ page, itemsPerPage, sortBy }) {
 		this.loading = true;
@@ -130,7 +151,7 @@
 			  itemsPerPage,
 			  sortBy: sortKey,
 			  sortOrder,
-			  search: this.search,
+			  dateRange: this.formattedDateRangeString,
 			},
 		  });
 		  this.serverItems = response.data.items || [];
@@ -179,19 +200,31 @@
 		  toast.error("Failed to delete Preventive Service.");
 		}
 	  },
-	getStatusColor(status) {
-		switch (status) {
-			case 'Processing':
-			return 'orange'; // Color for Processing status
-			case 'Done':
-			return 'green'; // Color for Done status
-			case 'Cancel':
-			return 'red'; // Color for Cancel status
-			default:
-			return 'grey'; // Default color for unknown status
-		}
+	  getStatusColor(status) {
+			switch (status) {
+				case 'Processing':
+				return 'orange'; // Color for Processing status
+				case 'Done':
+				return 'green'; // Color for Done status
+				case 'Cancel':
+				return 'red'; // Color for Cancel status
+				default:
+				return 'grey'; // Default color for unknown status
+			}
+	  },
+	  PreventiveServiceIndex(){
+		this.$router.push({ name: "PreventiveServiceIndex" });
+
+	  }
 	},
-	},
+	watch: {
+    dateRange: {
+      handler() {
+        this.loadItems({ page: 1, itemsPerPage: this.itemsPerPage, sortBy: [] });
+      },
+      deep: true,
+    },
+  },
 	created() {
 	  this.loadItems({
 		page: 1,
