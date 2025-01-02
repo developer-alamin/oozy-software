@@ -4,19 +4,13 @@
       <v-row>
         <v-col cols="4"><span>Preventive Service List</span></v-col>
         <v-col cols="8" class="d-flex justify-end">
-          <v-text-field
-            v-model="search"
-            density="compact"
-            label="Search"
-            prepend-inner-icon="mdi-magnify"
-            variant="solo-filled"
-            class="mx-4"
-            flat
-            hide-details
-            solo
-            single-line
-            clearable
-          ></v-text-field>
+          <v-date-input
+            v-model="dateRange"
+            label="Select Date range"
+            multiple="range"
+            prepend-icon=""
+            style="padding-right: 10px;"
+          ></v-date-input>
           <v-btn
             @click="createPreventiveService"
             color="primary"
@@ -56,7 +50,7 @@
     <v-data-table-server
       v-model:items-per-page="itemsPerPage"
       :headers="headers"
-      :search="search"
+      :dateRange="formattedDateRangeString"
       :items="serverItems"
       :items-length="totalItems"
       :loading="loading"
@@ -145,7 +139,7 @@ export default {
       dialogName: "Are you sure you want to delete this Service ?",
       dialogNameAcknowledged: "Are you sure you want to Acknowledge?",
 
-      search: "",
+      dateRange: null,
       itemsPerPage: 10,
       headers: [
         {
@@ -181,6 +175,18 @@ export default {
       selectedDetialId: null,
     };
   },
+  computed: {
+    formattedDateRangeString() {
+      if (Array.isArray(this.dateRange) && this.dateRange.length > 0) {
+        // Loop through the date range array and format each date
+        const formattedDates = this.dateRange.map(date => new Date(date).toISOString());
+        
+        // Join the dates into a comma-separated string
+        return formattedDates.join(',');
+      }
+      return ""; // Return an empty string if no date range is selected
+    },
+  },
   methods: {
     async loadItems({ page, itemsPerPage, sortBy }) {
       this.loading = true;
@@ -193,7 +199,7 @@ export default {
             itemsPerPage,
             sortBy: sortKey,
             sortOrder,
-            search: this.search,
+            dateRange: this.formattedDateRangeString,
           },
         });
         this.serverItems = response.data.items || [];
@@ -284,7 +290,14 @@ export default {
     },
 
   },
-
+  watch: {
+    dateRange: {
+      handler() {
+        this.loadItems({ page: 1, itemsPerPage: this.itemsPerPage, sortBy: [] });
+      },
+      deep: true,
+    },
+  },
   created() {
     this.loadItems({
       page: 1,

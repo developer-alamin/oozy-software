@@ -6,19 +6,13 @@
 			<span>Breakdown Service Trash List</span>
 		  </v-col>
 		  <v-col cols="6" class="d-flex justify-end">
-			<v-text-field
-			  v-model="search"
-			  density="compact"
-			  label="Search"
-			  prepend-inner-icon="mdi-magnify"
-			  variant="solo-filled"
-			  class="mx-4"
-			  flat
-			  hide-details
-			  solo
-			  single-line
-			  clearable
-			></v-text-field>
+			<v-date-input
+				v-model="dateRange"
+				label="Select Date range"
+				multiple="range"
+				prepend-icon=""
+				style="padding-right: 10px;"
+			></v-date-input>
 			<v-btn
             @click="AllBreakdownService"
             color="primary"
@@ -39,7 +33,7 @@
 	  <v-data-table-server
 		v-model:items-per-page="itemsPerPage"
 		:headers="headers"
-		:search="search"
+		:dateRange="formattedDateRangeString"
 		:items="serverItems"
 		:items-length="totalItems"
 		:loading="loading"
@@ -90,7 +84,7 @@
 		restoreDialogName: "Are you sure you want to restore this Breakdown Service?",
 		dialogName: "Are you sure you want to delete this Breakdown Service permanently?",
   
-		search: "",
+		dateRange: null,
 		itemsPerPage: 10,
 		headers: [
 		  { title: "DateTime", key: "date_time", sortable: true },
@@ -107,6 +101,18 @@
 		selectedUuid: null,
 	  };
 	},
+	computed: {
+    formattedDateRangeString() {
+      if (Array.isArray(this.dateRange) && this.dateRange.length > 0) {
+        // Loop through the date range array and format each date
+        const formattedDates = this.dateRange.map(date => new Date(date).toISOString());
+        
+        // Join the dates into a comma-separated string
+        return formattedDates.join(',');
+      }
+      return ""; // Return an empty string if no date range is selected
+    },
+  },
 	methods: {
 	  async loadItems({ page, itemsPerPage, sortBy }) {
 		this.loading = true;
@@ -119,7 +125,7 @@
 			  itemsPerPage,
 			  sortBy: sortKey,
 			  sortOrder,
-			  search: this.search,
+			  dateRange: this.formattedDateRangeString,
 			},
 		  });
 		  this.serverItems = response.data.items || [];
@@ -173,6 +179,14 @@
 
 	  }
 	},
+	watch: {
+    dateRange: {
+      handler() {
+        this.loadItems({ page: 1, itemsPerPage: this.itemsPerPage, sortBy: [] });
+      },
+      deep: true,
+    },
+  },
 	created() {
 	  this.loadItems({
 		page: 1,

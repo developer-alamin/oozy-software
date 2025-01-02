@@ -49,7 +49,7 @@ class Supplier extends Model
     {   
        
         return [
-            'company_id'   => 'required|exists:companies,id',
+            'company_id'    => 'required|exists:companies,id',
             'name'           => 'required|string|max:255',
             'type'           => 'nullable',
             'email'          => 'required|email|max:255|unique:suppliers,email',

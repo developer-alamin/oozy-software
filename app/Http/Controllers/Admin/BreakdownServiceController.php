@@ -79,13 +79,6 @@ class BreakdownServiceController extends Controller
         ->select('breakdown_services.*', 'breakdown_service_details.technician_status', 'breakdown_service_details.id as detail_id');
 
 
-
-      
-
-
-
-
-
         // Paginate results
         $BreakdownService = $BreakdownServiceQuery->with(['mechine_assing:id,machine_code,name'])
                         ->paginate($itemsPerPage);
@@ -612,7 +605,7 @@ class BreakdownServiceController extends Controller
         $itemsPerPage = $request->input('itemsPerPage', 5);
         $sortBy       = $request->input('sortBy', 'created_at'); // Default sort by created_at
         $sortOrder    = $request->input('sortOrder', 'desc');    // Default order is descending
-        $search       = $request->input('search', '');          // Search term
+        $dateRange    = $request->input('dateRange', '');
 
         // Apply search filter
         if (!empty($search)) {
@@ -621,7 +614,15 @@ class BreakdownServiceController extends Controller
 
         // Apply sorting
         $query->orderBy($sortBy, $sortOrder);
-
+        
+        if ($dateRange) {
+            $dates = explode(',', $dateRange);
+            $startDate = Carbon::parse($dates[0])->startOfDay(); // Ensure start of the day for $startDate
+            $endDate = Carbon::parse(end($dates))->endOfDay();   // Ensure end of the day for $endDate
+        
+            $query = $query->whereDate('date_time', '>=', $startDate)
+                                  ->whereDate('date_time', '<=', $endDate);
+        }
         // Paginate results
         $brands = $query->with(['mechine_assing'])->paginate($itemsPerPage);
 
