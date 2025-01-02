@@ -296,7 +296,13 @@ const routes = [
         meta: { title: "Breakdown Service Start Details" },
         props: true,
       },
-      
+      {
+        path: "breakdown-service/trash",
+        name: "BreakdownServiceTrash",
+        component: adminComponents.BreakdownServiceTrash,
+        meta: { title: "Breakdown Service Trash" },
+        props: true,
+      },
 
     // preventive service
       {

@@ -87,11 +87,11 @@ export default {
             valid: false,
             loading: false,
             statusItems: ["Pending", "Processing", "Done", "Cancel"],
-		    preventive_service: {
-		        mechine_assing_id: null,
-		        technician_id: null,
-		    },
-      		machineItems: [],
+            preventive_service: {
+                mechine_assing_id: null,
+                technician_id: null,
+            },
+      		  machineItems: [],
             technicianLists: [],
             errors: {},
             serverError: null,

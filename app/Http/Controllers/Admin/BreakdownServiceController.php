@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\HelperController;
+use App\Models\Admin;
 use App\Models\BreakdownService;
 use App\Models\BreakdownServiceDetail;
 use App\Models\MechineAssing;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -23,7 +26,10 @@ class BreakdownServiceController extends Controller
         $itemsPerPage = $request->input('itemsPerPage', 5);
         $sortBy       = $request->input('sortBy', 'created_at');
         $sortOrder    = $request->input('sortOrder', 'desc'); 
-        $search       = $request->input('search', '');
+        $dateRange    = $request->input('dateRange', '');
+
+        
+
 
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
@@ -54,6 +60,15 @@ class BreakdownServiceController extends Controller
         //     $BreakdownServiceQuery->where('name', 'LIKE', '%' . $search . '%');
         // }
 
+        if ($dateRange) {
+            $dates = explode(',', $dateRange);
+            $startDate = Carbon::parse($dates[0])->startOfDay(); // Ensure start of the day for $startDate
+            $endDate = Carbon::parse(end($dates))->endOfDay();   // Ensure end of the day for $endDate
+        
+            $BreakdownServiceQuery =$BreakdownServiceQuery->whereDate('date_time', '>=', $startDate)
+                                  ->whereDate('date_time', '<=', $endDate);
+        }
+
         // Apply sorting
         $BreakdownServiceQuery->orderBy($sortBy, $sortOrder);
 
@@ -62,7 +77,6 @@ class BreakdownServiceController extends Controller
                  ->whereRaw('breakdown_service_details.created_at = (SELECT MAX(created_at) FROM breakdown_service_details WHERE breakdown_service_id = breakdown_services.id)');
         })
         ->select('breakdown_services.*', 'breakdown_service_details.technician_status', 'breakdown_service_details.id as detail_id');
-
 
 
         // Paginate results
@@ -90,6 +104,7 @@ class BreakdownServiceController extends Controller
      */
     public function store(Request $request)
     {
+
         // Check which authentication guard is in use and set the creator
         $creator = null;
         if (Auth::guard('admin')->check()) {
@@ -262,9 +277,53 @@ class BreakdownServiceController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($uuid)
     {
-        //
+        // Find BreakdownService by UUID
+        $breakdownService = BreakdownService::where('uuid', $uuid)->first();
+
+        if (!$breakdownService) {
+            return response()->json(['success' => false, 'message' => 'BreakdownService not found.'], 404);
+        }
+
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            // Check if the admin is a superadmin
+            if ($currentUser->role === 'superadmin') {
+                // Superadmin can delete any BreakdownService without additional checks
+            } else {
+                $creatorType = Admin::class;
+                // Regular admin authorization check using uuid for BreakdownService
+                if ($breakdownService->creator_type !== $creatorType || $breakdownService->creator_uuid !== $currentUser->uuid) {
+                    return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to delete this BreakdownService.'], 403);
+                }
+            }
+
+        } elseif (Auth::guard('user')->check()) {
+            $currentUser = Auth::guard('user')->user();
+            $creatorType = User::class;
+            // Regular user authorization check using uuid for BreakdownService
+            if ($breakdownService->creator_type !== $creatorType || $breakdownService->creator_uuid !== $currentUser->uuid) {
+                return response()->json(['success' => false, 'message' => 'Forbidden: You are not authorized to delete this BreakdownService.'], 403);
+            }
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        try {
+            // Delete the BreakdownService
+            $breakdownService->delete();
+            return response()->json([
+                'success' => true,
+                'message' => 'BreakdownService deleted successfully.'
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting BreakdownService: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
     }
 
     
@@ -525,11 +584,113 @@ class BreakdownServiceController extends Controller
         ], 200);
     }
 
+    public function trashed(Request $request)
+    {
+        $currentUser = $this->getAuthenticatedUser();
+        if (!$currentUser) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
 
+        // Initialize the query
+        $query = BreakdownService::onlyTrashed();
+
+        // Apply creator filter for non-superadmin users
+        if ($currentUser->role !== 'superadmin') {
+            $query->where('creator_id', $currentUser->id)
+                ->where('creator_type', get_class($currentUser));
+        }
+
+        // Get parameters from the request
+        $page         = $request->input('page', 1);
+        $itemsPerPage = $request->input('itemsPerPage', 5);
+        $sortBy       = $request->input('sortBy', 'created_at'); // Default sort by created_at
+        $sortOrder    = $request->input('sortOrder', 'desc');    // Default order is descending
+        $dateRange    = $request->input('dateRange', '');
+
+        // Apply search filter
+        if (!empty($search)) {
+            $query->where('name', 'LIKE', '%' . $search . '%');
+        }
+
+        // Apply sorting
+        $query->orderBy($sortBy, $sortOrder);
+        
+        if ($dateRange) {
+            $dates = explode(',', $dateRange);
+            $startDate = Carbon::parse($dates[0])->startOfDay(); // Ensure start of the day for $startDate
+            $endDate = Carbon::parse(end($dates))->endOfDay();   // Ensure end of the day for $endDate
+        
+            $query = $query->whereDate('date_time', '>=', $startDate)
+                                  ->whereDate('date_time', '<=', $endDate);
+        }
+        // Paginate results
+        $brands = $query->with(['mechine_assing'])->paginate($itemsPerPage);
+
+        // Return the response as JSON
+        return response()->json([
+            'items' => $brands->items(),
+            'total' => $brands->total(),
+        ]);
+    }
     public function trashed_count(){
         $trashedCount = BreakdownService::onlyTrashed()->count();
         return response()->json([
             'trashedCount' => $trashedCount
         ], Response::HTTP_OK);
+    }
+    public function restore($uuid)
+    {
+        $currentUser = $this->getAuthenticatedUser();
+        if (!$currentUser) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        $query = BreakdownService::onlyTrashed()->where('uuid', $uuid);
+
+        // Apply creator filter for non-superadmin users
+        if ($currentUser->role !== 'superadmin') {
+            $query->where('creator_id', $currentUser->id)
+                ->where('creator_type', get_class($currentUser));
+        }
+
+        $restored = $query->restore();
+
+        return $restored
+            ? response()->json(['message' => 'Breakdown Service restored successfully'], Response::HTTP_OK)
+            : response()->json(['message' => 'Breakdown Service not found or is not trashed'], Response::HTTP_NOT_FOUND);
+    }
+    public function forceDelete($uuid)
+    {
+        $currentUser = $this->getAuthenticatedUser();
+        if (!$currentUser) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        $query = BreakdownService::onlyTrashed()->where('uuid', $uuid);
+
+        // Apply creator filter for non-superadmin users
+        if ($currentUser->role !== 'superadmin') {
+            $query->where('creator_id', $currentUser->id)
+                ->where('creator_type', get_class($currentUser));
+        }
+
+        $breakdownService = $query->firstOrFail();
+
+        try {
+            $breakdownService->forceDelete();
+            return response()->json(['success' => true, 'message' => 'Breakdown Service permanently deleted successfully.'], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error deleting Breakdown Service: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private function getAuthenticatedUser()
+    {
+        if (Auth::guard('admin')->check()) {
+            return Auth::guard('admin')->user();
+        } elseif (Auth::guard('user')->check()) {
+            return Auth::guard('user')->user();
+        }
+        return null;
     }
 }

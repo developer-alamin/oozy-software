@@ -115,6 +115,9 @@ Route::get('/get_parses', [ServiceController::class, 'getParses']);
 
 // ----------- Breakdown Service Route--------------------------
 Route::get('breakdown-service/trashed-count', [BreakdownServiceController::class, 'trashed_count'])->name('breakdown-service.trashed-count');
+Route::get('breakdown-service/trashed', [BreakdownServiceController::class,'Trashed']);
+Route::post('breakdown-service/{uuid}/restore', [BreakdownServiceController::class,'Restore']);
+Route::delete('breakdown-service/{uuid}/forceDelete', [BreakdownServiceController::class,'forceDelete']);
 Route::get('breakdown-service/{uuid}/edit', [BreakdownServiceController::class, 'edit'])->name('breakdown-service.edit');
 Route::get('breakdown-service/{uuid}/get-assign-to-technician', [BreakdownServiceController::class, 'get_assign_to_technician'])->name('breakdown-service.get-assign-to-technician');
 Route::put('breakdown-service/{uuid}/save-assign-to-technician', [BreakdownServiceController::class, 'save_assign_to_technician'])->name('breakdown-service.save-assign-to-technician');
