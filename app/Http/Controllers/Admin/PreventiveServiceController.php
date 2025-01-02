@@ -11,6 +11,7 @@ use App\Models\PreventiveServiceDetail;
 use App\Models\MechineAssing;
 use App\Models\Parse;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -27,7 +28,7 @@ class PreventiveServiceController extends Controller
         $itemsPerPage = $request->input('itemsPerPage', 5);
         $sortBy       = $request->input('sortBy', 'created_at');
         $sortOrder    = $request->input('sortOrder', 'desc'); 
-        $search       = $request->input('search', '');
+        $dateRange    = $request->input('dateRange', '');
 
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
@@ -57,6 +58,15 @@ class PreventiveServiceController extends Controller
         // if (!empty($search)) {
         //     $PreventiveServiceQuery->where('name', 'LIKE', '%' . $search . '%');
         // }
+
+        if ($dateRange) {
+            $dates = explode(',', $dateRange);
+            $startDate = Carbon::parse($dates[0])->startOfDay(); // Ensure start of the day for $startDate
+            $endDate = Carbon::parse(end($dates))->endOfDay();   // Ensure end of the day for $endDate
+        
+            $PreventiveServiceQuery =$PreventiveServiceQuery->whereDate('date_time', '>=', $startDate)
+                                  ->whereDate('date_time', '<=', $endDate);
+        }
 
         // Apply sorting
         $PreventiveServiceQuery->orderBy($sortBy, $sortOrder);
@@ -724,16 +734,24 @@ class PreventiveServiceController extends Controller
         $itemsPerPage = $request->input('itemsPerPage', 5);
         $sortBy       = $request->input('sortBy', 'created_at'); // Default sort by created_at
         $sortOrder    = $request->input('sortOrder', 'desc'); // Default order is descending
-        $search       = $request->input('search', ''); // Search term, default is empty
+        $dateRange       = $request->input('dateRange', ''); // Search term, default is empty
 
         // Apply search if the search term is not empty
         if (!empty($search)) {
             $preventiveServicesQuery->where('name', 'LIKE', '%' . $search . '%'); // Adjust as per your preventive service fields
         }
 
+
         // Apply sorting
         $preventiveServicesQuery->orderBy($sortBy, $sortOrder);
-
+        if ($dateRange) {
+            $dates = explode(',', $dateRange);
+            $startDate = Carbon::parse($dates[0])->startOfDay(); // Ensure start of the day for $startDate
+            $endDate = Carbon::parse(end($dates))->endOfDay();   // Ensure end of the day for $endDate
+        
+            $preventiveServicesQuery = $preventiveServicesQuery->whereDate('date_time', '>=', $startDate)
+                                  ->whereDate('date_time', '<=', $endDate);
+        }
         // Paginate results
         $preventiveServices = $preventiveServicesQuery->with(['mechine_assing'])->paginate($itemsPerPage);
 

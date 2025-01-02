@@ -126,8 +126,8 @@ class SupplierController extends Controller
         $supplier->company_id     = $request->company_id;
         $supplier->name           = $name;
         $supplier->email          = $request->email;
-        $supplier->phone          = $request->contact_person;
-        $supplier->contact_person = $request->phone;
+        $supplier->phone          = $request->phone;
+        $supplier->contact_person = $request->contact_person;
         $supplier->address        = $request->address;
         $supplier->description    = $request->description;
         $supplier->photo          = $uploadImg;
