@@ -1,9 +1,9 @@
 <template>
-    <v-card outlined class="mx-auto my-5" max-width="900">
+    <v-card outlined class="mx-auto my-5">
         <v-card-title>Service Details</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="update">
-               
+            
                 <v-row>
 		          <v-col cols="12">
 		            <v-autocomplete
@@ -24,50 +24,81 @@
 		              </template>
 		            </v-autocomplete>
 		          </v-col>
-		        </v-row>
-
-                <v-row>
-		          <v-col cols="12">
+		          <v-col cols="12" md="6" >
+					<div class="d-flex align-items-center">
+						<v-btn
+							@click="problemBtn"
+							color="primary"
+							icon
+							style="width: 20px; height: 20px;margin-top: 10px;" 
+						>
+							<v-tooltip location="top" activator="parent">
+							<template v-slot:activator="{ props }">
+								<v-icon v-bind="props" style="font-size: 20px">mdi-plus</v-icon>
+							</template>
+							<span>Add New Finding</span>
+							</v-tooltip>
+						</v-btn>
+						<v-autocomplete
+						v-model="breakdown_service.problem_note_id"
+						:items="BreakdownProblemNotes"
+						item-value="id"
+						item-title="note"
+						label="Select Finding"
+						outlined
+						clearable
+						multiple
+						small-chips
+						density="comfortable"
+						:rules="[rules.required]"
+						:error-messages="errors.problem_note_id ? errors.problem_note_id : ''"
+						@update:search="fetchBreakdownProblemNote"
+						>
+						<template v-slot:label> Select Finding <span style="color: red">*</span> </template>
+						</v-autocomplete>
+					</div>
+		          </v-col>
+				  <v-col cols="12" md="6">
+					<div class="d-flex align-items-center">
+						<v-btn
+							@click="actionBtn"
+							color="primary"
+							icon
+							style="width: 20px; height: 20px;" 
+						>
+							<v-tooltip location="top" activator="parent">
+							<template v-slot:activator="{ props }">
+								<v-icon v-bind="props" style="font-size: 20px">mdi-plus</v-icon>
+							</template>
+							<span>Add New Action</span>
+							</v-tooltip>
+						</v-btn>
 		            <v-autocomplete
-		              v-model="breakdown_service.problem_note_id"
-		              :items="BreakdownProblemNotes"
+		              v-model="breakdown_service.action_id"
+		              :items="actions"
 		              item-value="id"
-		              item-title="break_down_problem_note"
-		              label="Select Problem Notes"
+		              item-title="name"
+		              label="Select Action"
 		              outlined
 		              clearable
 		              multiple
 		              small-chips
 		              density="comfortable"
 				      :rules="[rules.required]"
-		              :error-messages="errors.problem_note_id ? errors.problem_note_id : ''"
-		              @update:search="fetchBreakdownProblemNote"
+		              :error-messages="errors.action_id ? errors.action_id : ''"
+		              @update:search="fetchActions"
 		            >
-		              <template v-slot:label> Select Problem Notes <span style="color: red">*</span> </template>
+		              <template v-slot:label> Select Action <span style="color: red">*</span> </template>
 		            </v-autocomplete>
+					</div>
 		          </v-col>
 		        </v-row>
-
-                <v-row>
-		          <v-col cols="12">
-			        	<v-textarea
-				          v-model="breakdown_service.note"
-				          :error-messages="errors.note || ''"
-				        >
-					          <template v-slot:label>
-					           Note
-					          </template>
-				        </v-textarea>
-		          </v-col>
-		        </v-row>
-
-
                 <v-row>
 		          <v-col cols="12">
 		          	 <v-table>
 					  <thead>
 					    <tr>
-					      <th class="text-left">Part Name</th>
+					      <th class="text-left">Spares Parts Name</th>
 					      <th class="text-left">Qty</th>
 					      <th class="text-center">Action</th>
 					    </tr>
@@ -80,14 +111,14 @@
 					          :items="parts"
 					          item-value="id"
 					          item-title="name"
-					          label="Select Parts"
+					          label="Select Spares Parts"
 					          outlined
 					          clearable
 					          density="comfortable"
 					          :error-messages="errors.parts_id ? errors.parts_id : ''"
 					          @update:search="fetchParts"
 					        >
-					          <template v-slot:label> Select Parts </template>
+					          <template v-slot:label> Select Spares Parts </template>
 					        </v-autocomplete>
 					      </td>
 					      <td>
@@ -110,10 +141,8 @@
 
 		          </v-col>
 		        </v-row>
-
-
 		        <v-row>
-		            <v-col cols="12">
+		            <v-col cols="12" :md="(breakdown_service.technician_status == 'Hold') ?'6':''">
 			            <v-select
 			              v-model="breakdown_service.technician_status"
 			              :items="statusItems"
@@ -123,7 +152,26 @@
 				      	  :rules="[rules.required]"
 			              density="comfortable"
 			            ></v-select>
-		          </v-col>
+		            </v-col>
+					<v-col v-if="breakdown_service.technician_status == 'Hold'" cols="12" md="6">
+						<v-autocomplete
+							v-model="breakdown_service.technician_id"
+							:items="technicians"
+							item-value="id"
+							item-title="name"
+							label="Select Technician"
+							outlined
+							clearable
+							multiple
+							small-chips
+							density="comfortable"
+							:rules="[(breakdown_service.technician_status == 'Hold') ? rules.required : []]"
+							:error-messages="errors.technician_id ? errors.technician_id : ''"
+							@update:search="technicians"
+						>
+							<template v-slot:label> Select Technician <span style="color: red">*</span> </template>
+						</v-autocomplete>
+					</v-col>
 		        </v-row>
 
                 <v-row class="mt-4">
@@ -149,6 +197,124 @@
             </v-form>
         </v-card-text>
 
+
+		<!-- Problem Dialog -->
+		<v-dialog v-model="problem_dialog" max-width="700px">
+			<v-card>
+				<v-card-title>
+				<span class="text-h5">Add Finding </span>
+				</v-card-title>
+				<v-form ref="problemForm" v-model="ProblemValid" @submit.prevent="addProblem">
+					<v-row class="px-5">
+						<v-col cols="12">
+							<v-text-field
+								v-model="problem.note"
+								:rules="[rules.required]"
+								label="Note"
+								outlined
+								density="comfortable"
+								:error-messages="errors.note ? errors.note : ''"
+							>
+								<template v-slot:label>
+									Note <span style="color: red">*</span>
+								</template>
+							</v-text-field>
+						</v-col>
+						<v-col cols="12">
+							<v-autocomplete
+							v-model="problem.company_id"
+							:items="companies"
+							item-value="id"
+							item-title="name"
+							outlined
+							clearable
+							density="comfortable"
+							:rules="[rules.required]"
+							:error-messages="errors.company_id || ''"
+							@update:search="fetchCompanies"
+							no-filter
+							>
+							<template v-slot:label>
+								Select Company <span style="color: red">*</span>
+							</template>
+							</v-autocomplete>
+						</v-col>
+						
+					</v-row>
+					<v-row class="pb-3 px-5">
+						<v-card-actions class="ms-auto">
+							<v-btn color="primary" text @click="problem_dialog = false">Close</v-btn>
+							<v-btn
+								type="submit"
+								color="white"
+								class="bg-primary"
+								:disabled="!ProblemValid || problemLoading"
+								:loading="problemLoading"
+							>Add</v-btn>
+						</v-card-actions>
+					</v-row>
+				</v-form>
+				
+			</v-card>
+		</v-dialog>
+		<!-- Action Dialog -->
+		<v-dialog v-model="action_dialog" max-width="700px">
+			<v-card>
+				<v-card-title>
+				<span class="text-h5">Add Action </span>
+				</v-card-title>
+				<v-form ref="actionForm" v-model="ActionValid" @submit.prevent="addAction">
+					<v-row class="px-5">
+						<v-col cols="12">
+							<v-text-field
+								v-model="action.name"
+								:rules="[rules.required]"
+								label="Name"
+								outlined
+								density="comfortable"
+								:error-messages="errors.name ? errors.name : ''"
+							>
+								<template v-slot:label>
+									Name <span style="color: red">*</span>
+								</template>
+							</v-text-field>
+						</v-col>
+						<v-col cols="12" >
+							<v-autocomplete
+							v-model="action.company_id"
+							:items="companies"
+							item-value="id"
+							item-title="name"
+							outlined
+							clearable
+							density="comfortable"
+							:rules="[rules.required]"
+							:error-messages="errors.company_id || ''"
+							@update:search="fetchCompanies"
+							no-filter
+							>
+							<template v-slot:label>
+								Select Company <span style="color: red">*</span>
+							</template>
+							</v-autocomplete>
+						</v-col>
+					</v-row>
+					<v-row class="pb-3 px-5">
+						<v-card-actions class="ms-auto">
+							<v-btn color="primary" text @click="action_dialog = false">Close</v-btn>
+							<v-btn
+								type="submit"
+								color="white"
+								class="bg-primary"
+								:disabled="!ActionValid || actionLoading"
+								:loading="actionLoading"
+							>Add</v-btn>
+						</v-card-actions>
+					</v-row>
+				</v-form>
+				
+			</v-card>
+		</v-dialog>
         <!-- Server Error Message -->
         <v-alert v-if="serverError" source="error" class="my-4">
             {{ serverError }}
@@ -161,14 +327,23 @@ import { toast } from "vue3-toastify";
 export default {
     data() {
         return {
+			problem_dialog:false,
+			action_dialog:false,
+			//search:'',
             valid: false,
+			ProblemValid:false,
+			ActionValid:false,
             loading: false,
-      		statusItems: ["Done", "Failed"],
+			problemLoading:false,
+			actionLoading:false,
+			actionStatusItems: ["Active", "Inactive"],
+      		statusItems: ["Done", "Failed","Hold"],
 		    breakdown_service: {
 		        mechine_assing_id: null,
+				technician_id:null,
+				action_id:null,
 		        problem_note_id: null,
 		        technician_status: null,
-		        note: null,
 		        parts_info: [
 		        	{
 			        	parts_id: null,
@@ -176,11 +351,24 @@ export default {
 			        }
 		    	],
 		    },
+			action:{
+				company_id:'',
+				name:'',
+			},
+			problem: {
+				company_id:null,
+				note: "",
+			},
       		machineItems: [],
       		BreakdownServiceDetailData: [],
       		BreakdownServiceData: [],
       		BreakdownProblemNotes: [],
+			actions:[],
       		parts: [],
+			limit: 5,
+            companies:[],
+			technicians: [],
+            selectedCompany: null,
             errors: {},
             serverError: null,
             rules: {
@@ -191,9 +379,59 @@ export default {
     created() {
     	this.BreakdownServiceDetail()
     	this.fetchParts();
+		this.fetchTechnician();
     },
     methods: {
+		async fetchTechnician(search = "", id = 0) {
+			try {
+			const response = await this.$axios.get("/search_user/"+id, {
+				params: {
+				search,
+				},
+			});
+			this.technicians = response.data;
+			} catch (error) {
+			console.error("Error fetching machine codes:", error);
+			}
+		},
+		actionBtn(){
+			this.action_dialog = true;
+		},
+		problemBtn(){
+			this.problem_dialog = true;
+		},
+		formatCompany(company) {
+        if (company) {
+            console.log(company)
+            if (typeof company === "number") {
+                // Use strict equality (===) and ensure proper assignment in the find function
+                company = this.companies.find((item) => item.id === company);
+            }
+            // Safely return the company name or a fallback if the name is missing
+            return company && company.name ? company.name : "No Company Name";
+            }
+            // Fallback if no company data is provided
+            return "No Company Data";
+        },
+        async fetchCompanies(search) {
+            try {
+                // Make a GET request to the '/get_companies' endpoint with query parameters
+                const response = await this.$axios.get('/get_companies', {
+                    params: {
+                    search: this.search || '', // Use `this.search` or fallback to an empty string
+                    limit: this.limit || 5,   // Use `this.limit` or fallback to default value (5)
+                    },
+                });
+                // Update the companies array with the fetched data
+                this.companies = response.data;
+                } catch (error) {
+                // Log any errors that occur during the request
+                console.error('Error fetching companies:', error);
+                // Optionally, handle the error (e.g., show an error message to the user)
+                this.$toast.error('Failed to fetch companies. Please try again later.');
+                }
 
+        },
     	 // Add a new part entry
 	  	addNewPart() {
 		    this.breakdown_service.parts_info.push({
@@ -250,6 +488,21 @@ export default {
 	        console.error("Error fetching problem notes:", error);
 	      }
 	    },
+		async fetchActions(search) {
+			try {
+				const response = await this.$axios.get('/get_actions', {
+				params: {
+					search: search, // Use an empty string if no search term is provided
+					limit: this.limit,    // Ensure `this.limit` is defined in your component
+				},
+				});
+				// Update the actions data with the response
+				this.actions = response.data;
+			} catch (error) {
+				console.error("Error fetching actions:", error); // Clarify the error message
+			}
+		},
+
         async fetchParts(search = "") {
 	      try {
 	        const response = await this.$axios.get("/get_parts");
@@ -270,11 +523,13 @@ export default {
                         `breakdown-service/${detailId}/breakdown-service-start-save-details`,
                         this.breakdown_service
                     );
+					
                     if (response.data.success) {
                         toast.success("Data has been saved!");
                         this.$router.push({ name: "BreakdownServiceIndex" });
                     }
                 } catch (error) {
+					
                     if (error.response && error.response.status === 422) {
                         toast.error("Failed to save.");
                         this.errors = error.response.data.errors || {};
@@ -291,12 +546,97 @@ export default {
                 }
             }, 1000);
         },
+
+		async addAction() {
+			this.errors = {};
+            this.serverError = null;
+            this.actionLoading = true;
+
+			const actionFormData = new FormData();
+
+			Object.entries(this.action).forEach(([key, value]) => {
+				actionFormData.append(key, value);
+			});
+
+		try {
+			const response = await this.$axios.post("/action", actionFormData);
+			if (response.data.success) {
+				toast.success("Action created successfully!");
+				this.actionResetForm();
+				this.action_dialog = false;
+			}
+		} catch (error) {
+			if (error.response && error.response.status === 422) {
+			this.errors = error.response.data.errors || {};
+			toast.error("Failed to create action.");
+			} else {
+			toast.error("An error occurred. Please try again.");
+			this.serverError = "An error occurred. Please try again.";
+			}
+		} finally {
+			this.actionLoading = false;
+		}
+        },
+		async addProblem() {
+			this.errors = {};
+            this.serverError = null;
+            this.problemLoading= true;
+
+			const problemFormData = new FormData();
+
+			Object.entries(this.problem).forEach(([key, value]) => {
+				problemFormData.append(key, value);
+			});
+
+			try {
+				const response = await this.$axios.post(
+					"/breakdown-problem-notes",
+					problemFormData
+				);	
+				if (response.data.success) {
+					toast.success("Action created successfully!");
+					this.problemResetForm();
+					this.problem_dialog = false;
+				}
+			} catch (error) {
+				if (error.response && error.response.status === 422) {
+				this.errors = error.response.data.errors || {};
+				toast.error("Failed to create action.");
+				} else {
+				toast.error("An error occurred. Please try again.");
+				this.serverError = "An error occurred. Please try again.";
+				}
+			} finally {
+				this.actionLoading = false;
+			}
+        },
         resetForm() {
             this.fetchMachine(); 
             this.errors = {};
             this.$refs.form.resetValidation();
         },
-
-    },
+		actionResetForm(){
+			if (this.$refs.actionForm) {
+				this.$refs.actionForm.resetValidation();
+				this.action = {
+					name: "",
+					company_id: null,
+					status: "Active",
+				};
+				this.errors = {};
+			}
+		},
+		problemResetForm(){
+			if (this.$refs.problemForm) {
+				this.$refs.problemForm.resetValidation();
+				this.problem = {
+					note: "",
+					company_id: null,
+					status: "Active",
+				};
+				this.errors = {};
+			}
+		},
+    }
 };
 </script>

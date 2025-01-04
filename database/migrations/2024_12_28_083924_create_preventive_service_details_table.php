@@ -13,14 +13,16 @@ return new class extends Migration
     {
         Schema::create('preventive_service_details', function (Blueprint $table) {
             $table->id();
-            
-            $table->enum('status',["Processing","Done","Cancel"])->default('Processing');
-            $table->enum('technician_status',['Acknowledge','Acknowledged','Start Service','Done', 'Failed'])->nullable();
+            $table->uuid('uuid')->unique();
+            $table->enum('status',["Processing","Done","Cancel","Hold"])->default('Processing');
+            $table->enum('technician_status',['Acknowledge','Acknowledged','Start Service','Done', 'Failed',"Hold"])->nullable();
             $table->dateTime("acknowledge_date_time")->nullable();
 
             $table->dateTime('service_start_date_time')->nullable();
             $table->dateTime('service_end_date_time')->nullable();
             $table->string("problem_note_id")->nullable()->comment('for multiple id'); 
+            $table->string("helper_technician_id")->nullable()->comment('for multiple id'); 
+            $table->string("action_id")->nullable()->comment('for multiple id'); 
             $table->string('note')->nullable();
             $table->text('parts_info')->nullable()->comment('for parts id and qty');
 

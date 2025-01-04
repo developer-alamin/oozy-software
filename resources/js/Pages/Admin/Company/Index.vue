@@ -70,6 +70,9 @@
             loading-text="Loading... Please wait"
             @update:options="loadItems"
         >
+        <template v-slot:item.user.name="{ item }">
+            {{ item.user && item.user.name ? item.user.name : "N\\A" }}
+        </template>
             <template v-slot:item.status="{ item }">
                 <v-chip
                     :color="item.status === 'Active' ? 'green' : 'red'"
@@ -117,14 +120,11 @@ export default {
             itemsPerPage: 15,
             headers: [
                 { title: "Name", key: "name", sortable: true },
-                {
-                    title: "Status",
-                    key: "status",
-                    value: "status",
-                    sortable: true,
-                },
+                { title: "User's Name", key: "user.name", sortable: true },
+                { title: "Status", key: "status", sortable: true },
                 { title: "Actions", key: "actions", sortable: false },
             ],
+
             serverItems: [],
             loading: true,
             totalItems: 0,

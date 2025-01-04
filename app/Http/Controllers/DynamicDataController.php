@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Action;
 use App\Models\Brand;
 use App\Models\BreakDownProblemNote;
 use App\Models\Company;
@@ -585,6 +586,30 @@ class DynamicDataController extends Controller
 
         // Return the BreakDownProblemNotes as JSON
         return response()->json($breakDownProblemNotes);
+    }
+    public function get_actions(Request $request, $ids = "")
+    {
+        $search = $request->query('search', ''); // Search parameter
+        $limit = $request->query('limit', 5);    // Default limit of 5
+
+        // Base query for the Action model
+        $actions = Action::query();
+        // Apply search filter if provided
+        if ($search) {
+            $actions = $actions->where('name', 'like', '%' . $search . '%'); // Assuming 'name' is a column in the Action model
+        }
+        // If IDs are provided, filter by IDs
+        if ($ids) {
+            $actions = $actions->whereIn('id', explode(',', $ids));
+        }
+
+       
+
+        // Limit the results and get the data
+        $actions = $actions->limit($limit)->get();
+
+        // Return the data as JSON
+        return response()->json($actions);
     }
 
 }

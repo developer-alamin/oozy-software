@@ -70,15 +70,6 @@
                             
                             <v-row>
                                 <v-col cols="6">
-                                    <b>Notes : </b>
-                                </v-col>
-                                <v-col cols="6">
-                                    <v-card-subtitle>  {{ signle_service.note }}</v-card-subtitle>
-                                </v-col>
-                            </v-row>
-                            <v-divider></v-divider>
-                            <v-row>
-                                <v-col cols="6">
                                     <b>Teachnician Name : </b>
                                 </v-col>
                                 <v-col cols="6">
@@ -182,10 +173,11 @@
                     </v-row>
                     <v-row>
                         <v-col cols="12">
-                            <v-card-title>Service Parts List</v-card-title>
+                            <v-card-title>Service Spares Parts List</v-card-title>
                             <v-table>
                                 <thead>
                                     <tr>
+                                        <th>Sr</th>
                                         <th v-if="signle_service?.parsed_parts_info && signle_service?.parsed_parts_info.length > 0" 
                                         v-for="(value, key) in signle_service?.parsed_parts_info[0]" 
                                             :key="key">
@@ -195,6 +187,7 @@
                                 </thead>
                                 <tbody>
                                     <tr v-for="(part, index) in signle_service?.parsed_parts_info" :key="index">
+                                        <td>{{ index+1 }}</td>
                                         <td v-for="(value, key) in part" :key="key">
                                         {{ value }}
                                         </td>
@@ -203,22 +196,35 @@
                             </v-table>
                         </v-col>
                         <v-col cols="12">
-                            <v-card-title>Service Problem Note List</v-card-title>
-                            <v-table>
+                            <v-card-title>Service Finding Note List</v-card-title>
+                            <v-table >
                                 <thead>
                                     <tr>
                                         <th>Sr</th>
-                                        <th>Note</th>
-                                        <th>Status</th>
-                                        <th>Create Date</th>
+                                        <th>Finding</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                    <tr v-if="signle_service?.problem_notes" v-for="(item,key) in signle_service?.problem_notes" :key="key">
                                     <td>{{ key+1 }}</td>
                                     <td>{{ item.note }}</td>
-                                    <td>{{ item.status }}</td>
-                                    <td>{{ formatDate(item.created_at) }}</td>
+                                   </tr>
+                                </tbody>
+                            </v-table>
+                        </v-col>
+                        <v-col cols="12">
+                            <v-card-title>Service Action List</v-card-title>
+                            <v-table >
+                                <thead>
+                                    <tr>
+                                        <th>Sr</th>
+                                        <th>Name</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                   <tr v-if="signle_service?.actions" v-for="(item,key) in signle_service?.actions" :key="key">
+                                    <td>{{ key+1 }}</td>
+                                    <td>{{ item.name }}</td>
                                    </tr>
                                 </tbody>
                             </v-table>

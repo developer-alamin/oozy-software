@@ -25,7 +25,7 @@
               :items="BreakdownProblemNotes"
               item-value="id"
               item-title="note"
-              label="Select Problem Notes"
+              label="Select Finding"
               outlined
               clearable
               multiple

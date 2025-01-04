@@ -1,5 +1,5 @@
 <template>
-    <v-card outlined class="mx-auto my-5" max-width="">
+    <v-card outlined class="mx-auto my-5" max-width="500">
         <v-card-title>Create Company</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="submit">
@@ -44,7 +44,7 @@
                             :disabled="!valid || loading"
                             :loading="loading"
                         >
-                            Create Company
+                           Next
                         </v-btn>
                     </v-col>
                 </v-row>
@@ -98,13 +98,16 @@ export default {
                 try {
                     // Assuming the actual API call here
                     const response = await this.$axios.post(
-                        "/company",
+                        "company/next",
                         formData
                     );
                     if (response.data.success) {
-                        toast.success("Company create successfully!");
+                       const item = response.data.item;
+                        
+                        this.$router.push({ name: "CompanyNext", state: { item } });
+                       // toast.success("Company create successfully!");
                         // localStorage.setItem("token", response.data.token);
-                        this.resetForm();
+                        //this.resetForm();
                     }
                 } catch (error) {
                     if (error.response && error.response.status === 422) {

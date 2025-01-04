@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ActionsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\RentController;
 use App\Http\Controllers\Admin\CompanyController;
@@ -148,7 +149,18 @@ Route::get("/preventive-signle-service/{uuid}/details",[PreventiveServiceControl
 Route::resource('preventive-service',PreventiveServiceController::class);
 
 
+//actions route list
+Route::controller(ActionsController::class)
+->prefix('actions')
+->as("actions.")
+->group(function(){
+  Route::get("trashed-count","trashedActionsCount");
+  Route::get("/trashed","trashed");
+  Route::post('{uuid}/restore', 'restore');
+  Route::delete('{uuid}/force-delete', 'forceDelete');
 
+});
+Route::resource( 'action',ActionsController::class);
 
 
 // -------------------------------------------- mechine typeroute statr here-------------------------------------------------------------------
@@ -322,10 +334,16 @@ Route::put('/operator/{uuid}', [OperatorController::class, 'update'])->name('ope
 Route::resource('operator', OperatorController::class);
 
 // --------------------------------------------Company route statr here-------------------------------------------------------------------
+
+
+
 Route::get('company/trash', [CompanyController::class, 'trash'])->name('trash');
 Route::get('company/trashed-count', [CompanyController::class, 'trashed_count'])->name('trashed-count');
 Route::post('company/{id}/restore', [CompanyController::class, 'restore'])->name('restore');
 Route::delete('company/{id}/forceDelete', [CompanyController::class, 'forceDelete'])->name('forceDelete');
+Route::post("company/next",[CompanyController::class,"companyNext"]);
+
+
 Route::resource('company', CompanyController::class);
 
 // --------------------------------------------Factory route statr here-------------------------------------------------------------------
@@ -397,7 +415,7 @@ Route::get('/get-machine-code-ways/details/{machine_code}', [DynamicDataControll
 Route::get('/get_breakdown_problem_notes/{ids?}', [DynamicDataController::class, 'getBreakdownProblemNotes']);
 Route::get('/get_groups', [DynamicDataController::class, 'getGroups']);
 Route::get('/get_parts', [DynamicDataController::class, 'getParts']);
-
+Route::get("/get_actions",[DynamicDataController::class,"get_actions"])->name("get_actions");
 
 // Admin Auth Routes
 Route::prefix('admin')->group(function () {

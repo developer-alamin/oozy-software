@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\HelperController;
+use App\Models\Action;
 use App\Models\Admin;
 use App\Models\BreakDownProblemNote;
 use App\Models\PreventiveService;
@@ -377,6 +378,7 @@ class PreventiveServiceController extends Controller
 
     public function save_assign_to_technician(Request $request, $uuid)
     {
+
         // Check which authentication guard is in use and set the creator
         $creator = null;
         if (Auth::guard('admin')->check()) {
@@ -394,7 +396,7 @@ class PreventiveServiceController extends Controller
             'mechine_assing_id'     => 'required|numeric',
             'technician_id'         => 'required|numeric',
         ]);
-
+    
         // Create the new service instance with validated data
         $service = new PreventiveServiceDetail();
         $service->uuid = HelperController::generateUuid();
@@ -410,7 +412,7 @@ class PreventiveServiceController extends Controller
         try {
             $service->save();
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Failed to save technician assign.'], 500);
+            return response()->json(['success' => false, 'message' => 'Failed to save technician assign.'.$e], 500);
         }
 
         // Return a success response
@@ -571,6 +573,9 @@ class PreventiveServiceController extends Controller
         $PreventiveServiceDetail->status = ($request->technician_status == 'Failed') ? 'Cancel' : $request->technician_status;
         $PreventiveServiceDetail->service_end_date_time = now();
         $PreventiveServiceDetail->problem_note_id = $request->problem_note_id ? json_encode($request->problem_note_id) : NULL;
+        $PreventiveServiceDetail->action_id = $request->action_id ? json_encode($request->action_id) : NULL;
+        $PreventiveServiceDetail->helper_technician_id = $request->technician_id ? json_encode($request->technician_id) : NULL;
+
         $PreventiveServiceDetail->note = $request->note;
         $PreventiveServiceDetail->parts_info = $request->parts_info ? json_encode($request->parts_info) : NULL;
         $PreventiveServiceDetail->updater()->associate($creator);
@@ -648,6 +653,7 @@ class PreventiveServiceController extends Controller
         // Decode the parts_info if available
         $decodedPartsInfo = [];
         $parsedParts = []; // To store parts with name and qty
+       
         if (!empty($singleService->parts_info)) {
             $decodedPartsInfo = json_decode($singleService->parts_info, true);
     
@@ -670,11 +676,8 @@ class PreventiveServiceController extends Controller
                 ];
             }
         }
-         // Decode the problem_note_id if available
+        // Decode the problem_note_id if available
         $decodedProblemNoteIds = [];
-
-
-
         $parsedProblemNotes = []; // To store problem notes
 
         if (!empty($singleService->problem_note_id)) {
@@ -692,10 +695,31 @@ class PreventiveServiceController extends Controller
     
             
         }
+
+
+        // Decode the action_ids if available
+        $decodedActionIds = [];
+        $parsedActions = []; // To store actions
+
+        if (!empty($singleService->action_id)) {
+            $decodedActionIds = json_decode($singleService->action_id, true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid JSON format in action_id.',
+                ], 400);
+            }
+
+            // Fetch actions from the Action model
+            $parsedActions = Action::whereIn('id', $decodedActionIds)->get(); // Get actions by id
+        }
+
          // Add the parsed parts info and problem notes to the response
         $singleService->parsed_parts_info = $parsedParts;
         $singleService->problem_notes = $parsedProblemNotes;
-
+        $singleService->actions = $parsedActions;
+       
         return response()->json($singleService,200);
     }
     public function preventiveservicetrashed(Request $request){

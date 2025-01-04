@@ -11,6 +11,7 @@ export { default as AllCompanyIndex } from "../Pages/Admin/Company/Index.vue";
 export { default as CompanyCreate } from "../Pages/Admin/Company/Create.vue";
 export { default as CompanyEdit } from "../Pages/Admin/Company/Edit.vue";
 export { default as CompanyTrash } from "../Pages/Admin/Company/Trash.vue";
+export { default as CompanyNext } from "../Pages/Admin/Company/Next.vue";
 
 // Mechine components
 export { default as MechineIndex } from "../Pages/Admin/Mechine/Index.vue";
@@ -48,6 +49,13 @@ export { default as BreakdownServiceTrash } from "../Pages/Admin/BreakdownServic
 export { default as AssignToTechnicianBreakdownService } from "../Pages/Admin/BreakdownService/AssignToTechnician.vue";
 export { default as BreakdownServiceStart } from "../Pages/Admin/BreakdownService/BreakdownServiceStart.vue";
 export { default as BreakdownServiceStartDetails } from "../Pages/Admin/BreakdownService/BreakdownServiceStartDetails.vue";
+
+//Actions Components
+export { default as ActionIndexPage } from "../Pages/Admin/Actions/Index.vue";
+export { default as ActionCreatePage } from "../Pages/Admin/Actions/Create.vue";
+export { default as ActionEditPage } from "../Pages/Admin/Actions/Edit.vue";
+export { default as ActionTrashPage } from "../Pages/Admin/Actions/Trash.vue";
+
 
 
 // Preventive Service components

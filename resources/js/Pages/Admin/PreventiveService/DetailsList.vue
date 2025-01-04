@@ -104,7 +104,6 @@ export default {
                 { title: 'Acknowledge Date', key: 'acknowledge_date_time', sortable: false },
                 { title: 'Service Start Date', key: 'service_start_date_time', sortable: false },
                 { title: 'Service End Date', key: 'service_end_date_time', sortable: false },
-                { title: 'Note', key: 'note', sortable: false },
                 { title: 'Actions', key: 'actions', sortable: false },
             ],
             serverItems: [],

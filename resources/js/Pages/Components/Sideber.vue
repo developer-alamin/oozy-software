@@ -180,7 +180,7 @@
           data-bs-toggle="collapse"
           href="#"
         >
-          <i class="bi bi-funnel"></i><span>Parse</span
+          <i class="bi bi-funnel"></i><span>Spares parts</span
           ><i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul
@@ -197,7 +197,7 @@
                 //active: isParseRouteShow?.isParseCreateActive,
               }"
             >
-              <i class="bi bi-circle"></i><span>Create Parse</span>
+              <i class="bi bi-circle"></i><span>Create Parts</span>
             </router-link>
           </li>
 
@@ -209,7 +209,7 @@
                 //active: isParseRouteShow.isParseIndexActive,
               }"
             >
-              <i class="bi bi-circle"></i><span>All Parse</span>
+              <i class="bi bi-circle"></i><span>All Parts</span>
             </router-link>
           </li>
           <li>
@@ -578,7 +578,16 @@
               active-class="active"
               :class="{ active: isBreakDownNoteRoute }"
             >
-              <i class="bi bi-circle"></i><span>Breakdown Problem Note</span>
+              <i class="bi bi-circle"></i><span>Problems List</span>
+            </router-link>
+          </li>
+          <li>
+            <router-link
+              :to="{ name: 'ActionIndexPage' }"
+              active-class="active"
+              :class="{ active: isAdminActionsIndexRoute}"
+            >
+              <i class="bi bi-circle"></i><span>Actions List</span>
             </router-link>
           </li>
           <li>
@@ -737,6 +746,13 @@ const isBreakDownNoteRoute = computed(() =>
   ].includes(route.name)
 );
 
+const isAdminActionsIndexRoute = computed(() =>
+  [
+    "ActionIndexPage",
+  ].includes(route.name)
+);
+
+
 // const isGroupRoute = computed(() =>
 //     ["GroupIndex", "GroupCreate", "GroupEdit", "GroupTrash"].includes(
 //         route.name
@@ -861,6 +877,7 @@ const isSettingRouteShow = computed(() => {
     "BreakDownNoteCreate",
     "BreakDownNoteEdit",
     "BreakDownNoteTrash",
+    "ActionIndexPage",
   ].includes(route.name);
 });
 

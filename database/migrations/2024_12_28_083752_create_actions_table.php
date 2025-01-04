@@ -11,16 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('preventive_services', function (Blueprint $table) {
+        Schema::create('actions', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
-            $table->dateTime('date_time');
-            $table->enum('service_status',['Pending','Processing','Done','Cancel',"Hold"])->default("Pending");
+            $table->text('name');
+            $table->enum('status',['Active','Inactive'])->default("Active");
            
-
             // Foreign key assign
             $table->foreignId('company_id');
-            $table->foreignId('mechine_assing_id');
 
             // Foreign key References
             $table->foreign("company_id")
@@ -29,13 +27,6 @@ return new class extends Migration
             ->onUpdate('cascade')
             ->onDelete('cascade');
 
-            $table->foreign("mechine_assing_id")
-            ->references('id')
-            ->on('mechine_assings')
-            ->onUpdate('cascade')
-            ->onDelete('cascade');
-
-           
 
             $table->morphs('creator');
             $table->morphs('updater');
@@ -54,6 +45,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('preventive_services');
+        Schema::dropIfExists('actions');
     }
 };

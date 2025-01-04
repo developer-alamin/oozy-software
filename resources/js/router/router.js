@@ -12,6 +12,7 @@ import * as adminComponents from "./adminComponents.js";
 import UserTechnicianIndex from "../Pages/Technician/Index.vue";
 import Contact from "../Pages/Contact.vue";
 import adminAuthMiddleware from "../middleware/adminAuth.js";
+import { teal } from "vuetify/util/colors";
 
 const routes = [
   {
@@ -85,12 +86,19 @@ const routes = [
         meta: { title: "User Create" },
       },
 
-
+      //company route
       {
         path: "company/create", // New route for Contact
         name: "CompanyCreate",
         component: adminComponents.CompanyCreate,
         meta: { title: "Company Create" },
+      },
+      {
+        path: "company/next", // New route for Contact
+        name: "CompanyNext",
+        component: adminComponents.CompanyNext,
+        meta: { title: "Company Next" },
+        props:true
       },
       {
         path: "company/index", // New route for Contact
@@ -473,6 +481,31 @@ const routes = [
         name: "BreakDownNoteTrash",
         component: adminComponents.BreakDownNoteTrash,
         meta: { title: "Breakdown Note Trash" },
+      },
+      //Actions Route
+      {
+        path: "action/index", 
+        name: "ActionIndexPage",
+        component: adminComponents.ActionIndexPage,
+        meta: { title: "Action Index Page" },
+      },
+      {
+        path: "action/create", 
+        name: "ActionCreatePage",
+        component: adminComponents.ActionCreatePage,
+        meta: { title: "Action Create Page" },
+      },
+      {
+        path: "action/:uuid/edit", 
+        name: "ActionEditPage",
+        component: adminComponents.ActionEditPage,
+        meta: { title: "Action Edit Page" },
+      },
+      {
+        path: "action/trash", 
+        name: "ActionTrashPage",
+        component: adminComponents.ActionTrashPage,
+        meta: { title: "Action Trash Page" },
       },
       // brand
       {
