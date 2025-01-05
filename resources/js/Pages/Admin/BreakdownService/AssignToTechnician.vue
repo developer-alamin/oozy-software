@@ -1,5 +1,5 @@
 <template>
-    <v-card outlined class="mx-auto my-5" max-width="900">
+    <v-card outlined class="mx-auto my-5">
         <v-card-title>Assign to Technician</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="update">
@@ -92,12 +92,12 @@ export default {
 		        technician_id: null,
 		    },
       		machineItems: [],
-            technicianLists: [],
-            errors: {},
-            serverError: null,
-            rules: {
-                required: (value) => !!value || "Required.",
-            },
+          technicianLists: [],
+          errors: {},
+          serverError: null,
+          rules: {
+              required: (value) => !!value || "Required.",
+          },
         };
     },
     created() {
@@ -134,19 +134,19 @@ export default {
 	      }
 	    },
 
-        async fetchTechnician(search = "", id = 0) {
-          try {
-            const response = await this.$axios.get("/search_user/"+id, {
-              params: {
-                search,
-              },
-            });
-            this.technicianLists = response.data;
-            console.log(response.data)
-          } catch (error) {
-            console.error("Error fetching machine codes:", error);
-          }
-        },
+      async fetchTechnician(search = "", id = 0) {
+        try {
+          const response = await this.$axios.get("/search_user/"+id, {
+            params: {
+              search,
+            },
+          });
+          this.technicianLists = response.data;
+          console.log(response.data)
+        } catch (error) {
+          console.error("Error fetching machine codes:", error);
+        }
+      },
 
         async update() {
             this.errors = {};
@@ -163,6 +163,9 @@ export default {
                         toast.success("Technician Assign saved!");
                         this.$router.push({ name: "BreakdownServiceIndex" });
                     }
+
+                   
+                    
                 } catch (error) {
                     if (error.response && error.response.status === 422) {
                         toast.error("Failed to update Technician Assign.");

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->uuid('uuid')->unique();
             $table->dateTime('date_time');
-            $table->enum('service_status',['Pending','Processing','Done','Cancel'])->default("Pending");
+            $table->enum('service_status',['Pending','Processing','Done','Cancel',"Hold"])->default("Pending");
 
             $table->string("supervisor_problem_note_id")->nullable()->comment('for multiple id, note from supervisor'); 
             $table->string('supervisor_note')->nullable()->comment('note from supervisor');

@@ -363,6 +363,8 @@ class BreakdownServiceController extends Controller
 
     public function save_assign_to_technician(Request $request, $uuid)
     {
+
+
         // Check which authentication guard is in use and set the creator
         $creator = null;
         if (Auth::guard('admin')->check()) {
@@ -377,13 +379,14 @@ class BreakdownServiceController extends Controller
 
         // Validate the incoming request data
         $validatedData = $request->validate([
-            'mechine_assing_id'     => 'required|numeric',
-            'technician_id'         => 'required|numeric',
+            'mechine_assing_id'     => 'required',
+            'technician_id'         => 'required',
         ]);
+
 
         // Create the new service instance with validated data
         $service = new BreakdownServiceDetail();
-
+        $service->uuid = HelperController::generateUuid();
         $service->breakdown_service_id = BreakdownService::where('uuid', $uuid)->first()?->id??0;
         $service->technician_id = $request->technician_id;
         $service->status = 'Processing';
@@ -537,6 +540,7 @@ class BreakdownServiceController extends Controller
     }
 
     public function breakdown_service_start_save_details(Request $request, $detail_id){
+        
         $BreakdownServiceDetail = BreakdownServiceDetail::where('id', $detail_id)->firstOrFail();
 
         // Check which authentication guard is in use and set the creator
@@ -557,6 +561,8 @@ class BreakdownServiceController extends Controller
         $BreakdownServiceDetail->status = ($request->technician_status == 'Failed') ? 'Cancel' : $request->technician_status;
         $BreakdownServiceDetail->service_end_date_time = now();
         $BreakdownServiceDetail->problem_note_id = $request->problem_note_id ? json_encode($request->problem_note_id) : NULL;
+        $BreakdownServiceDetail->action_id = $request->action_id ? json_encode($request->action_id) : NULL;
+        $BreakdownServiceDetail->helper_technician_id = $request->technician_id ? json_encode($request->technician_id) : NULL;
         $BreakdownServiceDetail->note = $request->note;
         $BreakdownServiceDetail->parts_info = $request->parts_info ? json_encode($request->parts_info) : NULL;
         $BreakdownServiceDetail->updater()->associate($creator);
@@ -564,11 +570,11 @@ class BreakdownServiceController extends Controller
         try {
             $BreakdownServiceDetail->save();
 
-
             //update BreakdownService service_status
             $BreakdownService = BreakdownService::where('id', $BreakdownServiceDetail->breakdown_service_id)->firstOrFail(); 
             $BreakdownService->service_status = ($request->technician_status == 'Failed') ? 'Cancel' : $request->technician_status;
             $BreakdownService->updater()->associate($creator);
+            
             $BreakdownService->save();
 
 

@@ -1,6 +1,6 @@
 <template>
   <v-card outlined class="mx-auto my-5" max-width="">
-    <v-card-title>Create Parse</v-card-title>
+    <v-card-title>Create Spares Parts</v-card-title>
     <v-card-text>
       <v-form ref="form" v-model="valid" @submit.prevent="submit">
         <v-row>

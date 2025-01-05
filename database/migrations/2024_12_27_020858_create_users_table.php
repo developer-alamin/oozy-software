@@ -24,8 +24,24 @@ return new class extends Migration
             $table->text('address')->nullable();
             $table->text('description')->nullable();
             $table->enum('status', ['pending', 'approved', 'cancel'])->default('pending');
+            
+
+            // Foreign key assign
+            $table->foreignId('company_id')->nullable();
+            
+            
+
+            $table->foreign("company_id")
+            ->references('id')
+            ->on('companies')
+            ->onUpdate('cascade')
+            ->onDelete('set null');
+
+
             $table->morphs('creator');
             $table->morphs('updater'); 
+
+
             $table->rememberToken();
             $table->softDeletes();
             $table->timestamp('created_at')->useCurrent();

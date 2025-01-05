@@ -19,7 +19,7 @@ return new class extends Migration
             $table->enum('status', ['Active', 'Inactive', 'Pending'])->default('Inactive');
            
 
-             // Foreign key assign
+            // Foreign key assign
             $table->foreignId('company_id');
             $table->foreignId('factory_id');
 
