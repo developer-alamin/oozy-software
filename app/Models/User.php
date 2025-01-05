@@ -22,8 +22,13 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'company_id',
         'phone',
-        'status'
+        'status',
+        'creator_type',
+        'creator_id ',
+        'updater_type',
+        'updater_id '
     ];
 
     protected $casts = [
@@ -31,6 +36,16 @@ class User extends Authenticatable
         'created_at' => 'datetime', // Automatically cast 'created_at' to a Carbon instance
         'updated_at' => 'datetime', // Automatically cast 'updated_at' to a Carbon instance
     ];
+
+    public static function validationRules()
+    {
+        return [
+            'name'         => 'required|string|max:255',
+            'email'        => 'required|email|max:255|unique:users,email',
+            'photo'        => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Example for image validation
+            'password'     => 'required|string|min:8|max:255',
+        ];
+    }
 
     /**
      * The attributes that should be hidden for serialization.
@@ -58,104 +73,104 @@ class User extends Authenticatable
 
 
 
-    public function createdTechnicians(): MorphMany
+    public function createdTechnicians()
     {
         return $this->morphMany(Technician::class, 'creator');
     }
 
     // Technicians updated by this user
-    public function updatedTechnicians(): MorphMany
+    public function updatedTechnicians()
     {
         return $this->morphMany(Technician::class, 'updater');
     }
 
     // Brands created by this user
-    public function createdBrands(): MorphMany
+    public function createdBrands()
     {
         return $this->morphMany(Brand::class, 'creator');
     }
 
     // Brands updated by this user
-    public function updatedBrands(): MorphMany
+    public function updatedBrands()
     {
         return $this->morphMany(Brand::class, 'updater');
     }
 
     // Models created by this user
-    public function createdModels(): MorphMany
+    public function createdModels()
     {
         return $this->morphMany(ProductModel::class, 'creator');
     }
 
     // Models updated by this user
-    public function updatedModels(): MorphMany
+    public function updatedModels()
     {
         return $this->morphMany(ProductModel::class, 'updater');
     }
 
     // Category created by this user
-    public function createdCategorys(): MorphMany
+    public function createdCategorys()
     {
         return $this->morphMany(Category::class, 'creator');
     }
 
     // Categorys updated by this user
-    public function updatedCategorys(): MorphMany
+    public function updatedCategorys()
     {
         return $this->morphMany(Category::class, 'updater');
     }
     // Units created by this user
-    public function createdUnits(): MorphMany
+    public function createdUnits()
     {
         return $this->morphMany(Unit::class, 'creator');
     }
 
     // Units updated by this user
-    public function updatedUnits(): MorphMany
+    public function updatedUnits()
     {
         return $this->morphMany(Unit::class, 'updater');
     }
      // Parse Units created by this user
-    public function createdParseUnits(): MorphMany
+    public function createdParseUnits()
     {
         return $this->morphMany(Unit::class, 'creator');
     }
     // Parse Units updated by this user
-    public function updatedParseUnits(): MorphMany
+    public function updatedParseUnits()
     {
         return $this->morphMany(Unit::class, 'updater');
     }
      // Lines created by this user
-    public function createdLines(): MorphMany
+    public function createdLines()
     {
         return $this->morphMany(Line::class, 'creator');
     }
 
     // Lines updated by this user
-    public function updatedLines(): MorphMany
+    public function updatedLines()
     {
         return $this->morphMany(Line::class, 'updater');
     }
      // groups created by this user
-     public function createdGroups(): MorphMany
+     public function createdGroups()
      {
          return $this->morphMany(Group::class, 'creator');
      }
 
      // groups updated by this user
-     public function updatedGroups(): MorphMany
+     public function updatedGroups()
      {
          return $this->morphMany(Group::class, 'updater');
      }
 
       // factorys created by this user
-    public function createdFactorys(): MorphMany
+    public function createdFactorys()
     {
         return $this->morphMany(Factory::class, 'creator');
     }
 
     // factorys updated by this user
-    public function updatedFactorys(): MorphMany
+    public function updatedFactorys()
     {
         return $this->morphMany(Factory::class, 'updater');
     }
@@ -164,76 +179,86 @@ class User extends Authenticatable
         return $this->hasMany(Factory::class,);
     }
      // Operators created by this user
-     public function createdOperators(): MorphMany
+     public function createdOperators()
      {
          return $this->morphMany(Operator::class, 'creator');
      }
 
      // Operators updated by this user
-     public function updatedOperators(): MorphMany
+     public function updatedOperators()
      {
          return $this->morphMany(Operator::class, 'updater');
      }
     // mechine assing created by this user
-    public function createdMechineAssings(): MorphMany
+    public function createdMechineAssings()
     {
         return $this->morphMany(MechineAssing::class, 'creator');
     }
     // mechine assing updated by this user
-    public function updatedMechineAssings(): MorphMany
+    public function updatedMechineAssings()
     {
         return $this->morphMany(MechineAssing::class, 'updater');
     }
 
     //Parse created by this user
-    public function createdParses(): MorphMany
+    public function createdParses()
     {
         return $this->morphMany(Parse::class, 'creator');
     }
     //  mechine assing updated by this user
-    public function updatedParses(): MorphMany
+    public function updatedParses()
     {
         return $this->morphMany(Parse::class, 'updater');
     }
 
-    public function createdParseInStocks(): MorphMany
+    public function createdParseInStocks()
     {
         return $this->morphMany(ParseStockIn::class, 'creator');
     }
     //  mechine assing updated by this user
-    public function updatedParseInStocks(): MorphMany
+    public function updatedParseInStocks()
     {
         return $this->morphMany(ParseStockIn::class, 'updater');
     }
 
     // mechine Stock created by this user
-    public function createdMechineStocks(): MorphMany
+    public function createdMechineStocks()
     {
         return $this->morphMany(MechineStock::class, 'creator');
     }
     //  mechine Stock updated by this user
-    public function updatedMechineStocks(): MorphMany
+    public function updatedMechineStocks()
     {
         return $this->morphMany(MechineStock::class, 'updater');
     }
 
     // mechine Stock created by this user
-    public function createdServices(): MorphMany
+    public function createdServices()
     {
         return $this->morphMany(Service::class, 'creator');
     }
     //  mechine Stock updated by this user
-    public function updatedServices(): MorphMany
+    public function updatedServices()
     {
         return $this->morphMany(Service::class, 'updater');
     }
-    public function createdMovement(): MorphMany
+    public function createdMovement()
     {
         return $this->morphMany(Movement::class, 'creator');
     }
     //  movement 
-    public function updatedMovement(): MorphMany
+    public function updatedMovement()
     {
         return $this->morphMany(Movement::class, 'updater');
+    }
+
+    public function creator()
+    {
+        return $this->morphTo();
+    }
+
+    public function updater()
+    {
+        return $this->morphTo();
     }
 }

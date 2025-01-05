@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ActionsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\RentController;
 use App\Http\Controllers\Admin\CompanyController;
@@ -20,6 +21,8 @@ use App\Http\Controllers\Admin\BreakDownProblemNoteController;
 use App\Http\Controllers\Admin\BreakdownServiceController;
 use App\Http\Controllers\Auth\UserAuthController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\CauseController;
+use App\Http\Controllers\Admin\EffectController;
 use App\Http\Controllers\Admin\MachineMovementController;
 use App\Http\Controllers\Admin\MechineAssingController;
 use App\Http\Controllers\Admin\ParseController;
@@ -29,6 +32,7 @@ use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\Admin\ProductModelController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\PreventiveServiceController;
+use App\Http\Controllers\Admin\ProblemNoteController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\DynamicDataController;
 use App\Http\Controllers\MachineStatusController;
@@ -148,7 +152,18 @@ Route::get("/preventive-signle-service/{uuid}/details",[PreventiveServiceControl
 Route::resource('preventive-service',PreventiveServiceController::class);
 
 
+//actions route list
+Route::controller(ActionsController::class)
+->prefix('actions')
+->as("actions.")
+->group(function(){
+  Route::get("trashed-count","trashedActionsCount");
+  Route::get("/trashed","trashed");
+  Route::post('{uuid}/restore', 'restore');
+  Route::delete('{uuid}/force-delete', 'forceDelete');
 
+});
+Route::resource( 'action',ActionsController::class);
 
 
 // -------------------------------------------- mechine typeroute statr here-------------------------------------------------------------------
@@ -322,11 +337,57 @@ Route::put('/operator/{uuid}', [OperatorController::class, 'update'])->name('ope
 Route::resource('operator', OperatorController::class);
 
 // --------------------------------------------Company route statr here-------------------------------------------------------------------
+
+
+
 Route::get('company/trash', [CompanyController::class, 'trash'])->name('trash');
 Route::get('company/trashed-count', [CompanyController::class, 'trashed_count'])->name('trashed-count');
 Route::post('company/{id}/restore', [CompanyController::class, 'restore'])->name('restore');
 Route::delete('company/{id}/forceDelete', [CompanyController::class, 'forceDelete'])->name('forceDelete');
+Route::post("company/next",[CompanyController::class,"companyNext"]);
 Route::resource('company', CompanyController::class);
+
+
+//Problem Note Route Controller
+Route::controller(ProblemNoteController::class)
+->prefix("problemnotes")
+->as("problemnotes.")
+->group(function(){
+  Route::get('/trashed', 'trashed')->name('trashed');
+  Route::get('/trashed-count', 'trashed_count')->name('trashed-count');
+  Route::post('{uuid}/restore', 'restore')->name('restore');
+  Route::delete('{uuid}/force-delete',  'forceDelete')->name('forceDelete');
+
+});
+
+Route::resource('problemnote', ProblemNoteController::class);
+
+
+//Cause Route Controller 
+Route::controller(CauseController::class)
+    ->prefix("causes")
+    ->as("causes.")
+    ->group(function () {
+        Route::get('/trashed', 'trashed')->name('trashed');
+        Route::get('/trashed-count', 'trashed_count')->name('trashed-count');
+        Route::post('{uuid}/restore', 'restore')->name('restore');
+        Route::delete('{uuid}/force-delete', 'forceDelete')->name('forceDelete');
+    });
+
+Route::resource('cause', CauseController::class);
+
+// Effect Route Controller
+Route::controller(EffectController::class)
+    ->prefix("effects")
+    ->as("effects.")
+    ->group(function () {
+        Route::get('/trashed', 'trashed')->name('trashed');
+        Route::get('/trashed-count', 'trashed_count')->name('trashed-count');
+        Route::post('{uuid}/restore', 'restore')->name('restore');
+        Route::delete('{uuid}/force-delete', 'forceDelete')->name('forceDelete');
+    });
+
+Route::resource('effect', EffectController::class);
 
 // --------------------------------------------Factory route statr here-------------------------------------------------------------------
 
@@ -397,7 +458,9 @@ Route::get('/get-machine-code-ways/details/{machine_code}', [DynamicDataControll
 Route::get('/get_breakdown_problem_notes/{ids?}', [DynamicDataController::class, 'getBreakdownProblemNotes']);
 Route::get('/get_groups', [DynamicDataController::class, 'getGroups']);
 Route::get('/get_parts', [DynamicDataController::class, 'getParts']);
-
+Route::get("/get_actions",[DynamicDataController::class,"get_actions"])->name("get_actions");
+Route::get("/get_problemnotes",[DynamicDataController::class,"get_problemNotes"])->name("get_problemNotes");
+Route::get("/get_causes",[DynamicDataController::class,"get_causes"])->name("get_causes");
 
 // Admin Auth Routes
 Route::prefix('admin')->group(function () {

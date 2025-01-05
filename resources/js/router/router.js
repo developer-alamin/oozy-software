@@ -12,6 +12,7 @@ import * as adminComponents from "./adminComponents.js";
 import UserTechnicianIndex from "../Pages/Technician/Index.vue";
 import Contact from "../Pages/Contact.vue";
 import adminAuthMiddleware from "../middleware/adminAuth.js";
+import { teal } from "vuetify/util/colors";
 
 const routes = [
   {
@@ -85,12 +86,19 @@ const routes = [
         meta: { title: "User Create" },
       },
 
-
+      //company route
       {
         path: "company/create", // New route for Contact
         name: "CompanyCreate",
         component: adminComponents.CompanyCreate,
         meta: { title: "Company Create" },
+      },
+      {
+        path: "company/next", // New route for Contact
+        name: "CompanyNext",
+        component: adminComponents.CompanyNext,
+        meta: { title: "Company Next" },
+        props:true
       },
       {
         path: "company/index", // New route for Contact
@@ -473,6 +481,106 @@ const routes = [
         name: "BreakDownNoteTrash",
         component: adminComponents.BreakDownNoteTrash,
         meta: { title: "Breakdown Note Trash" },
+      },
+      //Actions Route
+      {
+        path: "action/index", 
+        name: "ActionIndexPage",
+        component: adminComponents.ActionIndexPage,
+        meta: { title: "Action Index Page" },
+      },
+      {
+        path: "action/create", 
+        name: "ActionCreatePage",
+        component: adminComponents.ActionCreatePage,
+        meta: { title: "Action Create Page" },
+      },
+      {
+        path: "action/:uuid/edit", 
+        name: "ActionEditPage",
+        component: adminComponents.ActionEditPage,
+        meta: { title: "Action Edit Page" },
+      },
+      {
+        path: "action/trash", 
+        name: "ActionTrashPage",
+        component: adminComponents.ActionTrashPage,
+        meta: { title: "Action Trash Page" },
+      },
+      //problem note Route
+      {
+        path: "problem-note/index", 
+        name: "ProblemNoteIndex",
+        component: adminComponents.ProblemNoteIndex,
+        meta: { title: "Problem Note Index Page" },
+      },
+      {
+        path: "problem-note/create", 
+        name: "ProblemNoteCreate",
+        component: adminComponents.ProblemNoteCreate,
+        meta: { title: "Problem Note Create Page" },
+      },
+      {
+        path: "problem-note/:uuid/edit", 
+        name: "ProblemNoteEdit",
+        component: adminComponents.ProblemNoteEdit,
+        meta: { title: "Problem Note Edit Page" },
+      },
+      {
+        path: "problem-note/trash", 
+        name: "ProblemNoteTrash",
+        component: adminComponents.ProblemNoteTrash,
+        meta: { title: "Problem Note Trash Page" },
+      },
+      //Cause Route
+      {
+        path: "cause/index", 
+        name: "CauseIndex",
+        component: adminComponents.CauseIndex,
+        meta: { title: "Cause Index Page" },
+      },
+      {
+        path: "cause/create", 
+        name: "CauseCreate",
+        component: adminComponents.CauseCreate,
+        meta: { title: "Cause Create Page" },
+      },
+      {
+        path: "cause/:uuid/edit", 
+        name: "CauseEdit",
+        component: adminComponents.CauseEdit,
+        meta: { title: "Cause Edit Page" },
+      },
+      {
+        path: "cause/trash", 
+        name: "CauseTrash",
+        component: adminComponents.CauseTrash,
+        meta: { title: "Cause Trash Page" },
+      },
+      //Effect Route
+      {
+        path: "effect/index", 
+        name: "EffectIndex",
+        component: adminComponents.EffectIndex,
+        meta: { title: "Effect Index Page" },
+      },
+      {
+        path: "effect/create", 
+        name: "EffectCreate",
+        component: adminComponents.EffectCreate,
+        meta: { title: "Effect Create Page" },
+      },
+      {
+        path: "effect/:uuid/edit", 
+        name: "EffectEdit",
+        component: adminComponents.EffectEdit,
+        meta: { title: "Effect Edit Page" },
+      },
+      {
+        path: "effect/trash", 
+        name: "EffectTrash",
+        component: adminComponents.EffectTrash,
+        meta: { title: "Effect Trash Page" },
       },
       // brand
       {

@@ -14,8 +14,14 @@ class Company extends Model
     protected $fillable = [
         'uuid',
         'name',
+        'user_id',
         'status',
     ];
+
+
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
 
     public static function validationRules()
     {

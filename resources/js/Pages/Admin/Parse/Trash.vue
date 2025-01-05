@@ -2,7 +2,7 @@
   <v-card>
     <v-card-title class="pt-5">
       <v-row>
-        <v-col cols="4"><span>Parse Trash List</span></v-col>
+        <v-col cols="4"><span>Spares Parts Trash List</span></v-col>
         <v-col cols="8" class="d-flex justify-end">
           <v-text-field
             v-model="search"
