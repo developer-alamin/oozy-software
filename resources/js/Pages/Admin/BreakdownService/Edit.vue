@@ -29,8 +29,8 @@
                         v-model="breakdown_service.supervisor_problem_note_id"
                         :items="BreakdownProblemNotes"
                         item-value="id"
-                        item-title="break_down_problem_note"
-                        label="Select Problem Notes"
+                        item-title="note"
+                        label="Select Finding"
                         outlined
                         clearable
                         multiple
@@ -40,7 +40,7 @@
                         :error-messages="errors.supervisor_problem_note_id ? errors.supervisor_problem_note_id : ''"
                         @update:search="fetchBreakdownProblemNote"
                       >
-                        <template v-slot:label> Select Problem Notes <span style="color: red">*</span> </template>
+                        <template v-slot:label> Select Finding <span style="color: red">*</span> </template>
                       </v-autocomplete>
                     </v-col>
 		        </v-row>

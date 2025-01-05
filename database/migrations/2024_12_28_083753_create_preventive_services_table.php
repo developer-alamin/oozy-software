@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->uuid('uuid')->unique();
             $table->dateTime('date_time');
-            $table->enum('service_status',['Pending','Processing','Done','Cancel'])->default("Pending");
+            $table->enum('service_status',['Pending','Processing','Done','Cancel',"Hold"])->default("Pending");
            
 
             // Foreign key assign

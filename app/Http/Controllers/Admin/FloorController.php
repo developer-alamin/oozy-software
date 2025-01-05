@@ -158,13 +158,13 @@ class FloorController extends Controller
 
         $validatedData = $request->validated();
         $floor = Floor::where('uuid', $request->uuid)->firstOrFail();
-    // Validate the incoming request data
-    //$validatedData = $request->validated();
+            // Validate the incoming request data
+            //$validatedData = $request->validated();
 
-// Determine the authenticated user (either from 'admin' or 'user' guard)
-if (Auth::guard('admin')->check()) {
-        $currentUser = Auth::guard('admin')->user();
-        $creatorType = Admin::class;
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+                $currentUser = Auth::guard('admin')->user();
+                $creatorType = Admin::class;
 
         // Check if the admin is a superadmin
         if ($currentUser->role === 'superadmin') {

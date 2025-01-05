@@ -1,6 +1,6 @@
 <template>
   <v-card outlined class="mx-auto my-5" max-width="">
-    <v-card-title>Parse Edit</v-card-title>
+    <v-card-title>Spares Parts</v-card-title>
     <v-card-text>
       <v-form ref="form" v-model="valid" @submit.prevent="submit">
         <v-row>

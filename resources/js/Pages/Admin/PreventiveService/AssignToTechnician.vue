@@ -164,6 +164,7 @@ export default {
                         this.$router.push({ name: "PreventiveServiceIndex" });
                     }
                 } catch (error) {
+
                     if (error.response && error.response.status === 422) {
                         toast.error("Failed to update Technician Assign.");
                         this.errors = error.response.data.errors || {};

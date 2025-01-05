@@ -15,6 +15,8 @@ class PreventiveServiceDetail extends Model
         'status',
         'technician_status',
         'preventive_service_id',
+        'helper_technician_id',
+        'action_id',
         'creator_type',
         'creator_id ',
         'updater_type',
@@ -33,6 +35,7 @@ class PreventiveServiceDetail extends Model
     public function preventiveService(){
         return $this->belongsTo(PreventiveService::class);
     }
+
     public function user(){
         return $this->belongsTo(User::class,"technician_id",'id');
 
