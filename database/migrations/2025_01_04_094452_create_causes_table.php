@@ -11,28 +11,27 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('floors', function (Blueprint $table) {
+        Schema::create('causes', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
             $table->string('name');
-            $table->text('description')->nullable();
-            $table->enum('status', ['Active', 'Inactive', 'Pending'])->default('Inactive');
+            $table->enum('status', ['Active', 'Inactive'])->default('Active');
            
 
             // Foreign key assign
             $table->foreignId('company_id');
-            $table->foreignId('factory_id');
-
+            $table->foreignId('problem_note_id');
+            
             // Foreign key References
             $table->foreign("company_id")
             ->references('id')
             ->on('companies')
             ->onUpdate('cascade')
             ->onDelete('cascade');
-            
-            $table->foreign("factory_id")
+
+            $table->foreign("problem_note_id")
             ->references('id')
-            ->on('factories')
+            ->on('problem_notes')
             ->onUpdate('cascade')
             ->onDelete('cascade');
 
@@ -45,7 +44,6 @@ return new class extends Migration
             ->useCurrent()
             ->useCurrentOnUpdate();
             $table->softDeletes();
-
         });
     }
 
@@ -54,6 +52,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('floors');
+        Schema::dropIfExists('causes');
     }
 };

@@ -534,7 +534,54 @@
         </ul>
       </li>
       <!-- End Machine Settings Nav -->
-  
+        <!-- Start Fish Bone Nav -->
+      <li class="nav-item">
+          <a
+            class="nav-link collapsed"
+            data-bs-target="#fish-bone-nav"
+            data-bs-toggle="collapse"
+            href="#"
+            :class="{ show: isSettingRouteShow }"
+          >
+            <i class="bi bi-sliders"></i><span>Fish Bone Digram</span
+            ><i class="bi bi-chevron-down ms-auto"></i>
+          </a>
+        <ul
+          id="fish-bone-nav"
+          class="nav-content collapse"
+          data-bs-parent="#sidebar-nav"
+          :class="{ show: isFishBoneRouteShow }"
+        >
+          <li>
+            <router-link
+              :to="{ name: 'ProblemNoteIndex' }"
+              active-class="active"
+              :class="{ active: isActiveProblemNoteRoute}"
+            >
+              <i class="bi bi-circle"></i><span>Problem Note</span>
+            </router-link>
+          </li>
+          <li>
+            <router-link
+              :to="{ name: 'CauseIndex' }"
+              active-class="active"
+              :class="{ active: isCauseRoute }"
+            >
+              <i class="bi bi-circle"></i><span>Cause List</span>
+            </router-link>
+          </li>
+          <li>
+            <router-link
+              :to="{ name: 'EffectIndex' }"
+              active-class="active"
+              :class="{ active: isEffectRoute }"
+            >
+              <i class="bi bi-circle"></i><span>Effect List</span>
+            </router-link>
+          </li>
+        </ul>
+      </li>
+      <!-- End Fish Bone Nav -->
       <!-- Start Settings Nav -->
       <li class="nav-item">
         <a
@@ -553,25 +600,6 @@
           data-bs-parent="#sidebar-nav"
           :class="{ show: isSettingRouteShow }"
         >
-          
-          <!-- <li>
-            <router-link
-              :to="{ name: 'TechnicianIndex' }"
-              active-class="active"
-              :class="{ active: isTechnicianRoute }"
-            >
-              <i class="bi bi-circle"></i><span>Technician</span>
-            </router-link>
-          </li>
-          <li>
-            <router-link
-              :to="{ name: 'OperatorIndex' }"
-              active-class="active"
-              :class="{ active: isOperatorRoute }"
-            >
-              <i class="bi bi-circle"></i><span>Supervisor</span>
-            </router-link>
-          </li> -->
           <li>
             <router-link
               :to="{ name: 'BreakDownNoteIndex' }"
@@ -752,6 +780,51 @@ const isAdminActionsIndexRoute = computed(() =>
   ].includes(route.name)
 );
 
+
+
+
+const isProblemNoteRoute = computed(() =>
+  [
+    "ProblemNoteIndex",
+    "ProblemNoteCreate",
+    'ProblemNoteEdit',
+    'ProblemNoteTrash'
+  ].includes(route.name)
+);
+const isCauseRoute = computed(() =>
+  [
+    "CauseIndex",
+    "CauseCreate",
+    'CauseEdit',
+    'CauseTrash'
+  ].includes(route.name)
+);
+const isEffectRoute = computed(() =>
+  [
+    "EffectIndex",
+    "EffectCreate",
+    'EffectEdit',
+    'EffectTrash'
+  ].includes(route.name)
+);
+
+
+const isFishBoneRouteShow = computed(() => {
+  return [
+    "ProblemNoteIndex",
+    "ProblemNoteCreate",
+    'ProblemNoteEdit',
+    'ProblemNoteTrash',
+    "CauseIndex",
+    "CauseCreate",
+    'CauseEdit',
+    'CauseTrash',
+    "EffectIndex",
+    "EffectCreate",
+    'EffectEdit',
+    'EffectTrash'
+  ].includes(route.name);
+});
 
 // const isGroupRoute = computed(() =>
 //     ["GroupIndex", "GroupCreate", "GroupEdit", "GroupTrash"].includes(

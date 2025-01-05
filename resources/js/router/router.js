@@ -507,6 +507,81 @@ const routes = [
         component: adminComponents.ActionTrashPage,
         meta: { title: "Action Trash Page" },
       },
+      //problem note Route
+      {
+        path: "problem-note/index", 
+        name: "ProblemNoteIndex",
+        component: adminComponents.ProblemNoteIndex,
+        meta: { title: "Problem Note Index Page" },
+      },
+      {
+        path: "problem-note/create", 
+        name: "ProblemNoteCreate",
+        component: adminComponents.ProblemNoteCreate,
+        meta: { title: "Problem Note Create Page" },
+      },
+      {
+        path: "problem-note/:uuid/edit", 
+        name: "ProblemNoteEdit",
+        component: adminComponents.ProblemNoteEdit,
+        meta: { title: "Problem Note Edit Page" },
+      },
+      {
+        path: "problem-note/trash", 
+        name: "ProblemNoteTrash",
+        component: adminComponents.ProblemNoteTrash,
+        meta: { title: "Problem Note Trash Page" },
+      },
+      //Cause Route
+      {
+        path: "cause/index", 
+        name: "CauseIndex",
+        component: adminComponents.CauseIndex,
+        meta: { title: "Cause Index Page" },
+      },
+      {
+        path: "cause/create", 
+        name: "CauseCreate",
+        component: adminComponents.CauseCreate,
+        meta: { title: "Cause Create Page" },
+      },
+      {
+        path: "cause/:uuid/edit", 
+        name: "CauseEdit",
+        component: adminComponents.CauseEdit,
+        meta: { title: "Cause Edit Page" },
+      },
+      {
+        path: "cause/trash", 
+        name: "CauseTrash",
+        component: adminComponents.CauseTrash,
+        meta: { title: "Cause Trash Page" },
+      },
+      //Effect Route
+      {
+        path: "effect/index", 
+        name: "EffectIndex",
+        component: adminComponents.EffectIndex,
+        meta: { title: "Effect Index Page" },
+      },
+      {
+        path: "effect/create", 
+        name: "EffectCreate",
+        component: adminComponents.EffectCreate,
+        meta: { title: "Effect Create Page" },
+      },
+      {
+        path: "effect/:uuid/edit", 
+        name: "EffectEdit",
+        component: adminComponents.EffectEdit,
+        meta: { title: "Effect Edit Page" },
+      },
+      {
+        path: "effect/trash", 
+        name: "EffectTrash",
+        component: adminComponents.EffectTrash,
+        meta: { title: "Effect Trash Page" },
+      },
       // brand
       {
         path: "brand/index", // New route for Contact

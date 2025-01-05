@@ -56,6 +56,25 @@ export { default as ActionCreatePage } from "../Pages/Admin/Actions/Create.vue";
 export { default as ActionEditPage } from "../Pages/Admin/Actions/Edit.vue";
 export { default as ActionTrashPage } from "../Pages/Admin/Actions/Trash.vue";
 
+//Problem Note Components
+export { default as ProblemNoteIndex } from "../Pages/Admin/ProblemNote/Index.vue";
+export { default as ProblemNoteCreate } from "../Pages/Admin/ProblemNote/Create.vue";
+export { default as ProblemNoteEdit } from "../Pages/Admin/ProblemNote/Edit.vue";
+export { default as ProblemNoteTrash } from "../Pages/Admin/ProblemNote/Trash.vue";
+
+//Cause Components
+export { default as CauseIndex } from "../Pages/Admin/Cause/Index.vue";
+export { default as CauseCreate } from "../Pages/Admin/Cause/Create.vue";
+export { default as CauseEdit } from "../Pages/Admin/Cause/Edit.vue";
+export { default as CauseTrash } from "../Pages/Admin/Cause/Trash.vue";
+
+//Effect Components
+export { default as EffectIndex } from "../Pages/Admin/Effects/Index.vue";
+export { default as EffectCreate } from "../Pages/Admin/Effects/Create.vue";
+export { default as EffectEdit } from "../Pages/Admin/Effects/Edit.vue";
+export { default as EffectTrash } from "../Pages/Admin/Effects/Trash.vue";
+
+
 
 
 // Preventive Service components
