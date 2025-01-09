@@ -61,7 +61,7 @@
     <template v-slot:item.actions="{ item }">
           <template v-if="item.technician_status && item.technician_status == 'Acknowledge'">
               <v-icon @click="showConfirmDTechnicianBreakdownServiceAcknowledge(item.detail_id)" class="mr-2"
-                >mdi-check-outline</v-icon
+                >mdi-check-outline </v-icon
             >
           </template>
           <template v-else-if="item.technician_status && item.technician_status == 'Acknowledged'">

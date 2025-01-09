@@ -524,6 +524,7 @@ export default {
                         this.breakdown_service
                     );
 					
+					
                     if (response.data.success) {
                         toast.success("Data has been saved!");
                         this.$router.push({ name: "BreakdownServiceIndex" });

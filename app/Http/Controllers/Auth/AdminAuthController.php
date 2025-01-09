@@ -41,6 +41,9 @@ class AdminAuthController extends Controller
       'email' => 'required|email',
       'password' => 'required',
     ]);
+
+
+    
     // Find the user by email
     $admin = Admin::where('email', $request->email)->first();
     // Check if the admin exists and the password is correct

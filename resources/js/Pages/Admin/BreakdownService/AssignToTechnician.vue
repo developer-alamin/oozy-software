@@ -121,7 +121,7 @@ export default {
         },
 
 
-        async fetchMachine(search = "", id = 0) {
+      async fetchMachine(search = "", id = 0) {
 	      try {
 	        const response = await this.$axios.get("/search_machine/"+id, {
 	          params: {
@@ -138,7 +138,7 @@ export default {
         try {
           const response = await this.$axios.get("/search_user/"+id, {
             params: {
-              search,
+              search : search,
             },
           });
           this.technicianLists = response.data;
