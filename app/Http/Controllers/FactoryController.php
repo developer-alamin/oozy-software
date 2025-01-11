@@ -52,6 +52,10 @@ class FactoryController extends Controller
         } else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
+
+
+
+        
         // Apply search if the search term is not empty
         if (!empty($factoryCode)) {
             $factoriesQuery->where('factory_code', $factoryCode);

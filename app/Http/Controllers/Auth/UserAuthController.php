@@ -2,13 +2,14 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\OTPMail;
 use App\Models\Admin;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\JsonResponse;
-
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
 class UserAuthController extends Controller
@@ -118,24 +119,12 @@ class UserAuthController extends Controller
   public function login(Request $request)
   {
       // Validate the login data
-      $request->validate([
+      $request->validate( [
           'email'    => 'required|email',
           'password' => 'required',
       ]);
 
-      // Try to find the admin first
-      $admin = Admin::where('email', $request->email)->first();
-      if ($admin && Hash::check($request->password, $admin->password)) {
-          // Generate Sanctum token for admin
-          $token = $admin->createToken('AdminToken')->plainTextToken;
-          return response()->json([
-              'token'  => $token,
-              'user'   => $admin,
-              'role'   => 'admin', // Adding role to identify
-          ]);
-      }
-
-      // If not admin, try to find the user
+      // If Match User, try to find the user
       $user = User::where('email', $request->email)->first();
       if ($user && Hash::check($request->password, $user->password)) {
           // Generate Sanctum token for user
@@ -151,6 +140,118 @@ class UserAuthController extends Controller
       return response()->json([
           'message' => 'Invalid credentials'
       ], 401);
+
+
+  }
+
+  public function forgotPassword(Request $request){
+       // Validate the login data
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        // Retrieve the user by email
+        $user = User::where('email', $request->input('email'))->first();
+        if ($user) {
+            // Generate a random OTP
+            $otp = rand(1000, 9999);
+
+            // Send OTP to the user's email
+            try {
+                Mail::to($user->email)->send(new OTPMail($otp));
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to send OTP. Please try again later.',
+                    'error' => $e->getMessage(),
+                ], 500);
+            }
+
+            // Save OTP to the user record (optional: include expiration)
+            $user->otp = $otp;
+            $user->otp_expires_at = now()->addMinutes(100); // Optional expiration time
+            $user->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'OTP sent successfully.',
+            ], 200);
+        }
+
+        // If the email doesn't exist (though this shouldn't happen due to validation)
+        return response()->json([
+            'success' => false,
+            'message' => 'Email not found.',
+        ], 404);
+  }
+
+  public function verifyOtp(Request $request){
+        // Validate the request data
+        $validatedData = $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'otp' => 'required|exists:users,otp',
+        ]);
+
+        // Retrieve the user based on email
+        $user = User::where('email', $validatedData['email'])->first();
+
+        // Check if the OTP matches
+        if ($user && $user->otp == $validatedData['otp']) {
+            // Check if the OTP has expired
+            if (now()->greaterThan($user->otp_expires_at)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'OTP has expired.',
+                ], 400);
+            }
+
+            // Mark OTP as verified (optional: clear OTP fields)
+            $user->otp = null;
+            $user->otp_expires_at = null;
+            $user->otp_verified = true; // Add this field if needed
+            $user->save();
+
+            return response()->json([
+                'success' => true,
+                'item' => $user,
+                'message' => 'OTP verified successfully.',
+            ], 200);
+        }
+
+        // Return an error if OTP is invalid (although validation should catch most cases)
+        return response()->json([
+            'success' => false,
+            'message' => 'Invalid OTP.',
+        ], 400);
+  }
+  public function resetPassword(Request $request){
+        // Validate the input data
+        $validatedData = $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'password' => 'required|min:8|confirmed', // 'password_confirmation' is required
+        ]);
+
+        // Retrieve the user based on email
+        $user = User::where('email', $validatedData['email'])->first();
+        
+        // Ensure the OTP is verified (assuming you have an `otp_verified` column)
+        if ($user && $user->otp_verified) {
+            // Update the user's password
+            $user->password = Hash::make($validatedData['password']);
+            $user->otp_verified = false; // Reset OTP verification status
+            $user->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Password reset successfully.',
+            ], 200);
+        }
+
+        // If OTP has not been verified
+        return response()->json([
+            'success' => false,
+            'message' => 'OTP not verified. Please verify your OTP first.',
+        ], 400);
   }
   /**
  * @OA\Post(
@@ -191,13 +292,28 @@ class UserAuthController extends Controller
 
   public function register(Request $request)
   {
+
       // Validate the registration data
       $request->validate([
           'name'     => 'required|string|max:255',
           'email'    => 'required|string|email|max:255|unique:users|unique:admins',
-          'password' => 'required|string|min:8|confirmed',
+          'password' => 'required|string|min:8',
           'role'     => 'required|string|in:admin,user', // Admin or user role
       ]);
+
+
+    // Determine the authenticated user (either from 'admin' or 'user' guard)
+    if (Auth::guard('admin')->check()) {
+        $currentUser = Auth::guard('admin')->user();
+        $creatorType = Admin::class;
+        
+    } elseif (Auth::guard('user')->check()) {
+        $currentUser = Auth::guard('user')->user();
+        $creatorType = User::class;
+        
+    } else {
+        return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+    }
 
       // Determine if the user is registering as an admin or user
       if ($request->role === 'admin') {
@@ -215,19 +331,24 @@ class UserAuthController extends Controller
               'role'   => 'admin',
           ]);
       } else {
-          // Create a user
-          $user = User::create([
-              'name'     => $request->name,
-              'email'    => $request->email,
-              'password' => Hash::make($request->password),
-          ]);
-          $token = $user->createToken('UserToken')->plainTextToken;
 
-          return response()->json([
-              'token'  => $token,
-              'user'   => $user,
-              'role'   => 'user',
-          ]);
+        // Create a user
+        $user = new User();
+        $user->name = $request->input('name');
+        $user->email = $request->input('email');
+        $user->password = Hash::make($request->input('password'));
+        $user->creator()->associate($currentUser);
+        $user->updater()->associate($currentUser);
+        $user->save();
+
+       // return response()->json($user,200);status: 
+        $token = $user->createToken('UserToken')->plainTextToken;
+
+        return response()->json([
+            'token'  => $token,
+            'user'   => $user,
+            'role'   => 'user',
+        ]);
       }
   }
 
