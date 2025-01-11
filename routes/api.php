@@ -37,6 +37,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\DynamicDataController;
 use App\Http\Controllers\MachineStatusController;
 use App\Http\Controllers\MachineTagController;
+use App\Http\Controllers\MobileApi\MobileApiController;
 use App\Http\Controllers\OperatorController;
 use App\Models\BreakdownService;
 use App\Models\MechineAssing;
@@ -69,7 +70,7 @@ Route::controller(FloorController::class)
     Route::get('/trashed', 'floortrashed')->name('floor.trashed');
     Route::post('{id}/restore', 'floorrestore')->name('floor.restore');
     Route::delete('{id}/force-delete', 'floorforcedelete')->name('floor.force.delete');
-  });
+});
 Route::resource('floor', FloorController::class);
 
 // --------------------------------------------Machine route statr here-------------------------------------------------------------------
@@ -480,10 +481,52 @@ Route::prefix('admin')->group(function () {
 });
 Route::get('/auth/user', [AuthController::class, 'fetchGobalUserAuthInfo']);
 Route::get('/user/role/auth', [AuthController::class, 'fetchUserAuthRoleInfo']);
+
+
+
 // User Auth Routes
 Route::prefix('user')->group(function () {
     Route::post('/register', [UserAuthController::class, 'register']);
     Route::post('/login', [UserAuthController::class, 'login']);
     Route::post('/logout', [UserAuthController::class, 'logout'])->middleware('auth:user');
-    Route::get('/dashboard', [UserController::class, 'dashboard'])->middleware('auth:user');
+    Route::post("/forgot-password",[UserAuthController::class,"forgotPassword"]);
+    Route::post('/verify-otp', [UserAuthController::class, 'verifyOtp']);
+    Route::post('/reset-password', [UserAuthController::class, 'resetPassword']);
+    Route:: get('/dashboard', [UserController::class, 'dashboard'])->middleware('auth:user');
 });
+
+
+
+// Mobile Api Route Start Form Here
+Route::controller(MobileApiController::class)
+->prefix("breakdown-services")
+->as("breakdown-services")
+->group(function(){
+
+
+  //Operator Flow Api
+  Route::prefix('operator')->group(function () {
+    Route::get('machine-code',"operatormachinecodebydata");
+    Route::post("machine-report","operatormachinereport");
+    Route::get('all-machine-breakdown',"operatorallmachinebreakdown");
+    Route::get('pending',"operatorbreakdownservicepending");
+    Route::get('processing',"operatorbreakdownserviceprocessing");
+    Route::get('done',"operatorbreakdownservicedone");
+    Route::get('cencel',"operatorbreakdownservicecencel");
+    Route::post('decline',"operatorbreakdownservicedecline");
+    Route::post('resolve',"operatorbreakdownserviceresolve");
+  });
+
+  // Technician Flow Api
+  Route::prefix("technician")->group(function(){
+    Route::get("/all-list-show", "technicianbreakdownservicelistshow");
+    Route::get("/machine-code-search","technicianmachinecodesearch");
+    Route::post("{uuid}/assigntotechnician","save_assign_to_technician");
+    Route::put("{details_id}/acknowledge","TechnicianAcknowedge");
+    Route::put("{details_id}/service-start","TechnicianStartDetails");
+  });
+  
+});
+
+// Mobile Api Route End Form Here
+

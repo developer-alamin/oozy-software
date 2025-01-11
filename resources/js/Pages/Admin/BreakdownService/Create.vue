@@ -194,6 +194,9 @@ export default {
 
       try {
         const response = await this.$axios.post("/breakdown-service", formData);
+       console.log(response);
+       
+       
         if (response.data.success) {
           toast.success("Breakdown Service created successfully!");
           this.resetForm();
