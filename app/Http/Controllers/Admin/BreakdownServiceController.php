@@ -83,7 +83,6 @@ class BreakdownServiceController extends Controller
         $BreakdownService = $BreakdownServiceQuery->with(['mechine_assing:id,machine_code,name'])
                         ->paginate($itemsPerPage);
 
-
         // Return the response as JSON
         return response()->json([
             'items' => $BreakdownService->items(),
@@ -104,7 +103,6 @@ class BreakdownServiceController extends Controller
      */
     public function store(Request $request)
     {
-
         // Check which authentication guard is in use and set the creator
         $creator = null;
         if (Auth::guard('admin')->check()) {
@@ -540,7 +538,8 @@ class BreakdownServiceController extends Controller
     }
 
     public function breakdown_service_start_save_details(Request $request, $detail_id){
-        
+    
+
         $BreakdownServiceDetail = BreakdownServiceDetail::where('id', $detail_id)->firstOrFail();
 
         // Check which authentication guard is in use and set the creator

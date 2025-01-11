@@ -52,21 +52,21 @@ export const useAuthStore = defineStore("auth", {
     },
 
     async login(email, password) {
-      const response = await useAxios("post", "/user/login", {
+      const response = await useAxios("post", "/admin/login", {
         email,
         password,
       });
 
       this.token = response.data.token;
-      this.user = response.data.user;
-      this.role = response.data.user.role;
+      this.user = response.data.admin;
+      this.role = response.data.admin.role;
 
       console.log(this.token);
 
       setCookie({ name: "__authToken", data: this.token, expire: "2H" });
       setCookie({
         name: "user_id",
-        data: response?.data?.user?.id,
+        data: response?.data?.admin?.id,
         expire: "7D",
       });
     },
