@@ -40,9 +40,10 @@ class Line extends Model
         'updated_at' => 'datetime', // Automatically cast 'updated_at' to a Carbon instance
     ];
 
-    public function units()
+   
+    public function company()
     {
-        return $this->belongsTo(Unit::class,'unit_id');
+        return $this->belongsTo(Company::class);
     }
     // Polymorphic relationships
     public function creator()
@@ -54,6 +55,8 @@ class Line extends Model
     {
         return $this->morphTo();
     }
+    
+
     public function lines()
     {
         return $this->belongsToMany(Line::class, 'line_unit', 'unit_id', 'line_id')
@@ -61,6 +64,10 @@ class Line extends Model
     }
     public function unit()
     {
-        return $this->belongsTo(Unit::class,'unit_id');
+        return $this->belongsTo(Unit::class);
+    }
+
+    public function requisitions(){
+        return $this->hasMany(Requisition::class,"line_id",'id');
     }
 }

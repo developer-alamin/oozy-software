@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CauseController;
 use App\Http\Controllers\Admin\EffectController;
 use App\Http\Controllers\Admin\MachineMovementController;
+use App\Http\Controllers\Admin\MachineRequisitionController;
 use App\Http\Controllers\Admin\MechineAssingController;
 use App\Http\Controllers\Admin\ParseController;
 use App\Http\Controllers\Admin\ParseUnitController;
@@ -41,6 +42,25 @@ use App\Http\Controllers\MobileApi\MobileApiController;
 use App\Http\Controllers\OperatorController;
 use App\Models\BreakdownService;
 use App\Models\MechineAssing;
+
+
+//Machine Requisition Group Controller
+
+Route::controller(MachineRequisitionController::class)
+->prefix("machine-requisition")
+->as("machine-requisition.")
+->group(function(){
+    Route::get("index","index");
+    Route::post("store-requisition","StoreRequisition");
+    Route::get("lines","Lines");
+    Route::get("/machine-calender","machineCalender");
+    Route::get("machine-types","MachineTypes");
+});
+
+
+
+
+
 
 // --------------------------------------------supplier route statr here-------------------------------------------------------------------
 //Route::get('/suppliers/{uuid}/edit', [SupplierController::class, 'edit'])->name('suppliers.edit');
