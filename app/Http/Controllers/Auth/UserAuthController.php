@@ -293,45 +293,25 @@ class UserAuthController extends Controller
   public function register(Request $request)
   {
 
-      // Validate the registration data
-      $request->validate([
-          'name'     => 'required|string|max:255',
-          'email'    => 'required|string|email|max:255|unique:users|unique:admins',
-          'password' => 'required|string|min:8',
-          'role'     => 'required|string|in:admin,user', // Admin or user role
-      ]);
+        // Determine the authenticated user (either from 'admin' or 'user' guard)
+        if (Auth::guard('admin')->check()) {
+            $currentUser = Auth::guard('admin')->user();
+            $creatorType = Admin::class;
+            
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
 
 
-    // Determine the authenticated user (either from 'admin' or 'user' guard)
-    if (Auth::guard('admin')->check()) {
-        $currentUser = Auth::guard('admin')->user();
-        $creatorType = Admin::class;
-        
-    } elseif (Auth::guard('user')->check()) {
-        $currentUser = Auth::guard('user')->user();
-        $creatorType = User::class;
-        
-    } else {
-        return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
-    }
+        // Validate the registration data
+        $request->validate([
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8',
+        ]);
 
-      // Determine if the user is registering as an admin or user
-      if ($request->role === 'admin') {
-          // Create an admin
-          $admin = Admin::create([
-              'name'     => $request->name,
-              'email'    => $request->email,
-              'password' => Hash::make($request->password),
-          ]);
-          $token = $admin->createToken('AdminToken')->plainTextToken;
 
-          return response()->json([
-              'token'  => $token,
-              'user'   => $admin,
-              'role'   => 'admin',
-          ]);
-      } else {
-
+    
         // Create a user
         $user = new User();
         $user->name = $request->input('name');
@@ -349,7 +329,8 @@ class UserAuthController extends Controller
             'user'   => $user,
             'role'   => 'user',
         ]);
-      }
+
+
   }
 
 

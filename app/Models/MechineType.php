@@ -68,4 +68,8 @@ class MechineType extends Model
         $brand->restore();
         return true;
     }
+    public function requisitionDetails()
+    {
+        return $this->hasMany(RequisitionDetails::class);
+    }
 }
