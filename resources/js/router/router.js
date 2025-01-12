@@ -49,6 +49,20 @@ const routes = [
         meta: { title: "Admin All User Index" },
       },
       {
+        path: "machine-requisition/index",
+        name: "MachineRequisitionIndex",
+        component: adminComponents.MachineRequisitionIndex,
+        meta: { title: "Machine Requisition Index Page" },
+        props: true,
+      },
+      {
+        path: "machine-requisition/calendar",
+        name: "MachineRequisitionCelender",
+        component: adminComponents.MachineRequisitionCelender,
+        meta: { title: "Machine Requisition Calender Page" },
+        props: true,
+      },
+      {
         path: "user/index",
         name: "AdminUserIndex",
         component: adminComponents.AdminUserIndex,

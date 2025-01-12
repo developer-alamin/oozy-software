@@ -213,11 +213,10 @@ export default {
                         "/suppliers",
                         formData
                     );
-                     console.log(response.data)
-
                     if (response.data.success) {
-                        this.resetForm();
+                       
                         toast.success("Supplier Created successfully!");
+                         this.resetForm();
                         // Notify the user on success (e.g., with a toast)
                     }
                 } catch (error) {

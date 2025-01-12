@@ -10,6 +10,7 @@
         </router-link>
       </li>
       <!-- End Dashboard Nav -->
+
       <!-- Start License Nav -->
       <li class="nav-item">
         <a
@@ -36,6 +37,50 @@
         </ul>
       </li>
       <!-- End License Nav -->
+
+
+       <!-- Start Machine Requisition Nav -->
+      <li class="nav-item">
+        <a
+         :class="{ show: isActiveMachineRequisionRoute }"
+          class="nav-link collapsed"
+          data-bs-target="#machine-requisition"
+          data-bs-toggle="collapse"
+          href="#"
+        >
+          <i class="bi bi-shield-lock"></i>
+          <span>Machine Requisition</span>
+          <i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul
+          id="machine-requisition"
+          class="nav-content collapse"
+          data-bs-parent="#sidebar-nav"
+        >
+          <li>
+            <router-link 
+            :to="{ name: 'MachineRequisitionIndex' }"
+            active-class="active"
+            :class="{ active: isActiveMachineIndex }"
+            >
+              <i class="bi bi-circle"></i>
+              <span>Machine Requisition</span>
+            </router-link>
+          </li>
+          <li>
+            <router-link 
+            :to="{ name: 'MachineRequisitionCelender' }"
+            active-class="active"
+            :class="{ active: isActiveMachineCelander }"
+            >
+              <i class="bi bi-circle"></i>
+              <span>Machine Calender</span>
+            </router-link>
+          </li>
+        </ul>
+      </li>
+      <!-- End Machine Requisition Nav -->
+
       <!-- Start Machines Nav -->
       <li class="nav-item">
         <a
@@ -656,6 +701,34 @@ const isMechineRouteShow = computed(() => {
   ].includes(route.name);
 });
 
+
+const isActiveProblemNoteRoute = computed(() => {
+  return [
+    "ProblemNoteIndex",
+  ].includes(route.name);
+});
+
+// Check if the current route is part of the Mechine-related routes
+const isActiveMachineCelander = computed(() => {
+  return [
+    "MachineRequisitionCelender"
+  ].includes(route.name);
+});
+
+
+const isActiveMachineIndex = computed(() => {
+  return [
+    "MachineRequisitionIndex",
+  ].includes(route.name);
+});
+// Check if the current route is part of the Mechine-related routes
+const isActiveMachineRequisionRoute = computed(() => {
+  return [
+    "MachineRequisitionIndex",
+    "MachineRequisitionCelender"
+  ].includes(route.name);
+});
+
 const isMachineRoute = computed(() =>
   [
     "MechineIndex",
@@ -878,6 +951,9 @@ const isSupplierRoute = computed(() =>
   )
 );
 
+
+
+
 const MechineTypeRoute = computed(() =>
   [
     "MechineTypeIndex",
@@ -886,6 +962,9 @@ const MechineTypeRoute = computed(() =>
     "MechineTypeTrash",
   ].includes(route.name)
 );
+
+
+
 const isMechineSourceRoute = computed(() =>
   [
     "MechineSourceIndex",
