@@ -80,9 +80,6 @@ class SupplierController extends Controller
      */
     public function store(Request $request)
     {
-
-        return response()->json($request->all(),200);
-
         $validator = Validator::make($request->all(), Supplier::rules());
        
         if ($validator->fails()) {
