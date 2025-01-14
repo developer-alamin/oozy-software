@@ -36,6 +36,15 @@
         loading-text="Loading... Please wait"
         @update:options="loadItems"
       >
+        <template v-slot:body.append>
+        <tr class="bg-primary">
+          <td>Total MC Sum  </td>
+          <td>
+            {{totalMcSum}}
+          </td>
+          <td colspan="4"></td>
+        </tr>
+      </template>
     </v-data-table-server>
     </v-card>
   
@@ -61,6 +70,7 @@
           { title: "Type", value: "name", sortable: true },
           { title: "Total", value: "mc_sum", sortable: true },
         ],
+        totalMcSum: 0,
         serverItems: [],
         lines: [],
         loading: true,
@@ -90,12 +100,10 @@
 
           console.log(response.data);
 
-
           this.serverItems = response.data.items || [];
           this.totalItems = response.data.total || 0;
+          this.totalMcSum = response.data.total_sum;
 
-
-          
         } catch (error) {
           console.error("Error loading items:", error);
           toast.error("Failed to load items. Please try again.");

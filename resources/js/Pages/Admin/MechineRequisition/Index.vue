@@ -105,7 +105,6 @@
               <table class="table table-bordered table-hover table-striped">
                 <thead>
                   <tr>
-                    <th>Id</th>
                     <th>Machine Type</th>
                     <th>M/C</th>
                   </tr>

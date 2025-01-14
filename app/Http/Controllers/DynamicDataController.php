@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Action;
+use App\Models\Admin;
 use App\Models\Brand;
 use App\Models\BreakDownProblemNote;
 use App\Models\Cause;
 use App\Models\Company;
 use App\Models\Factory;
+use App\Models\FishboneCategory;
 use App\Models\Floor;
 use App\Models\Group;
 use App\Models\Line;
@@ -20,6 +22,7 @@ use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 
 class DynamicDataController extends Controller
 {
@@ -620,23 +623,20 @@ class DynamicDataController extends Controller
         $limit = $request->query('limit', 5);    // Default limit of 5
 
         // Base query for the Action model
-        $actions = ProblemNote::query();
+        $problemNotes = ProblemNote::query();
         // Apply search filter if provided
         if ($search) {
-            $actions = $actions->where('name', 'like', '%' . $search . '%'); // Assuming 'name' is a column in the Action model
+            $problemNotes = $problemNotes->where('name', 'like', '%' . $search . '%'); // Assuming 'name' is a column in the Action model
         }
         // If IDs are provided, filter by IDs
         if ($ids) {
-            $actions = $actions->whereIn('id', explode(',', $ids));
+            $problemNotes = $problemNotes->whereIn('id', explode(',', $ids));
         }
-
-       
-
         // Limit the results and get the data
-        $actions = $actions->with(["company:id,name"])->limit($limit)->get();
+        $problemNotes = $problemNotes->with(["company:id,name"])->limit($limit)->get();
 
         // Return the data as JSON
-        return response()->json($actions);
+        return response()->json($problemNotes);
     }
     public function get_causes(Request $request, $ids = "")
     {
@@ -667,4 +667,93 @@ class DynamicDataController extends Controller
 
     }
 
+    public function fishboneDigrame(Request $request, $ids = "")
+    {
+        
+        $currentUser = $this->getAuthenticatedUser();
+
+        if (!$currentUser) {
+          return response()->json(["message"=> "Unauthenticated"],0);
+        }
+        $creatorType = $this->getCreatorType(); 
+
+
+        $search = $request->query('search', ''); // Search parameter
+        $limit = $request->query('limit', 5);    // Default limit of 5
+        $ids = $request->query('ids', '');  
+
+       
+
+        $problemNotes = ProblemNote::query();
+
+        if ($search) {
+            $problemNotes = ProblemNote::where('name', 'like', '%' . $search . '%'); // Assuming 'name' is a column in the ProblemNote model
+        }
+
+        $problemNotes = $problemNotes->where("creator_id", $currentUser->id)
+        ->where("creator_type", $creatorType)
+        ->with(["fisbone_categories.causes"])
+        ->limit($limit)
+        ->get();
+
+        return response()->json($problemNotes,Response::HTTP_OK);
+    }
+
+    public function getFishboneCategory(Request $request, $ids = '')
+    {
+        $currentUser = $this->getAuthenticatedUser();
+        
+        if (!$currentUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        
+        $creatorType = $this->getCreatorType();
+    
+        // Get query parameters
+        $search = $request->query('search', ''); // Search parameter
+        $limit = $request->query('limit', 5);    // Default limit of 5
+        $ids = $request->query('ids', $ids);     // Use either the passed 'ids' or query parameter
+    
+        // Begin query
+        $categoryQuery = FishboneCategory::query();
+        $categoryQuery->where("creator_id", $currentUser->id)
+                      ->where("creator_type", $creatorType);
+    
+        // Apply search filter if provided
+        if ($search) {
+            $categoryQuery = $categoryQuery->where("name", "like", "%" . $search . "%");
+        }
+    
+        // Apply 'ids' filter if provided (ensure it's not empty)
+        if (!empty($ids)) {
+            $idsArray = explode(',', $ids); // Assuming 'ids' is a comma-separated list of IDs
+            $categoryQuery = $categoryQuery->whereIn('id', $idsArray);
+        }
+    
+        // Fetch categories with relationships and apply limit
+        $categories = $categoryQuery->with(['problemNote.company'])->limit($limit)->get();
+    
+        // Return the response
+        return response()->json([
+            'items' => $categories
+        ], Response::HTTP_OK);
+    }
+    
+    // Helper method to get authenticated user
+    private function getAuthenticatedUser()
+    {
+        if (Auth::guard('admin')->check()) {
+            return Auth::guard('admin')->user();
+        } elseif (Auth::guard('user')->check()) {
+            return Auth::guard('user')->user();
+        }
+        return null;
+    }
+    
+    // Helper method to get creator type
+    private function getCreatorType()
+    {
+        return Auth::guard('admin')->check() ? Admin::class : (Auth::guard('user')->check() ? User::class : null);
+    }
+    
 }

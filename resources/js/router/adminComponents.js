@@ -63,17 +63,18 @@ export { default as ProblemNoteEdit } from "../Pages/Admin/ProblemNote/Edit.vue"
 export { default as ProblemNoteTrash } from "../Pages/Admin/ProblemNote/Trash.vue";
 
 //Cause Components
-export { default as CauseIndex } from "../Pages/Admin/Cause/Index.vue";
-export { default as CauseCreate } from "../Pages/Admin/Cause/Create.vue";
-export { default as CauseEdit } from "../Pages/Admin/Cause/Edit.vue";
-export { default as CauseTrash } from "../Pages/Admin/Cause/Trash.vue";
+export { default as FishboneCategoryIndex } from "../Pages/Admin/FishboneCategory/Index.vue";
+export { default as FishboneCategoryCreate } from "../Pages/Admin/FishboneCategory/Create.vue";
+export { default as FishboneCategoryEdit } from "../Pages/Admin/FishboneCategory/Edit.vue";
+export { default as FishboneCategoryTrash } from "../Pages/Admin/FishboneCategory/Trash.vue";
 
 //Effect Components
-export { default as EffectIndex } from "../Pages/Admin/Effects/Index.vue";
-export { default as EffectCreate } from "../Pages/Admin/Effects/Create.vue";
-export { default as EffectEdit } from "../Pages/Admin/Effects/Edit.vue";
-export { default as EffectTrash } from "../Pages/Admin/Effects/Trash.vue";
+export { default as CausesIndex } from "../Pages/Admin/Causes/Index.vue";
+export { default as CausesCreate } from "../Pages/Admin/Causes/Create.vue";
+export { default as CausesEdit } from "../Pages/Admin/Causes/Edit.vue";
+export { default as CausesTrash } from "../Pages/Admin/Causes/Trash.vue";
 
+export { default as FishboneDigrameIndex } from "../Pages/Admin/FishboneDigrame/Index.vue";
 
 
 

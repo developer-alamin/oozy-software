@@ -22,7 +22,9 @@ use App\Http\Controllers\Admin\BreakdownServiceController;
 use App\Http\Controllers\Auth\UserAuthController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CauseController;
+use App\Http\Controllers\Admin\CausesController;
 use App\Http\Controllers\Admin\EffectController;
+use App\Http\Controllers\Admin\FishboneCategoryController;
 use App\Http\Controllers\Admin\MachineMovementController;
 use App\Http\Controllers\Admin\MachineRequisitionController;
 use App\Http\Controllers\Admin\MechineAssingController;
@@ -43,6 +45,13 @@ use App\Http\Controllers\OperatorController;
 use App\Models\BreakdownService;
 use App\Models\MechineAssing;
 
+
+
+
+
+
+
+Route::get("fishbone-digrame",[DynamicDataController::class,"fishboneDigrame"]);
 
 //Machine Requisition Group Controller
 
@@ -383,9 +392,21 @@ Route::controller(ProblemNoteController::class)
 
 Route::resource('problemnote', ProblemNoteController::class);
 
+//Fishbone Category Route Controller 
+Route::controller( FishboneCategoryController::class)
+    ->prefix("fishbone-categories")
+    ->as("fishbone-categories.")
+    ->group(function () {
+        Route::get('/trashed', 'trashed')->name('trashed');
+        Route::get('/trashed-count', 'trashed_count')->name('trashed-count');
+        Route::post('{uuid}/restore', 'restore')->name('restore');
+        Route::delete('{uuid}/force-delete', 'forceDelete')->name('forceDelete');
+  });
 
-//Cause Route Controller 
-Route::controller(CauseController::class)
+Route::resource('fishbone-category', FishboneCategoryController::class);
+
+// Cause Route Controller
+Route::controller(CausesController::class)
     ->prefix("causes")
     ->as("causes.")
     ->group(function () {
@@ -393,22 +414,9 @@ Route::controller(CauseController::class)
         Route::get('/trashed-count', 'trashed_count')->name('trashed-count');
         Route::post('{uuid}/restore', 'restore')->name('restore');
         Route::delete('{uuid}/force-delete', 'forceDelete')->name('forceDelete');
-    });
+});
 
-Route::resource('cause', CauseController::class);
-
-// Effect Route Controller
-Route::controller(EffectController::class)
-    ->prefix("effects")
-    ->as("effects.")
-    ->group(function () {
-        Route::get('/trashed', 'trashed')->name('trashed');
-        Route::get('/trashed-count', 'trashed_count')->name('trashed-count');
-        Route::post('{uuid}/restore', 'restore')->name('restore');
-        Route::delete('{uuid}/force-delete', 'forceDelete')->name('forceDelete');
-    });
-
-Route::resource('effect', EffectController::class);
+Route::resource('cause', CausesController::class);
 
 // --------------------------------------------Factory route statr here-------------------------------------------------------------------
 
@@ -482,6 +490,7 @@ Route::get('/get_parts', [DynamicDataController::class, 'getParts']);
 Route::get("/get_actions",[DynamicDataController::class,"get_actions"])->name("get_actions");
 Route::get("/get_problemnotes",[DynamicDataController::class,"get_problemNotes"])->name("get_problemNotes");
 Route::get("/get_causes",[DynamicDataController::class,"get_causes"])->name("get_causes");
+Route::get("/get-fishbone-category",[DynamicDataController::class,"getFishboneCategory"]);
 
 // Admin Auth Routes
 Route::prefix('admin')->group(function () {
@@ -526,13 +535,12 @@ Route::controller(MobileApiController::class)
 
   //Operator Flow Api
   Route::prefix('operator')->group(function () {
-    Route::get('machine-code',"operatormachinecodebydata");
+    Route::post('machine-code',"operatormachinecodebydata");
     Route::post("machine-report","operatormachinereport");
     Route::get('all-machine-breakdown',"operatorallmachinebreakdown");
-    Route::get('pending',"operatorbreakdownservicepending");
-    Route::get('processing',"operatorbreakdownserviceprocessing");
-    Route::get('done',"operatorbreakdownservicedone");
-    Route::get('cencel',"operatorbreakdownservicecencel");
+
+    Route::get("{status}/check","operatorbreakdownservicecheck");
+
     Route::post('decline',"operatorbreakdownservicedecline");
     Route::post('resolve',"operatorbreakdownserviceresolve");
   });

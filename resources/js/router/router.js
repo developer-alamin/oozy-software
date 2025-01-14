@@ -523,6 +523,13 @@ const routes = [
       },
       //problem note Route
       {
+        path: "fishbone-digrame/index", 
+        name: "FishboneDigrameIndex",
+        component: adminComponents.FishboneDigrameIndex,
+        meta: { title: "Fishbone Digrame Index Page" },
+      },
+      //problem note Route
+      {
         path: "problem-note/index", 
         name: "ProblemNoteIndex",
         component: adminComponents.ProblemNoteIndex,
@@ -548,53 +555,53 @@ const routes = [
       },
       //Cause Route
       {
+        path: "fishbone/category/index", 
+        name: "FishboneCategoryIndex",
+        component: adminComponents.FishboneCategoryIndex,
+        meta: { title: "Fishbone Category Index Page" },
+      },
+      {
+        path: "fishbone/category/create", 
+        name: "FishboneCategoryCreate",
+        component: adminComponents.FishboneCategoryCreate,
+        meta: { title: "Fishbone Category Create Page" },
+      },
+      {
+        path: "fishbone/category/:uuid/edit", 
+        name: "FishboneCategoryEdit",
+        component: adminComponents.FishboneCategoryEdit,
+        meta: { title: "Fishbone Category Edit Page" },
+      },
+      {
+        path: "fishbone/category/trash", 
+        name: "FishboneCategoryTrash",
+        component: adminComponents.FishboneCategoryTrash,
+        meta: { title: "Fishbone Category Trash Page" },
+      },
+      //Cause Route
+      {
         path: "cause/index", 
-        name: "CauseIndex",
-        component: adminComponents.CauseIndex,
+        name: "CausesIndex",
+        component: adminComponents.CausesIndex,
         meta: { title: "Cause Index Page" },
       },
       {
         path: "cause/create", 
-        name: "CauseCreate",
-        component: adminComponents.CauseCreate,
+        name: "CausesCreate",
+        component: adminComponents.CausesCreate,
         meta: { title: "Cause Create Page" },
       },
       {
         path: "cause/:uuid/edit", 
-        name: "CauseEdit",
-        component: adminComponents.CauseEdit,
+        name: "CausesEdit",
+        component: adminComponents.CausesEdit,
         meta: { title: "Cause Edit Page" },
       },
       {
         path: "cause/trash", 
-        name: "CauseTrash",
-        component: adminComponents.CauseTrash,
+        name: "CausesTrash",
+        component: adminComponents.CausesTrash,
         meta: { title: "Cause Trash Page" },
-      },
-      //Effect Route
-      {
-        path: "effect/index", 
-        name: "EffectIndex",
-        component: adminComponents.EffectIndex,
-        meta: { title: "Effect Index Page" },
-      },
-      {
-        path: "effect/create", 
-        name: "EffectCreate",
-        component: adminComponents.EffectCreate,
-        meta: { title: "Effect Create Page" },
-      },
-      {
-        path: "effect/:uuid/edit", 
-        name: "EffectEdit",
-        component: adminComponents.EffectEdit,
-        meta: { title: "Effect Edit Page" },
-      },
-      {
-        path: "effect/trash", 
-        name: "EffectTrash",
-        component: adminComponents.EffectTrash,
-        meta: { title: "Effect Trash Page" },
       },
       // brand
       {

@@ -101,57 +101,54 @@ class MachineRequisitionController extends Controller
         $lineId = $request->input('line', '');
         
         if ($lineId) {
-            // requisition টেবিলের line_id অনুযায়ী ফিল্টার করা
-            $machineTypesWithSum = Requisition::where('line_id', $lineId) // requisition টেবিলের line_id অনুযায়ী ফিল্টার
-                ->with(['requisitionDetails.machineType'])  // requisitionDetails এবং machineType সম্পর্ক লোড করা
+            $machineTypesWithSum = Requisition::where('line_id', $lineId) 
+                ->with(['requisitionDetails.machineType'])  
                 ->get()
                 ->flatMap(function ($requisition) {
-                    // requisitionDetails থেকে mc এর মান সংগ্রহ করা
+
                     return $requisition->requisitionDetails->map(function ($detail) {
                         return [
-                            'machine_type_id' => $detail->machine_type_id,  // মেশিন টাইপ আইডি
-                            'mc' => $detail->mc, // mc মান
-                            'machineType' => $detail->machineType->name, // মেশিন টাইপ নাম
+                            'machine_type_id' => $detail->machine_type_id, 
+                            'mc' => $detail->mc, 
+                            'machineType' => $detail->machineType->name, 
                         ];
                     });
                 })
-                ->groupBy('machine_type_id') // machine_type_id অনুযায়ী গ্রুপ করা
+                ->groupBy('machine_type_id')
                 ->map(function ($items, $machineTypeId) {
-                    // mc_sum গণনা এবং নাম নির্ধারণ
-                    $mcSum = $items->sum('mc');  // mc এর যোগফল
-                    $name = $items->first()['machineType'];  // প্রথম আইটেমের machineType নাম
+                    
+                    $mcSum = $items->sum('mc');  
+                    $name = $items->first()['machineType'];  
             
                     return [
                         'machine_type_id' => $machineTypeId,
-                        'mc_sum' => $mcSum,  // mc যোগফল
-                        'name' => $name,  // মেশিন টাইপ নাম
+                        'mc_sum' => $mcSum,  
+                        'name' => $name,  
                     ];
                 })
                 ->values();
         } else {
-            // line_id না থাকলে সমস্ত requisition ডেটা রিটার্ন করা
             $machineTypesWithSum = Requisition::with(['requisitionDetails.machineType']) // requisitionDetails এবং machineType সম্পর্ক লোড করা
                 ->get()
                 ->flatMap(function ($requisition) {
-                    // requisitionDetails থেকে mc এর মান সংগ্রহ করা
                     return $requisition->requisitionDetails->map(function ($detail) {
                         return [
-                            'machine_type_id' => $detail->machine_type_id,  // মেশিন টাইপ আইডি
-                            'mc' => $detail->mc, // mc মান
-                            'machineType' => $detail->machineType->name, // মেশিন টাইপ নাম
+                            'machine_type_id' => $detail->machine_type_id,  
+                            'mc' => $detail->mc, 
+                            'machineType' => $detail->machineType->name, 
                         ];
                     });
                 })
-                ->groupBy('machine_type_id') // machine_type_id অনুযায়ী গ্রুপ করা
+                ->groupBy('machine_type_id')
                 ->map(function ($items, $machineTypeId) {
-                    // mc_sum গণনা এবং নাম নির্ধারণ
-                    $mcSum = $items->sum('mc');  // mc এর যোগফল
-                    $name = $items->first()['machineType'];  // প্রথম আইটেমের machineType নাম
+                   
+                    $mcSum = $items->sum('mc'); 
+                    $name = $items->first()['machineType'];  
             
                     return [
                         'machine_type_id' => $machineTypeId,
-                        'mc_sum' => $mcSum,  // mc যোগফল
-                        'name' => $name,  // মেশিন টাইপ নাম
+                        'mc_sum' => $mcSum,  
+                        'name' => $name,  
                     ];
                 })
                 ->values();
@@ -159,45 +156,15 @@ class MachineRequisitionController extends Controller
         
         // Manually Paginate the results
         $machineTypesWithSumCollection = collect($machineTypesWithSum); // Convert to Collection
-        
+        $totalMcSum = $machineTypesWithSum->sum('mc_sum');
         $paginatedItems = $machineTypesWithSumCollection->forPage($page, $itemsPerPage); // Manually paginate
         
         // Return paginated response
         return response()->json([
-            'items' => $paginatedItems, // Data for the current page
-            'total' => $machineTypesWithSumCollection->count(), // Total number of items
-            'current_page' => (int)$page, // Current page number
-            'total_pages' => ceil($machineTypesWithSumCollection->count() / $itemsPerPage), // Total number of pages
+            "total_sum" => $totalMcSum,
+            'items' => $paginatedItems,
+            'total' => $machineTypesWithSumCollection->count(), 
         ]);
-        
-        
-        
-        
-      
-        
-       
-
-        // // Build the query for MechineType
-        // $typeQuery = MechineType::query()
-        //     ->where('mechine_types.creator_type', $className) // Filter by creator_type
-        //     ->where('mechine_types.creator_id', $currentUser->id) // Filter by creator_id
-        //     ->leftJoin('requisition_details', 'mechine_types.id', '=', 'requisition_details.machine_type_id') // Join with requisition_details
-        //     ->select(
-        //         'mechine_types.id',
-        //         'mechine_types.name',
-        //         DB::raw('COALESCE(SUM(requisition_details.mc), 0) as total_mc') // Calculate sum of 'mc', fallback to 0 if null
-        //     )
-        //     ->groupBy('mechine_types.id', 'mechine_types.name'); // Group by id and name
-
-        // // Apply sorting and pagination
-        // $types = $typeQuery
-        //     ->paginate($itemsPerPage); // Paginate the results
-
-        // Return paginated response
-        // return response()->json([
-        //     'items' => $types->items(), // Data for the current page
-        //     'total' => $types->total(), // Total number of items
-        // ]);
     }
 
 

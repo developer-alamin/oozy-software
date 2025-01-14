@@ -46,4 +46,10 @@ class ProblemNote extends Model
     {
         return $this->morphTo();
     }
+    public function fisbone_categories()
+    {
+        return $this->hasMany(FishboneCategory::class,"problem_note_id","id");
+    }
+   
 }
+
