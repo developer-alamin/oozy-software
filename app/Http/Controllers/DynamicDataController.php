@@ -753,7 +753,6 @@ class DynamicDataController extends Controller
         $problem  = ProblemNote::where('id', $id)
         ->where("creator_id", $currentUser->id)
         ->where("creator_type", $creatorType)
-        ->whereHas('fishbone_categories') 
         ->with(["fishbone_categories.causes"])
         ->first();
         return response()->json($problem,Response::HTTP_OK);

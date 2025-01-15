@@ -10,9 +10,9 @@
      :key="`group1-${index}`">
         <div class="rootcause blue">{{ category.name }}</div>
         <div class="subcause">
-          <div class="stat">p1</div>
-          <div class="stat">P2</div>
-          <div class="stat">P3</div>
+          <div v-for="(cause,index) in category.causes" :key="index" class="stat">
+            {{ cause.name }}
+          </div>
         </div>
       </div>
 
@@ -21,14 +21,12 @@
      v-for="(category, index) in item?.fishbone_categories.filter((_, i) => i % 2 !== 0)" 
      :key="`group2-${index}`">
         <div class="subcause">
-          <div class="stat">P1</div>
-          <div class="stat">P2</div>
-          <div class="stat">P3</div>
+          <div v-for="(cause,index) in category.causes" :key="index" class="stat">
+            {{ cause.name }}
+          </div>
         </div>
         <div class="rootcause blue">{{ category.name }}</div>
       </div>
-
-
       <div class="defect">
         <v-autocomplete
           v-model="item.id"
@@ -92,12 +90,11 @@ export default {
         const response = await this.$axios.get("/fishbone-digrame", {
           params: { search: this.search },  // Use the provided search term
         });
-        // Ensure `items` is not empty initially
+
+
         if (this.items.length === 0 && response.data.length > 0) {
-          // Push the first item to `items` when it's the first time data is loaded
           this.items.push(response.data[0]);
         }
-        // Update problems list for the autocomplete dropdown
         this.problems = response.data || [];
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -111,6 +108,8 @@ export default {
       try {
         this.lodding = true;
         const response = await this.$axios.get(`/problemby/${problem}/fishbone-category`);
+        console.log(response.data); 
+        
         if (response.data) {
           this.items[index] = response.data;
         }else{
