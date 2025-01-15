@@ -1,90 +1,45 @@
 <template>
+  <div class="loadding_warrper" v-if="lodding">
+    <span class="loader"></span>
+  </div>
   <div class="fishbone_items">
-    <div class="fishbone-item" v-for="(item, index) in items" :key="index">
-      <div class="cause">
-        <div class="rootcause blue">Mensch</div>
+    <div class="fishbone-item  pb-5" v-for="(item, index) in items" :key="index">
+    
+      <div class="cause" 
+     v-for="(category, index) in item?.fishbone_categories.filter((_, i) => i % 2 === 0)" 
+     :key="`group1-${index}`">
+        <div class="rootcause blue">{{ category.name }}</div>
         <div class="subcause">
-          <div class="leftstart">
-            <span class="span">P1</span>
-          </div>
-          <div class="stat">
-            <div class="stat-text">P1</div>
-            <div class="sub-stat">S1</div>
-          </div>
-          <div class="leftstart">
-            <span class="span">P1</span>
-          </div>
-          <div class="stat">P1</div>
-          <div class="stat">P1</div>
-        </div>
-      </div>
-
-      <div class="cause">
-        <div class="rootcause green">Maschine</div>
-        <div class="subcause">
-          <div class="stat">P1</div>
-          <div class="leftstart">
-            <span class="span">P1</span>
-          </div>
-          <div class="stat">P1</div>
-        </div>
-        <div class="subcause">
-          <div class="leftstart">
-            <span class="span">P1</span>
-          </div>
-          <div class="stat">P1</div>
-        </div>
-      </div>
-      <div class="cause">
-        <div class="rootcause yellow">Milieu</div>
-        <div class="subcause">
-          <div class="stat">P1</div>
-          <div class="stat">P1</div>
-          <div class="stat">P1</div>
-          <div class="stat">P1</div>
-          <div class="stat">P1</div>
+          <div class="stat">p1</div>
+          <div class="stat">P2</div>
+          <div class="stat">P3</div>
         </div>
       </div>
 
       <div class="line"></div>
-      <div class="cause">
+      <div class="cause" 
+     v-for="(category, index) in item?.fishbone_categories.filter((_, i) => i % 2 !== 0)" 
+     :key="`group2-${index}`">
         <div class="subcause">
           <div class="stat">P1</div>
-          <div class="stat">P1</div>
-          <div class="stat">P1</div>
+          <div class="stat">P2</div>
+          <div class="stat">P3</div>
         </div>
-        <div class="rootcause blue">Messung</div>
+        <div class="rootcause blue">{{ category.name }}</div>
       </div>
-      <div class="cause">
-        <div class="subcause">
-          <div class="leftstart">
-            <span class="span">P1</span>
-          </div>
-          <div class="stat">P1</div>
-          <div class="stat">P1</div>
-        </div>
-        <div class="rootcause green">Material</div>
-      </div>
-      <div class="cause">
-        <div class="subcause">
-          <div class="leftstart">
-            <span class="span">P1</span>
-          </div>
-          <div class="stat">P1</div>
-          <div class="stat">P1</div>
-        </div>
-        <div class="rootcause yellow">Methoden</div>
-      </div>
+
+
       <div class="defect">
         <v-autocomplete
-          v-model="category.company_id"
-          :items="companies"
+          v-model="item.id"
+          :items="problems"
           item-value="id"
           item-title="name"
           outlined
           clearable
           density="comfortable"
-          @update:search="fetchCompanies"
+          @update:model-value="fetchCategories($event, index)"
+          @update:search="(search) => fetchProblems(search, index)"
         ></v-autocomplete>
         <v-btn
           @click="createFishbone"
@@ -99,7 +54,20 @@
             <span>Add New Problem</span>
           </v-tooltip>
         </v-btn>
-        
+        <v-btn
+          v-if="index !== 0 && items.length > 1"
+          color="red"
+          icon
+          style="width: 40px; height: 40px"
+          @click="deleteRow(index)"
+        >
+          <v-tooltip location="top" activator="parent">
+            <template v-slot:activator="{ props }">
+              <v-icon v-bind="props" style="font-size: 20px">mdi-delete</v-icon>
+            </template>
+            <span>Delete Problem</span>
+          </v-tooltip>
+        </v-btn>
       </div>
     </div>
   </div>
@@ -109,36 +77,108 @@
 export default {
   data() {
     return {
-      items: [1], // Array to hold fishbone items
-      category: {
-        company_id: null, // Default to null for better flexibility
-        status: null,
-        description: "",
+      items: [], 
+      fishbone: {
+        problems: [], 
       },
-      companies: [], // Holds fetched companies
+      problems: [], 
+      lodding:false,
     };
   },
   methods: {
-    async fetchData() {
+    async fetchProblems(search, index) {
       try {
-        const response = await this.$axios.get("/fishbone-digrame");
-        this.companies = response.data || [];
+        
+        const response = await this.$axios.get("/fishbone-digrame", {
+          params: { search: this.search },  // Use the provided search term
+        });
+        // Ensure `items` is not empty initially
+        if (this.items.length === 0 && response.data.length > 0) {
+          // Push the first item to `items` when it's the first time data is loaded
+          this.items.push(response.data[0]);
+        }
+        // Update problems list for the autocomplete dropdown
+        this.problems = response.data || [];
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } 
+    },
+    async fetchCategories(problem, index) {
+
+      if (!problem) {
+        return;
+      }
+      try {
+        this.lodding = true;
+        const response = await this.$axios.get(`/problemby/${problem}/fishbone-category`);
+        if (response.data) {
+          this.items[index] = response.data;
+        }else{
+          this.items.push(Object.assign({}, this.items[0])); // Copy the first item
+        }
+        this.lodding = false;
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     },
     async createFishbone() {
-     this.items.push(1);
-      
+      this.items.push(Object.assign({}, this.items[0])); // Copy the first item
+    },  
+    async deleteRow(index) {
+      this.items.splice(index, 1); // Delete a specific row
     },
   },
   created() {
-    this.fetchData(); // Fetch initial data when component is created
+    this.fetchProblems(); // Fetch initial data when component is created
   },
 };
 </script>
 
 <style scoped>
+
+.loader {
+  width: 67px;
+    height: 67px;
+    border-radius: 50%;
+    display: inline-block;
+    position: relative;
+    background: linear-gradient(0deg, rgb(255 255 255 / 0%) 33%, #06f036 100%);
+    box-sizing: border-box;
+    animation: rotation-4ef4078a 1s linear infinite;
+
+}
+.loader::after {
+  content: '';
+    box-sizing: border-box;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #5d518c;
+}
+@keyframes rotation {
+  0% { transform: rotate(0deg) }
+  100% { transform: rotate(360deg)}
+} 
+      .loadding_warrper {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    right: 0;
+    left: 0;
+    z-index: 11111;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.6;
+}
+   
+
 .fishbone-item {
       display: inline-grid;
       grid-template-columns: repeat(4, auto);

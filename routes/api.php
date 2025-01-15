@@ -52,6 +52,7 @@ use App\Models\MechineAssing;
 
 
 Route::get("fishbone-digrame",[DynamicDataController::class,"fishboneDigrame"]);
+Route::get('problemby/{id}/fishbone-category', [DynamicDataController::class,"problemByFishboneCategory"]);
 
 //Machine Requisition Group Controller
 
@@ -401,8 +402,7 @@ Route::controller( FishboneCategoryController::class)
         Route::get('/trashed-count', 'trashed_count')->name('trashed-count');
         Route::post('{uuid}/restore', 'restore')->name('restore');
         Route::delete('{uuid}/force-delete', 'forceDelete')->name('forceDelete');
-  });
-
+});
 Route::resource('fishbone-category', FishboneCategoryController::class);
 
 // Cause Route Controller

@@ -667,7 +667,7 @@ class DynamicDataController extends Controller
 
     }
 
-    public function fishboneDigrame(Request $request, $ids = "")
+    public function fishboneDigrame(Request $request,   $ids = "")
     {
         
         $currentUser = $this->getAuthenticatedUser();
@@ -687,12 +687,13 @@ class DynamicDataController extends Controller
         $problemNotes = ProblemNote::query();
 
         if ($search) {
-            $problemNotes = ProblemNote::where('name', 'like', '%' . $search . '%'); // Assuming 'name' is a column in the ProblemNote model
+            $problemNotes = $problemNotes->where('name', 'like', '%' . $search . '%'); // Assuming 'name' is a column in the ProblemNote model
+            
         }
 
         $problemNotes = $problemNotes->where("creator_id", $currentUser->id)
         ->where("creator_type", $creatorType)
-        ->with(["fisbone_categories.causes"])
+        ->with(["fishbone_categories.causes"])
         ->limit($limit)
         ->get();
 
@@ -737,6 +738,26 @@ class DynamicDataController extends Controller
         return response()->json([
             'items' => $categories
         ], Response::HTTP_OK);
+    }
+
+    public function problemByFishboneCategory($id){
+        $currentUser = $this->getAuthenticatedUser();
+        if (!$currentUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        $creatorType = $this->getCreatorType();
+
+        if (!$id) {
+            return response()->json(['error' => 'Problem Id not found'], 404);  
+        }
+        $problem  = ProblemNote::where('id', $id)
+        ->where("creator_id", $currentUser->id)
+        ->where("creator_type", $creatorType)
+        ->whereHas('fishbone_categories') 
+        ->with(["fishbone_categories.causes"])
+        ->first();
+        return response()->json($problem,Response::HTTP_OK);
+
     }
     
     // Helper method to get authenticated user
