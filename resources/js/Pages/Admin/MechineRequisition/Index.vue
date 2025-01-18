@@ -2,7 +2,7 @@
   <v-card>
     <v-card-title class="pt-5">
       <v-row class="align-items-center">
-        <v-col cols="4">
+        <v-col cols="3">
           <v-autocomplete
             v-model="factory"
             :items="factories"
@@ -39,7 +39,7 @@
       @update:options="loadItems"
     >
     <template v-slot:item.requisition="{ item }">
-        <span>{{ item.requisition.total ?? "N\A"  }}</span>
+        <span>{{ item.requisition.total ?? "N\A" }}</span>
     </template>
   </v-data-table-server>
   </v-card>
@@ -80,6 +80,7 @@
                 outlined
                 clearable
                 density="comfortable"
+                :rules="[rules.required]"
               />
             </v-col>
             <v-col cols="12" md="6">
@@ -88,6 +89,7 @@
                 label="Style"
                 type="text"
                 density="comfortable"
+                :rules="[rules.required]"
               />
             </v-col>
             <v-col cols="12" md="6">
@@ -110,20 +112,41 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="(item, index) in requisition.types" :key="index">
-                    <td>{{ item.name }}</td>
-                    <td>
-                      <input
-                        type="number"
-                        v-model.number="item.mc"
-                        class="form-control"
-                        placeholder="Enter M/C"
-                        @input="updateTotal"
-                      />
-                    </td>
-                  </tr>
+                  <!-- If requisition.types is not empty -->
+                  <template v-if="requisition.types && requisition.types.length > 0">
+                    <tr v-for="(item, index) in requisition.types" :key="index">
+                      <td>{{ item.name }}</td>
+                      <td>
+                        <v-text-field
+                            type="number"
+                            v-model="item.mc"
+                            :rules="[rules.required]"
+                            label="Enter M/C"
+                            outlined
+                            clearable
+                            density="comfortable"
+                            @input="updateTotal"
+                          >
+                            <template v-slot:label>
+                              Enter M/C<span style="color: red">*</span>
+                            </template>
+                          </v-text-field>
+
+                      </td>
+                    </tr>
+                  </template>
+
+                  <!-- If requisition.types is empty -->
+                  <template v-else>
+                    <tr>
+                      <td colspan="2" style="text-align: center; color: red;">
+                        No machine types available. Please add at least one type.
+                      </td>
+                    </tr>
+                  </template>
                 </tbody>
               </table>
+
             </v-col>
           </v-row>
           <v-row class="justify-end">
@@ -131,10 +154,10 @@
               <v-btn color="danger" @click="dialog = false">Cancel</v-btn>
               <v-btn 
                color="primary"
-               :disabled="!requisitionValid || loading"
-                :loading="loading"
-                 type="submit"
-                 >Save</v-btn>
+               :disabled="!requisitionValid || loading || requisition.types.length === 0"
+               :loading="loading"
+               type="submit"
+               >Save</v-btn>
             </v-card-actions>
           </v-row>
         </v-form>
@@ -157,9 +180,9 @@ export default {
       requisitionValid: false,
       itemsPerPage: 15,
       headers: [
-        { title: "Unit", value: "unit.name", sortable: true },
+        { title: "Unit", value: "unit.name", sortable: false },
         { title: "Line", value: "name", sortable: true },
-        { title: "M/C", value: "total", sortable: true },
+        { title: "M/C", value: "total", sortable: false },
       ],
       requisition: {
         line: null,
@@ -181,18 +204,6 @@ export default {
     };
   },
   methods: {
-    formatDateRange() {
-      if (Array.isArray(this.requisition.dateRange) && this.requisition.dateRange.length > 0) {
-        // Format each date in the array as ISO string
-        const formattedDates = this.requisition.dateRange.map((date) =>
-          new Date(date).toISOString()
-        );
-
-        // Join the formatted dates with commas
-        return formattedDates.join(",");
-      }
-      return ""; // Return an empty string if the dateRange is not valid
-    },
     async loadItems({ page, itemsPerPage, sortBy }) {
       this.loading = true;
       const sortOrder = sortBy.length ? sortBy[0].order : "desc";
@@ -225,14 +236,11 @@ export default {
       const formData = new FormData();
       Object.entries(this.requisition).forEach(([key, value]) => {
         if (key === "types") {
-          // Convert the `types` array to a JSON string for submission
           formData.append(key, JSON.stringify(value));
         } else if (key === "dateRange" && Array.isArray(value) && value.length > 0) {
-          // Format the `dateRange` as a comma-separated string
           const formattedDateRange = value.map((date) => new Date(date).toISOString()).join(",");
           formData.append(key, formattedDateRange);
         } else {
-          // Add other fields as-is
           formData.append(key, value);
         }
       });
@@ -240,9 +248,8 @@ export default {
       this.$axios
         .post("/machine-requisition/store-requisition", formData)
         .then((response) => {
-          console.log(response.data);
-
           if (response.data.success) {
+            this.resetForm();
             toast.success("Requisition created successfully.");
             this.dialog = false;
             this.loadItems({ page: 1, itemsPerPage: this.itemsPerPage, sortBy: [] });
@@ -255,7 +262,6 @@ export default {
         .finally(() => {
           this.loading = false;
         });
-
     },
     addRequisition() {
       this.dialog = true;
@@ -283,35 +289,46 @@ export default {
       }
     },
     async fetchMachineTypes() {
-
       if (!this.requisition.line) {
-         this.lines = [];
+        this.requisition.types = [];
         return;
       }
-
       try {
-        const response = await this.$axios.get(`/machine-requisition/machine-types`,);
-
-      console.log(response.data);
-      
-        this.requisition.types = response.data.map((item) => ({
-          id: item.id,
-          name: item.name,
-          mc: 0,
-        }));
+        const response = await this.$axios.get(`/machine-requisition/machine-types`, {
+          params: { line: this.requisition.line },
+        });
+        this.requisition.types = response.data.machine_types || [];
       } catch (error) {
         console.error("Error fetching machine types:", error);
         toast.error("Failed to fetch machine types.");
       }
     },
     updateTotal() {
-      this.requisition.total = this.requisition.types.reduce((acc, item) => acc + item.mc, 0);
+      this.requisition.total = this.requisition.types.reduce((acc, item) => {
+        const mc = parseFloat(item.mc) || 0;
+        return acc + mc;
+      }, 0);
     },
     formatFactory(factory) {
       if (!factory) return "No Factory Data";
       const factoryName = factory.name || "No Factory Name";
       const userName = factory.company?.name || "No Company";
       return `${factoryName} -- ${userName}`;
+    },
+    resetForm() {
+      if (this.$refs.createRequisition) {
+        this.$refs.createRequisition.resetValidation(); // Reset the form via its ref if necessary
+        this.requisition = {
+          line: "",
+          dateRange: "",
+          style: '',
+          types: [],
+        };
+        this.errors = {}; // Reset errors on form reset
+      }
+
+    
+      
     },
   },
   watch: {
@@ -326,21 +343,9 @@ export default {
     this.fetchMachineTypes();
     this.loadItems({ page: 1, itemsPerPage: this.itemsPerPage, sortBy: [] });
   },
-
-   resetForm() {
-      this.requisition = {
-          line: "",
-          dateRange: "",
-          style:'',
-          types:'',
-      };
-      this.errors = {}; // Reset errors on form reset
-      if (this.$refs.createRequisition) {
-          this.$refs.createRequisition.reset(); // Reset the form via its ref if necessary
-      }
-  },
 };
 </script>
+
 
 <style scoped>
 /* Add styles if necessary */

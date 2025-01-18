@@ -273,7 +273,7 @@ class DynamicDataController extends Controller
         // dd( $factoryId);
 
         // Fetch lines through the relationship chain
-        $lines = Line::whereHas('units.floors.factories', function ($query) use ($factoryId) {
+        $lines = Line::whereHas('unit.floor.factories', function ($query) use ($factoryId) {
             $query->where('id', $factoryId);
         })
         ->select('id', 'name') // Select only necessary columns

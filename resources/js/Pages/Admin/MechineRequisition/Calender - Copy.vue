@@ -22,15 +22,20 @@
           {{ cell.value }}
         </td>
       </tr>
-      
-       <!-- Summary Row (Sum of Each Column) -->
-      <tr class="text-center font-weight-bold">
+       <!-- Dynamic Data Rows -->
+       <tr v-for="(row, rowIndex) in rowData" :key="rowIndex" class="text-center">
         <td
-          v-for="(sum, index) in columnSums"
-          :key="index"
-          :style="{ backgroundColor: 'lightgray' }"
+          v-for="(cell, cellIndex) in row"
+          :key="cellIndex"
+          :style="{ backgroundColor: cell.color || 'transparent' }"
         >
-          {{ sum }}
+          {{ cell.value }}
+        </td>
+      </tr>
+      <!-- Footer row displaying sums -->
+      <tr class="footerTable">
+        <td v-for="(date, index) in dates" :key="'footer-' + index" class="sum-cell">
+          {{ getPairSum(index) }}
         </td>
       </tr>
     </table>
@@ -273,21 +278,6 @@ export default {
   created() {
     this.loadItems({ page: 1, itemsPerPage: this.itemsPerPage, sortBy: [] });
   },
-  computed : {
-    columnSums() {
-      // Initialize an array with zero values for each column
-      const sums = Array(this.rowData[0]?.length || 0).fill(0);
-
-      // Loop through each row and add the values to corresponding columns
-      this.rowData.forEach((row) => {
-        row.forEach((cell, index) => {
-          sums[index] += cell.value || 0; // Add the value (default to 0 if undefined)
-        });
-      });
-
-      return sums;
-    },
-  }
 };
 </script>
 

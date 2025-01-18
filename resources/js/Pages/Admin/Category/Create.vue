@@ -1,5 +1,5 @@
 <template>
-    <v-card outlined class="mx-auto my-5" max-width="">
+    <v-card outlined class="mx-auto my-5">
         <v-card-title>Create category</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="submit">

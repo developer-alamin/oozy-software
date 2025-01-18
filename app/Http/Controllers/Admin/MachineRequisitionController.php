@@ -168,7 +168,7 @@ class MachineRequisitionController extends Controller
     }
 
 
-    public function MachineTypes(Request $request)
+    public function lineWiseMachineTypes(Request $request)
     {   
         $currentUser = $this->getAuthentiCreator();
         if (!$currentUser) {
@@ -178,19 +178,28 @@ class MachineRequisitionController extends Controller
         $className = get_class($currentUser);
         $line_id = $request->input("line",'');
 
-       // $line = Line::with(["requisitions.requisition_details"])->findOrFail($line_id);
 
+        $line = Line::with('machines.mechineType')->findOrFail(intval($line_id));
 
-       // return response()->json($line,200);
+        $groupedMachines = $line->machines->groupBy(function ($machine) {
+            return $machine->mechineType->id;
+        });
 
-        $machineTypes = MechineType::query();
-        $machineTypes = $machineTypes->where('creator_type', $className)
-        ->where('creator_id', $currentUser->id)
-        ->select('id', 'name')
-        ->get()
-        ->toArray();
-        
-        return response()->json($machineTypes, 200);
+        $result = [
+            'machine_types' => $groupedMachines->map(function ($machines, $machineTypeId) {
+                $machineType = $machines->first()->mechineType;
+                return [
+                    'id' => $machineType->id,
+                    'name' => $machineType->name,
+                    "mc" => 0,
+                ];
+            })->values(),
+            'machines' => $groupedMachines->map(function ($machines, $machineTypeId) {
+                return $machines->values();
+            })->values()
+        ];
+
+        return response()->json($result, 200);
     }
 
 

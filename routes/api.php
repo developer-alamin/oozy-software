@@ -64,7 +64,7 @@ Route::controller(MachineRequisitionController::class)
     Route::post("store-requisition","StoreRequisition");
     Route::get("lines","Lines");
     Route::get("/machine-calender","machineCalender");
-    Route::get("machine-types","MachineTypes");
+    Route::get("machine-types","lineWiseMachineTypes");
 });
 
 

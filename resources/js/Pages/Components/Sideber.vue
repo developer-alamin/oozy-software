@@ -789,7 +789,12 @@ const isPreventiveServiceRouteShow = computed(() => {
     "PreventiveServiceCreate",
     "PreventiveServiceIndex",
     "PreventiveServiceEdit",
+    "AssignToTechnicianPreventiveService",
+    "PreventiveServiceStart",
+    "PreventiveServiceStartDetails",
     "PreventiveServiceTrash",
+    "PreventiveServiceDetailsList",
+    "SignleServiceDetails"
   ].includes(route.name);
 });
 
@@ -949,6 +954,10 @@ const isMachineManageSettingsRouteShow = computed(() => {
     "MechineSourceIndex",
     "MechineSourceCreate",
     "MechineSourceEdit",
+    "MachineStatusIndex",
+    "MachineStatusCreate",
+    "MachineStatusEdit",
+    "MachineStatusTrash"
   ].includes(route.name);
 });
 const isBrandRoute = computed(() =>
