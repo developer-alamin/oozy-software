@@ -6,17 +6,17 @@
        <v-row>
         <v-col cols="12" >
           <v-autocomplete
-          v-model="line.unit_id"
-          :items="units"
-          item-value="id"
-          :item-title="formatUnit"
-          outlined
-          clearable
-          density="comfortable"
-          :rules="[rules.required]"
-          :error-messages="errors.unit_id ? errors.unit_id : ''"
-          @update:search="fetchUnits"
-        >
+            v-model="line.unit_id"
+            :items="units"
+            item-value="id"
+            :item-title="formatUnit"
+            outlined
+            clearable
+            density="comfortable"
+            :rules="[rules.required]"
+            :error-messages="errors.unit_id ? errors.unit_id : ''"
+            @update:search="fetchUnits"
+          >
           <template v-slot:label>
             Select Unit <span style="color: red">*</span>
           </template>

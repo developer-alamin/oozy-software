@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\HelperController;
 use App\Models\Factory;
 use App\Models\Line;
+use App\Models\MechineAssing;
 use App\Models\MechineType;
 use App\Models\Rent;
 use App\Models\Requisition;
@@ -93,13 +94,105 @@ class MachineRequisitionController extends Controller
         }
         
         $className = get_class($currentUser);
+
+        $machine  = MechineAssing::first();
+
+
+
+
+        $line = '1';  
+        $month = '2025-01';  
+       
+        // Set start and end dates for the given month
+        $startDate = Carbon::parse($month . '-01');
+        $endDate = $startDate->copy()->endOfMonth();
+        $dates = [];
+        for ($date = $startDate; $date <= $endDate; $date->addDay()) {
+            // Format the date to show only the day
+            $dates[] = $date->format('d'); // Only the day part
+        }
+
+        // Query to calculate total required, total assigned, and shortage for each machine type
+        $result = DB::table('requisition_details')
+            ->join('requisitions', 'requisitions.id', '=', 'requisition_details.requisition_id') // Join requisitions table
+            ->leftJoin('mechine_assings', function ($join) {
+                $join->on('requisition_details.machine_type_id', '=', 'mechine_assings.machine_type_id')
+                    ->whereColumn('requisitions.line_id', '=', 'mechine_assings.line_id'); // Match line_id
+            })
+            ->select(
+                'requisition_details.machine_type_id', // Machine type
+                DB::raw('DATE(requisitions.created_at) as date'), // Date
+                DB::raw('SUM(requisition_details.mc) as total_required'), // Sum mc for each requisition_id
+                DB::raw('COUNT(DISTINCT mechine_assings.id) as total_assigned'), // Count unique assignments
+                DB::raw('SUM(requisition_details.mc) - COUNT(DISTINCT mechine_assings.id) as shortage') // Calculate shortage
+            )
+            ->whereRaw('DATE_FORMAT(requisitions.created_at, "%Y-%m") = ?', [$month]) // Filter by year-month
+            ->where('requisitions.line_id', '=', $line) // Filter by line
+            ->groupBy('requisition_details.machine_type_id', 'date') // Group by machine type and date
+            ->get();
+
+        // Map results to include all dates
+        $machineData = [];
+        foreach ($result as $row) {
+            // Convert the date to day format (e.g., 11 from 2025-01-11)
+            $dateOnlyDay = Carbon::parse($row->date)->format('d');
+            
+            $machineData[$row->machine_type_id][$dateOnlyDay] = [
+                'total_required' => $row->total_required,
+                'total_assigned' => $row->total_assigned,
+                'shortage' => $row->shortage,
+            ];
+        }
+
+        // Prepare JSON response data
+        $responseData = [
+            'headers' => $dates, // All dates (now only days) for table headers
+            'rows' => [], // Machine type data
+        ];
+
+        foreach ($machineData as $machineTypeId => $dateData) {
+            $row = [
+                'machine_type' => $machineTypeId,
+                'data' => [],
+            ];
+
+            foreach ($dates as $date) {
+                $row['data'][] = [
+                    'total_required' => $dateData[$date]['total_required'] ?? 0,
+                    'total_assigned' => $dateData[$date]['total_assigned'] ?? 0,
+                    'shortage' => $dateData[$date]['shortage'] ?? 0,
+                ];
+            }
+
+            $responseData['rows'][] = $row;
+        }
+
+        return response()->json($responseData,200);
         
         $page           = $request->input('page', 1);
         $itemsPerPage   = $request->input('itemsPerPage', 5);
         $sortBy         = $request->input('sortBy', 'created_at'); 
         $sortOrder      = $request->input('sortOrder', 'desc');
         $lineId = $request->input('line', '');
-        
+
+
+        $datePicker = $request->input('datePicker','');
+
+        if (!empty($datePicker)) {
+            // Use Carbon to parse the date and extract the month and year
+            $date = Carbon::parse($datePicker);
+
+            // Extract the month as a 2-digit number (01, 02, ..., 12)
+            $month = $date->format('m');  // 'm' gives the 2-digit month
+
+             // Extract the full month name (e.g., January, February)
+             $monthName = $date->format('F');  // 'F' gives the full month name
+             return response()->json($monthName,200);
+
+        }
+
+
+
         if ($lineId) {
             $machineTypesWithSum = Requisition::where('line_id', $lineId) 
                 ->with(['requisitionDetails.machineType'])  

@@ -18,6 +18,22 @@
             </template>
           </v-autocomplete>
         </v-col>
+        <v-col cols="3">
+          <v-autocomplete
+            v-model="unit"
+              :items="units"
+              item-value="id"
+              :item-title="formatUnit"
+              outlined
+              clearable
+              density="comfortable"
+              @update:search="fetchUnits"
+            >
+            <template v-slot:label>
+              Select Unit 
+            </template>
+          </v-autocomplete>
+        </v-col>
         <v-col cols="4" class="text-center ms-auto">
           <v-btn @click="addRequisition" color="primary">
             <v-icon>mdi-plus</v-icon>
@@ -31,6 +47,7 @@
       v-model:items-per-page="itemsPerPage"
       :headers="headers"
       :factory="factory"
+      :unit="unit"
       :items="serverItems"
       :items-length="totalItems"
       :loading="loading"
@@ -176,6 +193,8 @@ export default {
   },
   data() {
     return {
+      search:'',
+      unit:null,
       factory: null,
       requisitionValid: false,
       itemsPerPage: 15,
@@ -194,6 +213,7 @@ export default {
       factories: [],
       serverItems: [],
       lines: [],
+      units: [],
       loading: true,
       totalItems: 0,
       dialog: false,
@@ -216,6 +236,7 @@ export default {
             sortBy: sortKey,
             sortOrder,
             factory: this.factory,
+            unit:this.unit
           },
         });
         this.serverItems = response.data.items || [];
@@ -226,6 +247,35 @@ export default {
       } finally {
         this.loading = false;
       }
+    },
+    async fetchUnits(search) {
+      try {
+        const response = await this.$axios.get(`/get_units`, {
+          params: {
+            search:this.search,
+            limit: this.limit,
+          },
+        });
+        this.units = response.data;
+      } catch (error) {
+        console.error("Error fetching units:", error);
+      }
+    },
+    // Format factory name with user name
+    formatUnit(unit) {
+      if (unit) {
+        // Check if `unit` is a number, and find the corresponding object
+        if (typeof unit === "number") {
+          unit = this.units.find((item) => item.id === unit);
+        }
+        // If the unit is found, process further
+        if (unit) {
+          const unitName = unit.name || "No Unit Name";
+          // Return the formatted string
+          return unitName;
+        }
+      }
+      return "No Unit Data";
     },
     createRequisition() {
       this.requisitionValid = true;
@@ -269,7 +319,7 @@ export default {
     async fetchFactories(search) {
       try {
         const response = await this.$axios.get(`/get_factories`, {
-          params: { search, limit: 10 },
+          params: { search : this.search, limit: 10 },
         });
         this.factories = response.data || [];
       } catch (error) {

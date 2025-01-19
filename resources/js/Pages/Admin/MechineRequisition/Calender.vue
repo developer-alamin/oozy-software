@@ -1,7 +1,7 @@
 <template>
   <div>
-   <!-- Table with Calendar Data -->
-   <table class="table table-bordered">
+    <!-- Table with Calendar Data -->
+    <table class="table table-bordered">
       <!-- Header -->
       <tr class="text-center table_header">
         <th colspan="60" :style="{ backgroundColor: colors.lightBlue }">Nov-24</th>
@@ -14,22 +14,14 @@
       </tr>
       <!-- Dynamic Data Rows -->
       <tr v-for="(row, rowIndex) in rowData" :key="rowIndex" class="text-center">
-        <td
-          v-for="(cell, cellIndex) in row"
-          :key="cellIndex"
-          :style="{ backgroundColor: cell.color || 'transparent' }"
-        >
-          {{ cell.value }}
+        <td v-for="(cell, cellIndex) in row" :key="cellIndex" :style="{ backgroundColor: cell.color || 'transparent' }">
+          {{ cell.value !== undefined && cell.value !== null ? cell.value : "--" }}
         </td>
       </tr>
-      
-       <!-- Summary Row (Sum of Each Column) -->
+
+      <!-- Summary Row (Sum of Each Column) -->
       <tr class="text-center font-weight-bold">
-        <td
-          v-for="(sum, index) in columnSums"
-          :key="index"
-          :style="{ backgroundColor: 'lightgray' }"
-        >
+        <td v-for="(sum, index) in columnSums" :key="index" :style="{ backgroundColor: 'lightgray' }">
           {{ sum }}
         </td>
       </tr>
@@ -37,7 +29,6 @@
 
     <!-- Machine Type Line Section -->
     <v-card>
-      <!-- Header Section -->
       <v-card-title class="pt-5">
         <v-row class="align-items-center">
           <v-col cols="4">
@@ -59,7 +50,15 @@
               </template>
             </v-autocomplete>
           </v-col>
+          <v-col cols="4">
+            <v-date-input
+              v-model="datePicker"
+              label="Select a date"
+              max-width="368"
+            ></v-date-input>
+          </v-col>
         </v-row>
+        
       </v-card-title>
 
       <!-- Data Table Section -->
@@ -67,6 +66,7 @@
         v-model:items-per-page="itemsPerPage"
         :headers="headers"
         :items="serverItems"
+        :datePicker="datePicker" 
         :items-length="totalItems"
         :loading="loading"
         item-value="created_at"
@@ -74,7 +74,6 @@
         @update:options="loadItems"
         class="custom-table"
       >
-        <!-- Dynamic Rows -->
         <template v-slot:body="{ items }">
           <tr v-for="(item, idx) in items" :key="idx">
             <td>{{ idx + 1 }}</td>
@@ -82,7 +81,6 @@
             <td>{{ item.mc_sum }}</td>
           </tr>
         </template>
-        <!-- Footer Row -->
         <template v-slot:body.append>
           <tr class="footerTable">
             <td>Total MC Sum</td>
@@ -103,6 +101,7 @@ export default {
   components: { ConfirmDialog },
   data() {
     return {
+      datePicker: null,
       colors: {
         lightBlue: "#d6dce4",
         lightApricot: "#f7caac",
@@ -119,23 +118,7 @@ export default {
       lines: [],
       loading: true,
       totalItems: 0,
-      dates: [
-        { label: "15", color: "#f7caac" },
-        { label: "16", color: "#d6dce4" },
-        { label: "17", color: "#d6dce4" },
-        { label: "18", color: "#d6dce4" },
-        { label: "19", color: "#9cc2e5" },
-        { label: "20", color: "#d6dce4" },
-        { label: "21", color: "#d6dce4" },
-        { label: "22", color: "#f7caac" },
-        { label: "23", color: "#d6dce4" },
-        { label: "24", color: "#d6dce4" },
-        { label: "25", color: "#d6dce4" },
-        { label: "26", color: "#d6dce4" },
-        { label: "27", color: "#d6dce4" },
-        { label: "28", color: "#d6dce4" },
-        { label: "29", color: "#f7caac" },
-      ],
+      dates:[],
       rowData: [
         [
           { value: 128, color: "#f7caac" },
@@ -168,6 +151,7 @@ export default {
           { value: -13 },
           { value: 111, color: "#f7caac" },
           { value: -2, color: "#f7caac" },
+          { value: 100 }
         ],
         [
           { value: 100, color: "#f7caac" },
@@ -205,41 +189,29 @@ export default {
     };
   },
   methods: {
-    getPairSum(dateIndex) {
-      let sum = 0;
-      for (let rowIndex = 0; rowIndex < this.rowData.length; rowIndex++) {
-        const adjustedDateIndex = dateIndex * 2 + rowIndex;
-        console.log(rowIndex);
-
-        // Get the cell value at the adjusted dateIndex
-        const cell = this.rowData[rowIndex][dateIndex];
-
-        // Ensure the value exists and is a valid number
-        if (cell && typeof cell.value === "number") {
-          sum += cell.value;
-        }
-      }
-      return sum;
-    },
     async loadItems({ page, itemsPerPage, sortBy }) {
       this.loading = true;
       const sortOrder = sortBy.length ? sortBy[0].order : "desc";
       const sortKey = sortBy.length ? sortBy[0].key : "created_at";
       try {
-        const response = await this.$axios.get("/machine-requisition/machine-calender", {
-          params: {
-            page,
-            itemsPerPage,
-            sortBy: sortKey,
-            sortOrder,
-            line: this.line,
-          },
-        });
-
-        this.serverItems = response.data.items || [];
-        this.totalItems = response.data.total || 0;
-        this.totalMcSum = response.data.total_sum;
+        // const response = await this.$axios.get("/machine-requisition/machine-calender", {
+        //   params: {
+        //     page,
+        //     itemsPerPage,
+        //     sortBy: sortKey,
+        //     sortOrder,
+        //     line: this.line,
+        //     datePicker:this.datePicker
+        //   },
+        // });
+      const response = await this.$axios.get("/machine-requisition/machine-calender");
+          console.log(response.data);
+          
+        // this.serverItems = response.data.items || [];
+        // this.totalItems = response.data.total || 0;
+        // this.totalMcSum = response.data.total_sum;
       } catch (error) {
+        console.log(error)
         toast.error("Failed to load items. Please try again.");
       } finally {
         this.loading = false;
@@ -263,6 +235,12 @@ export default {
     },
   },
   watch: {
+    datePicker: {
+      handler() {
+        this.loadItems({ page: 1, itemsPerPage: this.itemsPerPage, sortBy: [] });
+      },
+      deep: true,
+    },
     line: {
       handler() {
         this.loadItems({ page: 1, itemsPerPage: this.itemsPerPage, sortBy: [] });
@@ -273,18 +251,26 @@ export default {
   created() {
     this.loadItems({ page: 1, itemsPerPage: this.itemsPerPage, sortBy: [] });
   },
-  computed : {
+  computed: {
+    dates() {
+      const currentMonth = new Date().getMonth();
+      const currentYear = new Date().getFullYear();
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+      const dates = [];
+      for (let i = 1; i <= daysInMonth; i++) {
+        // Ensure `i` is treated as a valid date number
+        let color = i % 2 === 0 ? this.colors.lightBlue : this.colors.lightApricot;
+        dates.push({ label: i.toString(), color });
+      }
+      return dates;
+  },
     columnSums() {
-      // Initialize an array with zero values for each column
       const sums = Array(this.rowData[0]?.length || 0).fill(0);
-
-      // Loop through each row and add the values to corresponding columns
       this.rowData.forEach((row) => {
         row.forEach((cell, index) => {
-          sums[index] += cell.value || 0; // Add the value (default to 0 if undefined)
+          sums[index] += (cell.value !== undefined && cell.value !== null) ? cell.value : 0;
         });
       });
-
       return sums;
     },
   }

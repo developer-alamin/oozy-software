@@ -26,38 +26,76 @@ use Illuminate\Support\Facades\Auth;
 
 class DynamicDataController extends Controller
 {
-    public function getCompanies(Request $request){
-
-       // Get the search term and limit from the request, with defaults
+    public function getCompanies(Request $request)
+    {
+        // Get the authenticated user
+        $currentUser = $this->getAuthenticatedUser();
+        if (!$currentUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+    
+        // Get the creator type (admin or user)
+        $creatorType = $this->getCreatorType();
+    
+        // Get the search term and limit from the request, with defaults
         $search = $request->query('search', ''); // Default search is an empty string
-        
-        
-        $limit = (int) $request->query( 'limit', 5); // Default limit is 5
-
+        $limit = (int) $request->query('limit', 5); // Default limit is 5
+    
         // Validate the limit to ensure it's a positive integer
         if ($limit <= 0) {
             $limit = 5; // Fallback to default if invalid
         }
-
-        // Query the Company model to search for records by name with a limit
-        $companies = Company::where('name', 'like', '%' . $search . '%')
-                    ->limit($limit)
-                    ->get();
-
+    
+        // Build the query for the Company model
+        $companyQuery = Company::query()
+            ->where('creator_id', $currentUser->id)
+            ->where('creator_type', $creatorType);
+    
+        // Apply search filter if provided
+        if ($search) {
+            $companyQuery->where('name', 'like', '%' . $search . '%');
+        }
+    
+        // Retrieve the companies with the limit applied
+        $companies = $companyQuery->limit($limit)->get();
+    
         // Return the results as a JSON response
-        return response()->json($companies,Response::HTTP_OK);
-
+        return response()->json($companies, Response::HTTP_OK);
     }
+    
     public function getCompanyWaysFactories(Request $request)
     {
+
+         // Get the authenticated user
+         $currentUser = $this->getAuthenticatedUser();
+         if (!$currentUser) {
+             return response()->json(['error' => 'Unauthorized'], 401);
+         }
+     
+         // Get the creator type (admin or user)
+         $creatorType = $this->getCreatorType();
+
+
+
       $search = $request->query('search', '');
       $limit = $request->query('limit', 5);
       $companyId = $request->query('company_id');
 
+
+
+      $factoryQuery = Factory::query();
+      $factoryQuery->where('creator_id', $currentUser->id)
+      ->where('creator_type', $creatorType);
+
+        if ($companyId) {
+            $factoryQuery->where('company_id', $companyId);
+        }
+
+        if ($search) { 
+            $factoryQuery->where('name', 'LIKE', '%'. $search . '%');
+        }
       // Query factories by company and name
-      $factories = Factory::where('company_id', $companyId)
-          ->where('name', 'like', '%' . $search . '%')
-          ->limit($limit)
+      $factories = $factoryQuery->limit($limit)
           ->get();
 
       return response()->json($factories);
@@ -89,16 +127,35 @@ class DynamicDataController extends Controller
         return response()->json($factories);
     }
     public function getUnits(Request $request){
+        $currentUser = $this->getAuthenticatedUser();
+
+        if (!$currentUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $creatorType = $this->getCreatorType();
 
         // Get search term and limit from the request, with defaults
         $search = $request->query('search', '');
-        $limit  = $request->query('limit', 5); // Default limit of 10
-        // Query to search for factories by name with a limit
-        $factories = Unit::with(['floors.factories.company'])->where('name', 'like', '%' . $search . '%')
-                    //  ->limit($limit)
-                     ->get();
-        // Return the factories as JSON
-        return response()->json($factories);
+        $limit = $request->query('limit', 5); // Default limit of 5
+
+        // Build the query
+        $unitQuery = Unit::query();
+        $unitQuery->where('creator_id', $currentUser->id)
+                ->where('creator_type', $creatorType);
+
+        if ($search) {
+            $unitQuery->where('name', 'like', '%' . $search . '%');
+        }
+
+        // Retrieve the units with the selected columns
+        $units = $unitQuery->select('id', 'name')
+                        ->limit($limit)
+                        ->get();
+
+        // Return the units as JSON
+        return response()->json($units);
+
     }
     public function getBrandAll(Request $request){
 
