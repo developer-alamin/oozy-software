@@ -38,10 +38,6 @@ class Unit extends Model
         'updated_at' => 'datetime', // Automatically cast 'updated_at' to a Carbon instance
     ];
 
-    public function floors()
-    {
-        return $this->belongsTo(Floor::class,'floor_id');
-    }
     public function creator()
     {
         return $this->morphTo();
@@ -58,7 +54,7 @@ class Unit extends Model
     }
     public function floor()
     {
-        return $this->belongsTo(Floor::class, 'floor_id');
+        return $this->belongsTo(Floor::class, 'floor_id','id');
     }
     // public function lines()
     // {

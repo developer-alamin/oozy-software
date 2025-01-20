@@ -1,5 +1,5 @@
 <template>
-    <v-card outlined class="mx-auto my-5" max-width="500">
+    <v-card outlined class="mx-auto my-5">
         <v-card-title>Create Company</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="submit">

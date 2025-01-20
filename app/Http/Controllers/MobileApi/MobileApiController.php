@@ -56,7 +56,12 @@ class MobileApiController extends Controller
         $data = MechineAssing::where('machine_code', $machinecode)
         ->where('creator_type', $className) // Match creator type
         ->where('creator_id', $currentUser->id) // Match creator ID
-        ->with(["creator:id,name","line.unit.floor"])
+        ->with([
+            'line:id,name,unit_id', // Retrieve line's id, name, and unit_id
+            'line.unit:id,name,floor_id', // Retrieve unit's id, name, and floor_id
+            'line.unit.floor:id,name' // Retrieve only id and name from floor
+        ])
+        ->select('id', 'machine_code', 'line_id', 'name', 'created_at')
         ->first();
 
         
@@ -94,10 +99,14 @@ class MobileApiController extends Controller
         
         // Validation rules and messages
         $validator = Validator::make($request->all(), [
-            'mechine_assing_id' => 'required|exists:mechine_assings,id',
+            'mechine_assing_id' => 'required|exists:mechine_assings,id', // Existing validation
+            'supervisor_problem_note_id' => 'required_without:supervisor_note|nullable',
+            'supervisor_note' => 'required_without:supervisor_problem_note_id|nullable',
         ], [
             'mechine_assing_id.required' => 'Machine ID is required!',
             'mechine_assing_id.exists' => 'Machine ID does not exist!',
+            'supervisor_problem_note_id.required_without' => 'Either Supervisor Problem Note ID or Supervisor Note must be provided.',
+            'supervisor_note.required_without' => 'Either Supervisor Problem Note ID or Supervisor Note must be provided.',
         ]);
 
         // Check for validation errors
@@ -203,51 +212,32 @@ class MobileApiController extends Controller
         ], Response::HTTP_OK);
         
     }
-    public function operatorbreakdownservicepending(){
-        $currentUser = $this->getAuthentiCreator();
 
+
+    public function operatorbreakdownservicecheck(Request $request,$status){
+        $currentUser = $this->getAuthentiCreator();
         if (!$currentUser) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized',
             ], 403);
         }
-        
         $className = get_class($currentUser);
-        
-        $service = BreakdownService::where('creator_type', $className)
-            ->where('creator_id', $currentUser->id)
-            ->where('service_status', 'Pending')
-            ->latest()
-            ->with([
-                'creator:id,name',
-                'mechine_assing:id,name',
-                'service_details:id,breakdown_service_id,status',
-            ])
-            ->get();
-        
-        return response()->json([
-            'success' => true,
-            'message' => 'Pending Breakdown service data fetched successfully!',
-            'data' => $service,
-        ], Response::HTTP_OK);
-        
-    }
-    public function operatorbreakdownserviceprocessing(){
-        $currentUser = $this->getAuthentiCreator();
 
-        if (!$currentUser) {
+           // Validate the status
+        $validStatuses = ['Pending', 'Processing', 'Done', 'Cancel', 'Hold', 'Request'];
+        
+        if (!in_array($status, $validStatuses)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthorized',
-            ], 403);
+                'message' => 'Invalid status provided. Valid statuses are: ' . implode(', ', $validStatuses),
+            ], 422);
         }
-        
-        $className = get_class($currentUser);
-        
-        $service = BreakdownService::where('creator_type', $className)
+
+
+         $service = BreakdownService::where('creator_type', $className)
             ->where('creator_id', $currentUser->id)
-            ->where('service_status', 'Processing')
+            ->where('service_status', $status)
             ->latest()
             ->with([
                 'creator:id,name',
@@ -261,66 +251,9 @@ class MobileApiController extends Controller
             'message' => 'Processing Breakdown service data fetched successfully!',
             'data' => $service,
         ], Response::HTTP_OK);
-        
-    }
-    public function operatorbreakdownservicedone(){
-        $currentUser = $this->getAuthentiCreator();
 
-        if (!$currentUser) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized',
-            ], 403);
-        }
-        
-        $className = get_class($currentUser);
-        
-        $service = BreakdownService::where('creator_type', $className)
-            ->where('creator_id', $currentUser->id)
-            ->where('service_status', 'Done')
-            ->latest()
-            ->with([
-                'creator:id,name',
-                'mechine_assing:id,name',
-                'service_details:id,breakdown_service_id,status',
-            ])
-            ->get();
-        
-        return response()->json([
-            'success' => true,
-            'message' => 'Done Breakdown service data fetched successfully!',
-            'data' => $service,
-        ], Response::HTTP_OK);
     }
-    public function operatorbreakdownservicecencel(){
-        $currentUser = $this->getAuthentiCreator();
 
-        if (!$currentUser) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized',
-            ], 403);
-        }
-        
-        $className = get_class($currentUser);
-        
-        $service = BreakdownService::where('creator_type', $className)
-            ->where('creator_id', $currentUser->id)
-            ->where('service_status', 'Cencel')
-            ->latest()
-            ->with([
-                'creator:id,name',
-                'mechine_assing:id,name',
-                'service_details:id,breakdown_service_id,status',
-            ])
-            ->get();
-        
-        return response()->json([
-            'success' => true,
-            'message' => 'Cencel Breakdown service data fetched successfully!',
-            'data' => $service,
-        ], Response::HTTP_OK);
-    }
     public function operatorbreakdownservicedecline(Request $request){
         $currentUser = $this->getAuthentiCreator();
 

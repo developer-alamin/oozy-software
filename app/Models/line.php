@@ -55,6 +55,10 @@ class Line extends Model
     {
         return $this->morphTo();
     }
+
+    public function machines(){
+        return $this->hasMany(MechineAssing::class,'line_id','id');
+    }
     
 
     public function lines()
