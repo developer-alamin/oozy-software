@@ -63,6 +63,13 @@ const routes = [
         props: true,
       },
       {
+        path: "machine-requisition/change",
+        name: "MachineRequisitionChange",
+        component: adminComponents.MachineRequisitionChange,
+        meta: { title: "Machine Requisition Change Page" },
+        props: true,
+      },
+      {
         path: "user/index",
         name: "AdminUserIndex",
         component: adminComponents.AdminUserIndex,

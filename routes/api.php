@@ -62,8 +62,8 @@ Route::controller(MachineRequisitionController::class)
 ->group(function(){
     Route::get("index","index");
     Route::post("store-requisition","StoreRequisition");
-    Route::get("lines","Lines");
     Route::get("/machine-calender","machineCalender");
+    Route::get("machine-change","machineChange");
     Route::get("machine-types","lineWiseMachineTypes");
 });
 
@@ -491,7 +491,7 @@ Route::get("/get_actions",[DynamicDataController::class,"get_actions"])->name("g
 Route::get("/get_problemnotes",[DynamicDataController::class,"get_problemNotes"])->name("get_problemNotes");
 Route::get("/get_causes",[DynamicDataController::class,"get_causes"])->name("get_causes");
 Route::get("/get-fishbone-category",[DynamicDataController::class,"getFishboneCategory"]);
-
+Route::get('/get-lines',[DynamicDataController::class,'get_lines']);
 // Admin Auth Routes
 Route::prefix('admin')->group(function () {
   // admin user

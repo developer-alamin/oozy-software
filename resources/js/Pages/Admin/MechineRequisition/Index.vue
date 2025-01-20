@@ -4,35 +4,22 @@
       <v-row class="align-items-center">
         <v-col cols="3">
           <v-autocomplete
-            v-model="factory"
-            :items="factories"
+            v-model="line"
+            :items="lines"
             item-value="id"
-            :item-title="formatFactory"
+            :item-title="formatLine"
             outlined
             clearable
             density="comfortable"
-            @update:search="fetchFactories"
+            @update:search="fetchLines"
           >
             <template v-slot:label>
-              Select Factory <span style="color: red">*</span>
+              Select Line <span style="color: red">*</span>
             </template>
           </v-autocomplete>
         </v-col>
         <v-col cols="3">
-          <v-autocomplete
-            v-model="unit"
-              :items="units"
-              item-value="id"
-              :item-title="formatUnit"
-              outlined
-              clearable
-              density="comfortable"
-              @update:search="fetchUnits"
-            >
-            <template v-slot:label>
-              Select Unit 
-            </template>
-          </v-autocomplete>
+      
         </v-col>
         <v-col cols="4" class="text-center ms-auto">
           <v-btn @click="addRequisition" color="primary">
@@ -42,23 +29,6 @@
         </v-col>
       </v-row>
     </v-card-title>
-
-    <v-data-table-server
-      v-model:items-per-page="itemsPerPage"
-      :headers="headers"
-      :factory="factory"
-      :unit="unit"
-      :items="serverItems"
-      :items-length="totalItems"
-      :loading="loading"
-      item-value="created_at"
-      loading-text="Loading... Please wait"
-      @update:options="loadItems"
-    >
-    <template v-slot:item.requisition="{ item }">
-        <span>{{ item.requisition.total ?? "N\A" }}</span>
-    </template>
-  </v-data-table-server>
   </v-card>
 
   <v-dialog v-model="dialog" max-width="900">
@@ -193,16 +163,10 @@ export default {
   },
   data() {
     return {
+      line:null,
       search:'',
       unit:null,
-      factory: null,
       requisitionValid: false,
-      itemsPerPage: 15,
-      headers: [
-        { title: "Unit", value: "unit.name", sortable: false },
-        { title: "Line", value: "name", sortable: true },
-        { title: "M/C", value: "total", sortable: false },
-      ],
       requisition: {
         line: null,
         dateRange: null,
@@ -210,12 +174,8 @@ export default {
         types: [],
         total: 0,
       },
-      factories: [],
-      serverItems: [],
       lines: [],
-      units: [],
       loading: true,
-      totalItems: 0,
       dialog: false,
       errors: {}, // Stores validation errors
       rules: {
@@ -235,47 +195,17 @@ export default {
             itemsPerPage,
             sortBy: sortKey,
             sortOrder,
-            factory: this.factory,
-            unit:this.unit
+            line: this.line,
           },
         });
-        this.serverItems = response.data.items || [];
-        this.totalItems = response.data.total || 0;
+       console.log(response.data);
+       
       } catch (error) {
         console.error("Error loading items:", error);
         toast.error("Failed to load items. Please try again.");
       } finally {
         this.loading = false;
       }
-    },
-    async fetchUnits(search) {
-      try {
-        const response = await this.$axios.get(`/get_units`, {
-          params: {
-            search:this.search,
-            limit: this.limit,
-          },
-        });
-        this.units = response.data;
-      } catch (error) {
-        console.error("Error fetching units:", error);
-      }
-    },
-    // Format factory name with user name
-    formatUnit(unit) {
-      if (unit) {
-        // Check if `unit` is a number, and find the corresponding object
-        if (typeof unit === "number") {
-          unit = this.units.find((item) => item.id === unit);
-        }
-        // If the unit is found, process further
-        if (unit) {
-          const unitName = unit.name || "No Unit Name";
-          // Return the formatted string
-          return unitName;
-        }
-      }
-      return "No Unit Data";
     },
     createRequisition() {
       this.requisitionValid = true;
@@ -316,20 +246,10 @@ export default {
     addRequisition() {
       this.dialog = true;
     },
-    async fetchFactories(search) {
-      try {
-        const response = await this.$axios.get(`/get_factories`, {
-          params: { search : this.search, limit: 10 },
-        });
-        this.factories = response.data || [];
-      } catch (error) {
-        console.error("Error fetching factories:", error);
-        toast.error("Failed to fetch factories.");
-      }
-    },
+    
     async fetchLines(search) {
       try {
-        const response = await this.$axios.get(`/machine-requisition/lines`, {
+        const response = await this.$axios.get(`/get-lines`, {
           params: { search, limit: 5 },
         });
         this.lines = response.data || [];
@@ -359,12 +279,13 @@ export default {
         return acc + mc;
       }, 0);
     },
-    formatFactory(factory) {
-      if (!factory) return "No Factory Data";
-      const factoryName = factory.name || "No Factory Name";
-      const userName = factory.company?.name || "No Company";
-      return `${factoryName} -- ${userName}`;
-    },
+    formatLine(line) {
+        if (!line) return;
+        const lineName = line.name || "No Line Name";
+        const companyName = line.company?.name || "No Company";
+        this.line = line.id;
+        return `${lineName} -- ${companyName}`;
+      },
     resetForm() {
       if (this.$refs.createRequisition) {
         this.$refs.createRequisition.resetValidation(); // Reset the form via its ref if necessary
@@ -382,7 +303,7 @@ export default {
     },
   },
   watch: {
-    factory: {
+    line: {
       handler() {
         this.loadItems({ page: 1, itemsPerPage: this.itemsPerPage, sortBy: [] });
       },

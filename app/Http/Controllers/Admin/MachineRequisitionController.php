@@ -33,57 +33,14 @@ class MachineRequisitionController extends Controller
         $itemsPerPage = $request->input('itemsPerPage', 5);
         $sortBy       = $request->input('sortBy', 'created_at');
         $sortOrder    = $request->input('sortOrder', 'desc');
-        $factorySearchTerm = $request->input('factory', '');
-        
-        // Fetch factories based on creator type and ID
-        $factoryQuery = Factory::query()
-            ->where('creator_type', $className)
-            ->where('creator_id', $currentUser->id);
-        
-        // Apply search term if provided
-        if ($factorySearchTerm) {
-            $factoryQuery->where('id', $factorySearchTerm);
-        }
-        
-        // Get factories with relationships
-        $factories = $factoryQuery->with(['floors.units.lines'])->get();
-        
-        // Check if factories exist
-        if ($factories->isEmpty()) {
-            return response()->json(['message' => 'No factories found'], 404);
-        }
-        
-        // Extract line IDs
-        $lineIds = $factories->pluck('floors')
-            ->flatten()
-            ->pluck('units')
-            ->flatten()
-            ->pluck('lines')
-            ->flatten()
-            ->pluck('id')
-            ->toArray();
+        $lineId = $request->input('line', '1');
 
-        $lines = Line::whereIn('lines.id', $lineIds)
-        ->with(['unit', 'requisitions' => function($query) {
-            $query->selectRaw('line_id, SUM(total) as total')
-                ->groupBy('line_id');
-        }])
-        ->orderBy($sortBy, $sortOrder)
-        ->paginate($itemsPerPage);
 
-        // Access the 'requisition_total' after pagination
-        $lines->getCollection()->transform(function ($line) {
-            // If there is a requisition, set the total sum from the aggregated data
-            $line->total = $line->requisitions->isEmpty() ? 0 : $line->requisitions->first()->total;
-            return $line;
-        });
         
-        // Return paginated lines
-        return response()->json([
-            'items' => $lines->items(),
-            'total' => $lines->total(),
-        ]);        
 
+
+
+        return response()->json($lineId,200);
     }
 
     public function machineCalender(Request $request)  {
@@ -95,169 +52,423 @@ class MachineRequisitionController extends Controller
         
         $className = get_class($currentUser);
 
-        $machine  = MechineAssing::first();
-
-
-
-
-        $line = '1';  
-        $month = '2025-01';  
-       
-        // Set start and end dates for the given month
-        $startDate = Carbon::parse($month . '-01');
-        $endDate = $startDate->copy()->endOfMonth();
-        $dates = [];
-        for ($date = $startDate; $date <= $endDate; $date->addDay()) {
-            // Format the date to show only the day
-            $dates[] = $date->format('d'); // Only the day part
-        }
-
-        // Query to calculate total required, total assigned, and shortage for each machine type
-        $result = DB::table('requisition_details')
-            ->join('requisitions', 'requisitions.id', '=', 'requisition_details.requisition_id') // Join requisitions table
-            ->leftJoin('mechine_assings', function ($join) {
-                $join->on('requisition_details.machine_type_id', '=', 'mechine_assings.machine_type_id')
-                    ->whereColumn('requisitions.line_id', '=', 'mechine_assings.line_id'); // Match line_id
-            })
-            ->select(
-                'requisition_details.machine_type_id', // Machine type
-                DB::raw('DATE(requisitions.created_at) as date'), // Date
-                DB::raw('SUM(requisition_details.mc) as total_required'), // Sum mc for each requisition_id
-                DB::raw('COUNT(DISTINCT mechine_assings.id) as total_assigned'), // Count unique assignments
-                DB::raw('SUM(requisition_details.mc) - COUNT(DISTINCT mechine_assings.id) as shortage') // Calculate shortage
-            )
-            ->whereRaw('DATE_FORMAT(requisitions.created_at, "%Y-%m") = ?', [$month]) // Filter by year-month
-            ->where('requisitions.line_id', '=', $line) // Filter by line
-            ->groupBy('requisition_details.machine_type_id', 'date') // Group by machine type and date
-            ->get();
-
-        // Map results to include all dates
-        $machineData = [];
-        foreach ($result as $row) {
-            // Convert the date to day format (e.g., 11 from 2025-01-11)
-            $dateOnlyDay = Carbon::parse($row->date)->format('d');
-            
-            $machineData[$row->machine_type_id][$dateOnlyDay] = [
-                'total_required' => $row->total_required,
-                'total_assigned' => $row->total_assigned,
-                'shortage' => $row->shortage,
-            ];
-        }
-
-        // Prepare JSON response data
-        $responseData = [
-            'headers' => $dates, // All dates (now only days) for table headers
-            'rows' => [], // Machine type data
-        ];
-
-        foreach ($machineData as $machineTypeId => $dateData) {
-            $row = [
-                'machine_type' => $machineTypeId,
-                'data' => [],
-            ];
-
-            foreach ($dates as $date) {
-                $row['data'][] = [
-                    'total_required' => $dateData[$date]['total_required'] ?? 0,
-                    'total_assigned' => $dateData[$date]['total_assigned'] ?? 0,
-                    'shortage' => $dateData[$date]['shortage'] ?? 0,
-                ];
-            }
-
-            $responseData['rows'][] = $row;
-        }
-
-        return response()->json($responseData,200);
-        
-        $page           = $request->input('page', 1);
-        $itemsPerPage   = $request->input('itemsPerPage', 5);
-        $sortBy         = $request->input('sortBy', 'created_at'); 
-        $sortOrder      = $request->input('sortOrder', 'desc');
         $lineId = $request->input('line', '');
 
 
-        $datePicker = $request->input('datePicker','');
+        $month = $request->input('month', Carbon::now()->month); 
+        $year = $request->input('year', Carbon::now()->year);    
+        
+        // Get the last day of the given month
+        $lastDayOfMonth = Carbon::createFromFormat('Y-m', $year . '-' . $month)->endOfMonth();
+        // Get the day of the last day
+        $lastDay = $lastDayOfMonth->day;
+        
+        // Merge year and month into "Y-m" format
+        $mergeYearMonth = Carbon::create($year, $month, 1)->format('Y-m');
+        
+        // Format as "Jan-2025"
+        $monthYearLabel = Carbon::create($year, $month, 1)->format('M-Y');
+        
+        // Assign values
+        $yearLabel = $monthYearLabel; // "Jan-2025"
+        $yearAndMonth = $mergeYearMonth; // "2025-01"
+        $total_days_in_month = $lastDay; // Last day [e.g., 31]
 
-        if (!empty($datePicker)) {
-            // Use Carbon to parse the date and extract the month and year
-            $date = Carbon::parse($datePicker);
 
-            // Extract the month as a 2-digit number (01, 02, ..., 12)
-            $month = $date->format('m');  // 'm' gives the 2-digit month
+       // return response()->json($mergeYearMonth,200);
 
-             // Extract the full month name (e.g., January, February)
-             $monthName = $date->format('F');  // 'F' gives the full month name
-             return response()->json($monthName,200);
 
+       $machine_type = DB::table('requisitions')
+        ->join('requisition_details', 'requisitions.id', '=', 'requisition_details.requisition_id')
+        ->join('mechine_types', 'requisition_details.machine_type_id', '=', 'mechine_types.id')
+        ->when($lineId, function ($query) use ($lineId) {
+            return $query->where('requisitions.line_id', $lineId);
+        })
+        ->whereRaw("DATE_FORMAT(requisitions.startDate, '%Y-%m') = ?", [$mergeYearMonth])
+        ->select(
+            'mechine_types.name as machine_type_name',
+            'requisition_details.machine_type_id',
+            DB::raw('SUM(requisition_details.mc) as total_mc')
+        )
+        ->groupBy('requisition_details.machine_type_id', 'mechine_types.name')
+        ->get()
+        ->toArray();
+
+
+        $totalMachineCountSum = 0;
+        $totalByDays = [];
+        $result = '';
+
+        $result .= '
+            <style>
+            .red-col { background-color: #e7bbbb !important; }
+            .green-col { background-color: #c8e6f7 !important; }
+            .tbl-wrapper { width: 100%; overflow-x: auto; margin: 20px 0; }
+            .tbl { width: 100%; border-collapse: collapse; margin: 10px 0; font-family: Arial, sans-serif; }
+            .tbl th, .tbl td { padding: 5px; text-align: left; border: 1px solid #a5a5a5; font-size: 11px; }
+            .tbl th { background-color: #f2f2f2; font-weight: normal; }
+            table .txt-center { text-align: center; }
+            table .txt-right { text-align: right; }
+            @media (max-width: 768px) { .tbl { font-size: 12px; } .tbl th, .tbl td { padding: 5px; } }
+            @media (max-width: 480px) { .tbl { font-size: 10px; } .tbl th, .tbl td { padding: 5px; } .tbl-wrapper { overflow-x: scroll; } }
+            </style>';
+
+        $result .= '<div class="tbl-wrapper"><table class="tbl"><thead><tr><th class="txt-center" rowspan="4">No</th><th class="txt-center" rowspan="4">Machine Type</th><th class="txt-center" rowspan="4">Total <br> Active Machine</th></tr><tr><th class="txt-center" colspan="100">' . $yearLabel . '</th></tr><tr>';
+
+        for ($day = 1; $day <= $total_days_in_month; $day++) {
+            $class = "";
+            if ($day == 1 || $day == $total_days_in_month) {
+                $class = "red-col";
+            }
+            if ($day == 10 || $day == 20) {
+                $class = "green-col";
+            }
+
+            $result .= '<th class="txt-center ' . $class . '" colspan="2">' . $day . '</th>';
         }
 
+        $result .= '</tr><tr>';
 
+        for ($day = 1; $day <= $total_days_in_month; $day++) {
+            $class = "";
+            if ($day == 1 || $day == $total_days_in_month) {
+                $class = "red-col";
+            }
+            if ($day == 10 || $day == 20) {
+                $class = "green-col";
+            }
+
+            $result .= '<th class="' . $class . '">R</th><th  class="' . $class . '">S</th>';
+        }
+
+        $result .= '</tr></thead><tbody>';
+
+        foreach ($machine_type as $index => $machine) {
+            $result .= '<tr>';
+            $result .= '<td class="txt-right">' . ($index + 1) . '</td>';
+            $result .= '<td>' . ($machine->machine_type_name ?? '--') . '</td>';
+            $result .= '<td class="txt-right">' . ($machine->total_mc ?? '--') . '</td>';
+
+            $totalMachineCountSum += $machine->total_mc ?? 0;
+
+            for ($day = 1; $day <= $total_days_in_month; $day++) {
+                $date = $yearAndMonth . '-' . str_pad($day, 2, '0', STR_PAD_LEFT);
+
+                $dateByRequisitionCount = DB::table('requisitions')
+                    ->join('requisition_details', 'requisitions.id', '=', 'requisition_details.requisition_id')
+                    ->when($lineId, function ($query) use ($lineId) {
+                        return $query->where('requisitions.line_id', $lineId);
+                    })
+                    ->where('requisition_details.machine_type_id', $machine->machine_type_id)
+                    ->whereDate('requisitions.startDate', $date)
+                    ->sum('requisition_details.mc') ?? 0;
+
+                $dateByMachineCount = DB::table('mechine_assings')
+                    ->when($lineId, function ($query) use ($lineId) {
+                        return $query->where('line_id', $lineId);
+                    })
+                    ->where('machine_type_id', $machine->machine_type_id)
+                    ->whereDate('created_at', $date)
+                    ->count() ?? 0;
+
+                $class = "";
+                if ($day == 1 || $day == $total_days_in_month) {
+                    $class = "red-col";
+                }
+                if ($day == 10 || $day == 20) {
+                    $class = "green-col";
+                }
+
+                $difference = $dateByRequisitionCount - $dateByMachineCount;
+
+                // Ensure the $totalByDays[$day] is initialized before using it
+                if (!isset($totalByDays[$day])) {
+                    $totalByDays[$day] = ['requisitionCount' => 0, 'difference' => 0];
+                }
+
+                // Add daily data to $totalByDays
+                $totalByDays[$day]['requisitionCount'] += $dateByRequisitionCount;
+                $totalByDays[$day]['difference'] += $difference;
+
+                $result .= '<td class="' . $class . '">' . $dateByRequisitionCount . '</td><td class="' . $class . '">' . $difference . '</td>';
+            }
+
+            $result .= '</tr>';
+        }
+
+        $result .= '</tbody><tfoot><tr><td colspan="2" class="txt-right"><strong>Total:</strong></td><td class="txt-right">' . $totalMachineCountSum . '</td>';
+
+        for ($day = 1; $day <= $total_days_in_month; $day++) {
+            // Check if the day index exists before accessing
+            $requisitionCount = isset($totalByDays[$day]['requisitionCount']) ? $totalByDays[$day]['requisitionCount'] : 0;
+            $difference = isset($totalByDays[$day]['difference']) ? $totalByDays[$day]['difference'] : 0;
+
+            $result .= '<td class="txt-right">' . $requisitionCount . '</td>';
+            $result .= '<td class="txt-right">' . $difference . '</td>';
+        }
+
+        $result .= '</tr></tfoot></table></div>';
+
+        return response()->json($result, 200);
+
+        
+
+
+    }
+
+    public function machineChange(Request $request){
+        $currentUser = $this->getAuthentiCreator();
+        if (!$currentUser) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+        
+        $className = get_class($currentUser);
+
+        $month = $request->input('month', Carbon::now()->month); 
+        $year = $request->input('year', Carbon::now()->year);    
+        
+        // Get the last day of the given month
+        $lastDayOfMonth = Carbon::createFromFormat('Y-m', $year . '-' . $month)->endOfMonth();
+        // Get the day of the last day
+        $lastDay = $lastDayOfMonth->day;
+        
+        // Merge year and month into "Y-m" format
+        $mergeYearMonth = Carbon::create($year, $month, 1)->format('Y-m');
+        
+        // Format as "Jan-2025"
+        $monthYearLabel = Carbon::create($year, $month, 1)->format('M-Y');
+        
+
+
+        $yearLabel = $monthYearLabel;
+        $yearAndMonth = $mergeYearMonth;
+        $total_days_in_month = $lastDay;
+
+
+
+        $lineId = $request->input('line', '');
+
+        $linesQuery = Line::with(['unit:id,name', 'requisitions:id,total,line_id'])
+        ->whereHas('requisitions', function($query) use ($yearAndMonth) {
+            $query->where('startDate', 'like', $yearAndMonth . '%');
+        });   
 
         if ($lineId) {
-            $machineTypesWithSum = Requisition::where('line_id', $lineId) 
-                ->with(['requisitionDetails.machineType'])  
-                ->get()
-                ->flatMap(function ($requisition) {
-
-                    return $requisition->requisitionDetails->map(function ($detail) {
-                        return [
-                            'machine_type_id' => $detail->machine_type_id, 
-                            'mc' => $detail->mc, 
-                            'machineType' => $detail->machineType->name, 
-                        ];
-                    });
-                })
-                ->groupBy('machine_type_id')
-                ->map(function ($items, $machineTypeId) {
-                    
-                    $mcSum = $items->sum('mc');  
-                    $name = $items->first()['machineType'];  
-            
-                    return [
-                        'machine_type_id' => $machineTypeId,
-                        'mc_sum' => $mcSum,  
-                        'name' => $name,  
-                    ];
-                })
-                ->values();
-        } else {
-            $machineTypesWithSum = Requisition::with(['requisitionDetails.machineType']) // requisitionDetails এবং machineType সম্পর্ক লোড করা
-                ->get()
-                ->flatMap(function ($requisition) {
-                    return $requisition->requisitionDetails->map(function ($detail) {
-                        return [
-                            'machine_type_id' => $detail->machine_type_id,  
-                            'mc' => $detail->mc, 
-                            'machineType' => $detail->machineType->name, 
-                        ];
-                    });
-                })
-                ->groupBy('machine_type_id')
-                ->map(function ($items, $machineTypeId) {
-                   
-                    $mcSum = $items->sum('mc'); 
-                    $name = $items->first()['machineType'];  
-            
-                    return [
-                        'machine_type_id' => $machineTypeId,
-                        'mc_sum' => $mcSum,  
-                        'name' => $name,  
-                    ];
-                })
-                ->values();
+            // If a specific lineId is provided, filter by that lineId
+            $linesQuery->where('id', $lineId);
         }
+
         
-        // Manually Paginate the results
-        $machineTypesWithSumCollection = collect($machineTypesWithSum); // Convert to Collection
-        $totalMcSum = $machineTypesWithSum->sum('mc_sum');
-        $paginatedItems = $machineTypesWithSumCollection->forPage($page, $itemsPerPage); // Manually paginate
+        // Fetch the lines based on the condition
+        $lines = $linesQuery->get();
+
         
-        // Return paginated response
-        return response()->json([
-            "total_sum" => $totalMcSum,
-            'items' => $paginatedItems,
-            'total' => $machineTypesWithSumCollection->count(), 
-        ]);
+        $lineByRequisitions = $lines->map(function ($line) {
+            return [
+                'id' => $line->id,
+                'name' => $line->name,
+                'unit' => $line->unit, // Unit relationship
+                'total_requisition_sum' => $line->requisitions->sum('total'), // Sum of 'total' from requisitions
+            ];
+        });
+
+
+        $totalRequisitionSum = 0; 
+        $totalByDays = []; 
+        
+        $result = "";
+        
+        $result .= '
+            <style>
+            .red-col {
+                background-color: #e7bbbb !important;
+            }
+            .green-col {
+                background-color: #c8e6f7 !important;
+            }
+            .tbl-wrapper {
+                width: 100%;
+                overflow-x: auto; /* This allows horizontal scrolling on smaller screens */
+                margin: 20px 0;
+            }
+        
+            .tbl {
+                width: 100%;
+                border-collapse: collapse; /* Ensures borders are collapsed for a clean look */
+                margin: 10px 0;
+                font-family: Arial, sans-serif;
+            }
+        
+            .tbl th, .tbl td {
+                padding: 5px;
+                text-align: left;
+                border: 1px solid #a5a5a5; /* Adds a light gray border around the table cells */
+                font-size: 11px;
+            }
+        
+            .tbl th {
+                background-color: #f2f2f2; /* Light gray background for header */
+                font-weight: normal;
+            }
+        
+            table .txt-center{
+                text-align: center;
+            }
+            table .txt-right{
+                text-align: right;
+            }
+        
+            /* Responsive styling */
+            @media (max-width: 768px) {
+                .tbl {
+                    font-size: 12px; /* Smaller font size for mobile devices */
+                }
+        
+                .tbl th, .tbl td {
+                    padding: 5px; /* Less padding for smaller screens */
+                }
+            }
+        
+            @media (max-width: 480px) {
+                .tbl {
+                    font-size: 10px; /* Even smaller font size on very small screens */
+                }
+        
+                .tbl th, .tbl td {
+                    padding: 5px; /* Minimal padding on small screens */
+                }
+        
+                .tbl-wrapper {
+                    overflow-x: scroll; /* Ensure horizontal scroll works for small devices */
+                }
+            }
+        </style>
+        
+        <div class="tbl-wrapper">
+            <table class="tbl">
+                <thead>
+                    <tr>
+                        <th class="txt-center" rowspan="4">No</th>
+                        <th class="txt-center" rowspan="4">Units</th>
+                        <th class="txt-center" rowspan="4">Location</th>
+                        <th class="txt-center" rowspan="4">Allocated </th>
+                    </tr>
+                    <tr>
+                        <th class="txt-center" colspan="100">'. $yearLabel .'</th>
+                    </tr>
+                    <tr>';
+        
+                    for ($day = 1; $day <= $total_days_in_month; $day++) {
+                        $class="";
+                        if($day == 1 || $day == $total_days_in_month){
+                            $class="red-col";
+                        }
+                        if($day == 10 || $day == 20){
+                            $class="green-col";
+                        }
+        
+                        $result .= '<th class="txt-center '.$class.'" colspan="2">' . $day . '</th>';
+                    }
+                        
+                    $result .= '</tr>
+                    <tr>';
+        
+                    for ($day = 1; $day <= $total_days_in_month; $day++) {
+                        $class="";
+                        if($day == 1 || $day == $total_days_in_month){
+                            $class="red-col";
+                        }
+                        if($day == 10 || $day == 20){
+                            $class="green-col";
+                        }
+        
+                        $result .= '<th class="'. $class .'">R</th>
+                        <th  class="'. $class .'">C</th>';
+                    }
+        
+                    $result .= '</tr>
+                </thead>
+                <tbody>';
+        
+                if (empty($lineByRequisitions)) {
+                    $totalColumns = 4 + ($total_days_in_month * 2); // 4 for the main columns + 2 for each day's "R" and "C"
+                    $result .= '<tr><td colspan="' . $totalColumns . '" class="txt-center">No data available</td></tr>';
+                } else {
+                    foreach ($lineByRequisitions as $index => $lineByRequisition) { 
+                        $result .= '<tr>';
+                        $result .= '<td class="txt-right">' . ($index + 1) . '</td>'; 
+                        $result .= '<td>' . $lineByRequisition['unit']['name'] . '</td>';
+                        $result .= '<td>' . $lineByRequisition['name'] . '</td>';
+                        $result .= '<td class="txt-right">' . $lineByRequisition['total_requisition_sum'] . '</td>';
+        
+                        $totalRequisitionSum += $lineByRequisition['total_requisition_sum'];
+        
+                        for ($day = 1; $day <= $total_days_in_month; $day++) {
+                            // Ensure the day is in two-digit format (e.g., "01", "02")
+                            $date = $yearAndMonth . '-' . str_pad($day, 2, '0', STR_PAD_LEFT);
+                            $startOfDay = Carbon::parse($date)->startOfDay(); // 2025-01-18 00:00:00
+                            $endOfDay = Carbon::parse($date)->endOfDay(); // 2025-01-18 23:59:59
+        
+                            // Fetch requisition count
+                            $dateByRequisitionCount = Requisition::where("line_id", $lineByRequisition['id'])
+                                ->where('startDate', $date)
+                                ->sum('total');
+        
+                            $lineByMachineCount = MechineAssing::where('line_id', $lineByRequisition['id'])
+                                ->whereBetween('created_at', [$startOfDay, $endOfDay])
+                                ->count();
+        
+                            $class = "";
+                            if ($day == 1 || $day == $total_days_in_month) {
+                                $class = "red-col";
+                            }
+                            if ($day == 10 || $day == 20) {
+                                $class = "green-col";
+                            }
+        
+                            $difference = $dateByRequisitionCount - $lineByMachineCount;
+        
+                            // Add to daily totals
+                            if (!isset($totalByDays[$day])) {
+                                $totalByDays[$day] = ['requisitionCount' => 0, 'difference' => 0];
+                            }
+                            $totalByDays[$day]['requisitionCount'] += $dateByRequisitionCount;
+                            $totalByDays[$day]['difference'] += $difference;
+        
+                            $result .= '<td class="' . $class . '">' . $dateByRequisitionCount . '</td><td class="' . $class . '">' . $difference . '</td>';
+                        }
+        
+                        $result .= '</tr>';
+                    }
+                }
+        
+                // Add totals to the footer
+                $result .= '
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" class="txt-right"><strong>Total:</strong></td>
+                        <td class="txt-right">' . $totalRequisitionSum . '</td>';
+        
+                    for ($day = 1; $day <= $total_days_in_month; $day++) {
+                        if (isset($totalByDays[$day])) {
+                            $result .= '<td class="txt-right">' . $totalByDays[$day]['requisitionCount'] . '</td>';
+                            $result .= '<td class="txt-right">' . $totalByDays[$day]['difference'] . '</td>';
+                        } else {
+                            $result .= '<td class="txt-right">0</td>';
+                            $result .= '<td class="txt-right">0</td>';
+                        }
+                    }
+        
+                $result .= '
+                    </tr>
+                </tfoot>
+            </table>
+        </div>';
+        
+        return response()->json($result, 200);
+        
+       
     }
 
 
@@ -294,25 +505,6 @@ class MachineRequisitionController extends Controller
 
         return response()->json($result, 200);
     }
-
-
-    public function Lines(Request $request)  {
-        
-        $search = $request->query('search', ''); 
-        $limit = (int) $request->query( 'limit', 5); 
-
-        if ($limit <= 0) {
-            $limit = 5; 
-        }
-
-        $lines = Line::where('name', 'like', '%' . $search . '%')
-                    ->limit($limit)
-                    ->with('company')
-                    ->get();
-
-        return response()->json($lines,Response::HTTP_OK);
-    }
-
 
     public function StoreRequisition(Request $request) {
         $currentUser = $this->getAuthentiCreator();
@@ -391,7 +583,6 @@ class MachineRequisitionController extends Controller
        
     }
 
-  
     private function getAuthentiCreator()  {
         if (Auth::guard('admin')->check()) {
             return Auth::guard('admin')->user();

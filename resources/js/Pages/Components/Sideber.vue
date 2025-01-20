@@ -77,6 +77,16 @@
               <span>Machine Calender</span>
             </router-link>
           </li>
+          <li>
+            <router-link 
+            :to="{ name: 'MachineRequisitionChange' }"
+            active-class="active"
+            :class="{ active: isActiveMachineChange }"
+            >
+              <i class="bi bi-circle"></i>
+              <span>Machine Change</span>
+            </router-link>
+          </li>
         </ul>
       </li>
       <!-- End Machine Requisition Nav -->
@@ -727,6 +737,12 @@ const isActiveMachineCelander = computed(() => {
     "MachineRequisitionCelender"
   ].includes(route.name);
 });
+// Check if the current route is part of the Mechine-related routes
+const isActiveMachineChange = computed(() => {
+  return [
+    "MachineRequisitionChange"
+  ].includes(route.name);
+});
 
 
 const isActiveMachineIndex = computed(() => {
@@ -738,7 +754,8 @@ const isActiveMachineIndex = computed(() => {
 const isActiveMachineRequisionRoute = computed(() => {
   return [
     "MachineRequisitionIndex",
-    "MachineRequisitionCelender"
+    "MachineRequisitionCelender",
+    "MachineRequisitionChange"
   ].includes(route.name);
 });
 
