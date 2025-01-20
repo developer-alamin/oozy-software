@@ -77,6 +77,16 @@
               <span>Machine Calender</span>
             </router-link>
           </li>
+          <li>
+            <router-link 
+            :to="{ name: 'MachineRequisitionChange' }"
+            active-class="active"
+            :class="{ active: isActiveMachineChange }"
+            >
+              <i class="bi bi-circle"></i>
+              <span>Machine Change</span>
+            </router-link>
+          </li>
         </ul>
       </li>
       <!-- End Machine Requisition Nav -->
@@ -586,7 +596,7 @@
             data-bs-target="#fish-bone-nav"
             data-bs-toggle="collapse"
             href="#"
-            :class="{ show: isSettingRouteShow }"
+            :class="{ show: isFishBoneRouteShow }"
           >
             <i class="bi bi-sliders"></i><span>Fish Bone Digram</span
             ><i class="bi bi-chevron-down ms-auto"></i>
@@ -597,6 +607,15 @@
           data-bs-parent="#sidebar-nav"
           :class="{ show: isFishBoneRouteShow }"
         >
+        <li>
+            <router-link
+              :to="{ name: 'FishboneDigrameIndex' }"
+              active-class="active"
+              :class="{ active: isActiveFishboneDigrameIndexRoute}"
+            >
+              <i class="bi bi-circle"></i><span>Fishbone Digrame</span>
+            </router-link>
+          </li>
           <li>
             <router-link
               :to="{ name: 'ProblemNoteIndex' }"
@@ -608,20 +627,20 @@
           </li>
           <li>
             <router-link
-              :to="{ name: 'CauseIndex' }"
+              :to="{ name: 'FishboneCategoryIndex' }"
               active-class="active"
-              :class="{ active: isCauseRoute }"
+              :class="{ active: isFishboneCategoryRoute }"
             >
-              <i class="bi bi-circle"></i><span>Cause List</span>
+              <i class="bi bi-circle"></i><span>Category List</span>
             </router-link>
           </li>
           <li>
             <router-link
-              :to="{ name: 'EffectIndex' }"
+              :to="{ name: 'CausesIndex' }"
               active-class="active"
-              :class="{ active: isEffectRoute }"
+              :class="{ active: isCausesRoute }"
             >
-              <i class="bi bi-circle"></i><span>Effect List</span>
+              <i class="bi bi-circle"></i><span>Cause List</span>
             </router-link>
           </li>
         </ul>
@@ -702,6 +721,10 @@ const isMechineRouteShow = computed(() => {
 });
 
 
+
+// Check if the current route is part of the Fishbone-related routes
+
+
 const isActiveProblemNoteRoute = computed(() => {
   return [
     "ProblemNoteIndex",
@@ -712,6 +735,12 @@ const isActiveProblemNoteRoute = computed(() => {
 const isActiveMachineCelander = computed(() => {
   return [
     "MachineRequisitionCelender"
+  ].includes(route.name);
+});
+// Check if the current route is part of the Mechine-related routes
+const isActiveMachineChange = computed(() => {
+  return [
+    "MachineRequisitionChange"
   ].includes(route.name);
 });
 
@@ -725,7 +754,8 @@ const isActiveMachineIndex = computed(() => {
 const isActiveMachineRequisionRoute = computed(() => {
   return [
     "MachineRequisitionIndex",
-    "MachineRequisitionCelender"
+    "MachineRequisitionCelender",
+    "MachineRequisitionChange"
   ].includes(route.name);
 });
 
@@ -776,7 +806,12 @@ const isPreventiveServiceRouteShow = computed(() => {
     "PreventiveServiceCreate",
     "PreventiveServiceIndex",
     "PreventiveServiceEdit",
+    "AssignToTechnicianPreventiveService",
+    "PreventiveServiceStart",
+    "PreventiveServiceStartDetails",
     "PreventiveServiceTrash",
+    "PreventiveServiceDetailsList",
+    "SignleServiceDetails"
   ].includes(route.name);
 });
 
@@ -864,20 +899,20 @@ const isProblemNoteRoute = computed(() =>
     'ProblemNoteTrash'
   ].includes(route.name)
 );
-const isCauseRoute = computed(() =>
+const isFishboneCategoryRoute = computed(() =>
   [
-    "CauseIndex",
-    "CauseCreate",
-    'CauseEdit',
-    'CauseTrash'
+    "FishboneCategoryIndex",
+    "FishboneCategoryCreate",
+    'FishboneCategoryEdit',
+    'FishboneCategoryTrash'
   ].includes(route.name)
 );
-const isEffectRoute = computed(() =>
+const isCausesRoute = computed(() =>
   [
-    "EffectIndex",
-    "EffectCreate",
-    'EffectEdit',
-    'EffectTrash'
+    "CausesIndex",
+    "CausesCreate",
+    'CausesEdit',
+    'CausesTrash'
   ].includes(route.name)
 );
 
@@ -888,14 +923,15 @@ const isFishBoneRouteShow = computed(() => {
     "ProblemNoteCreate",
     'ProblemNoteEdit',
     'ProblemNoteTrash',
-    "CauseIndex",
-    "CauseCreate",
-    'CauseEdit',
-    'CauseTrash',
-    "EffectIndex",
-    "EffectCreate",
-    'EffectEdit',
-    'EffectTrash'
+    "FishboneCategoryIndex",
+    "FishboneCategoryCreate",
+    'FishboneCategoryEdit',
+    'FishboneCategoryTrash',
+    "CausesIndex",
+    "CausesCreate",
+    'CausesEdit',
+    'CausesTrash',
+    "FishboneDigrameIndex",
   ].includes(route.name);
 });
 
@@ -935,6 +971,10 @@ const isMachineManageSettingsRouteShow = computed(() => {
     "MechineSourceIndex",
     "MechineSourceCreate",
     "MechineSourceEdit",
+    "MachineStatusIndex",
+    "MachineStatusCreate",
+    "MachineStatusEdit",
+    "MachineStatusTrash"
   ].includes(route.name);
 });
 const isBrandRoute = computed(() =>

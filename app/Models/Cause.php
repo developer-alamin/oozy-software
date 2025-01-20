@@ -16,7 +16,7 @@ class Cause extends Model
         'name',
         'status',
         'company_id',
-        "problem_note_id",
+        "fishbone_category_id",
         'creator_id',
         'creator_type',
         'updater_id',
@@ -25,9 +25,9 @@ class Cause extends Model
     public static function validationRules()
     {
         return [
-            'problem_note_id'   => 'required|exists:problem_notes,id',
-            'name'              => 'required|string|max:255',
-            'status'            => 'nullable|in:Active,Inactive',
+            'fishbone_category_id'  => 'required|exists:fishbone_categories,id',
+            'name'                  => 'required|string|max:255',
+            'status'                => 'nullable|in:Active,Inactive',
         ];
     }
 
@@ -35,10 +35,11 @@ class Cause extends Model
     {
         return $this->belongsTo( Company::class, 'company_id');
     } 
-    public function problemNote()
+    public function fishbone_category()
     {
-        return $this->belongsTo( ProblemNote::class, 'problem_note_id');
+        return $this->belongsTo( FishboneCategory::class, 'fishbone_category_id','id');
     } 
+
     // Polymorphic relationships
     public function creator()
     {

@@ -1,5 +1,5 @@
 <template>
-    <v-card outlined class="mx-auto my-5" max-width="">
+    <v-card outlined class="mx-auto my-5">
         <v-card-title>
             <v-row>
                 <v-col cols="12" md="6"> Create Rent </v-col>
