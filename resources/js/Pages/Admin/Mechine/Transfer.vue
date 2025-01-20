@@ -1,5 +1,5 @@
 <template>
-  <v-card outlined class="mx-auto my-5" max-width="">
+  <v-card outlined class="mx-auto my-5">
     <v-card-title>Machine Movement</v-card-title>
     <v-card-text>
       <v-form v-model="valid" ref="form" @submit.prevent="update">

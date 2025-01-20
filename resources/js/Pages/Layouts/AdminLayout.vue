@@ -7,7 +7,6 @@
     </main>
     <!-- <Footer /> -->
 </template>
-
 <script setup>
 import Sidebar from "../Components/Sideber.vue";
 import Header from "../Components/Header.vue";

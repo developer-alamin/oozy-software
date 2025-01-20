@@ -72,4 +72,6 @@ class MechineType extends Model
     {
         return $this->hasMany(RequisitionDetails::class);
     }
+
+    
 }

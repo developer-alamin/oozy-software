@@ -53,7 +53,7 @@ class UnitController extends Controller
         // Apply sorting
         $unitsQuery->orderBy($sortBy, $sortOrder);
         // Paginate results
-        $units = $unitsQuery->with('creator:id,name','floors:id,name')->paginate($itemsPerPage);
+        $units = $unitsQuery->with('creator:id,name','floor:id,name')->paginate($itemsPerPage);
         // Return the response as JSON
         return response()->json([
             'items' => $units->items(), // Current page items
@@ -95,6 +95,7 @@ class UnitController extends Controller
          } else {
              return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
          }
+
          // Create the technician and associate it with the creator
          $unit = new Unit($validatedData);
          $unit->uuid = HelperController::generateUuid();

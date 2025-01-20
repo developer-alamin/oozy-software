@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Action;
+use App\Models\Admin;
 use App\Models\Brand;
 use App\Models\BreakDownProblemNote;
 use App\Models\Cause;
 use App\Models\Company;
 use App\Models\Factory;
+use App\Models\FishboneCategory;
 use App\Models\Floor;
 use App\Models\Group;
 use App\Models\Line;
@@ -20,41 +22,80 @@ use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 
 class DynamicDataController extends Controller
 {
-    public function getCompanies(Request $request){
-
-       // Get the search term and limit from the request, with defaults
+    public function getCompanies(Request $request)
+    {
+        // Get the authenticated user
+        $currentUser = $this->getAuthenticatedUser();
+        if (!$currentUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+    
+        // Get the creator type (admin or user)
+        $creatorType = $this->getCreatorType();
+    
+        // Get the search term and limit from the request, with defaults
         $search = $request->query('search', ''); // Default search is an empty string
-        
-        
-        $limit = (int) $request->query( 'limit', 5); // Default limit is 5
-
+        $limit = (int) $request->query('limit', 5); // Default limit is 5
+    
         // Validate the limit to ensure it's a positive integer
         if ($limit <= 0) {
             $limit = 5; // Fallback to default if invalid
         }
-
-        // Query the Company model to search for records by name with a limit
-        $companies = Company::where('name', 'like', '%' . $search . '%')
-                    ->limit($limit)
-                    ->get();
-
+    
+        // Build the query for the Company model
+        $companyQuery = Company::query()
+            ->where('creator_id', $currentUser->id)
+            ->where('creator_type', $creatorType);
+    
+        // Apply search filter if provided
+        if ($search) {
+            $companyQuery->where('name', 'like', '%' . $search . '%');
+        }
+    
+        // Retrieve the companies with the limit applied
+        $companies = $companyQuery->limit($limit)->get();
+    
         // Return the results as a JSON response
-        return response()->json($companies,Response::HTTP_OK);
-
+        return response()->json($companies, Response::HTTP_OK);
     }
+    
     public function getCompanyWaysFactories(Request $request)
     {
+
+         // Get the authenticated user
+         $currentUser = $this->getAuthenticatedUser();
+         if (!$currentUser) {
+             return response()->json(['error' => 'Unauthorized'], 401);
+         }
+     
+         // Get the creator type (admin or user)
+         $creatorType = $this->getCreatorType();
+
+
+
       $search = $request->query('search', '');
       $limit = $request->query('limit', 5);
       $companyId = $request->query('company_id');
 
+
+
+      $factoryQuery = Factory::query();
+      $factoryQuery->where('creator_id', $currentUser->id)
+      ->where('creator_type', $creatorType);
+
+        if ($companyId) {
+            $factoryQuery->where('company_id', $companyId);
+        }
+
+        if ($search) { 
+            $factoryQuery->where('name', 'LIKE', '%'. $search . '%');
+        }
       // Query factories by company and name
-      $factories = Factory::where('company_id', $companyId)
-          ->where('name', 'like', '%' . $search . '%')
-          ->limit($limit)
+      $factories = $factoryQuery->limit($limit)
           ->get();
 
       return response()->json($factories);
@@ -62,94 +103,164 @@ class DynamicDataController extends Controller
 
     public function getFactories(Request $request){
 
+         // Get the authenticated user
+         $currentUser = $this->getAuthenticatedUser();
+         if (!$currentUser) {
+             return response()->json(['error' => 'Unauthorized'], 401);
+         }
+     
+         // Get the creator type (admin or user)
+         $creatorType = $this->getCreatorType();
+
+
         // Get search term and limit from the request, with defaults
         $search = $request->query('search', '');
         $limit  = $request->query('limit', 5); // Default limit of 10
         // Query to search for factories by name with a limit
-        $factories = Factory::with('company:id,name')->where('name', 'like', '%' . $search . '%')
-                    //  ->limit($limit)
-                     ->get();
+       
+       $factoryQuery = Factory::query();
+       $factoryQuery->where('creator_id', $currentUser->id)
+       ->where('creator_type', $creatorType);
+       
+       if ($search) {
+        $factoryQuery->where('name', 'LIKE', '%'. $search . '%');
+
+       }
+       
+        $factories =  $factoryQuery->with('company:id,name')
+                      ->limit($limit)
+                       ->get();
+
+
+
         // Return the factories as JSON
         return response()->json($factories);
     }
 
     public function getFloors(Request $request){
 
-        // Get search term and limit from the request, with defaults
-        $search = $request->query('search', '');
-        $limit  = $request->query('limit', 5); // Default limit of 10
-        // Query to search for factories by name with a limit
-        $factories = Floor::with(['factories.company:id,name'])->where('name', 'like', '%' . $search . '%')
-                    //  ->limit($limit)
-                     ->get();
-        // Return the factories as JSON
-        return response()->json($factories);
-    }
-    public function getUnits(Request $request){
+         // Get the authenticated user
+         $currentUser = $this->getAuthenticatedUser();
+         if (!$currentUser) {
+             return response()->json(['error' => 'Unauthorized'], 401);
+         }
+     
+         // Get the creator type (admin or user)
+         $creatorType = $this->getCreatorType();
+
+
 
         // Get search term and limit from the request, with defaults
         $search = $request->query('search', '');
         $limit  = $request->query('limit', 5); // Default limit of 10
+        
+        
+        $floorQyery = Floor::query();
+        $floorQyery->where('creator_id', $currentUser->id)
+         ->where('creator_type', $creatorType);
+        
+
+         if ($search) {
+            $floorQyery->where('name','LIKE', '%'. $search . '%');
+         }
+        
         // Query to search for factories by name with a limit
-        $factories = Unit::with(['floors.factories.company'])->where('name', 'like', '%' . $search . '%')
-                    //  ->limit($limit)
-                     ->get();
+        $floors =  $floorQyery->with(['factories.company:id,name'])
+                    ->limit($limit)
+                    ->get();
+
+
         // Return the factories as JSON
-        return response()->json($factories);
+        return response()->json($floors);
+    }
+    public function getUnits(Request $request){
+        $currentUser = $this->getAuthenticatedUser();
+
+        if (!$currentUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $creatorType = $this->getCreatorType();
+
+        // Get search term and limit from the request, with defaults
+        $search = $request->query('search', '');
+        $limit = $request->query('limit', 5); // Default limit of 5
+
+        // Build the query
+        $unitQuery = Unit::query();
+        $unitQuery->where('creator_id', $currentUser->id)
+                ->where('creator_type', $creatorType);
+
+        if ($search) {
+            $unitQuery->where('name', 'like', '%' . $search . '%');
+        }
+
+        // Retrieve the units with the selected columns
+        $units = $unitQuery->select('id', 'name')
+                        ->limit($limit)
+                        ->get();
+
+        // Return the units as JSON
+        return response()->json($units);
+
     }
     public function getBrandAll(Request $request){
 
+
+         // Get the authenticated user
+         $currentUser = $this->getAuthenticatedUser();
+         if (!$currentUser) {
+             return response()->json(['error' => 'Unauthorized'], 401);
+         }
+     
+         // Get the creator type (admin or user)
+         $creatorType = $this->getCreatorType();
+
+
         // Get search term and limit from the request, with defaults
         $search = $request->query('search', '');
         $limit  = $request->query('limit', 5); // Default limit of 10
+       
+        $brandQuery = Brand::query();
+        $brandQuery->where('creator_id', $currentUser->id)
+        ->where('creator_type', $creatorType);
+
+
+        if ($search) {
+            $brandQuery->where('name', 'like', '%' . $search . '%');
+        }
+       
         // Query to search for brands by name with a limit
-        $brands  = Brand::where('name', 'like', '%' . $search . '%')
-                     ->limit($limit)
-                     ->get();
+        $brands  = $brandQuery->with(['company:id,name'])
+                ->limit($limit)
+                ->get();
+
+
         // Return the brands as JSON
         return response()->json($brands);
     }
-
-
-
-    // public function getModels(Request $request)
-    // {
-    //     // Get search term, limit, and brand_id from the request
-    //     $search = $request->query('search', '');
-    //     $limit  = $request->query('limit', 5); // Default limit of 5
-    //     $brandId = $request->query('brand_id');
-
-    //     if (!$brandId) {
-    //         return response()->json([], 400); // Return empty if no brand_id is provided
-    //     }
-
-    //     // Query to search for models by brand_id and name with a limit
-    //     $models  = ProductModel::where('brand_id', $brandId)
-    //                  ->where('name', 'like', '%' . $search . '%')
-    //                  ->limit($limit)
-    //                  ->get();
-
-    //     // Return the models as JSON
-    //     return response()->json($models);
-    // }
-
-    // public function getModels(Request $request)
-    // {
-    //     $search = $request->query('search', '');
-    //     $limit = $request->query('limit', 5);
-
-    //     $models = ProductModel::where('name', 'like', '%' . $search . '%')
-    //         ->limit($limit)
-    //         ->get();
-    //     return response()->json($models);
-    // }
     public function getModels(Request $request)
     {
+
+      // Get the authenticated user
+      $currentUser = $this->getAuthenticatedUser();
+      if (!$currentUser) {
+          return response()->json(['error' => 'Unauthorized'], 401);
+      }
+  
+      // Get the creator type (admin or user)
+      $creatorType = $this->getCreatorType();
+
+
       $search   = $request->query('search', '');
       $limit    = $request->query('limit', 5); // Default limit of 5
       $brand_id = $request->query('brand_id');
 
       $query = ProductModel::query();
+
+      $query->where('creator_id', $currentUser->id)
+        ->where('creator_type', $creatorType);
+
 
       if ($brand_id) {
           $query->where('brand_id', $brand_id); // Filter by brand_id
@@ -162,103 +273,150 @@ class DynamicDataController extends Controller
       return response()->json($models);
     }
 
-    /**
-     * Fetch brands based on the selected model.
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function getBrands(Request $request)
     {
+
+         // Get the authenticated user
+      $currentUser = $this->getAuthenticatedUser();
+      if (!$currentUser) {
+          return response()->json(['error' => 'Unauthorized'], 401);
+      }
+  
+      // Get the creator type (admin or user)
+      $creatorType = $this->getCreatorType();
+
+
       // Get search term and limit from the request, with defaults
       $search = $request->query('search', '');
       $limit = $request->query('limit', 5); // Default limit of 5
 
+      $brandsQuery = Brand::query();
+      $brandsQuery->where('creator_id', $currentUser->id)
+        ->where('creator_type', $creatorType);
+
       // Query to search for brands by name with a limit
-      $brands = Brand::where('name', 'like', '%' . $search . '%')
+      $brands = $brandsQuery->where('name', 'like', '%' . $search . '%')
           ->limit($limit)
           ->get();
 
       // Return the brands as JSON
       return response()->json($brands);
-  }
-  public function getGroups(Request $request)
+    }
+    public function getGroups(Request $request)
+        {
+
+        // Get the authenticated user
+        $currentUser = $this->getAuthenticatedUser();
+        if (!$currentUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+    
+        // Get the creator type (admin or user)
+        $creatorType = $this->getCreatorType();
+
+
+        // Get search term and limit from the request, with defaults
+        $search = $request->query('search', '');
+        $limit = $request->query('limit', 5); // Default limit of 5
+
+
+        $groupsQuery = Group::query();
+
+        $groupsQuery->where('creator_id', $currentUser->id)
+            ->where('creator_type', $creatorType);
+
+        // Query to search for brands by name with a limit
+        $groups = $groupsQuery->where('name', 'like', '%' . $search . '%')
+            ->limit($limit)
+            ->get();
+
+        // Return the groups as JSON
+        return response()->json($groups);
+    }
+    public function getParts(Request $request)
     {
-      // Get search term and limit from the request, with defaults
-      $search = $request->query('search', '');
-      $limit = $request->query('limit', 5); // Default limit of 5
+        // Get the authenticated user
+        $currentUser = $this->getAuthenticatedUser();
+        if (!$currentUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
 
-      // Query to search for brands by name with a limit
-      $groups = Group::where('name', 'like', '%' . $search . '%')
-          ->limit($limit)
-          ->get();
+        // Get the creator type (admin or user)
+        $creatorType = $this->getCreatorType();
 
-      // Return the groups as JSON
-      return response()->json($groups);
-  }
-  public function getParts(Request $request)
-  {
-      // Get search term and limit from the request, with defaults
-      $search = $request->query('search', '');
-      $limit = $request->query('limit', 5); // Default limit of 5
+        // Get search term and limit from the request, with defaults
+        $search = $request->query('search', '');
+        $limit = $request->query('limit', 5); // Default limit of 5
 
-      // Query to search for brands by name with a limit
-      $parts = Parse::where('name', 'like', '%' . $search . '%')
-          ->limit($limit)
-          ->get();
 
-      // Return the parts as JSON
-      return response()->json($parts);
-  }
+        $ParseQuery = Parse::query();
+        $ParseQuery->where('creator_id', $currentUser->id)
+            ->where('creator_type', $creatorType);
 
-    // public function getBrands(Request $request)
-    // {
-    //     $modelId = $request->query('model_id');
-    //     $search = $request->query('search', '');
-    //     $limit = $request->query('limit', 5);
+        // Query to search for brands by name with a limit
+        $parts = $ParseQuery->where('name', 'like', '%' . $search . '%')
+            ->limit($limit)
+            ->get();
 
-    //     if (!$modelId) {
-    //         return response()->json([]);
-    //     }
-
-    //     $model = ProductModel::find($modelId);
-
-    //     if (!$model) {
-    //         return response()->json([]);
-    //     }
-
-    //     $query = Brand::where('id', $model->brand_id);
-
-    //     if ($search) {
-    //         $query->where('name', 'like', '%' . $search . '%');
-    //     }
-
-    //     $brands = $query->limit($limit)->get();
-
-    //     return response()->json($brands);
-    // }
+        // Return the parts as JSON
+        return response()->json($parts);
+    }
 
     public function getMachineStatus(Request $request){
+
+
+          // Get the authenticated user
+          $currentUser = $this->getAuthenticatedUser();
+          if (!$currentUser) {
+              return response()->json(['error' => 'Unauthorized'], 401);
+          }
+  
+          // Get the creator type (admin or user)
+          $creatorType = $this->getCreatorType();
+
 
         // Get search term and limit from the request, with defaults
         $search = $request->query('search', '');
         $limit  = $request->query('limit', 20); // Default limit of 10
+       
+       $Query = MachineStatus::query();
+       $Query->where('creator_id', $currentUser->id)
+       ->where('creator_type', $creatorType);
+       
         // Query to search for brands by name with a limit
-        $machineStatus  = MachineStatus::where('name', 'like', '%' . $search . '%')
-                    //  ->limit($limit)
+        $machineStatus  = $Query->where('name', 'like', '%' . $search . '%')
+                      ->limit($limit)
                      ->get();
         // Return the machineStatus as JSON
         return response()->json($machineStatus);
     }
     public function getLinesByMachine(Request $request)
     {
+
+        // Get the authenticated user
+        $currentUser = $this->getAuthenticatedUser();
+        if (!$currentUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        // Get the creator type (admin or user)
+        $creatorType = $this->getCreatorType();
+
+
+
         $machineId = $request->query('machine_id');
         if (!$machineId) {
             return response()->json(['error' => 'Machine ID is required'], 400);
         }
 
+
+
+        $query = Line::query();
+        $query->where('creator_id', $currentUser->id)
+            ->where('creator_type', $creatorType);
+
         // Fetch lines associated with the factory of the selected machine
-        $lines = Line::whereHas('units.floors.factories', function ($query) use ($machineId) {
+        $lines = $query->whereHas('units.floors.factories', function ($query) use ($machineId) {
             $query->where('id', MechineAssing::find($machineId)->factory_id);
         })->get(['id', 'name']);
 
@@ -266,11 +424,27 @@ class DynamicDataController extends Controller
     }
     public function getLinesByFactory(Request $request)
     {
+
+        // Get the authenticated user
+        $currentUser = $this->getAuthenticatedUser();
+        if (!$currentUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        // Get the creator type (admin or user)
+        $creatorType = $this->getCreatorType();
+
+
         $factoryId = $request->input('factory_id');
-        // dd( $factoryId);
+ 
+
+        $query = Line::query();
+        $query->where('creator_id', $currentUser->id)
+        ->where('creator_type', $creatorType);
+
 
         // Fetch lines through the relationship chain
-        $lines = Line::whereHas('units.floors.factories', function ($query) use ($factoryId) {
+        $lines = $query->whereHas('unit.floor.factories', function ($query) use ($factoryId) {
             $query->where('id', $factoryId);
         })
         ->select('id', 'name') // Select only necessary columns
@@ -279,74 +453,32 @@ class DynamicDataController extends Controller
         return response()->json($lines);
     }
 
-    /**
-     * @OA\Get(
-     *     path="/get_machine_codes",
-     *     tags={"Machine Management"},
-     *     summary="Retrieve machine codes based on search criteria",
-     *     description="Fetch machine codes that match a search term and filter by location status 'Sewing Line'. Supports grouping by unique machine codes and limiting results.",
-     *     security={{"bearerAuth": {}}},
-     *     @OA\Parameter(
-     *         name="search",
-     *         in="query",
-     *         description="Partial or full machine code to filter results. This field is optional and editable.",
-     *         required=false,
-     *         @OA\Schema(type="string", example="MC123")
-     *     ),
-     *     @OA\Parameter(
-     *         name="limit",
-     *         in="query",
-     *         description="Maximum number of results to return. Default is 5.",
-     *         required=false,
-     *         @OA\Schema(type="integer", example=10)
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(
-     *             type="array",
-     *             @OA\Items(
-     *                 @OA\Property(property="id", type="integer", description="Unique ID of the record", example=1),
-     *                 @OA\Property(property="machine_code", type="string", description="Unique code of the machine", example="MC123"),
-     *                 @OA\Property(property="location_status", type="string", description="Current status of the machine's location", example="Sewing Line"),
-     *                 @OA\Property(property="created_at", type="string", format="date-time", description="Timestamp of the machine record creation", example="2024-01-01T12:00:00Z")
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=400,
-     *         description="Bad request due to invalid input.",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Invalid search parameter.")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthorized",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Unauthorized access.")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Internal server error.",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="An unexpected error occurred.")
-     *         )
-     *     )
-     * )
-     */
-
     public function getMachineCodes(Request $request)
     {
+
+
+          // Get the authenticated user
+          $currentUser = $this->getAuthenticatedUser();
+          if (!$currentUser) {
+              return response()->json(['error' => 'Unauthorized'], 401);
+          }
+  
+          // Get the creator type (admin or user)
+          $creatorType = $this->getCreatorType();
+
+
         // Get search term and limit from the request, with defaults
         $search      = $request->query('search', '');
         $limit       = $request->query('limit', 5); // Default limit of 10
+       
+          $query = MechineAssing::query();
+          $query->where('creator_id', $currentUser->id)
+          ->where('creator_type', $creatorType);
+       
+    
+       
         // Query to search for machines by code with a limit
-        $machineCodes = MechineAssing::selectRaw('
+        $machineCodes = $query->selectRaw('
                             MAX(id) as id,
                             machine_code,
                             line_id,
@@ -362,19 +494,38 @@ class DynamicDataController extends Controller
         return response()->json($machineCodes);
     }
 
-
     public function searchMachine(Request $request, $id = 0)
     {
+
+
+          // Get the authenticated user
+          $currentUser = $this->getAuthenticatedUser();
+          if (!$currentUser) {
+              return response()->json(['error' => 'Unauthorized'], 401);
+          }
+  
+          // Get the creator type (admin or user)
+          $creatorType = $this->getCreatorType();
+
+
+
+
         $search      = $request->query('search', '');
         $limit       = $request->query('limit', 1);
 
+        $query = MechineAssing::query();
+        $query->where('creator_id', $currentUser->id)
+        ->where('creator_type', $creatorType);
+
+
         //when edit
         if($id){
-            $machine = MechineAssing::where('id', $id)
+
+            $machine = $query->where('id', $id)
                 ->limit($limit)
                 ->get();
             }else{
-                $machine = MechineAssing::where('machine_code', 'like', '%' . $search . '%')
+                $machine = $query->where('machine_code', 'like', '%' . $search . '%')
                 ->limit($limit)
                 ->get();
             }
@@ -384,16 +535,33 @@ class DynamicDataController extends Controller
 
     public function searchUser(Request $request, $id = 0)
     {
+
+
+         // Get the authenticated user
+         $currentUser = $this->getAuthenticatedUser();
+         if (!$currentUser) {
+             return response()->json(['error' => 'Unauthorized'], 401);
+         }
+ 
+         // Get the creator type (admin or user)
+         $creatorType = $this->getCreatorType();
+
         $search      = $request->query('search', '');
         $limit       = $request->query('limit', 1);
 
+         $query = User::query();
+         $query->where('creator_id', $currentUser->id)
+            ->where('creator_type', $creatorType);
+
+
+
         //when edit
         if($id){
-            $user = User::where('id', $id)
+            $user = $query->where('id', $id)
                 ->limit($limit)
                 ->get();
             }else{
-                $user = User::where('name', 'like', '%' . $search . '%')
+                $user = $query->where('name', 'like', '%' . $search . '%')
                 ->limit($limit)
                 ->get();
             }
@@ -401,55 +569,26 @@ class DynamicDataController extends Controller
         return response()->json($user);
     }
 
-    /**
-     * @OA\Get(
-     *     path="/get-machine-code-ways/details/{machine_code}",
-     *     tags={"MachineCodes"},
-     *     summary="Retrieve machine details by machine code",
-     *     description="Fetch machine data based on the provided machine code.",
-     *     security={{"bearerAuth": {}}},
-     *     @OA\Parameter(
-     *         name="machine_code",
-     *         in="path",
-     *         description="Machine code to fetch details",
-     *         required=true,
-     *         @OA\Schema(
-     *             type="string",
-     *             example="OZ-00000006"
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Machine data",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="id", type="integer", example=1),
-     *             @OA\Property(property="machine_code", type="string", example="OZ-00000006"),
-     *             @OA\Property(property="unit_id", type="integer", example=1),
-     *              @OA\Property(property="floor_id", type="integer", example=1),
-     *             @OA\Property(property="line_id", type="integer", example=1),
-     *             @OA\Property(property="location", type="string", example="Sewing Line"),
-     *             @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T12:00:00Z")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Machine not found or not assigned to the sewing line"
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthorized - Invalid or missing API token"
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Internal Server Error"
-     *     )
-     * )
-     */
     public function getManuallyApiMachineDetails(Request $request)
     {
+
+        // Get the authenticated user
+        $currentUser = $this->getAuthenticatedUser();
+        if (!$currentUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        // Get the creator type (admin or user)
+        $creatorType = $this->getCreatorType();
+
+        $query = MechineAssing::query();
+        $query->where('creator_id', $currentUser->id)
+        ->where('creator_type', $creatorType);
+
+
+
         // Fetch the machine assignment using the machine code
-        $machine = MechineAssing::where('machine_code', $request->machine_code)
+        $machine = $query->where('machine_code', $request->machine_code)
             ->where('location_status', 'Sewing Line') // Ensure the machine is assigned to the correct location
             ->with(['line.unit', 'line.unit.floor']) // Eager load related models
             ->first([
@@ -493,50 +632,7 @@ class DynamicDataController extends Controller
     }
 
 
-     /**
-     * @OA\Get(
-     *     path="/machine/details/{machine_code}",
-     *     tags={"MachineCodes"},
-     *     summary="Retrieve machine details by machine code",
-     *     description="Fetch machine data based on the provided machine code.",
-     *     security={{"bearerAuth": {}}},
-     *     @OA\Parameter(
-     *         name="machine_code",
-     *         in="path",
-     *         description="Machine code to fetch details",
-     *         required=true,
-     *         @OA\Schema(
-     *             type="string",
-     *             example="MC123"
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Machine data",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="id", type="integer", example=1),
-     *             @OA\Property(property="machine_code", type="string", example="MC123"),
-     *             @OA\Property(property="location_status", type="string", example="Sewing Line"),
-     *             @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T12:00:00Z")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Machine not found or not assigned to the sewing line"
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthorized - Invalid or missing API token"
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Internal Server Error"
-     *     )
-     * )
-     */
-
-
+    
     public function getApiMachineDetails($machine_code)
     {
         // Fetch the machine assignment using the machine code
@@ -591,22 +687,38 @@ class DynamicDataController extends Controller
     }
     public function get_actions(Request $request, $ids = "")
     {
+
+            // Get the authenticated user
+        $currentUser = $this->getAuthenticatedUser();
+        if (!$currentUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+    
+        // Get the creator type (admin or user)
+        $creatorType = $this->getCreatorType();
+
         $search = $request->query('search', ''); // Search parameter
         $limit = $request->query('limit', 5);    // Default limit of 5
 
+
+
+
         // Base query for the Action model
-        $actions = Action::query();
+        $query = Action::query();
+
+
+        $query->where('creator_id', $currentUser->id)
+            ->where('creator_type', $creatorType);
         // Apply search filter if provided
         if ($search) {
-            $actions = $actions->where('name', 'like', '%' . $search . '%'); // Assuming 'name' is a column in the Action model
+            $actions = $query->where('name', 'like', '%' . $search . '%'); // Assuming 'name' is a column in the Action model
         }
         // If IDs are provided, filter by IDs
         if ($ids) {
-            $actions = $actions->whereIn('id', explode(',', $ids));
+            $actions = $query->whereIn('id', explode(',', $ids));
         }
 
        
-
         // Limit the results and get the data
         $actions = $actions->limit($limit)->get();
 
@@ -616,45 +728,68 @@ class DynamicDataController extends Controller
 
     public function get_problemNotes(Request $request, $ids = "")
     {
+        // Get the authenticated user
+        $currentUser = $this->getAuthenticatedUser();
+        if (!$currentUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        // Get the creator type (admin or user)
+        $creatorType = $this->getCreatorType();
+
         $search = $request->query('search', ''); // Search parameter
         $limit = $request->query('limit', 5);    // Default limit of 5
 
         // Base query for the Action model
-        $actions = ProblemNote::query();
+        $query = ProblemNote::query();
+
+        $query->where('creator_id', $currentUser->id)
+        ->where('creator_type', $creatorType);
+
+
         // Apply search filter if provided
         if ($search) {
-            $actions = $actions->where('name', 'like', '%' . $search . '%'); // Assuming 'name' is a column in the Action model
+            $problemNotes = $query->where('name', 'like', '%' . $search . '%'); // Assuming 'name' is a column in the Action model
         }
         // If IDs are provided, filter by IDs
         if ($ids) {
-            $actions = $actions->whereIn('id', explode(',', $ids));
+            $problemNotes = $query->whereIn('id', explode(',', $ids));
         }
-
-       
-
         // Limit the results and get the data
-        $actions = $actions->with(["company:id,name"])->limit($limit)->get();
+        $problemNotes = $problemNotes->with(["company:id,name"])->limit($limit)->get();
 
         // Return the data as JSON
-        return response()->json($actions);
+        return response()->json($problemNotes);
     }
     public function get_causes(Request $request, $ids = "")
     {
+        // Get the authenticated user
+        $currentUser = $this->getAuthenticatedUser();
+        if (!$currentUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        // Get the creator type (admin or user)
+        $creatorType = $this->getCreatorType();
+
+
         $search = $request->query('search', ''); // Search parameter
         $limit = $request->query('limit', 5);    // Default limit of 5
         $ids = $request->query('ids', '');       // Assuming 'ids' parameter might be passed
 
         // Base query for the Cause model
-        $causes = Cause::query();
+        $query = Cause::query();
+        $query->where('creator_id', $currentUser->id)
+        ->where('creator_type', $creatorType);
 
         // Apply search filter if provided
         if ($search) {
-            $causes = $causes->where('name', 'like', '%' . $search . '%'); // Assuming 'name' is a column in the Cause model
+            $causes = $query->where('name', 'like', '%' . $search . '%'); // Assuming 'name' is a column in the Cause model
         }
 
         // If IDs are provided, filter by IDs
         if ($ids) {
-            $causes = $causes->whereIn('id', explode(',', $ids));
+            $causes = $query->whereIn('id', explode(',', $ids));
         }
 
         // Limit the results and get the data
@@ -667,4 +802,147 @@ class DynamicDataController extends Controller
 
     }
 
+    public function fishboneDigrame(Request $request,   $ids = "")
+    {
+        
+        $currentUser = $this->getAuthenticatedUser();
+
+        if (!$currentUser) {
+          return response()->json(["message"=> "Unauthenticated"],0);
+        }
+        $creatorType = $this->getCreatorType(); 
+
+
+        $search = $request->query('search', ''); // Search parameter
+        $limit = $request->query('limit', 5);    // Default limit of 5
+        $ids = $request->query('ids', '');  
+
+       
+
+        $problemNotes = ProblemNote::query();
+
+        if ($search) {
+            $problemNotes = $problemNotes->where('name', 'like', '%' . $search . '%'); // Assuming 'name' is a column in the ProblemNote model
+            
+        }
+
+        $problemNotes = $problemNotes->where("creator_id", $currentUser->id)
+        ->where("creator_type", $creatorType)
+        ->with(["fishbone_categories.causes"])
+        ->limit($limit)
+        ->get();
+
+        return response()->json($problemNotes,Response::HTTP_OK);
+    }
+
+    public function getFishboneCategory(Request $request, $ids = '')
+    {
+        $currentUser = $this->getAuthenticatedUser();
+        
+        if (!$currentUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        
+        $creatorType = $this->getCreatorType();
+    
+        // Get query parameters
+        $search = $request->query('search', ''); // Search parameter
+        $limit = $request->query('limit', 5);    // Default limit of 5
+        $ids = $request->query('ids', $ids);     // Use either the passed 'ids' or query parameter
+    
+        // Begin query
+        $categoryQuery = FishboneCategory::query();
+        $categoryQuery->where("creator_id", $currentUser->id)
+                      ->where("creator_type", $creatorType);
+    
+        // Apply search filter if provided
+        if ($search) {
+            $categoryQuery = $categoryQuery->where("name", "like", "%" . $search . "%");
+        }
+    
+        // Apply 'ids' filter if provided (ensure it's not empty)
+        if (!empty($ids)) {
+            $idsArray = explode(',', $ids); // Assuming 'ids' is a comma-separated list of IDs
+            $categoryQuery = $categoryQuery->whereIn('id', $idsArray);
+        }
+    
+        // Fetch categories with relationships and apply limit
+        $categories = $categoryQuery->with(['problemNote.company'])->limit($limit)->get();
+    
+        // Return the response
+        return response()->json([
+            'items' => $categories
+        ], Response::HTTP_OK);
+    }
+
+    public function problemByFishboneCategory($id){
+        $currentUser = $this->getAuthenticatedUser();
+        if (!$currentUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        $creatorType = $this->getCreatorType();
+
+        if (!$id) {
+            return response()->json(['error' => 'Problem Id not found'], 404);  
+        }
+        $problem  = ProblemNote::where('id', $id)
+        ->where("creator_id", $currentUser->id)
+        ->where("creator_type", $creatorType)
+        ->with(["fishbone_categories.causes"])
+        ->first();
+        return response()->json($problem,Response::HTTP_OK);
+
+    }
+
+
+    public function get_lines(Request $request)  {
+        
+        // Get the authenticated user
+        $currentUser = $this->getAuthenticatedUser();
+        if (!$currentUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        // Get the creator type (admin or user)
+        $creatorType = $this->getCreatorType();
+    
+        $search = $request->query('search', ''); 
+        $limit = (int) $request->query( 'limit', 5); 
+
+
+        if ($limit <= 0) {
+            $limit = 5; 
+        }
+
+        $query = Line::query();
+        $query->where('creator_id', $currentUser->id)
+        ->where('creator_type', $creatorType);
+
+        if ($search) {
+            $query->where('name','like','%'. $search .'%');
+        }
+
+        $lines =  $query->with('company')
+                    ->limit($limit)
+                    ->get();
+
+        return response()->json($lines,Response::HTTP_OK);
+    }
+    
+    // Helper method to get authenticated user
+    private function getAuthenticatedUser()
+    {
+        if (Auth::guard('admin')->check()) {
+            return Auth::guard('admin')->user();
+        } elseif (Auth::guard('user')->check()) {
+            return Auth::guard('user')->user();
+        }
+        return null;
+    }
+    
+    // Helper method to get creator type
+    private function getCreatorType()
+    {
+        return Auth::guard('admin')->check() ? Admin::class : (Auth::guard('user')->check() ? User::class : null);
+    }
+    
 }

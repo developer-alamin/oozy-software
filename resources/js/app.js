@@ -18,6 +18,12 @@ import "vue3-toastify/dist/index.css";
 import { toast } from "vue3-toastify";
 import VueApexCharts from "vue3-apexcharts";
 
+import $ from 'jquery';
+window.$ = window.jQuery = $; 
+
+
+
+
 // Import fonts and any global custom styles
 // import "@/assets/styles/global.css"; // (If you have any custom global styles)
 
