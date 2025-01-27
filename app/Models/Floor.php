@@ -61,4 +61,8 @@ class Floor extends Model
         return $this->belongsTo(Factory::class, 'factory_id');
     }
 
+    public function machines(){
+        return $this->hasMany(MechineAssing::class,'line_id','id');
+    }
+
 }

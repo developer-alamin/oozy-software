@@ -19,7 +19,7 @@
           ></v-text-field>
           <v-btn
             @click="$router.push({ name: 'FishboneCategoryIndex' })"
-            color="primary"
+            class="primary-color"
             icon
             style="width: 40px; height: 40px"
           >

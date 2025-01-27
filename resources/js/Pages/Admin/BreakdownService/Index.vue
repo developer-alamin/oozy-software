@@ -3,6 +3,7 @@
     <v-card-title class="pt-5">
       <v-row>
         <v-col cols="4"><span>Breakdown Service List</span></v-col>
+        
         <v-col cols="8" class="d-flex justify-end">
           <v-date-input
             v-model="dateRange"
@@ -13,7 +14,7 @@
           ></v-date-input>
           <v-btn
             @click="createBreakdownService"
-            color="primary"
+            class="primary-color"
             icon
             style="width: 40px; height: 40px"
           >
@@ -45,6 +46,7 @@
           </v-badge>
         </v-col>
       </v-row>
+      
     </v-card-title>
 
     <v-data-table-server
@@ -117,6 +119,10 @@
 import { toast } from "vue3-toastify";
 import ConfirmDialog from "../../Components/ConfirmDialog.vue";
 import ConfirmDialogAcknowledged from "../../Components/ConfirmDialogAcknowledged.vue";
+import flatpickr from "flatpickr"; 
+import "flatpickr/dist/flatpickr.min.css"; 
+
+
 
 export default {
   components: {
@@ -125,6 +131,7 @@ export default {
   },
   data() {
     return {
+     
       dialogName: "Are you sure you want to delete this Service?",
       dialogNameAcknowledged: "Are you sure you want to Acknowledge?",
       dateRange: null,
@@ -158,7 +165,9 @@ export default {
       return ""; // Return an empty string if no date range is selected
     },
   },
+
   methods: {
+   
     async loadItems({ page, itemsPerPage, sortBy }) {
       this.loading = true;
       const sortOrder = sortBy.length ? sortBy[0].order : "desc";
@@ -255,6 +264,24 @@ export default {
 };
 </script>
 
-<style scoped>
-/* Optional styles */
+
+<style>
+/* প্রি-সিলেক্ট তারিখগুলোর জন্য স্টাইল */
+.flatpickr-day.pre-selected {
+  background-color: #4caf50 !important; /* প্রি-সিলেক্ট তারিখের ব্যাকগ্রাউন্ড */
+  color: white !important;
+  cursor: pointer !important; /* ক্লিকেবল রাখার জন্য */
+}
+
+/* ডিফল্ট তারিখের স্টাইল */
+.flatpickr-day {
+  cursor: pointer !important;
+}
+
+/* ডিসেবলড তারিখের স্টাইল */
+.flatpickr-day.disabled {
+  background-color: #e0e0e0 !important; /* ডিসেবলড তারিখের ব্যাকগ্রাউন্ড */
+  color: #bdbdbd !important; /* ডিসেবলড তারিখের ফন্ট কালার */
+  pointer-events: none !important; /* ক্লিক করা যাবে না */
+}
 </style>

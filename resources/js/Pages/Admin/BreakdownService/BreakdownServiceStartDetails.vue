@@ -28,7 +28,7 @@
 					<div class="d-flex align-items-center">
 						<v-btn
 							@click="problemBtn"
-							color="primary"
+							class="primary-color"
 							icon
 							style="width: 20px; height: 20px;margin-top: 10px;" 
 						>
@@ -62,7 +62,7 @@
 					<div class="d-flex align-items-center">
 						<v-btn
 							@click="actionBtn"
-							color="primary"
+							class="primary-color"
 							icon
 							style="width: 20px; height: 20px;" 
 						>
@@ -186,7 +186,7 @@
                         </v-btn>
                         <v-btn
                             type="submit"
-                            color="primary"
+                            class="primary-color"
                             :disabled="!valid || loading"
                             :loading="loading"
                         >
@@ -243,7 +243,7 @@
 					</v-row>
 					<v-row class="pb-3 px-5">
 						<v-card-actions class="ms-auto">
-							<v-btn color="primary" text @click="problem_dialog = false">Close</v-btn>
+							<v-btn class="primary-color" text @click="problem_dialog = false">Close</v-btn>
 							<v-btn
 								type="submit"
 								color="white"
@@ -301,7 +301,7 @@
 					</v-row>
 					<v-row class="pb-3 px-5">
 						<v-card-actions class="ms-auto">
-							<v-btn color="primary" text @click="action_dialog = false">Close</v-btn>
+							<v-btn class="primary-color" text @click="action_dialog = false">Close</v-btn>
 							<v-btn
 								type="submit"
 								color="white"

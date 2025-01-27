@@ -30,14 +30,14 @@
             single-line
             clearable
           ></v-text-field>
-          <v-btn @click="searchByFactoryCode" color="primary" class="mr-2">
+          <v-btn @click="searchByFactoryCode"  class="primary-color mr-2">
             <v-icon left>mdi-magnify</v-icon>
             <!-- Adds the magnifying glass icon -->
             <!-- Search -->
           </v-btn>
           <v-btn
             @click="FactoryCreate"
-            color="primary "
+             class="primary-color"
             icon
             style="width: 40px; height: 40px"
           >

@@ -4,14 +4,9 @@
       <v-row>
         <v-col cols="4"><span>Preventive Service List</span></v-col>
         <v-col cols="8" class="d-flex justify-end">
-          <v-date-picker
-            v-model="date2"
-            :event-color="date => date[9] % 2 ? 'red' : 'yellow'"
-            :events="functionEvents"
-          ></v-date-picker>
           <v-btn
             @click="createPreventiveService"
-            color="primary"
+            class="primary-color"
             icon
             style="width: 40px; height: 40px"
           >
@@ -41,6 +36,11 @@
               </v-tooltip>
             </v-btn>
           </v-badge>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="12">
+          <div ref="datepicker"></div>
         </v-col>
       </v-row>
     </v-card-title>
@@ -121,8 +121,8 @@ export default {
   components: { ConfirmDialog, ConfirmDialogAcknowledged },
   data() {
     return {
-      arrayEvents: null,
-      date2: new Date().toISOString().substr(0, 10),
+      selectedDates: [], //this.filterValidDates(["2025-01-22", "2025-01-26", "2025-01-27",new Date(2025, 8, 9)]),
+      clickedDate: null,
       dialogName: "Are you sure you want to delete this Service?",
       dialogNameAcknowledged: "Are you sure you want to Acknowledge?",
       itemsPerPage: 10,
@@ -146,28 +146,80 @@ export default {
     };
   },
   mounted() {
-    this.arrayEvents = [...Array(6)].map(() => {
-      const day = Math.floor(Math.random() * 30);
-      const d = new Date();
-      d.setDate(day);
-      return d.toISOString().substr(0, 10);
-    });
+    this.fatchDate();
   },
   methods: {
-    functionEvents(date) {
-      const [,, day] = date.split("-");
-      if ([12, 17, 28].includes(parseInt(day, 10))) return true;
-      if ([1, 19, 22].includes(parseInt(day, 10))) return ["red", "#00f"];
-      return false;
+    initFlatpickr() {
+      flatpickr(this.$refs.datepicker, {
+        inline: true,
+        mode: "multiple",
+        enable: this.selectedDates, // Use the updated selectedDates
+        onDayCreate: (dObj, dStr, fp, dayElem) => {
+          const date = [
+            dayElem.dateObj.getFullYear(),
+            String(dayElem.dateObj.getMonth() + 1).padStart(2, "0"),
+            String(dayElem.dateObj.getDate()).padStart(2, "0"),
+          ].join("-");
+
+          if (this.selectedDates.includes(date)) {
+            dayElem.classList.add("pre-selected");
+            dayElem.addEventListener("click", () => {
+              this.handleDateClick(date);
+            });
+          } else {
+            dayElem.classList.add("disabled");
+            dayElem.style.pointerEvents = "none";
+          }
+        },
+      });
     },
-    async loadItems({ page, itemsPerPage, sortBy }) {
+    filterValidDates(dates) {
+      const validDates = [];
+      dates.forEach(dateStr => {
+        const date = this.parseDate(dateStr); 
+        if (date) {
+          validDates.push(dateStr); 
+        }
+      });
+      return validDates;
+    },
+
+    parseDate(dateStr) {
+      const date = new Date(dateStr);
+      date.setHours(0, 0, 0, 0);
+      return date;
+    },
+
+    handleDateClick(date) {
+      this.clickedDate = date;
+      // Make sure the necessary parameters are passed to loadItems
+      this.loadItems({
+        page: 1,
+        itemsPerPage: this.itemsPerPage, 
+        sortBy: [] ,
+        calenderDate : this.clickedDate
+      });
+
+    },
+    async fatchDate(){
+      try {
+        const response = await this.$axios.get("/get_preventivedates");
+        this.selectedDates = this.filterValidDates(response.data);
+        console.log( this.selectedDates);
+      } catch (error) {
+        console.error("Error fetching trashed count:", error);
+      }
+    },
+
+    async loadItems({ page, itemsPerPage, sortBy,calenderDate }) {
       this.loading = true;
       const sortOrder = sortBy.length ? sortBy[0].order : "desc";
       const sortKey = sortBy.length ? sortBy[0].key : "created_at";
       try {
         const response = await this.$axios.get("/preventive-service", {
-          params: { page, itemsPerPage, sortBy: sortKey, sortOrder, dateRange: this.formattedDateRangeString },
+          params: { page, itemsPerPage, sortBy: sortKey, sortOrder, dateRange: calenderDate || '' },
         });
+
         this.serverItems = response.data.items || [];
         this.totalItems = response.data.total || 0;
         this.fetchTrashedPreventiveServiceCount();
@@ -243,6 +295,11 @@ export default {
         this.loadItems({ page: 1, itemsPerPage: this.itemsPerPage, sortBy: [] });
       },
       deep: true,
+    },
+    selectedDates(newDates) {
+      if (newDates.length) {
+        this.initFlatpickr(); // Reinitialize flatpickr when selectedDates is updated
+      }
     },
   },
   created() {

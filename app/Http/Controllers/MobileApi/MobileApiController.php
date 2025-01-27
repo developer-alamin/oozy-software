@@ -134,7 +134,7 @@ class MobileApiController extends Controller
         }
 
         // Encode problem_note_id if present
-        $problemNoteId = $request->has('problem_note_id') ? json_encode($request->problem_note_id) : null;
+        $problemNoteId = $request->has('supervisor_problem_note_id') ? json_encode($request->supervisor_problem_note_id) : null;
 
         // Create Breakdown Service
         $serviceCreate = BreakdownService::create([
@@ -144,7 +144,7 @@ class MobileApiController extends Controller
             'company_id' => $mechineAssing->company_id,
             'technician_id' => $technician ?? null,
             'supervisor_problem_note_id' => $problemNoteId,
-            'supervisor_note' => $request->input('problem_note', null),
+            'supervisor_note' => $request->input('supervisor_note', null),
             'creator_id' => $currentUser->id,
             'creator_type' => $className,
             'updater_id' => $currentUser->id,
@@ -185,7 +185,8 @@ class MobileApiController extends Controller
         }
         
         $className = get_class($currentUser);
-       
+
+
 
         $services = BreakdownService::query();
 
@@ -201,16 +202,20 @@ class MobileApiController extends Controller
             ->with([
                 'creator:id,name',           // Load creator's name
                 'mechine_assing',             // Load machine assignment details
-                'service_details',           // Load service details
+                'service_details',  
             ])
             ->get();
+
+        foreach ($services as $service) {
+            $service->supervisorProblemNotes = $service->supervisorProblemNotes();
+        }
         
         return response()->json([
             'success' => true,
             'message' => 'Breakdown service data fetched successfully!',
             'service' => $services,
         ], Response::HTTP_OK);
-        
+
     }
 
 
@@ -383,29 +388,63 @@ class MobileApiController extends Controller
 
         $className = get_class($currentUser); 
 
-        $serviceDetailsQuery = BreakdownServiceDetail::query();
 
-        // Add where clause with table prefix and eager loading for relationships
-        $serviceDetailsQuery->where("breakdown_service_details.technician_id", $currentUser->id)
-            ->with(['creator:id,name', 'updater:id,name', 'breckdown_service.mechine_assing']);
-        
-        // Add the join logic
-        $serviceDetailsQuery->leftJoin('breakdown_services', function ($join) {
-            $join->on('breakdown_services.id', '=', 'breakdown_service_details.breakdown_service_id')
+
+        $services = BreakdownService::query();
+
+        $services->leftJoin('breakdown_service_details', function ($join) {
+            $join->on('breakdown_service_details.breakdown_service_id', '=', 'breakdown_services.id')
                 ->whereRaw('breakdown_service_details.created_at = (SELECT MAX(created_at) FROM breakdown_service_details WHERE breakdown_service_id = breakdown_services.id)');
-        });
+        })
+        ->select('breakdown_services.*', 'breakdown_service_details.id as detail_id');
+
+        $services = $services->where('breakdown_services.creator_type', $className) // Specify the table
+            ->where('breakdown_services.creator_id', $currentUser->id) // Specify the table
+            ->latest()
+            ->with([
+                'creator:id,name',           // Load creator's name
+                'mechine_assing',             // Load machine assignment details
+                'service_details',  
+            ])
+            ->get();
+
+        foreach ($services as $service) {
+            $service->supervisorProblemNotes = $service->supervisorProblemNotes();
+        }
         
-        // Select the required columns
-        $serviceDetailsQuery->select('breakdown_services.*', 'breakdown_service_details.*');
-        
-        // Execute the query
-        $serviceDetails = $serviceDetailsQuery->get();
-        
-        // Return the response as JSON
         return response()->json([
             'success' => true,
-            'serviceDetails' => $serviceDetails,
-        ], 200);
+            'message' => 'Breakdown service data fetched successfully!',
+            'service' => $services,
+        ], Response::HTTP_OK);
+
+        // $serviceDetailsQuery = BreakdownServiceDetail::query();
+
+        // // Add where clause with table prefix and eager loading for relationships
+        // $serviceDetailsQuery->where("breakdown_service_details.technician_id", $currentUser->id)
+        //     ->with(['creator:id,name', 'updater:id,name', 'breckdown_service.mechine_assing']);
+        
+        // // Add the join logic
+        // $serviceDetailsQuery->leftJoin('breakdown_services', function ($join) {
+        //     $join->on('breakdown_services.id', '=', 'breakdown_service_details.breakdown_service_id')
+        //         ->whereRaw('breakdown_service_details.created_at = (SELECT MAX(created_at) FROM breakdown_service_details WHERE breakdown_service_id = breakdown_services.id)');
+        // });
+        
+        // // Select the required columns
+        // $serviceDetailsQuery->select('breakdown_services.*', 'breakdown_service_details.*');
+        
+        // // Execute the query
+        // $serviceDetails = $serviceDetailsQuery->get();
+        
+        // // Return the response as JSON
+        // return response()->json([
+        //     'success' => true,
+        //     'serviceDetails' => $serviceDetails,
+        // ], 200);
+
+
+
+
     }
     public function technicianmachinecodesearch(Request $request)
     {

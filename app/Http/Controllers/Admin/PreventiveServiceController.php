@@ -61,12 +61,11 @@ class PreventiveServiceController extends Controller
         // }
 
         if ($dateRange) {
-            $dates = explode(',', $dateRange);
-            $startDate = Carbon::parse($dates[0])->startOfDay(); // Ensure start of the day for $startDate
-            $endDate = Carbon::parse(end($dates))->endOfDay();   // Ensure end of the day for $endDate
+            // Parse the date to match the format 'YYYY-MM-DD'
+            $date = Carbon::createFromFormat('Y-m-d', $dateRange)->startOfDay(); // Start of the day (00:00:00)
         
-            $PreventiveServiceQuery =$PreventiveServiceQuery->whereDate('date_time', '>=', $startDate)
-                                  ->whereDate('date_time', '<=', $endDate);
+            // Filter the query for records where the date portion of `date_time` matches the given date
+            $PreventiveServiceQuery = $PreventiveServiceQuery->whereDate('date_time', '=', $date);
         }
 
         // Apply sorting

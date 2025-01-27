@@ -70,7 +70,7 @@
 
             <v-btn
               type="submit"
-              color="primary"
+               class="primary-color"
               :disabled="!valid || loading"
               :loading="loading"
             >

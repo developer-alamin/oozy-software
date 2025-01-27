@@ -26,6 +26,9 @@ class FloorController extends Controller
         $sortBy       = $request->input('sortBy', 'created_at'); // Default sort by created_at
         $sortOrder    = $request->input('sortOrder', 'desc');    // Default sort order is descending
         $search       = $request->input('search', '');           // Search term, default is empty
+      
+       
+       
         // Determine the authenticated user (either from 'admin' or 'user' guard)
         if (Auth::guard('admin')->check()) {
             $currentUser = Auth::guard('admin')->user();

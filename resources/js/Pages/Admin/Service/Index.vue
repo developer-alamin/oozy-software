@@ -19,7 +19,7 @@
           ></v-text-field>
           <v-btn
             @click="createService"
-            color="primary"
+          class="primary-color"
             icon
             style="width: 40px; height: 40px"
           >
@@ -112,8 +112,7 @@
           <template v-slot:activator="{ props }">
             <v-icon
               @click="serviceProcessing(item.uuid)"
-              class="mr-2"
-              color="primary"
+              class="primary-color mr-2"
               v-bind="props"
             >
               mdi-cogs

@@ -129,6 +129,7 @@ class UserAuthController extends Controller
       if ($user && Hash::check($request->password, $user->password)) {
           // Generate Sanctum token for user
           $token = $user->createToken('UserToken')->plainTextToken;
+          
           return response()->json([
               'token'  => $token,
               'user'   => $user,

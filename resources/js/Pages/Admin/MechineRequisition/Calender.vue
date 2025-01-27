@@ -9,18 +9,18 @@
           </v-col>
           <v-col cols="4" class="text-center ms-auto">
             <v-autocomplete
-                  v-model="line"
-                  :items="lines"
+                  v-model="factory"
+                  :items="factories"
                   item-value="id"
-                  :item-title="formatLine"
+                  :item-title="formatFactory"
                   outlined
                   clearable
                   density="comfortable"
-                  @update:model-value="getLine"
-                  @update:search="fetchLines"
+                  @update:model-value="onChangeFactory"
+                  @update:search="fetchFactories"
                 >
                 <template v-slot:label>
-                  Select Line <span style="color: red">*</span>
+                  Select Factory 
                 </template>
               </v-autocomplete>
           </v-col>
@@ -96,7 +96,7 @@ export default {
       selectedMonth: new Date().getMonth() + 1, // Selected month value
       selectedYear: new Date().getFullYear(), // Selected year value
       search:'',
-      line: null,
+      factory: null,
       itemsPerPage: 15,
       headers: [
         { title: "No", value: "sr_no", sortable: true },
@@ -105,7 +105,7 @@ export default {
       ],
       totalMcSum: 0,
       serverItems: [],
-      lines: [],
+      factories: [],
       loading: true,
       totalItems: 0,
       dates:[],
@@ -119,17 +119,16 @@ export default {
         this.years.push(year);
       }
     },
-    async loadItems({selectLine,month,year }) {
+    async loadItems({selectFactory,month,year }) {
         this.loading = true;
         try {
             const response = await this.$axios.get("/machine-requisition/machine-calender", {
                 params: {
-                    line: selectLine || '',
+                    factory: selectFactory || '',
                     month:month || this.selectedMonth,
                     year:year || this.selectedYear
                 }
             }); 
-            
             this.RowData = response.data;
         } catch (error) {
             console.log(error);
@@ -160,41 +159,42 @@ export default {
         console.error("Error loading items:", error);
       }
     },
-    async getLine() {
-        if (!this.line) {
+    async onChangeFactory() {
+        if (!this.factory) {
           this.loadItems({ page: 1, itemsPerPage: this.itemsPerPage, sortBy: [] });
         }
         try {
-            const selectLine = this.line;
-            console.log(selectLine);
+            const selectFactory = this.factory;
             
             const page = 1;  // Set the default page or get it from somewhere
             const itemsPerPage = this.itemsPerPage;
             const sortBy = [];  // Set the default sortBy or pass it from elsewhere
 
             // Call loadItems with the correct arguments
-            await this.loadItems({ page, itemsPerPage, sortBy, selectLine });
+            await this.loadItems({ page, itemsPerPage, sortBy, selectFactory });
 
         } catch (error) {
             console.log(error);
         }
+
+
     },
-    async fetchLines(search) {
+    async fetchFactories(search) {
       try {
-        const response = await this.$axios.get("/get-lines", {
+        const response = await this.$axios.get("/get_factories", {
           params: { search:this.search, limit: 10 },
         });
-        this.lines = response.data || [];
+        this.factories = response.data || [];
       } catch (error) {
         toast.error("Failed to fetch lines.");
       }
     },
-    formatLine(line) {
-      if (!line) return "No Line Data";
-      const lineName = line.name || "No Line Name";
-      const companyName = line.company?.name || "No Company";
-      this.line = line.id;
-      return `${lineName} -- ${companyName}`;
+    formatFactory(factory) {
+      if (!factory) return "No Factory Data";
+      const FactoryName = factory.name || "No Factory Name";
+      const companyName = factory.company?.name || "No Company";
+      //this.factory = factory.id;
+      return `${FactoryName} -- ${companyName}`;
     },
   },
   created() {

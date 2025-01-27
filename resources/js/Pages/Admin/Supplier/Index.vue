@@ -21,7 +21,7 @@
 
                     <v-btn
                         @click="createSupplier"
-                        color="primary"
+                      class="primary-color"
                         icon
                         style="width: 40px; height: 40px"
                     >

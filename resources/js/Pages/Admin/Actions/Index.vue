@@ -19,7 +19,7 @@
           ></v-text-field>
           <v-btn
             @click="actionCreate"
-            color="primary"
+            class="primary-color"
             icon
             style="width: 40px; height: 40px"
           >

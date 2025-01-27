@@ -73,5 +73,9 @@ class MechineType extends Model
         return $this->hasMany(RequisitionDetails::class);
     }
 
+    public function machines(){
+        return $this->hasMany(MechineAssing::class,'machine_type_id','id');
+    }
+
     
 }

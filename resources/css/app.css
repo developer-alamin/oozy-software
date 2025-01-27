@@ -7,3 +7,8 @@
 @import '../assets/vendor/simple-datatables/style.css';
 @import '../assets/css/style.css';
 @import '../assets/css/custom.css';
+
+
+
+@import url('https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');

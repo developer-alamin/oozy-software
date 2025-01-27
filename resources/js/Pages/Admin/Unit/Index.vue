@@ -19,7 +19,7 @@
           ></v-text-field>
           <v-btn
             @click="createUnit"
-            color="primary"
+           class="primary-color"
             icon
             style="width: 40px; height: 40px"
           >
@@ -27,7 +27,7 @@
               <template v-slot:activator="{ props }">
                 <v-icon v-bind="props" style="font-size: 20px">mdi-plus</v-icon>
               </template>
-              <span>Add a new Unit</span>
+              <span >Add a new Unit</span>
             </v-tooltip>
           </v-btn>
 
@@ -45,7 +45,7 @@
                     mdi-trash-can-outline
                   </v-icon>
                 </template>
-                <span>View trashed categories </span>
+                <span>View trashed Units </span>
               </v-tooltip>
             </v-btn>
           </v-badge>

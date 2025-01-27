@@ -1,34 +1,80 @@
 <template>
   <v-card>
     <v-card-title class="pt-5">
-      <v-row class="align-items-center">
+      <v-row class="">
         <v-col cols="3">
           <v-autocomplete
-            v-model="line"
-            :items="lines"
+          v-model="factory_id"
+          :items="factories"
+          item-value="id"
+          :item-title="formatFactory"
+          outlined
+          clearable
+          density="comfortable"
+          @update:model-value="onChangeFactory"
+          @update:search="fetchFactories"
+        >
+          <template v-slot:label>
+            Select Factory <span style="color: red">*</span>
+          </template>
+        </v-autocomplete>
+        </v-col>
+        <v-col cols="3">
+          <v-autocomplete
+            v-model="floor_id"
+            :items="floors"
             item-value="id"
-            :item-title="formatLine"
+            item-title="name"
             outlined
             clearable
             density="comfortable"
-            @update:search="fetchLines"
+            @update:search="fetchFloors"
+            @update:model-value="onChangeFloor"
+            :disabled="!factory_id"
           >
-            <template v-slot:label>
-              Select Line <span style="color: red">*</span>
-            </template>
-          </v-autocomplete>
+          <template v-slot:label>
+            Select Floor
+          </template>
+        </v-autocomplete>
         </v-col>
         <v-col cols="3">
-      
+          <v-autocomplete
+            v-model="unit_id"
+            :items="units"
+            item-value="id"
+            item-title="name"
+            outlined
+            clearable
+            density="comfortable"
+            @update:search="fetchUnits"
+            :disabled="!floor_id"
+          >
+          <template v-slot:label>
+            Select Unit 
+          </template>
+        </v-autocomplete>
         </v-col>
-        <v-col cols="4" class="text-center ms-auto">
-          <v-btn @click="addRequisition" color="primary">
+        <v-col cols="3" >
+          <v-btn @click="addRequisition" class="primary-color">
             <v-icon>mdi-plus</v-icon>
             <span class="ml-2">Add New Requisition</span>
           </v-btn>
         </v-col>
       </v-row>
     </v-card-title>
+    <v-data-table-server
+      v-model:items-per-page="itemsPerPage"
+      :headers="headers"
+      :search="search"
+      :unit="unit_id"
+      :items="serverItems"
+      :items-length="totalItems"
+      :loading="loading"
+      item-value="created_at"
+      loading-text="Loading... Please wait"
+      @update:options="loadItems"
+    >
+    </v-data-table-server>
   </v-card>
 
   <v-dialog v-model="dialog" max-width="900">
@@ -140,7 +186,7 @@
             <v-card-actions>
               <v-btn color="danger" @click="dialog = false">Cancel</v-btn>
               <v-btn 
-               color="primary"
+               class="primary-color"
                :disabled="!requisitionValid || loading || requisition.types.length === 0"
                :loading="loading"
                type="submit"
@@ -151,6 +197,21 @@
       </v-card-text>
     </v-card>
   </v-dialog>
+  
+
+  <v-card class="mt-2 d-none">
+    <v-row>
+    <v-col cols="12">
+      <apexchart
+        width="500px"
+        type="bar"
+        :options="chartOptions"
+        :series="series"
+      ></apexchart>
+    </v-col>
+  </v-row>
+  </v-card>
+  
 </template>
 
 <script>
@@ -163,6 +224,29 @@ export default {
   },
   data() {
     return {
+      chartOptions: {
+        chart: {
+          id: "vuechart-example",
+        },
+        xaxis: {
+          categories: ['South Korea', 'Canada', 'United Kingdom', 'Netherlands', 'Italy', 'France', 'Japan',
+            'United States', 'China', 'Germany'],
+        },
+        plotOptions: {
+          bar: {
+            horizontal: true, // This enables horizontal bars
+            borderRadius: 4,
+            borderRadiusApplication: 'end',
+          },
+        },
+      },
+      series: [
+        {
+          name: "series-22",
+          data: [400, 430, 448, 470, 540, 580, 690, 1100, 1200, 1380],
+        },
+      ],
+
       line:null,
       search:'',
       unit:null,
@@ -174,7 +258,24 @@ export default {
         types: [],
         total: 0,
       },
+      itemsPerPage: 15,
+      headers: [
+        { title: "Sr", key: "sr_number", sortable: true },
+        { title: "Unit", key: "unit.name", sortable: true },
+        { title: "Line", key: "name", sortable: true },
+        { title: "A M/C", key: "total_sum", sortable: true },
+      ],
+
+      serverItems: [],
+      totalItems: 0,
+      loading: true,
+      units:[],
+      unit_id:null,
+      floors: [],
+      floor_id: null,
       lines: [],
+      factory_id:null,
+      factories: [],
       loading: true,
       dialog: false,
       errors: {}, // Stores validation errors
@@ -195,10 +296,14 @@ export default {
             itemsPerPage,
             sortBy: sortKey,
             sortOrder,
-            line: this.line,
+            unit: this.unit_id,
           },
         });
-       console.log(response.data);
+
+        this.serverItems = response.data.items || [];
+        this.totalItems = response.data.total || 0;
+
+        console.log(response.data);
        
       } catch (error) {
         console.error("Error loading items:", error);
@@ -245,6 +350,64 @@ export default {
     },
     addRequisition() {
       this.dialog = true;
+    },
+    async onChangeFloor(){
+      if (!this.floor_id) return;
+      try {
+        const response = await this.$axios.get("/FloorByUnits", {
+          params: {
+            id: this.floor_id,
+          },
+        });
+        console.log(response.data);
+        
+        this.units = response.data;
+      } catch (error) {
+          console.log(error);
+      }
+    },
+    async onChangeFactory(newValue) {
+      if (!this.factory_id) {
+        return;
+      }
+      try {
+        const response = await this.$axios.get("/factoryByFloors", {
+          params: {
+            id: this.factory_id,
+          },
+        });
+        this.floors = response.data;
+      } catch (error) {
+        // Log the error or handle it appropriately
+        console.error("Error fetching factory by floors:", error);
+      }
+    },
+    async fetchFactories(search) {
+      try {
+        const response = await this.$axios.get(`/get_factories`, {
+          params: {
+            search: search,
+            limit: this.limit,
+          },
+        });
+        this.factories = response.data;
+      } catch (error) {
+        console.error("Error fetching factories:", error);
+      }
+    },
+    formatFactory(factory) {
+      if (factory) {
+          if (typeof factory === "number") {
+            factory = this.factories.find((item) => item.id === factory);
+          }
+          if (factory) {
+            const factoryName = factory.name || "No Factory Name";
+            const userName = factory.company?.name || "No Company";
+            return `${factoryName} -- ${userName}`;
+          }
+        }
+        return "No Factory Data";
+
     },
     
     async fetchLines(search) {
@@ -303,7 +466,7 @@ export default {
     },
   },
   watch: {
-    line: {
+    unit_id: {
       handler() {
         this.loadItems({ page: 1, itemsPerPage: this.itemsPerPage, sortBy: [] });
       },

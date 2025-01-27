@@ -16,16 +16,137 @@ use App\Models\Line;
 use App\Models\MachineStatus;
 use App\Models\MechineAssing;
 use App\Models\Parse;
+use App\Models\PreventiveService;
 use App\Models\ProblemNote;
 use App\Models\ProductModel;
 use App\Models\Unit;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
 class DynamicDataController extends Controller
 {
+
+
+
+public function FloorByUnits(Request $request){
+        // Get the authenticated user
+        $currentUser = $this->getAuthenticatedUser();
+        if (!$currentUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        // Get the creator type (admin or user)
+        $creatorType = $this->getCreatorType();
+
+
+         // Get the search term and limit from the request, with defaults
+        $search = $request->query('search', ''); // Default search is an empty string
+        $limit = (int) $request->query('limit', 5); // Default limit is 5
+        $floor = $request->input('id','');
+
+        $untis = Unit::query();
+
+        if ($floor) {
+            $untis = $untis->where('floor_id','=', $floor);
+        }
+
+        if ($search) {
+            $untis->where('name','like','%'. $search .'%');
+        }
+
+        $untis = $untis->limit($limit)->get();
+       
+        return response()->json($untis,Response::HTTP_OK);
+
+    }
+
+    public function factoryByFloors(Request $request){
+        // Get the authenticated user
+        $currentUser = $this->getAuthenticatedUser();
+        if (!$currentUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        // Get the creator type (admin or user)
+        $creatorType = $this->getCreatorType();
+
+
+         // Get the search term and limit from the request, with defaults
+        $search = $request->query('search', ''); // Default search is an empty string
+        $limit = (int) $request->query('limit', 5); // Default limit is 5
+        $factory = $request->input('id','');
+
+        $floors = Floor::query();
+
+        if ($factory) {
+            $floors = $floors->where('factory_id','=', $factory);
+        }
+
+        if ($search) {
+            $floors->where('name','like','%'. $search .'%');
+        }
+
+        $floors = $floors->limit($limit)->get();
+       
+        return response()->json($floors,Response::HTTP_OK);
+
+    }
+    public function get_problem_list(Request $request){
+        // Get the authenticated user
+        $currentUser = $this->getAuthenticatedUser();
+        if (!$currentUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        // Get the creator type (admin or user)
+        $creatorType = $this->getCreatorType();
+
+
+         // Get the search term and limit from the request, with defaults
+         $search = $request->query('search', ''); // Default search is an empty string
+         $limit = (int) $request->query('limit', 5); // Default limit is 5
+
+        $query = ProblemNote::query();
+        
+
+        if ($search) {
+            $query->where('name','like','%'. $search .'%');
+        }
+        
+
+        $problem_lists = $query->where('creator_id', $currentUser->id)
+        ->where('creator_type', $creatorType)
+        ->limit($limit)
+        ->select('id','name')
+        ->get();
+
+        return response()->json( $problem_lists,200);
+    }
+    public function get_preventivedates(Request $request){
+        // Get the authenticated user
+        $currentUser = $this->getAuthenticatedUser();
+        if (!$currentUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+    
+        // Get the creator type (admin or user)
+        $creatorType = $this->getCreatorType();
+
+        $preventiveDates = PreventiveService::query();
+
+        $dates = $preventiveDates->where('creator_id', $currentUser->id)
+        ->where('creator_type', $creatorType)
+        ->latest()
+        ->pluck('date_time') 
+        ->map(function ($date) {
+            return Carbon::parse($date)->format('Y-m-d'); 
+        })
+        ->toArray();
+    
+
+        return response()->json($dates, Response::HTTP_OK);
+
+    }
     public function getCompanies(Request $request)
     {
         // Get the authenticated user
@@ -47,9 +168,7 @@ class DynamicDataController extends Controller
         }
     
         // Build the query for the Company model
-        $companyQuery = Company::query()
-            ->where('creator_id', $currentUser->id)
-            ->where('creator_type', $creatorType);
+        $companyQuery = Company::query();
     
         // Apply search filter if provided
         if ($search) {
@@ -749,17 +868,18 @@ class DynamicDataController extends Controller
 
         // Apply search filter if provided
         if ($search) {
-            $problemNotes = $query->where('name', 'like', '%' . $search . '%'); // Assuming 'name' is a column in the Action model
+          $query->where('name', 'like', '%' . $search . '%'); // Assuming 'name' is a column in the Action model
         }
         // If IDs are provided, filter by IDs
         if ($ids) {
-            $problemNotes = $query->whereIn('id', explode(',', $ids));
+            $query->whereIn('id', explode(',', $ids));
         }
         // Limit the results and get the data
-        $problemNotes = $problemNotes->with(["company:id,name"])->limit($limit)->get();
+        $problemNotes = $query->where('creator_id', $currentUser->id)
+        ->with(["company:id,name"])->limit($limit)->get();
 
         // Return the data as JSON
-        return response()->json($problemNotes);
+        return response()->json($problemNotes,Response::HTTP_OK);
     }
     public function get_causes(Request $request, $ids = "")
     {
@@ -802,37 +922,34 @@ class DynamicDataController extends Controller
 
     }
 
-    public function fishboneDigrame(Request $request,   $ids = "")
+    public function fishboneDigrame(Request $request,$ids = "")
     {
-        
         $currentUser = $this->getAuthenticatedUser();
 
         if (!$currentUser) {
-          return response()->json(["message"=> "Unauthenticated"],0);
-        }
-        $creatorType = $this->getCreatorType(); 
-
-
-        $search = $request->query('search', ''); // Search parameter
-        $limit = $request->query('limit', 5);    // Default limit of 5
-        $ids = $request->query('ids', '');  
-
-       
-
-        $problemNotes = ProblemNote::query();
-
-        if ($search) {
-            $problemNotes = $problemNotes->where('name', 'like', '%' . $search . '%'); // Assuming 'name' is a column in the ProblemNote model
-            
+            return response()->json(["message" => "Unauthenticated"], Response::HTTP_UNAUTHORIZED); // Corrected status code
         }
 
-        $problemNotes = $problemNotes->where("creator_id", $currentUser->id)
-        ->where("creator_type", $creatorType)
-        ->with(["fishbone_categories.causes"])
-        ->limit($limit)
-        ->get();
+        $creatorType = $this->getCreatorType();
 
-        return response()->json($problemNotes,Response::HTTP_OK);
+        $limit = $request->query('limit', 5); // Default limit of 5
+        $problem = $request->query('problem', ''); // Optional problem parameter
+
+        $query = ProblemNote::query();
+
+        $query->where("creator_id", $currentUser->id)
+            ->where("creator_type", $creatorType);
+
+        // If a problem is selected, filter the results by that problem ID
+        if ($problem) {
+            $query->where('id', $problem); // Filter by problem id if provided
+        }
+
+        $problemNotes = $query->with(["fishbone_categories.causes"]) // Eager load the fishbone categories with causes
+            ->limit($limit)
+            ->get();
+
+        return response()->json($problemNotes, Response::HTTP_OK);
     }
 
     public function getFishboneCategory(Request $request, $ids = '')

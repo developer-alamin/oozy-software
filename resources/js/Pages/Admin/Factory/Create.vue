@@ -172,7 +172,7 @@
 
             <v-btn
               type="submit"
-              color="primary"
+              class="primary-color"
               :disabled="!valid || loading"
               :loading="loading"
             >
@@ -227,7 +227,6 @@ export default {
   methods: {
     formatCompany(company) {
       if (company) {
-        console.log(company)
           if (typeof company === "number") {
             // Use strict equality (===) and ensure proper assignment in the find function
             company = this.companies.find((item) => item.id === company);
@@ -235,7 +234,7 @@ export default {
 
           // Safely return the company name or a fallback if the name is missing
           return company && company.name ? company.name : "No Company Name";
-        }
+      }
 
         // Fallback if no company data is provided
         return "No Company Data";

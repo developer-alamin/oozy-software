@@ -59,7 +59,7 @@
             </v-btn>
             <v-btn
               type="submit"
-              color="primary"
+              class="primary-color"
               :disabled="!valid || loading"
               :loading="loading"
             >
@@ -139,7 +139,7 @@ export default {
       
       try {
         const response = await this.$axios.get("get_problemnotes", {
-          params: { search: search , limit: this.limit },
+          params: { search: search, limit: this.limit },
         });
         this.problemNotes = response.data || [];
 
@@ -152,10 +152,15 @@ export default {
     // Format Problem Note display in Autocomplete
     formatProblemNote(problemNote) {
       if (problemNote) {
-        const companyName = problemNote.company?.name || "No Company Name";
-        return `${problemNote.name || "No Name"} -- ${companyName}`;
+        if (typeof problemNote === "number") {
+            // Use strict equality (===) and ensure proper assignment in the find function
+            problemNote = this.problemNotes.find((item) => item.id === problemNote);
+          }
+        const companyName = problemNote?.company?.name || "No Company Name";
+          
+        return `${problemNote?.name || "No Name"} -- ${companyName}`;
       }
-      return "No Problem Note Data";
+      return "No Fishbone Data";
     },
 
     // Reset the form to default state

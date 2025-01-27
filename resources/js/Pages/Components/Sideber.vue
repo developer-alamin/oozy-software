@@ -4,7 +4,11 @@
     <ul class="sidebar-nav" id="sidebar-nav">
       <!-- Start Dashboard Nav -->
       <li class="nav-item">
-        <router-link class="nav-link" :to="{ name: 'AdminDashboard' }">
+        <router-link 
+        class="nav-link" 
+        :to="{ name: 'AdminDashboard' }"
+        :class="{active:isActiveAdminDashboard}"
+        >
           <i class="bi bi-house-door"></i>
           <span>Dashboard</span>
         </router-link>
@@ -42,8 +46,8 @@
        <!-- Start Machine Requisition Nav -->
       <li class="nav-item">
         <a
+         class="nav-link collapsed"
          :class="{ show: isActiveMachineRequisionRoute }"
-          class="nav-link collapsed"
           data-bs-target="#machine-requisition"
           data-bs-toggle="collapse"
           href="#"
@@ -55,6 +59,7 @@
         <ul
           id="machine-requisition"
           class="nav-content collapse"
+          :class="{ show: isActiveMachineRequisionRoute }"
           data-bs-parent="#sidebar-nav"
         >
           <li>
@@ -160,6 +165,9 @@
         </ul>
       </li>
       <!-- End Machines Nav -->
+
+
+      
       <!-- Start Organization Nav -->
       <li class="nav-item">
         <a
@@ -234,6 +242,7 @@
           data-bs-target="#tables-nav-parse"
           data-bs-toggle="collapse"
           href="#"
+          :class="{show:isActiveSparesPartsRoute}"
         >
           <i class="bi bi-funnel"></i><span>Spares parts</span
           ><i class="bi bi-chevron-down ms-auto"></i>
@@ -242,27 +251,22 @@
           id="tables-nav-parse"
           class="nav-content collapse"
           data-bs-parent="#sidebar-nav"
+          :class="{show:isActiveSparesPartsRoute}"
         >
-        
           <li>
             <router-link
               :to="{ name: 'ParseCreate' }"
               active-class="active"
-              :class="{
-                //active: isParseRouteShow?.isParseCreateActive,
-              }"
+              :class="{active:isActiveParseCreate}"
             >
               <i class="bi bi-circle"></i><span>Create Parts</span>
             </router-link>
           </li>
-
           <li>
             <router-link
               :to="{ name: 'ParseIndex' }"
               active-class="active"
-              :class="{
-                //active: isParseRouteShow.isParseIndexActive,
-              }"
+              :class="{active:isActiveParseIndex}"
             >
               <i class="bi bi-circle"></i><span>All Parts</span>
             </router-link>
@@ -271,17 +275,16 @@
             <router-link
               :to="{ name: 'CategoryIndex' }"
               active-class="active"
-              :class="{ active: isCategoryRoute }"
+              :class="{ active: isActiveCategoryRoute }"
             >
               <i class="bi bi-circle"></i><span>Parse Category</span>
             </router-link>
           </li>
-
           <li>
             <router-link
               :to="{ name: 'ParseUnitIndex' }"
               active-class="active"
-              :class="{ active: isParseUnitRoute }"
+              :class="{ active: isActiveParseUnitRoute }"
             >
               <i class="bi bi-circle"></i><span>Parse Unit</span>
             </router-link>
@@ -711,6 +714,7 @@ const isMechineRouteShow = computed(() => {
   return [
     "MechineIndex",
     "MechineCreate",
+    "MechineEdit",
     "MechineTrash",
     "MachineMovement",
     "MachineLocation",
@@ -720,7 +724,51 @@ const isMechineRouteShow = computed(() => {
   ].includes(route.name);
 });
 
+// Check if the current route is part of the Mechine-related routes
+const isActiveMachineRequisionRoute = computed(() => {
+  return [
+    "MachineRequisitionIndex",
+    "MachineRequisitionCelender",
+    "MachineRequisitionChange"
+  ].includes(route.name);
+});
 
+// Check if the current route is part of the Mechine-related routes
+const isActiveSparesPartsRoute = computed(() => {
+  return [
+    "ParseCreate",
+    "ParseIndex",
+    "ParseEdit",
+    "ParseTrash",
+    "CategoryIndex",
+    "CategoryCreate",
+    "CategoryEdit",
+    "CategoryTrash",
+    "ParseUnitIndex",
+    "ParseUnitCreate",
+    "ParseUnitEdit",
+    "ParseUnitTrash"
+  ].includes(route.name);
+});
+
+const isActiveParseCreate = computed(()=>{
+  return [
+    "ParseCreate"
+  ].includes(route.name);
+});
+const isActiveParseIndex = computed(()=>{
+  return [
+    "ParseIndex",
+    "ParseEdit",
+    "ParseTrash",
+  ].includes(route.name);
+});
+
+const isActiveAdminDashboard = computed(()=>{
+  return [
+    "AdminDashboard",
+  ].includes(route.name);
+});
 
 // Check if the current route is part of the Fishbone-related routes
 
@@ -748,14 +796,6 @@ const isActiveMachineChange = computed(() => {
 const isActiveMachineIndex = computed(() => {
   return [
     "MachineRequisitionIndex",
-  ].includes(route.name);
-});
-// Check if the current route is part of the Mechine-related routes
-const isActiveMachineRequisionRoute = computed(() => {
-  return [
-    "MachineRequisitionIndex",
-    "MachineRequisitionCelender",
-    "MachineRequisitionChange"
   ].includes(route.name);
 });
 
@@ -1099,10 +1139,3 @@ const isParseUnitRoute = computed(() =>
 );
 </script>
 
-<style scoped>
-/* Styles for when the router link is active */
-.active {
-  font-weight: bold;
-  color: #007bff; /* Blue color to indicate active link */
-}
-</style>

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
+use Illuminate\Support\Facades\DB;
 class BreakdownService extends Model
 {
     use HasFactory,SoftDeletes;
@@ -38,6 +38,13 @@ class BreakdownService extends Model
     {
         return $this->belongsTo(BreakdownServiceDetail::class, 'breakdown_service_id');
     }
-    
-
+   // BreakdownService মডেলে
+   public function supervisorProblemNotes()
+   {
+       // supervisor_problem_note_id এর স্ট্রিং থেকে কোটেশন চিহ্ন সরিয়ে, কমা দিয়ে আলাদা করা আইডিগুলো বের করা
+       $noteIds = explode(',', str_replace('"', '', $this->supervisor_problem_note_id));
+   
+       // তারপর সেগুলোর মাধ্যমে 'BreakDownProblemNote' মডেল থেকে সম্পর্কিত রেকর্ডগুলো ফিরিয়ে আনব
+       return BreakDownProblemNote::whereIn('id', $noteIds)->get();
+   }
 }

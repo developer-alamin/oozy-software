@@ -15,7 +15,7 @@
 			></v-date-input>
 			<v-btn
             @click="AllBreakdownService"
-            color="primary"
+            class="primary-color"
             icon
             style="width: 40px; height: 40px"
           >

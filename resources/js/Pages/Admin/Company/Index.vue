@@ -20,7 +20,7 @@
                     <v-btn
                         v-if="isAuthorized"
                         @click="createUser"
-                        color="primary"
+                        class="primary-color"
                         icon
                         style="width: 40px; height: 40px"
                     >

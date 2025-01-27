@@ -4,27 +4,60 @@
       <v-card>
         <v-card-title class="pt-5">
           <v-row class="align-items-center">
-            <v-col cols="3">
-              <span>Line Wise Machine Change</span>
-            </v-col>
-            <v-col cols="3" class="text-center ms-auto">
+            <v-col cols="3" class="">
               <v-autocomplete
-                  v-model="line"
-                  :items="lines"
+                  v-model="factory_id"
+                  :items="factories"
                   item-value="id"
-                  :item-title="formatLine"
+                  :item-title="formatFactory"
                   outlined
                   clearable
                   density="comfortable"
-                  @update:model-value="getLine"
-                  @update:search="fetchLines"
+                  @update:model-value="onChangeFactory"
+                  @update:search="fetchFactories"
                 >
                 <template v-slot:label>
-                  Select Line <span style="color: red">*</span>
+                  Select Factory 
                 </template>
               </v-autocomplete>
             </v-col>
             <v-col cols="3">
+              <v-autocomplete
+                v-model="floor_id"
+                :items="floors"
+                item-value="id"
+                item-title="name"
+                outlined
+                clearable
+                density="comfortable"
+                @update:search="fetchFloors"
+                @update:model-value="onChangeFloor"
+                :disabled="!factory_id"
+              >
+              <template v-slot:label>
+                Select Floor
+              </template>
+            </v-autocomplete>
+            </v-col>
+            <v-col cols="2">
+            <v-autocomplete
+              v-model="unit_id"
+              :items="units"
+              item-value="id"
+              item-title="name"
+              outlined
+              clearable
+              density="comfortable"
+              @update:model-value="onChangeUnit"
+              @update:search="fetchUnits"
+              :disabled="!floor_id"
+            >
+            <template v-slot:label>
+              Select Unit 
+            </template>
+          </v-autocomplete>
+          </v-col>
+            <v-col cols="2">
             <v-autocomplete
                v-model="selectedMonth"
                :items="monthItems"
@@ -104,8 +137,15 @@
           { title: "Type", value: "name", sortable: true },
           { title: "Total", value: "mc_sum", sortable: true },
         ],
+        units:[],
+        unit_id:null,
+        floors: [],
+        floor_id: null,
+        factory_id:null,
+        factories: [],
         totalMcSum: 0,
         serverItems: [],
+
         lines: [],
         loading: true,
         totalItems: 0,
@@ -120,41 +160,27 @@
           this.years.push(year);
         }
       },
-      async loadItems({selectLine,month,year  }) {
+      async loadItems({month,year,factory,floor,unit  }) {
           this.loading = true;
           try {
               const response = await this.$axios.get("/machine-requisition/machine-change", {
                   params: {
-                      line: selectLine || '',
-                      month:month || this.selectedMonth,
-                      year:year || this.selectedYear
+                    month:month || this.selectedMonth,
+                    year:year || this.selectedYear,
+                    factory:factory || this.factory_id,
+                    floor:floor || this.floor_id,
+                    unit:unit || this.unit_id
                   }
               });
+
+              //console.log(response.data);
+              
               this.RowData = response.data;
           } catch (error) {
               console.log(error);
               toast.error("Failed to load items. Please try again.");
           } finally {
               this.loading = false;
-          }
-      },
-
-      async getLine() {
-          if (!this.line) {
-            this.loadItems({ page: 1, itemsPerPage: this.itemsPerPage, sortBy: [] });
-          }
-          try {
-              const selectLine = this.line;
-            
-              const page = 1;  // Set the default page or get it from somewhere
-              const itemsPerPage = this.itemsPerPage;
-              const sortBy = [];  // Set the default sortBy or pass it from elsewhere
-
-              // Call loadItems with the correct arguments
-              await this.loadItems({ page, itemsPerPage, sortBy, selectLine });
-
-          } catch (error) {
-              console.log(error);
           }
       },
       async getMonth(){
@@ -179,23 +205,73 @@
           console.error("Error loading items:", error);
         }
       },
-      async fetchLines(search) {
+      async onChangeUnit(){
+        if (!this.unit_id) {
+            return ;
+        }
+        this.loadItems({ unit:this.unit_id });
+      },
+      async onChangeFloor(){
+        if (!this.floor_id) return;
         try {
-          const response = await this.$axios.get("/get-lines", {
-            params: { search:this.search, limit: 10 },
-          });          
-         this.lines = response.data || [];
+          this.loadItems({ floor:this.floor_id });
+          const response = await this.$axios.get("/FloorByUnits", {
+            params: {
+              id: this.floor_id,
+            },
+          });
+          this.units = response.data;
         } catch (error) {
-          toast.error("Failed to fetch lines.");
+            console.log(error);
         }
       },
-      formatLine(line) {
-        if (!line) return;
-        const lineName = line.name || "No Line Name";
-        const companyName = line.company?.name || "No Company";
-        this.line = line.id;
-        return `${lineName} -- ${companyName}`;
+      async onChangeFactory(newValue) {
+        if (!this.factory_id) {
+          return;
+        }
+        try {
+          this.loadItems({ factory:this.factory_id });
+
+          const response = await this.$axios.get("/factoryByFloors", {
+            params: {
+              id: this.factory_id,
+            },
+          });
+          this.floors = response.data;
+          console.log(this.floors);
+          
+        } catch (error) {
+          // Log the error or handle it appropriately
+          console.error("Error fetching factory by floors:", error);
+        }
       },
+      async fetchFactories(search) {
+        try {
+          const response = await this.$axios.get(`/get_factories`, {
+            params: {
+              search: search,
+              limit: this.limit,
+            },
+          });
+          this.factories = response.data;
+        } catch (error) {
+          console.error("Error fetching factories:", error);
+        }
+      },
+      formatFactory(factory) {
+        if (factory) {
+            if (typeof factory === "number") {
+              factory = this.factories.find((item) => item.id === factory);
+            }
+            if (factory) {
+              const factoryName = factory.name || "No Factory Name";
+              const userName = factory.company?.name || "No Company";
+              return `${factoryName} -- ${userName}`;
+            }
+          }
+          return "No Factory Data";
+      },
+  
     },
     created() {
       this.loadItems({ page: 1, itemsPerPage: this.itemsPerPage, sortBy: [] });

@@ -286,7 +286,7 @@
                             ></v-text-field>
                         </v-col>
                         <v-col class="text-right">
-                            <v-btn color="primary" @click="addParse"
+                            <v-btn class="primary-color" @click="addParse"
                                 >Add Parse</v-btn
                             >
                         </v-col>
@@ -329,7 +329,7 @@
 
                         <v-btn
                             type="submit"
-                            color="primary"
+                           class="primary-color"
                             :disabled="!valid || loading"
                             :loading="loading"
                         >

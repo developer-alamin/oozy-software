@@ -52,7 +52,10 @@ use App\Models\MechineAssing;
 
 
 Route::get("fishbone-digrame",[DynamicDataController::class,"fishboneDigrame"]);
+Route::get("get_problem_list",[DynamicDataController::class,"get_problem_list"]);
 Route::get('problemby/{id}/fishbone-category', [DynamicDataController::class,"problemByFishboneCategory"]);
+
+
 
 //Machine Requisition Group Controller
 
@@ -468,6 +471,7 @@ Route::controller(MachineTagController::class)
 Route::resource('machine-tag', MachineTagController::class);
 
 // Group Rents Controller End form here
+Route::get("/get_preventivedates",[DynamicDataController::class,"get_preventivedates"]);
 Route::get('/get_units', [DynamicDataController::class, 'getUnits']);
 Route::get('/get_floors', [DynamicDataController::class, 'getFloors']);
 Route::get('/get_factories', [DynamicDataController::class, 'getFactories']);
@@ -492,6 +496,8 @@ Route::get("/get_problemnotes",[DynamicDataController::class,"get_problemNotes"]
 Route::get("/get_causes",[DynamicDataController::class,"get_causes"])->name("get_causes");
 Route::get("/get-fishbone-category",[DynamicDataController::class,"getFishboneCategory"]);
 Route::get('/get-lines',[DynamicDataController::class,'get_lines']);
+Route::get("/factoryByFloors",[DynamicDataController::class,"factoryByFloors"]);
+Route::get('/FloorByUnits',[DynamicDataController::class,'FloorByUnits']);
 // Admin Auth Routes
 Route::prefix('admin')->group(function () {
   // admin user
@@ -548,7 +554,7 @@ Route::controller(MobileApiController::class)
   // Technician Flow Api
   Route::prefix("technician")->group(function(){
     Route::get("/all-list-show", "technicianbreakdownservicelistshow");
-    Route::get("/machine-code-search","technicianmachinecodesearch");
+    Route::post("/machine-code-search","technicianmachinecodesearch");
     Route::post("{uuid}/assigntotechnician","save_assign_to_technician");
     Route::put("{details_id}/acknowledge","TechnicianAcknowedge");
     Route::put("{details_id}/service-start","TechnicianStartDetails");
