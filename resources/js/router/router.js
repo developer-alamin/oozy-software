@@ -43,6 +43,14 @@ const routes = [
         },
       },
       {
+        path: "test",
+        name: "test",
+        component: adminComponents.Test,
+        meta: {
+          title: "Admin test page",
+        },
+      },
+      {
         path: "license",
         name: "AdminLicenseList",
         component: () => import("@/Pages/Admin/License/index.vue"),

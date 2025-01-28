@@ -54,16 +54,12 @@ class PreventiveServiceController extends Controller
         } else {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
-        // Apply search if the search term is not empty
-
-        // if (!empty($search)) {
-        //     $PreventiveServiceQuery->where('name', 'LIKE', '%' . $search . '%');
-        // }
+       
 
         if ($dateRange) {
             // Parse the date to match the format 'YYYY-MM-DD'
             $date = Carbon::createFromFormat('Y-m-d', $dateRange)->startOfDay(); // Start of the day (00:00:00)
-        
+
             // Filter the query for records where the date portion of `date_time` matches the given date
             $PreventiveServiceQuery = $PreventiveServiceQuery->whereDate('date_time', '=', $date);
         }

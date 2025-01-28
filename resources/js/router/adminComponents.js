@@ -206,4 +206,6 @@ export { default as MachineStatusTrash } from "../Pages/Admin/Mechine/MachineSta
 export { default as MachineRequisitionIndex } from "../Pages/Admin/MechineRequisition/Index.vue";
 export { default as MachineRequisitionCelender } from "../Pages/Admin/MechineRequisition/Calender.vue";
 export { default as MachineRequisitionChange } from "../Pages/Admin/MechineRequisition/Change.vue";
+export { default as Test } from "../Pages/Admin/Test/Test.vue";
+
 

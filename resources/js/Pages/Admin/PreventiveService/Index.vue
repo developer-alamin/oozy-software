@@ -40,7 +40,68 @@
       </v-row>
       <v-row>
         <v-col cols="12">
-          <div ref="datepicker"></div>
+            <div class="calendar-header">
+              <v-btn
+               @click="changeMonth(-1)"
+                class="primary-color"
+                icon
+                style="width: 40px; height: 40px"
+              >
+                <v-tooltip location="top" activator="parent">
+                  <template v-slot:activator="{ props }">
+                    <v-icon v-bind="props" style="font-size: 20px">mdi-arrow-left</v-icon>
+                  </template>
+                  <span>Previous Month And Year</span>
+                </v-tooltip>
+              </v-btn>
+              <h3>{{ currentMonthName }} {{ currentYear }}</h3>
+              <v-btn
+                @click="changeMonth(1)"
+                class="primary-color"
+                icon
+                style="width: 40px; height: 40px"
+              >
+                <v-tooltip location="top" activator="parent">
+                  <template v-slot:activator="{ props }">
+                    <v-icon v-bind="props" style="font-size: 20px">mdi-arrow-right</v-icon>
+                  </template>
+                  <span>Next Month And Year</span>
+                </v-tooltip>
+              </v-btn>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Sun</th>
+                  <th>Mon</th>
+                  <th>Tue</th>
+                  <th>Wed</th>
+                  <th>Thu</th>
+                  <th>Fri</th>
+                  <th>Sat</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(week, weekIndex) in calendarDays" :key="weekIndex">
+                  <td v-for="(day, dayIndex) in week" :key="dayIndex"
+                      :class="['date-cell', { 
+                        'empty': !day, 
+                        'selected': day && isSelected(day),
+                        'active': day && isActiveDate(day),
+                        'disabled': day && !isPreselectedDate(day)  // Disabled if not preselected
+                      }]"
+                      @click="selectDate(day)"
+                      :disabled="!isPreselectedDate(day)">  <!-- Disabled click if not preselected -->
+                    <span v-if="day">{{ day }}</span>
+                    <div v-if="day && getEventCountForDay(day) > 0" class="value-badge-count">
+                      {{ getEventCountForDay(day) }}
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div id="selectedDate">{{ selectedDateMessage }}</div>
+         
         </v-col>
       </v-row>
     </v-card-title>
@@ -49,6 +110,7 @@
       v-model:items-per-page="itemsPerPage"
       :headers="headers"
       :items="serverItems"
+      :dateRange="dateRange"
       :items-length="totalItems"
       :loading="loading"
       item-value="created_at"
@@ -121,7 +183,10 @@ export default {
   components: { ConfirmDialog, ConfirmDialogAcknowledged },
   data() {
     return {
-      selectedDates: [], //this.filterValidDates(["2025-01-22", "2025-01-26", "2025-01-27",new Date(2025, 8, 9)]),
+      currentDate: new Date(),  // Initial current date
+      preselectedData: '',
+      selectedDate: null,
+      selectedDates: [], 
       clickedDate: null,
       dialogName: "Are you sure you want to delete this Service?",
       dialogNameAcknowledged: "Are you sure you want to Acknowledge?",
@@ -145,81 +210,92 @@ export default {
       arrayEvents: [],
     };
   },
-  mounted() {
-    this.fatchDate();
+  computed: {
+      currentYear() {
+        return this.currentDate.getFullYear();  // Current year
+      },
+      currentMonth() {
+        return this.currentDate.getMonth();  // Current month (0-11)
+      },
+      currentMonthName() {
+        return this.currentDate.toLocaleString('default', { month: 'long' });  // Full month name (e.g., "January")
+      },
+      calendarDays() {
+        const startDay = new Date(this.currentYear, this.currentMonth, 1).getDay(); // Start day of the month (0-6)
+        const daysInMonth = new Date(this.currentYear, this.currentMonth + 1, 0).getDate();  // Total days in the month
+        const weeks = [];
+        let week = [];
+        let dayCount = 1;
+  
+        // Fill the calendar with days of the month, starting from the correct start day
+        for (let i = 0; i < 6; i++) {
+          week = [];
+          for (let j = 0; j < 7; j++) {
+            if (i === 0 && j < startDay || dayCount > daysInMonth) {
+              week.push(null);  // Empty cell for days before the start of the month or after the end
+            } else {
+              week.push(dayCount);  // Add the actual day number
+              dayCount++;
+            }
+          }
+          weeks.push(week);  // Add the filled week to the calendar
+          if (dayCount > daysInMonth) break;
+        }
+        return weeks;
+      },
+      selectedDateMessage() {
+        if (!this.selectedDate) {
+          return;
+        }
+        const formattedDate = this.formatDate(this.selectedDate);
+      }
   },
   methods: {
-    initFlatpickr() {
-      flatpickr(this.$refs.datepicker, {
-        inline: true,
-        mode: "multiple",
-        enable: this.selectedDates, // Use the updated selectedDates
-        onDayCreate: (dObj, dStr, fp, dayElem) => {
-          const date = [
-            dayElem.dateObj.getFullYear(),
-            String(dayElem.dateObj.getMonth() + 1).padStart(2, "0"),
-            String(dayElem.dateObj.getDate()).padStart(2, "0"),
-          ].join("-");
-
-          if (this.selectedDates.includes(date)) {
-            dayElem.classList.add("pre-selected");
-            dayElem.addEventListener("click", () => {
-              this.handleDateClick(date);
-            });
-          } else {
-            dayElem.classList.add("disabled");
-            dayElem.style.pointerEvents = "none";
-          }
-        },
-      });
+    changeMonth(direction) {
+      this.currentDate = new Date(this.currentYear, this.currentMonth + direction, 1); 
     },
-    filterValidDates(dates) {
-      const validDates = [];
-      dates.forEach(dateStr => {
-        const date = this.parseDate(dateStr); 
-        if (date) {
-          validDates.push(dateStr); 
-        }
-      });
-      return validDates;
+    formatDate(day) {
+      const date = new Date(this.currentYear, this.currentMonth, day);
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     },
-
-    parseDate(dateStr) {
-      const date = new Date(dateStr);
-      date.setHours(0, 0, 0, 0);
-      return date;
+    selectDate(day) {
+      if (!day || !this.isPreselectedDate(day)) return;  
+      this.selectedDate = day; 
+      this.dateRange = this.formatDate(this.selectedDate);   
     },
-
-    handleDateClick(date) {
-      this.clickedDate = date;
-      // Make sure the necessary parameters are passed to loadItems
-      this.loadItems({
-        page: 1,
-        itemsPerPage: this.itemsPerPage, 
-        sortBy: [] ,
-        calenderDate : this.clickedDate
-      });
-
+    isSelected(day) {
+      return this.selectedDate === day;  // Check if the day is selected
+    },
+    isActiveDate(day) {
+      const formattedDate = this.formatDate(day);
+      return this.preselectedData[formattedDate] !== undefined;  // Check if the date is in preselectedData
+    },
+    isPreselectedDate(day) {
+      const formattedDate = this.formatDate(day);
+      return this.preselectedData[formattedDate] !== undefined;  // Check if the date is preselected
+    },
+    getEventCountForDay(day) {
+      const formattedDate = this.formatDate(day);
+      return this.preselectedData[formattedDate] || 0;
     },
     async fatchDate(){
       try {
         const response = await this.$axios.get("/get_preventivedates");
-        this.selectedDates = this.filterValidDates(response.data);
-        console.log( this.selectedDates);
+        this.preselectedData = response.data;
       } catch (error) {
         console.error("Error fetching trashed count:", error);
       }
     },
-
-    async loadItems({ page, itemsPerPage, sortBy,calenderDate }) {
+    async loadItems({ page, itemsPerPage, sortBy }) {
       this.loading = true;
       const sortOrder = sortBy.length ? sortBy[0].order : "desc";
       const sortKey = sortBy.length ? sortBy[0].key : "created_at";
       try {
         const response = await this.$axios.get("/preventive-service", {
-          params: { page, itemsPerPage, sortBy: sortKey, sortOrder, dateRange: calenderDate || '' },
+          params: { page, itemsPerPage, sortBy: sortKey, sortOrder, dateRange: this.dateRange || '' },
         });
-
+        console.log(response.data);
+        
         this.serverItems = response.data.items || [];
         this.totalItems = response.data.total || 0;
         this.fetchTrashedPreventiveServiceCount();
@@ -296,13 +372,9 @@ export default {
       },
       deep: true,
     },
-    selectedDates(newDates) {
-      if (newDates.length) {
-        this.initFlatpickr(); // Reinitialize flatpickr when selectedDates is updated
-      }
-    },
   },
   created() {
+    this.fatchDate();
     this.loadItems({ page: 1, itemsPerPage: this.itemsPerPage, sortBy: [] });
     this.fetchTrashedPreventiveServiceCount();
   },
@@ -310,5 +382,93 @@ export default {
 </script>
 
 <style scoped>
-/* Add custom styles here if needed */
-</style>
+
+  .calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  .calendar-header button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+  }
+  .calendar-header h3 {
+    margin: 0;
+    font-size: 20px;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  th, td {
+    border: 1px solid #ddd;
+    padding: 15px;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+  }
+  th {
+    background-color: #f4f4f4;
+  }
+  td {
+    height: 80px;
+  }
+  td.selected {
+    background-color: #4caf50;
+    color: white;
+    font-weight: bold;
+  }
+  td.active {
+    background-color: #ff9800; /* Active date color */
+    color: white;
+    font-weight: bold;
+  }
+  td:hover {
+    background-color: #e0f7fa;
+  }
+  td.disabled {
+    background-color: #f9f9f9;
+    cursor: not-allowed;
+  }
+  .empty {
+    background-color: #f9f9f9;
+    cursor: default;
+  }
+  .value-badges {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+  }
+  .value-badge {
+    font-size: 10px;
+    background-color: #ff9800;
+    color: white;
+    padding: 2px 5px;
+    border-radius: 5px;
+    white-space: nowrap;
+  }
+  #selectedDate {
+    margin-top: 20px;
+    font-size: 18px;
+    color: #333;
+  }
+  .value-badge-count {
+    font-size: 14px;
+    background: #7e8bff;
+    border-radius: 6px;
+    font-weight: 400;
+}
+  </style>
+  

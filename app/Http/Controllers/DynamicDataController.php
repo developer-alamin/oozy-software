@@ -31,7 +31,7 @@ class DynamicDataController extends Controller
 
 
 
-public function FloorByUnits(Request $request){
+    public function FloorByUnits(Request $request){
         // Get the authenticated user
         $currentUser = $this->getAuthenticatedUser();
         if (!$currentUser) {
@@ -135,16 +135,20 @@ public function FloorByUnits(Request $request){
         $preventiveDates = PreventiveService::query();
 
         $dates = $preventiveDates->where('creator_id', $currentUser->id)
-        ->where('creator_type', $creatorType)
-        ->latest()
-        ->pluck('date_time') 
-        ->map(function ($date) {
-            return Carbon::parse($date)->format('Y-m-d'); 
-        })
-        ->toArray();
+            ->where('creator_type', $creatorType)
+            ->latest()
+            ->get();
+
+        $groupedDates = $dates->groupBy(function ($date) {
+            return Carbon::parse($date->date_time)->format('Y-m-d');
+        })->map(function ($events, $date) {
+            return $events->count();  
+        });
+
+        $formattedDates = $groupedDates->toArray();
     
 
-        return response()->json($dates, Response::HTTP_OK);
+        return response()->json($formattedDates, Response::HTTP_OK);
 
     }
     public function getCompanies(Request $request)
